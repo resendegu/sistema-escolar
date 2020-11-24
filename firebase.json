@@ -1,5 +1,6 @@
 {
   "hosting": {
+    "site": "sistemaescolar",
     "public": "public",
     "ignore": [
       "firebase.json",
