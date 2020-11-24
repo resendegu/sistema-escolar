@@ -1,0 +1,325 @@
+/*AST DIALOG*/
+#ast-dialog-bg {
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	background: rgba(0, 0, 0, 0.4);
+	z-index: 2050;
+	opacity: 0;
+	-webkit-transition: all 0.2s;
+	-moz-transition: all 0.2s;
+	transition: all 0.2s;
+}
+
+#ast-dialog-bg.show {
+	opacity: 1;
+}
+
+#ast-dialog-el {
+	position: absolute;
+	top: calc(50% - 150px);
+	left: 0;
+	right: 0;
+	margin: 0 auto;
+	display: block;
+	background: white;
+	width: 350px;
+	-webkit-transform: scale(1.4);
+	-moz-transform: scale(1.4);
+	-ms-transform: scale(1.4);
+	transform: scale(1.4);
+	-webkit-transition: all 0.2s;
+	-moz-transition: all 0.2s;
+	transition: all 0.2s;
+}
+
+#ast-dialog-el #ast-dialog-body {
+	min-height: 120px;
+	margin-bottom: 50px;
+}
+
+#ast-dialog-el.show {
+	-webkit-transform: scale(1);
+	-moz-transform: scale(1);
+	-ms-transform: scale(1);
+	transform: scale(1);
+}
+
+#ast-dialog-header, #ast-dialog-body {
+	padding: 6px 8px;
+	text-align: center;
+}
+
+#ast-dialog-header h3 {
+	margin: 5px auto;
+	text-align: center;
+}
+
+#ast-dialog-body p {
+	margin: 0 auto 10px;
+	text-align: center;
+}
+
+#ast-dialog-body #ast-dialog-icon img {
+	margin: 8px auto;
+	text-align: center;
+}
+
+#ast-dialog-body #ast-dialog-icon i {
+	margin: 8px auto 10px;
+	text-align: center;
+}
+
+#ast-dialog-footer {
+	position: absolute;
+	width: 100%;
+	bottom: 0;
+	padding: 10px 8px;
+	text-align: right;
+	border-top: thin #ccc solid; 
+	box-sizing: border-box;
+}
+
+#ast-dialog-footer button {
+	position: relative;
+	padding: 6px 8px;
+	background: transparent;
+	border: thin solid grey;
+	border-radius: 4px;
+	margin: 0px 5px;
+	cursor: pointer;
+	font-weight: bold;
+}
+
+#ast-dialog-footer button:after {
+	content: "";
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	background-color: #FFF;
+	opacity: 0;	
+	border-radius: 4px;
+	-webkit-transition: opacity 0.1s;
+	-moz-transition: opacity 0.1s;
+	transition: opacity 0.1s;
+}
+
+#ast-dialog-footer button:hover:after {
+	opacity: 0.2;
+}
+
+body.ast-dialog {
+	overflow: hidden;
+}
+
+/*AST TOAST*/
+#ast-toast-el {
+	position: fixed;
+	margin: 0 auto;
+	width: 350px;
+	min-height: 18px;
+	border-radius: 10px;
+	background: rgba(0, 0, 0, 0.9);
+	text-align: center;
+	padding: 8px;
+
+	opacity: 0;
+	-webkit-transition: opacity 0.2s;
+	-moz-transition: opacity 0.2s;
+	transition: opacity 0.2s;
+}
+
+#ast-toast-el p {
+	margin: 0;
+}
+
+/*AST SNACKBAR*/
+#ast-snack-el {
+	position: fixed;
+	margin: 0 auto;
+	right: 0;
+	left: 0;
+	background: rgba(0, 0, 0, 1);
+	text-align: center;
+	padding: 8px;
+
+	-webkit-transition: all 0.2s;
+	-moz-transition: all 0.2s;
+	transition: all 0.2s;
+}
+
+#ast-snack-el.show-top {
+	top: 0px !important;
+}
+
+#ast-snack-el.close-top {
+	top: -100px !important;
+}
+
+#ast-snack-el.show-bottom {
+	bottom: 0px !important;
+}
+
+#ast-snack-el.close-bottom {
+	bottom: -100px !important;
+}
+
+#ast-snack-el p {
+	margin: 0;
+}
+
+#ast-snack-el #ast-snack-button {
+	display: inline-block;
+	padding-left: 10px;
+	text-transform: uppercase;
+	font-weight: bold;
+	border-left: thin solid grey;
+	margin-left: 10px;
+	cursor: pointer;
+}
+
+/*AST NOTIFY*/
+#ast-notify-container {
+	width: 360px;
+	position: fixed;
+	bottom: 10px;
+}
+
+.ast-notify-wrapper {
+	position: relative;
+	margin-bottom: 10px;
+}
+
+.ast-notify-el {
+	box-sizing: border-box;
+	display: block;
+	position: absolute;
+	min-width: 250px;
+	max-width: 350px;
+	background: rgba(0, 0, 0, 1);
+	padding: 8px;
+	transform-origin: center;
+	-webkit-transform-origin: center;
+	-ms-transform-origin: center;
+	-moz-transform-origin: center;
+
+	-webkit-transition: all 0.2s;
+	-moz-transition: all 0.2s;
+	transition: all 0.2s;
+}
+
+.ast-notify-el.close-click {
+	transform: scale(0.7);
+	-webkit-transform-origin: scale(0.7);
+	-ms-transform-origin: scale(0.7);
+	-moz-transform-origin: scale(0.7);
+	opacity: 0;
+}
+
+.ast-notify-el .ast-notify-icon, .ast-notify-el .ast-notify-text {
+	display: block;
+	float: left;
+	padding: 5px;
+	box-sizing: border-box;
+}
+
+.ast-notify-el .ast-notify-icon {
+	width: 25%;
+	max-width: 62px;
+	text-align: center;
+}
+
+.ast-notify-el .ast-notify-close {
+	position: absolute;
+	top: 8px;
+	right: 10px;
+	font-size: 30px;
+	cursor: pointer;
+}
+
+.ast-notify-el .ast-notify-icon img {
+	max-width: 50px;
+}
+
+.ast-notify-el .ast-notify-icon i {
+	font-size: 250%;
+}
+
+.ast-notify-el .ast-notify-text {
+	width: 74%;
+	max-width: 285px;
+}
+
+.ast-notify-el .ast-notify-close {
+	padding: 5px 8px;
+}
+
+.ast-notify-clearfloat {
+	clear: both;
+}
+
+.ast-notify-el p.notify-header {
+	margin-top: 0;
+	margin-bottom: 8px;
+	font-weight: bold;
+	font-size: 115%;
+}
+
+.ast-notify-el p.notify-body {
+	margin: 0;
+}
+
+.ast-notify-el p.notify-footer {
+	margin: 0;
+	margin-top: 6px;
+	font-size: 85%;
+}
+
+/*Responsive Section*/
+@media screen and (max-width: 480px) {
+
+	#ast-dialog-el {
+		width: 250px;
+		font-size: 95%;
+	}
+
+	#ast-toast-el {
+		max-width: 250px;
+		font-size: 95%;
+	}
+
+	#ast-snack-el {
+		font-size: 95%;
+	}
+
+	.ast-notify-el {
+		max-width: 280px;
+		min-width: 200px;
+		right: -280px;
+		font-size: 90%;
+	}
+
+	.ast-notify-el.show {
+		right: 5px !important;
+	}
+
+	.ast-notify-el.close {
+		right: -280px !important;
+	}
+
+	.ast-notify-el .ast-notify-icon {
+		max-width: 52px;
+	}
+
+	.ast-notify-el .ast-notify-icon img {
+		max-width: 40px;
+	}
+
+	.ast-notify-el .ast-notify-icon i {
+		font-size: 230%;
+	}
+}

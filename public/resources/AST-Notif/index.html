@@ -1,0 +1,692 @@
+<!doctype html>
+<html>
+<head>
+	<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-59762215-10"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-59762215-10');
+</script>
+<meta charset="utf-8">
+<title>AST Notif | JS Notification UI Library</title>
+<meta name="description" content="Javascript notification UI library">
+<meta name="keywords" content="notification, javascript, javascript library">
+<meta name="author" content="Anandastoon">
+<link href="gaya.css?v=2" rel="stylesheet">
+<link href="fa/css/fa.css" rel="stylesheet">
+<link href="css/ast-notif.min.css?v=4" rel="stylesheet">
+<script src="js/ast-notif.min.js?v=4"></script>
+</head>
+<body>
+<section>
+	<div class="konten">
+		<div class="full-h full-w img-utama img-isi" style="">
+			<div class="kontener-absolut">
+				<div id="latar-div">
+					<div id="pembuka" class="absolut-tengah">
+						<h1 class="kepala">AST Notif <span id="versi"></span></h1>
+						<hr>
+						<p id="subjudul">When the original JS Alert needs treatments.</p>
+						<div id="kiri" class="pembagi-span">
+							<button class="tbl tbl-astnotif aktif" id="dialog">Dialog</button>
+							<button class="tbl tbl-astnotif" id="toast">Toast</button>
+							<button class="tbl tbl-astnotif" id="snackbar">Snack Bar</button>
+							<button class="tbl tbl-astnotif" id="notify">Notify</button>
+							<button class="tbl tbl-astnotif" id="contoh">Examples & Extras</button>
+							<button class="tbl tbl-astnotif" id="catatan">Notes</button>
+							<button class="tbl tbl-astnotif" id="unduh">Download</button>
+						</div>
+						<div id="kanan" class="pembagi-span">
+							<div id="pjn-dialog" class="konten-dokumen">
+								<h2 class="kepala">AST Dialog</h2>
+								<hr>
+								<p id="penjelasan">
+									This is the main purpose of making this library, replacing the old school JS alert.<br>
+									<em>No JQuery needed, written in pure JS. :)</em>
+									<pre>AstNotif.dialog("Caution!", "Hai Dunia! :D");</pre>
+									<div>
+										<button class="tbl tengah-blok" id="dialog-a">Show Dialog</button>
+									</div>
+									<hr class="sub-pembagi"></hr>
+									<h3 class="sub-kepala">API</h3>
+									<hr class="sub">
+									<pre>AstNotif.dialog(title: string, message: string, options[optional]: object, callbackOK: function, callbackCancel: function);</pre>
+									<h3 class="sub-kepala">Options</h3>
+									<hr class="sub">
+									<table class="ast-tabel">
+										<tr>
+											<th>Option</th>
+											<th>Description</th>
+										</tr>
+										<tr>
+											<td><code>color</code></td>
+											<td>Dialog text color.<br>
+											Argument: Hex color string or rgb, e.g: "#02BAF2"</td>
+										</tr>
+										<tr>
+											<td><code>bgcolor</code></td>
+											<td>Dialog theme color.<br>
+											Argument: Hex color string or rgb, e.g: "#02BAF2"</td>
+										</tr>
+										<tr>
+											<td><code>icon</code></td>
+											<td>Will dialog show icon?<br>
+											Argument: Booelan, true/false.</td>
+										</tr>
+										<tr>
+											<td><code>imgIcon</code></td>
+											<td>If dialog icon using image.<br>
+											Argument: String path e.g: "../your/path/image.png"</td>
+										</tr>
+										<tr>
+											<td><code>iconSize</code></td>
+											<td>The size of the icon.<br>
+											Argument: Integer. Read as pixel.</td>
+										</tr>
+										<tr>
+											<td><code>positive</code></td>
+											<td>Dialog button OK.<br>
+											Argument: String, default: "OK"</td>
+										</tr>
+										<tr>
+											<td><code>negative</code></td>
+											<td>Dialog button cancel.<br>
+											Argument: String, default: "cancel"</td>
+										</tr>
+										<tr>
+											<td><code>fa</code></td>
+											<td>Supports font awesome icon.<br>
+											Argument: Font awesome string, <strong>without "fa-"</strong>. So "fa-money" is just "money".</td>
+										</tr>
+									</table>
+								</p>
+							</div>
+							<div id="pjn-toast" class="konten-dokumen">
+								<h2 class="kepala">AST Toast</h2>
+								<hr>
+								<p id="penjelasan">
+									It just like a toast on your Android smartphone, with customizable color and others. :)
+									<pre>AstNotif.toast("Hai Dunia! :D");</pre>
+									<div>
+										<button class="tbl tengah-blok" id="toast-a">Show Toast</button>
+									</div>
+									<hr class="sub-pembagi"></hr>
+									<h3 class="sub-kepala">API</h3>
+									<hr class="sub">
+									<pre>AstNotif.toast(message: string, options[optional]: object);</pre>
+									<h3 class="sub-kepala">Options</h3>
+									<hr class="sub">
+									<table class="ast-tabel">
+										<tr>
+											<th>Option</th>
+											<th>Description</th>
+										</tr>
+										<tr>
+											<td><code>length</code></td>
+											<td>How long Toast will show.<br>
+											Argument: Integer in milliseconds or "SHORT"/"LONG"</td>
+										</tr>
+										<tr>
+											<td><code>color</code></td>
+											<td>Toast text color.<br>
+											Argument: Hex color string or rgb, e.g: "#02BAF2"</td>
+										</tr>
+										<tr>
+											<td><code>bgcolor</code></td>
+											<td>Toast background color.<br>
+											Argument: Hex color string or rgb, e.g: "#02BAF2"</td>
+										</tr>
+										<tr>
+											<td><code>reverseColor</code></td>
+											<td>Reverse background and text color, suitable if you want night mode for example.<br>
+											Argument: Hex color string or rgb, e.g: "#02BAF2"</td>
+										</tr>
+										<tr>
+											<td><code>alpha</code></td>
+											<td>Toast opacity or transparancy.<br>
+											Argument: Float number from 0 to 1.</td>
+										</tr>
+										<tr>
+											<td><code>borderRadius</code></td>
+											<td>Set Toast corner roundness.<br>
+											Argument: Integer or string that followed by "px" or "%". Integer is read as pixel (px). E.g: 50 or "40px" or "10%"</td>
+										</tr>
+										<tr>
+											<td><code>vdist</code></td>
+											<td>Set Toast vertical distance relative position after margin.<br>
+											Argument: Integer, read as pixel (px). Use minus for opposite use. (Doesn't apply to center ("c") position)</td>
+										</tr>
+										<tr>
+											<td><code>hdist</code></td>
+											<td>Set Toast horizontal distance relative position after margin.<br>
+											Argument: Integer, read as pixel (px). Use minus for opposite use. (Doesn't apply to center ("c") position)</td>
+										</tr>
+										<tr>
+											<td><code>margin</code></td>
+											<td>Set Toast margin relative to screen.<br>
+											Argument: Integer, read as pixel (px).</td>
+										</tr>
+										<tr>
+											<td><code>position</code></td>
+											<td>Set Toast position in 8 wind directions.<br>
+											Argument: Insensitive String, "n", "ne", "e", "se", "s", "sw", "w", "nw", and "c" for position of the center of the screen. Default "s".</td>
+										</tr>
+									</table>
+								</p>
+							</div>
+							<div id="pjn-snackbar" class="konten-dokumen">
+								<h2 class="kepala">AST Snackbar</h2>
+								<hr>
+								<p id="penjelasan">
+									It just like a snackbar on your Android smartphone, with customizable color and others. :)
+									<pre>AstNotif.snackbar("Hai Dunia! :D");</pre>
+									<div>
+										<button class="tbl tengah-blok" id="snackbar-a">Show Snackbar</button>
+									</div>
+									<hr class="sub-pembagi"></hr>
+									<h3 class="sub-kepala">API</h3>
+									<hr class="sub">
+									<pre>AstNotif.snackbar(message: string, options[optional]: object, action/callback: function);</pre>
+									<h3 class="sub-kepala">Options</h3>
+									<hr class="sub">
+									<table class="ast-tabel">
+										<tr>
+											<th>Option</th>
+											<th>Description</th>
+										</tr>
+										<tr>
+											<td><code>length</code></td>
+											<td>How long Snackbar will show.<br>
+											Argument: Integer in milliseconds or "SHORT"/"LONG"</td>
+										</tr>
+										<tr>
+											<td><code>color</code></td>
+											<td>Snackbar text color.<br>
+											Argument: Hex color string or rgb, e.g: "#02BAF2"</td>
+										</tr>
+										<tr>
+											<td><code>bgcolor</code></td>
+											<td>Snackbar background color.<br>
+											Argument: Hex color string or rgb, e.g: "#02BAF2"</td>
+										</tr>
+										<tr>
+											<td><code>btncolor</code></td>
+											<td>Snackbar button color.<br>
+											Argument: Hex color string or rgb, e.g: "#02BAF2"</td>
+										</tr>
+										<tr>
+											<td><code>button</code></td>
+											<td>Button text.<br>
+											Argument: Text string, button will not show if you leave this empty.</td>
+										</tr>
+										<tr>
+											<td><code>fa</code></td>
+											<td>Supports font awesome icon.<br>
+											Argument: Font awesome string, <strong>without "fa-"</strong>. So "fa-money" is just "money".</td>
+										</tr>
+										<tr>
+											<td><code>reverseColor</code></td>
+											<td>Reverse background and text color, suitable if you want night mode for example.<br>
+											Argument: Hex color string or rgb, e.g: "#02BAF2"</td>
+										</tr>
+										<tr>
+											<td><code>position</code></td>
+											<td>Snackbar position.<br>
+											Argument: "top" or "bottom". Default is "bottom".</td>
+										</tr>
+									</table>
+								</p>
+							</div>
+							<div id="pjn-notify" class="konten-dokumen">
+								<h2 class="kepala">AST Notify</h2>
+								<hr>
+								<p id="penjelasan">
+									If you are a Windows user, you should be familiar with this. :)
+									<pre>AstNotif.notify("The Title", "Hai Dunia! :D", "now");</pre>
+									<div>
+										<button class="tbl tengah-blok" id="notify-a">Show Notif</button>
+									</div>
+									<hr class="sub-pembagi"></hr>
+									<h3 class="sub-kepala">API</h3>
+									<hr class="sub">
+									<pre>AstNotif.notify(title: string, message: string, footer: string, options[optional]: object, callback: function);</pre>
+									<h3 class="sub-kepala">Options</h3>
+									<hr class="sub">
+									<table class="ast-tabel">
+										<tr>
+											<th>Option</th>
+											<th>Description</th>
+										</tr>
+										<tr>
+											<td><code>length</code></td>
+											<td>How long notif box will show.<br>
+											Argument: Integer in milliseconds or "SHORT"/"LONG", -1 for stay forever.</td>
+										</tr>
+										<tr>
+											<td><code>color</code></td>
+											<td>Notif box text color.<br>
+											Argument: Hex color string or rgb, e.g: "#02BAF2"</td>
+										</tr>
+										<tr>
+											<td><code>bgcolor</code></td>
+											<td>Notif box theme color.<br>
+											Argument: Hex color string or rgb, e.g: "#02BAF2"</td>
+										</tr>
+										<tr>
+											<td><code>icon</code></td>
+											<td>Will notif box show icon?<br>
+											Argument: Booelan, true/false.</td>
+										</tr>
+										<tr>
+											<td><code>imgIcon</code></td>
+											<td>If notif box icon using image.<br>
+											Argument: String path e.g: "../your/path/image.png"</td>
+										</tr>
+										<tr>
+											<td><code>fa</code></td>
+											<td>Supports font awesome icon.<br>
+											Argument: Font awesome string, <strong>without "fa-"</strong>. So "fa-money" is just "money".</td>
+										</tr>
+										<tr>
+											<td><code>position</code></td>
+											<td>Opacity or transparancy.<br>
+											Argument: String, "left" or "right". Default is "right"</td>
+										</tr>
+										<tr>
+											<td><code>alpha</code></td>
+											<td>Opacity or transparancy.<br>
+											Argument: Float number from 0 to 1.</td>
+										</tr>
+									</table>
+								</p>
+							</div>
+							<div id="pjn-contoh" class="konten-dokumen">
+								<h2 class="kepala">Examples & Extras</h2>
+								<hr>
+								<p id="penjelasan">
+									A semi playground you will enjoy. :)<br><br>
+									Choose a theme (just like a bootstrap ones):
+									<select id="temanya">
+										<option value="">Default</option>
+										<option value="dark">Dark</option>
+										<option value="success">Success</option>
+										<option value="warning">Warning</option>
+										<option value="info">Info</option>
+										<option value="primary">Primary</option>
+										<option value="danger">Danger</option>
+									</select>
+
+									<!-- AST DIALOG -->
+									
+									<hr class="sub-pembagi"></hr>
+									<h3 class="sub-kepala">AST Dialog</h3>
+									<hr class="sub">
+									Title: <span id="d-title">Travel Caution!</span><br>
+									Message: <span id="d-message">Jakarta is very good city. You should visit it!</span>
+									<label for="d-positive">
+										Button OK text:
+										<input type="text" id="d-positive" class="ast-input" value="OK">
+									</label>
+									<label for="d-negative">
+										Button Cancel text (leave it blank for OK only):
+										<input type="text" id="d-negative" class="ast-input" value="Cancel">
+									</label>
+									<label for="d-fa">
+										Font Awesome icon (without 'fa-'):
+										<input type="text" id="d-fa" class="ast-input" value="exclamation-circle">
+									</label>
+									<label for="d-iconsize">
+										Icon size (in px):
+										<input type="text" id="d-iconsize" class="ast-input" value="48">
+									</label>
+									<button class="tbl" id="buat-dialog">Generate Code and Dialog!</button>
+									<pre>AstNotif.dialog("Travel Caution!", "Jakarta is very good city. You should visit it!", <span id="cd-options">options[optional]: object</span>);</pre>
+
+									<!-- AST TOAST -->
+
+									<hr class="sub-pembagi"></hr>
+									<h3 class="sub-kepala">AST Toast</h3>
+									<hr class="sub">
+									Text: <span id="t-text">Jakarta is very good city. You should visit it!</span>
+									<label for="t-length">
+										Toast length:
+										<input type="text" id="t-length" class="ast-input" value="2000">
+									</label>
+									<label for="t-alpha">
+										Toast opacity/alpha:
+										<input type="text" id="t-alpha" class="ast-input" value="0.8">
+									</label>
+									<label for="t-borderRadius">
+										Toast border radius:
+										<input type="text" id="t-borderRadius" class="ast-input" value="10px">
+									</label>
+									<label for="t-position">
+										Toast position:
+										<select id="t-position">
+											<option value="n">North</option>
+											<option value="ne">North East</option>
+											<option value="e">East</option>
+											<option value="se">South East</option>
+											<option value="s" selected>South (Default)</option>
+											<option value="sw">South West</option>
+											<option value="w">West</option>
+											<option value="nw">North West</option>
+											<option value="c">Center</option>
+										</select>
+									</label>
+									<label for="t-vdist">
+										Toast vertical distance:
+										<input type="text" id="t-vdist" class="ast-input" value="10">
+									</label>
+									<label for="t-hdist">
+										Toast horizontal distance:
+										<input type="text" id="t-hdist" class="ast-input" value="0">
+									</label>
+									<label for="t-margin">
+										Toast margin:
+										<input type="text" id="t-margin" class="ast-input" value="10">
+									</label>
+									<button class="tbl" id="buat-toast">Generate Code and Toast!</button>
+									<pre>AstNotif.toast("Jakarta is very good city. You should visit it!", <span id="ct-options">options[optional]: object</span>);</pre>
+
+									<!-- AST SNACKBAR -->
+
+									<hr class="sub-pembagi"></hr>
+									<h3 class="sub-kepala">AST Snackbar</h3>
+									<hr class="sub">
+									Text: <span id="s-text">Jakarta is very good city. You should visit it!</span>
+									<label for="s-length">
+										Snackbar length:
+										<input type="text" id="s-length" class="ast-input" value="2000">
+									</label>
+									<label for="s-button">
+										Snackbar button:
+										<input type="text" id="s-button" class="ast-input" value="AGREE">
+									</label>
+									<label for="s-fa">
+										Font Awesome icon (without 'fa-'):
+										<input type="text" id="s-fa" class="ast-input" value="check">
+									</label>
+									<label for="s-position">
+										Position:
+										<select id="s-position">
+											<option value="bottom">Bottom (Default)</option>
+											<option value="top">Top</option>
+										</select>
+									</label>
+									<button class="tbl" id="buat-snackbar">Generate Code and Snackbar!</button>
+									<pre>AstNotif.snackbar("Jakarta is very good city. You should visit it!", <span id="cs-options">options[optional]: object</span>);</pre>
+
+									<!-- AST NOTIFY -->
+									
+									<hr class="sub-pembagi"></hr>
+									<h3 class="sub-kepala">AST Notify</h3>
+									<hr class="sub">
+									Header: <span id="n-title">Travel Caution!</span><br>
+									Message: <span id="n-message">Jakarta is very good city. You should visit it!</span>
+									<label for="d-positive">
+									Footer: <span id="n-footer">now</span>
+									<label for="n-length">
+										Notif length (-1 to stay forever):
+										<input type="text" id="n-length" class="ast-input" value="2000">
+									</label>
+									<label for="n-alpha">
+										Notif alpha:
+										<input type="text" id="n-alpha" class="ast-input" value="0.8">
+									</label>
+									<label for="n-fa">
+										Font Awesome icon (without 'fa-'):
+										<input type="text" id="n-fa" class="ast-input" value="exclamation-circle">
+									</label>
+									<label for="n-position">
+										Position:
+										<select id="n-position">
+											<option value="right">Right (Default)</option>
+											<option value="left">Left</option>
+										</select>
+									</label>
+									<button class="tbl" id="buat-notify">Generate Code and Notify!</button>
+									<pre>AstNotif.notify("Travel Caution!", "Jakarta is very good city. You should visit it!", "now", <span id="cn-options">options[optional]: object</span>);</pre>
+								</p>
+							</div>
+							<div id="pjn-catatan" class="konten-dokumen">
+								<h2 class="kepala">Notes</h2>
+								<hr>
+								<p id="penjelasan">
+									Thank you for using my library.<br>Works fine on IE 9, I guess.<br>
+									<strong>But there're some important notes you should notice.</strong>
+									<hr class="sub-pembagi"></hr>
+									This library, does <strong>not</strong> using <strong>new</strong> constructor. So, any changes you've made for the options <strong>are permanent unless</strong> you refresh the page. Thanks for understanding. :)
+
+									<hr class="sub-pembagi"></hr>
+									<h3 class="sub-kepala">OH</h3>
+									<hr class="sub">
+									There's also an alias for this library. You can just use <pre>astn</pre> instead of <pre>AstNotif</pre> just like jQuery that using <pre>$</pre> instead of <pre>jQuery</pre>.
+								</p>
+							</div>
+							<div id="pjn-unduh" class="konten-dokumen">
+								<h2 class="kepala">Download on Github</h2>
+								<hr>
+								<p id="penjelasan">
+									Thank you for using my library. Click this:<br>
+									<a href="https://github.com/anandastoon/AST-Notif">AST Notif download page.</a>
+
+									<hr class="sub-pembagi"></hr>
+									<h3 class="sub-kepala">Contact</h3>
+									<hr class="sub">
+									You can send email to <i>anandastoon@gmail.com</i> if you have any complaints or suggestions. Thank you for using my library, hope it can help everyone..
+
+									<hr class="sub-pembagi"></hr>
+									<h3 class="sub-kepala">Release Notes</h3>
+									<hr class="sub">
+									<ul id="rel-notes">
+										<li>0.0.5</li>
+										<h4>CHANGED</h4>
+										Toast: Rename top option to vdist.<br>
+										Toast: Rename left option to hdist.<br>
+										Toast: Rename padding option to margin.<br>
+										<li>0.0.4</li>
+										<h4>ADDED</h4>
+										Notify: Left position.
+										<h4>CHANGED</h4>
+										Notify: Click to close for non-permanent notify.
+										<hr>
+										<li>0.0.3</li>
+										<h4>ADDED</h4>
+										Dialog: Icon size.<br>
+										Toast: Left position option.<br>
+										Toast: Padding option.<br>
+										Toast: Positioning option by 8 wind directions.
+										<h4>CHANGED</h4>
+										Dialog: Set default icon size to 48px.<br>
+										Toast: Rename bottom option to top.
+										<hr>
+										<li>0.0.2</li>
+										<h4>ADDED</h4>
+										Toast: Add bottom position option.
+										<hr>
+										<li>0.0.1</li>
+										Initial release.
+									</ul>
+								</p>
+							</div>
+						</div>
+						<div style="clear: both;"></div>
+						<footer>&copy; Anandastoon 2019-2020</footer>
+					</div>
+				</div>
+			</div>
+		</div>
+    </div>
+</section>
+<footer>
+	<div class="konten">
+    	<div class="teks-kanan">
+    	</div>
+    </div>
+</footer>
+<script>
+	var tombolLib = ["dialog", "toast", "snackbar", "notify", "contoh", "catatan", "unduh"];
+	var kontenDokumen = document.querySelectorAll(".konten-dokumen");
+	var iAjah = 0;
+	document.getElementById("versi").innerHTML = "(v" + AstNotif.VERSION + ")";
+
+	tampilkanDok();
+
+	for(var i = 1; i < kontenDokumen.length; i++){
+		kontenDokumen[i].style.display = "none";
+	}
+
+	document.addEventListener("click", function (e) {
+		var optionGenerator = [];
+		var globalTheme = document.getElementById("temanya").value;
+		if (globalTheme != "") optionGenerator.push('theme: "' + globalTheme + '"');
+		switch(e.target.id) {
+			case "dialog-a":
+				AstNotif.dialog("The Title", "Hai Dunia! :D");
+				break;
+			case "toast-a":
+				AstNotif.toast("Hai Dunia! :D");
+				break;
+			case "snackbar-a":
+				AstNotif.snackbar("Hai Dunia! :D");
+				break;
+			case "notify-a":
+				AstNotif.notify("The Title", "Hai Dunia! :D", "now");
+				break;
+			// Generate thingy
+			case "buat-dialog":
+				var astDialogOpt = {
+					fa: document.getElementById("d-fa").value,
+					positive: document.getElementById("d-positive").value,
+					negative: document.getElementById("d-negative").value,
+					iconSize: document.getElementById("d-iconsize").value,
+					theme: globalTheme == "" ? "DEFAULT" : globalTheme
+				};
+				optionGenerator.push('fa: "' + astDialogOpt.fa + '"');
+				optionGenerator.push('positive: "' + astDialogOpt.positive + '"');
+				optionGenerator.push('negative: "' + astDialogOpt.negative + '"');
+				optionGenerator.push('iconSize: ' + astDialogOpt.iconSize);
+				AstNotif.dialog(document.getElementById("d-title").innerHTML, document.getElementById("d-message").innerHTML, astDialogOpt);
+				
+				document.getElementById("cd-options").innerHTML = "";
+				if (optionGenerator.length > 0)
+					document.getElementById("cd-options").innerHTML = "{" + optionGenerator.join(", ") + "}";
+				break;
+
+			case "buat-toast":
+
+				if (document.getElementById("t-alpha").value > 1) document.getElementById("t-alpha").value = 1;
+				if (document.getElementById("t-alpha").value < 0) document.getElementById("t-alpha").value = 0;
+				if (isNaN(document.getElementById("t-alpha").value)) document.getElementById("t-alpha").value = 0.8;
+
+				var astToastOpt = {
+					length: document.getElementById("t-length").value,
+					alpha: document.getElementById("t-alpha").value,
+					borderRadius: document.getElementById("t-borderRadius").value,
+					vdist: document.getElementById("t-vdist").value,
+					hdist: document.getElementById("t-hdist").value,
+					margin: document.getElementById("t-margin").value,
+					position: document.getElementById("t-position").value,
+					theme: globalTheme == "" ? "DEFAULT" : globalTheme
+				};
+				optionGenerator.push('length: ' + (isNaN(astToastOpt.length) ? '"' + astToastOpt.length + '"' : astToastOpt.length));
+				optionGenerator.push('alpha: ' + astToastOpt.alpha);
+				optionGenerator.push('borderRadius: ' + (isNaN(astToastOpt.borderRadius) ? '"' + astToastOpt.borderRadius + '"' : astToastOpt.borderRadius) );
+				optionGenerator.push('vdist: ' + astToastOpt.vdist);
+				optionGenerator.push('hdist: ' + astToastOpt.hdist);
+				optionGenerator.push('position: ' + '"' + astToastOpt.position + '"');
+				optionGenerator.push('margin: ' + astToastOpt.margin);
+				AstNotif.toast(document.getElementById("t-text").innerHTML, astToastOpt);
+			
+				document.getElementById("ct-options").innerHTML = "";
+				if (optionGenerator.length > 0)
+					document.getElementById("ct-options").innerHTML = "{" + optionGenerator.join(", ") + "}";
+				break;
+
+			case "buat-snackbar":
+
+				var astSnackOpt = {
+					length: document.getElementById("s-length").value,
+					button: document.getElementById("s-button").value,
+					position: document.getElementById("s-position").options[document.getElementById("s-position").selectedIndex].value,
+					fa: document.getElementById("s-fa").value,
+					theme: globalTheme == "" ? "DEFAULT" : globalTheme
+				};
+				optionGenerator.push('length: ' + (isNaN(astSnackOpt.length) ? '"' + astSnackOpt.length + '"' : astSnackOpt.length));
+				if (astSnackOpt.position == "top")
+					optionGenerator.push('position: "' + astSnackOpt.position + '"');
+				if (astSnackOpt.button != "")
+					optionGenerator.push('button: "' + astSnackOpt.button + '"');
+				optionGenerator.push('fa: "' + astSnackOpt.fa + '"');
+
+				if (!document.getElementById('ast-snack-el'))
+					AstNotif.snackbar(document.getElementById("s-text").innerHTML, astSnackOpt);
+			
+				document.getElementById("cs-options").innerHTML = "";
+				if (optionGenerator.length > 0)
+					document.getElementById("cs-options").innerHTML = "{" + optionGenerator.join(", ") + "}";
+				break;
+
+			case "buat-notify":
+
+				if (document.getElementById("n-alpha").value > 1) document.getElementById("n-alpha").value = 1;
+				if (document.getElementById("n-alpha").value < 0) document.getElementById("n-alpha").value = 0;
+				if (isNaN(document.getElementById("n-alpha").value)) document.getElementById("n-alpha").value = 0.8;
+
+				var astNotifyOpt = {
+					length: document.getElementById("n-length").value,
+					alpha: document.getElementById("n-alpha").value,
+					fa: document.getElementById("n-fa").value,
+					position: document.getElementById("n-position").value,
+					theme: globalTheme == "" ? "DEFAULT" : globalTheme
+				};
+				optionGenerator.push('length: ' + (isNaN(astNotifyOpt.length) ? '"' + astNotifyOpt.length + '"' : astNotifyOpt.length));
+				optionGenerator.push('alpha: ' + astNotifyOpt.alpha);
+				optionGenerator.push('position: "' + astNotifyOpt.position + '"');
+				optionGenerator.push('fa: "' + astNotifyOpt.fa + '"');
+			
+				AstNotif.notify(document.getElementById("n-title").innerHTML, document.getElementById("n-message").innerHTML, document.getElementById("n-footer").innerHTML, astNotifyOpt);
+
+				document.getElementById("cn-options").innerHTML = "";
+				if (optionGenerator.length > 0)
+					document.getElementById("cn-options").innerHTML = "{" + optionGenerator.join(", ") + "}";
+				break;
+		}
+		tampilkanDok(e.target.id);
+	});
+
+	function tampilkanDok(IDpengecualian = "") {
+		if (tombolLib.indexOf(IDpengecualian) > -1)
+			for(var i = 0; i < kontenDokumen.length; i++){
+				kontenDokumen[i].style.display = "none";
+				AddRemoveClass(document.getElementById(tombolLib[i]), "aktif", false);
+			}
+
+		if (IDpengecualian != "" && document.getElementById("pjn-" + IDpengecualian) != null) {
+			AddRemoveClass(document.getElementById(IDpengecualian), "aktif");
+			document.getElementById("pjn-" + IDpengecualian).style.display = 'block';
+		}
+	}
+
+	function AddRemoveClass(element, name, add = true) {
+		if (add) {
+			if (element.getAttribute("class") != null && element.getAttribute("class") != "") {
+				var arr = element.className.split(" ");
+				if (arr.indexOf(name) == -1)
+					element.className += " " + name;
+			} else
+				element.setAttribute("class", name);
+		} else {
+			if (element.getAttribute("class") != null && element.getAttribute("class") != "") {
+				var regexp = new RegExp(name, "g");
+				element.className = element.className.replace(regexp, "");
+			}
+		}
+	}
+</script>
+</body>
+</html>

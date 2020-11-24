@@ -1,0 +1,254 @@
+@font-face {
+    font-family: "josefin";
+    src: url("font/josefin.woff") format('woff');
+}
+@font-face {
+    font-family: "imprima";
+    src: url("font/imprima.woff") format('woff');
+}
+@font-face {
+    font-family: "bellefair";
+    src: url("font/bellefair.woff") format('woff');
+}
+@font-face {
+    font-family: "quicksand";
+    src: url("font/quicksand-regular.woff") format('woff');
+}
+
+* {
+	box-sizing: border-box;
+}
+
+html, body {
+	padding: 0;
+	margin: 0;
+	font-family: "quicksand";
+}
+
+hr {
+	border-color: #999;
+	width: 40%;
+}
+
+hr.sub {
+	border-color: #999;
+	width: 20%;
+}
+
+hr.sub-pembagi {
+	border-color: #999;
+	width: 100%;
+	margin-top: 15px;
+	margin-bottom: 8px;
+	border-width: 3px;
+	border-bottom: none;
+	border-top-style: dotted;
+}
+
+#subjudul {
+	font-size: 1.2em;
+	text-align: center;
+}
+
+.konten {
+	overflow: hidden;
+	background-color: #cdf3ff;
+}
+
+.kontener-absolut {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	margin: 8px;
+	border: 1px #ccc solid;
+	box-shadow: 0px 0px 2px #ccc;
+	background-color: white;
+}
+
+#latar-div {
+	position: absolute;
+	overflow: hidden;
+	width: 100%;
+	height: 100%;
+}
+
+.absolut-tengah {
+	position: absolute;
+	left: 0;
+	right: 0;
+	margin: 0 auto;
+}
+
+.tbl {
+	background-color: #fff;
+	border: thin solid grey;
+	color: #555;
+	padding: 10px 12px;
+	font-family: "imprima";
+}
+
+.tbl:hover {
+	background-color: #f4f4f4;
+}
+
+.tbl.aktif {
+	background-color: #eee;
+}
+
+.tbl-astnotif, label {
+	display: block;
+	margin-bottom: 10px;
+	width: 100%;
+}
+
+#rel-notes li {
+	font-family: "bellefair";
+	font-weight: bold;
+	font-size: 120%;
+	padding-top: 10px;
+}
+
+label {
+	margin-top: 10px;
+}
+
+select {
+	margin-top: 10px;
+	background-color: transparent;
+	border: thin solid grey;
+	color: #555;
+	padding: 8px 10px;
+	font-family: "imprima";
+	width: 100%;
+	display: block;
+}
+
+.ast-input {
+	margin-top: 8px;
+	background-color: transparent;
+	border: none;
+	color: #555;
+	padding: 6px 8px;
+	font-family: "imprima";
+	width: 100%;
+	display: block;
+	border-bottom: #ccc thin solid;
+}
+
+.pembagi-span {
+	padding-right: 20px;
+	float: left;
+	overflow: auto;
+}
+
+#kiri {
+	width: 25%;
+}
+
+#kanan {
+	width: 75%;
+	border: thin solid #ccc;
+	box-shadow: 0px 0px 8px inset #ccc;
+	height: auto;
+	padding: 10px;
+	min-height: 250px;
+	margin-bottom: 20px;
+}
+
+.tengah-blok {
+	margin-left: auto;
+	margin-right: auto;
+	display: block;
+}
+
+.kepala {
+	font-family: "bellefair";
+	text-align: center;
+	font-weight: normal;
+	margin-bottom: 8px;
+}
+
+.sub-kepala {
+	font-family: "bellefair";
+	text-align: center;
+	font-weight: normal;
+	margin-bottom: 8px;
+}
+
+pre {  
+	background: #f4f4f4;
+    border: 1px solid #ddd;
+    border-left: 3px solid #02baf2;
+    border-right: 3px solid #02baf2;
+    color: #666;
+    page-break-inside: avoid;
+    font-family: monospace;
+    font-size: 15px;
+    line-height: 1.6;
+    margin-bottom: 1em;
+    max-width: 100%;
+    overflow: auto;
+    padding: 0.5em 1.5em;
+    display: block;
+    word-wrap: break-word;
+}
+
+.ast-tabel {
+	border: 1px solid #ccc;
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.ast-tabel td, .ast-tabel th {
+	border: 1px solid #ccc;
+	padding: 6px 8px;
+}
+
+h1 {
+	font-size: 2em;
+}
+
+#versi {
+	font-size: 75%;
+}
+
+#pembuka {
+	margin: 30px auto;
+	width: 95%;
+	position: relative;
+	max-width: 1100px;
+	padding: 40px;
+	border: thin solid #ccc;
+	height: 90%;
+	box-shadow: 0px 0px 8px inset #ccc;
+	border-radius: 10px;
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+
+#rel-notes h4 {
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+#rel-notes hr {
+	border-color: #CCC;
+	text-align: left;
+	border-bottom: none;
+	border-top-style: dotted;
+	width: 40%;
+	margin: 10px 0;
+}
+
+footer {
+	text-align: right;
+	margin-bottom: 10px;
+}
+
+@media screen and (max-width: 640px) {
+	#pembuka {
+		padding: 20px 10px;
+	}
+}
