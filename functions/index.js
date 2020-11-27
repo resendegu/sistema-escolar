@@ -11,16 +11,16 @@ exports.helloWorld = functions.https.onRequest((request, response) => {
 });
 
 
-exports.verificadorDeAcesso = functions.https.onRequest((request, response) => {
-    let dados = JSON.parse(request.body)
-    return admin.database().ref(`sistemaEscolar/usuarios/${dados.email}/admin`).once('value')
-    .then(snapshot => {
-        if (snapshot.exists() && snapshot.val() == dados.uid) {
-            var data = JSON.stringify(snapshot.val())
-            console.log('oi')
-            response.status(200).send(snapshot.val())
+exports.verificadorDeAcesso = functions.https.onCall((data, context) => {
+    const dados = data
+    admin.database().ref(`sistemaEscolar/usuarios/${dados.email}/admin`).once('value').then(value => {
+        if (value.exists() && value.val() == dados.uid) {
+            console.log(value.val())
+            let val = value.val()
+            return val
         } else {
-            response.status(403).send('Deu ruim')
+            throw new functions.https.HttpsError('permission-denied', 'Você não possui permissão para acessar.')
         }
     })
+    
 })

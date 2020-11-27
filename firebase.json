@@ -11,7 +11,11 @@
       {
       "source": "/verificadorDeAcesso",
       "function": "verificadorDeAcesso"
-      } 
+      }, 
+      {
+        "source": "/helloWorld",
+        "function": "helloWorld"
+      }
     ]
   },
   "emulators": {

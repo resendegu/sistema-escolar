@@ -1,20 +1,15 @@
-var teste
+
 firebase.auth().onAuthStateChanged((user) => {
-    var dados = {email: user.email.replaceAll('@', '-').replaceAll('.', '_'), uid: user.uid}
-    fetch('http://localhost:5000/verificadorDeAcesso', {
-        body: JSON.stringify(dados),
-        method: 'POST',
-        mode: 'no-cors'
-    }).then(response => {
-       console.log(response)
+    validaAcesso(user)
+})
+
+function validaAcesso(user) {
+    //var dados = {email: user.email.replaceAll('@', '-').replaceAll('.', '_'), uid: user.uid}
+    const checkInfos = firebase.functions().httpsCallable('verificadorDeAcesso')
+    checkInfos({email: user.email.replaceAll('@', '-').replaceAll('.', '_'), uid: user.uid}).then(result => {
+        console.log(result.data)
     }).catch(error => {
         console.log(error)
     })
-    if (user != null) {
-        // Carrega painel do usuário
-        console.log('oi')
-    } else  {
-        console.log('oi')
-    }
-})
+}
     
