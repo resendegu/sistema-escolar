@@ -5,3 +5,4 @@ function usuarioAtual() {
 
     return user
 }
+
