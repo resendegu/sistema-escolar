@@ -12,9 +12,7 @@ exports.verificadorDeAcesso = functions.https.onCall((data, context) => {
     console.log(context.auth)
     let email = context.auth.token.email
     email = email.replaceAll('@', '-').replaceAll('.', '_')
-    let func = await admin.database().ref(`sistemaEscolar/usuarios/${email}/admin`).once('value')
-    
-    func.then(value => {
+    admin.database().ref(`sistemaEscolar/usuarios/${email}/admin`).once('value').then(value => {
         if (value.exists() && value.val() == context.auth.uid) {
             console.log(value.val())
             let val = value.val()

@@ -1,4 +1,4 @@
-
+firebase.auth().signInWithEmailAndPassword('guresende13@gmail.com', 'galo1234')
 firebase.auth().onAuthStateChanged((user) => {
     validaAcesso(user)
 })
