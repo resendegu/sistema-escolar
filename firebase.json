@@ -6,6 +6,7 @@
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
+<<<<<<< HEAD
     ],
     "rewrites": [
       {
@@ -16,6 +17,8 @@
         "source": "/helloWorld",
         "function": "helloWorld"
       }
+=======
+>>>>>>> parent of a26276d... alterações backend fracassos
     ]
   },
   "emulators": {

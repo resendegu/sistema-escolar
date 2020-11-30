@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 firebase.auth().signInWithEmailAndPassword('guresende13@gmail.com', 'galo1234')
 firebase.auth().onAuthStateChanged((user) => {
     validaAcesso(user)
@@ -15,3 +16,13 @@ checkInfos().then(result => {
     console.log(error)
 })
     
+=======
+document.addEventListener('DOMContentLoaded', function () {
+    let user = usuarioAtual()
+    if (user != null) {
+        // Carrega painel do usuário
+    } else if () {
+        
+    }
+})
+>>>>>>> parent of a26276d... alterações backend fracassos
