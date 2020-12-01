@@ -9,6 +9,8 @@
   <!-- Carregando arquivos da biblioteca AST-Notif. Créditos: https://github.com/anandastoon/AST-Notif -->
   <link rel="stylesheet" href="resources/AST-Notif/css/ast-notif.min.css">
   <link rel="shortcut icon" href="images/domain.png" type="image/x-icon">
+  
+  <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/4.6.1/firebase-ui-auth.css" />
 </head>
 <body>
   <!-- Outros Arquivos necessários para o Bootstrap -->
@@ -34,6 +36,7 @@
     to avoid connecting the SDK to running emulators.
   -->
   <script defer src="/__/firebase/init.js?useEmulator=true"></script>
+  <script src="https://www.gstatic.com/firebasejs/ui/4.6.1/firebase-ui-auth.js"></script>
   
   <!-- Conteúdo do site - Website content -->
   <header>
@@ -62,15 +65,63 @@
   </header>
 
   <!-- Parte principal -->
+  <div class="modal" tabindex="-1" role="dialog" id="modal">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="titulo">Modal title</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body" id="corpo">
+          <p>Modal body text goes here.</p>
+        </div>
+        <div class="modal-footer" id="botoes">
+          <button type="button" class="btn btn-primary">Save changes</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
   <div class="container">
-    
+    <div class="container" id="firebaseui-auth-container">
+
+    </div>
+    <div id="logado" class="container" style="visibility: hidden;">
+      <div class="row">
+          <div class="col-sm-6">
+          <div class="card">
+              <div class="card-body">
+              <h5 class="card-title" id="nome">Nome</h5>
+              <a href="#" onclick="alteraFoto()"><img src="./images/profile_placeholder.png" id="foto" class="rounded float-left" width="80px" style="margin-right: 10px;"></a>
+              <label class="card-text" id="email" style="font-size: small;">Email</label>
+              <br>
+                <br><br><br>
+                <button onclick="alteraFoto()" class="btn btn-primary btn-sm">Alterar foto</button>
+                <br><br>
+                <button type="button" id="sair" onclick="sair()" class="btn btn-warning btn-block">Sair</button>
+              </div>
+          </div>
+          </div>
+          <div class="col-sm-6" id="painelAdm" style="display: none;">
+          <div class="card">
+              <div class="card-body">
+                <h5 class="card-title">Painel do admnistrador</h5>
+              <button onclick="listaUsuarios()" class="btn btn-block btn-primary">Liberar acessos</button>
+              <button onclick="antesDeDeletar()" class="btn btn-block btn-danger">Remover acessos</button>
+              </div>
+          </div>
+          </div>
+      </div>
+  </div>
   </div>
 
   <!-- Carregando outros arquivos da biblioteca AST-Notif. Créditos: https://github.com/anandastoon/AST-Notif -->
   <script src="resources/AST-Notif/js/ast-notif.min.js"></script>
 
   <!-- Outros Arquivos -->
-  <script src="js/app.js"></script>
-  <script src="js/login.js"></script>
+  <script defer src="js/app.js"></script>
+  <script defer src="js/login.js"></script>
 </body>
 </html>
