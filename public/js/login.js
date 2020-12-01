@@ -144,6 +144,7 @@ function acessaUsuario(email, emailNormal) {
 }
 
 function liberaAcesso(email, acesso, checked) {
+    /*
     firebase.database().ref(`sistemaEscolar/usuarios/${email}/acessos/${acesso}`).set(checked)
     .then(() => {
         if (checked) {
@@ -155,6 +156,13 @@ function liberaAcesso(email, acesso, checked) {
     }).catch(error => {
         ASTNotif.dialog('Erro', error.message)
         console.log(error)
+    })
+    */
+
+    var liberaERemoveAcessos = firebase.functions().httpsCallable('liberaERemoveAcessos')
+
+    liberaERemoveAcessos({email: email, acesso: acesso, checked: checked}).then(function(result) {
+        console.log(result)
     })
 }
 

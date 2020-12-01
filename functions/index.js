@@ -44,3 +44,18 @@ exports.verificadorDeAcesso = functions.https.onRequest((request, response) => {
     })
 })
 
+exports.liberaERemoveAcessos = functions.https.onCall((data, context) => {
+    return admin.database().ref(`sistemaEscolar/usuarios/${data.email}/acessos/${data.acesso}`).set(data.checked)
+    .then(() => {
+        if (data.checked) {
+            return {acesso: 'Acesso concedido!'}
+        } else {
+            return {acesso: 'Acesso removido!'}
+        }
+    }).catch(error => {
+        console.log(error)
+        throw new functions.https.HttpsError('unknown', 'Erro')
+        
+    })
+    
+})
