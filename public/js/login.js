@@ -1,6 +1,6 @@
 var listaUsersRef = firebase.database().ref('sistemaEscolar/listaDeUsuarios')
 var ui = new firebaseui.auth.AuthUI(firebase.auth())
-
+//firebase.auth().signInWithEmailAndPassword('guresende13@gmail.com', 'galo1234')
 var uiConfig = {
     callbacks: {
       signInSuccessWithAuthResult: function(authResult, redirectUrl) {
@@ -78,7 +78,7 @@ function listaUsuarios() {
             if (snapshot.val().hasOwnProperty(key)) {
                 const child = snapshot.val()[key];
                 lista.push(child.email)
-                corpo += `<button id="0" class="list-group-item list-group-item-action" onclick="acessaUsuario('${child.email}')">${child.emailNormal}</button>`
+                corpo += `<button id="${i}" class="list-group-item list-group-item-action" onclick="acessaUsuario('${child.email}', '${child.emailNormal}')">${child.emailNormal}</button>`
                 i++ 
             }
         }
@@ -95,11 +95,73 @@ function listaUsuarios() {
     })
 }
 
-function acessaUsuario(email) {
+function acessaUsuario(email, emailNormal) {
     let acoesUser = document.getElementById('acoesUser')
     let usuariosRef = firebase.database().ref('sistemaEscolar/usuarios')
-    usuariosRef.child(email).once('value').then(snapshot => {
-        acoesUser.innerHTML = `Aqui vai as funções para o email ${email}`
+    usuariosRef.child(email).on('value', (snapshot) => {
+        var dados = snapshot.val()
+        acoesUser.innerHTML = `
+        <h6>Gerenciamento de usuários</h6>
+        Marque os acessos que deseja dar à esta conta
+        <div class="row">
+            <div class="col">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">`
+
+        for (let acesso in dados.acessos) {
+            if (dados.acessos.hasOwnProperty(acesso)) {
+                let status = dados.acessos[acesso];
+                console.log(acesso, status)
+                var acessoText
+                if (acesso == 'adm') {
+                    acessoText = 'administração'
+                } else {
+                    acessoText = acesso
+                }
+                var checked = ''
+                if (status == true) {
+                    checked = 'checked'
+                }
+                acoesUser.innerHTML += `
+                <div class="input-group-text">
+                    <input type="checkbox" ${checked} onclick="liberaAcesso('${email}', '${acesso}', this.checked)">
+                    &nbsp; Acesso ${acessoText}
+                </div>
+                `
+            }
+        }
+        
+        acoesUser.innerHTML += `
+            </div>
+            </div>
+            </div>
+            <div class="col">
+                <button type="button" class="btn btn-danger" onclick="apagarConta('${emailNormal}')">Remover e apagar esta conta</button>
+            </div>
+        </div>`
     })
 
+}
+
+function liberaAcesso(email, acesso, checked) {
+    firebase.database().ref(`sistemaEscolar/usuarios/${email}/acessos/${acesso}`).set(checked)
+    .then(() => {
+        if (checked) {
+            AstNotif.notify('Acesso liberado!', 'Acesso concedido com sucesso.')
+        } else {
+            AstNotif.notify('Acesso removido!', 'Acesso removido com sucesso.')
+        }
+        
+    }).catch(error => {
+        ASTNotif.dialog('Erro', error.message)
+        console.log(error)
+    })
+}
+
+function apagarConta(email, sure=false) {
+    if (sure == true) {
+        
+    } else {
+        AstNotif.dialog('Confirmação', `Você têm certeza que deseja apagar o usuário ${email}, os dados serão mantidos mas esta conta perderá acesso à todas as áreas que foram designadas. <br><br> <button type="button" class="btn btn-danger" onclick="apagarConta('${email}', true)">Apagar esta conta agora</button>`, {positive: 'Voltar', negative: ''})
+    }
 }

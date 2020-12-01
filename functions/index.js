@@ -10,6 +10,7 @@ admin.initializeApp()
 //   response.send("Hello from Firebase!");
 // });
 
+
 exports.verificadorDeAcesso = functions.https.onRequest((request, response) => {
     let dados = JSON.parse(request.body)
     return admin.database().ref(`sistemaEscolar/usuarios/${dados.email}/admin`).once('value')
