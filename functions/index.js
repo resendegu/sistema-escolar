@@ -11,14 +11,29 @@ admin.initializeApp()
 // });
 
 
-exports.verificadorDeAcesso = functions.https.onRequest((request, response) => {
-    let dados = JSON.parse(request.body)
+exports.verificadorDeAcesso = functions.https.onCall((data, context) => {
+    try {
+        if (context.auth.token.acessos.master == true) {
+            return true
+        } else if (context.auth.token.acessos[data.acesso] == true) {
+            return true
+        } else {
+            throw new functions.https.HttpsError('permission-denied', 'Acesso não liberado.')
+        }
+    } catch (error) {
+        throw new functions.https.HttpsError('permission-denied', 'Você não tem permissão para acesso. Você deve contatar um Administrador Master do sistema para liberação de acessos.')
+    }
+    
+    console.log(context)
+    
+
+    let dados = data
     return admin.database().ref(`sistemaEscolar/usuarios/${dados.email}/admin`).once('value')
     .then(snapshot => {
         if (snapshot.exists() && snapshot.val() == dados.uid /**&& dados.provider == 'google.com'**/) {
-            response.status(200).send(snapshot.val())
+            return {uid: snapshot.val()}
         } else {
-            response.status(403).send()
+            
             var dadosNoBanco = admin.database().ref(`sistemaEscolar/usuarios/${dados.email}/`)
             var listaDeUsers = admin.database().ref(`sistemaEscolar/listaDeUsuarios`)
             dadosNoBanco.once('value')
@@ -31,7 +46,7 @@ exports.verificadorDeAcesso = functions.https.onRequest((request, response) => {
                         professores: false
                     }).then(() => {
                         listaDeUsers.push({email: dados.email, emailNormal: dados.emailNormal}).then(() => {
-
+                            throw new functions.https.HttpsError('permission-denied', 'Você não possui permissão de admin master')
                         }).catch(error => {
                             console.log(error)
                         })
@@ -45,6 +60,7 @@ exports.verificadorDeAcesso = functions.https.onRequest((request, response) => {
 })
 
 exports.liberaERemoveAcessos = functions.https.onCall((data, context) => {
+    console.log(context)
     return admin.database().ref(`sistemaEscolar/usuarios/${data.email}/acessos/${data.acesso}`).set(data.checked)
     .then(() => {
         if (data.checked) {
@@ -58,4 +74,8 @@ exports.liberaERemoveAcessos = functions.https.onCall((data, context) => {
         
     })
     
+})
+
+exports.apagaContas = functions.https.onCall((data, context) => {
+
 })

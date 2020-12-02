@@ -1,5 +1,6 @@
 var listaUsersRef = firebase.database().ref('sistemaEscolar/listaDeUsuarios')
 var ui = new firebaseui.auth.AuthUI(firebase.auth())
+var loader = document.getElementById('loader')
 //firebase.auth().signInWithEmailAndPassword('guresende13@gmail.com', 'galo1234')
 var uiConfig = {
     callbacks: {
@@ -12,7 +13,7 @@ var uiConfig = {
       uiShown: function() {
         // The widget is rendered.
         // Hide the loader.
-        document.getElementById('loader').style.display = 'none';
+        loader.style.visibility = 'hidden';
       }
     },
     // Will use popup for IDP Providers sign-in flow instead of the default, redirect.
@@ -28,7 +29,7 @@ var uiConfig = {
     privacyPolicyUrl: ''
 };
 
-document.addEventListener('DOMContentLoaded', function() {
+//document.addEventListener('DOMContentLoaded', function() {
     firebase.auth().onAuthStateChanged((user) => {
         if (user) {
             document.getElementById('logado').style.visibility = 'visible'
@@ -37,27 +38,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('foto').src = user.photoURL
             }
             document.getElementById('email').innerText = user.email
-            var dados = {email: user.email.replaceAll('@', '-').replaceAll('.', '_'), uid: user.uid, provider: user.providerData.providerId, emailNormal: user.email}
-            fetch('http://localhost:5000/verificadorDeAcesso', {
-                body: JSON.stringify(dados),
-                method: 'POST',
-                mode: 'no-cors'
-            }).then(response => {
-                if (response.status == 200) {
-                    document.getElementById('painelAdm').style.display = 'block'
-
-                } else {
-                    document.getElementById('painelAdm').remove()
-                }
-                console.log(response)
-            }).catch(error => {
-                console.log(error)
+            var verificadorDeAcesso = firebase.functions().httpsCallable('verificadorDeAcesso')
+            verificadorDeAcesso({acesso: 'master'}).then(function(result) {
+                console.log(result)
+                loader.style.visibility = 'hidden'
+                document.getElementById('painelAdm').style.display = 'block'
+                
+            }).catch(function(error) {
+                loader.style.visibility = 'hidden'
+                document.getElementById('painelAdm').remove()
             })
         } else {
             ui.start("#firebaseui-auth-container", uiConfig)
         }
     })
-})
+//})
 
 function sair() {
     firebase.auth().signOut().then(function() {
@@ -136,7 +131,7 @@ function acessaUsuario(email, emailNormal) {
             </div>
             </div>
             <div class="col">
-                <button type="button" class="btn btn-danger" onclick="apagarConta('${emailNormal}')">Remover e apagar esta conta</button>
+                <button type="button" class="btn btn-danger" onclick="apagarConta('${emailNormal}', '${email}')">Remover e apagar esta conta</button>
             </div>
         </div>`
     })
@@ -144,32 +139,18 @@ function acessaUsuario(email, emailNormal) {
 }
 
 function liberaAcesso(email, acesso, checked) {
-    /*
-    firebase.database().ref(`sistemaEscolar/usuarios/${email}/acessos/${acesso}`).set(checked)
-    .then(() => {
-        if (checked) {
-            AstNotif.notify('Acesso liberado!', 'Acesso concedido com sucesso.')
-        } else {
-            AstNotif.notify('Acesso removido!', 'Acesso removido com sucesso.')
-        }
-        
-    }).catch(error => {
-        ASTNotif.dialog('Erro', error.message)
-        console.log(error)
-    })
-    */
-
     var liberaERemoveAcessos = firebase.functions().httpsCallable('liberaERemoveAcessos')
 
     liberaERemoveAcessos({email: email, acesso: acesso, checked: checked}).then(function(result) {
-        console.log(result)
+        AstNotif.notify(result.data.acesso, '')
     })
 }
 
-function apagarConta(email, sure=false) {
+function apagarConta(emailNormal, email, sure=false) {
     if (sure == true) {
-        
+        var apagaContas = firebase.functions().httpsCallable('liberaERemoveAcessos')
+        apagaContas({emailNormal: emailNormal, email: email, emailAdmin: firebase})
     } else {
-        AstNotif.dialog('Confirmação', `Você têm certeza que deseja apagar o usuário ${email}, os dados serão mantidos mas esta conta perderá acesso à todas as áreas que foram designadas. <br><br> <button type="button" class="btn btn-danger" onclick="apagarConta('${email}', true)">Apagar esta conta agora</button>`, {positive: 'Voltar', negative: ''})
+        AstNotif.dialog('Confirmação', `Você têm certeza que deseja apagar o usuário ${email}, os dados serão mantidos mas esta conta perderá acesso à todas as áreas que foram designadas. <br><br> <button type="button" class="btn btn-danger" onclick="apagarConta('${emailNormal}', '${email}', true)">Apagar esta conta agora</button>`, {positive: 'Voltar', negative: ''})
     }
 }
