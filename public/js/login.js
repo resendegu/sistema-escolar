@@ -1,7 +1,6 @@
 var listaUsersRef = firebase.database().ref('sistemaEscolar/listaDeUsuarios')
 var ui = new firebaseui.auth.AuthUI(firebase.auth())
 var loader = document.getElementById('loader')
-//firebase.auth().signInWithEmailAndPassword('gustavo@teste.com', 'galo1234')
 var uiConfig = {
     callbacks: {
       signInSuccessWithAuthResult: function(authResult, redirectUrl) {
@@ -22,6 +21,11 @@ var uiConfig = {
     signInOptions: [
       // Leave the lines as is for the providers you want to offer your users.
       firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+      {
+        provider: firebase.auth.EmailAuthProvider.PROVIDER_ID,
+        signInMethod: firebase.auth.EmailAuthProvider.EMAIL_LINK_SIGN_IN_METHOD,
+        requireDisplayName: true
+      }
     ],
     // Terms of service url.
     tosUrl: '',

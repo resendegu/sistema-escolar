@@ -1,15 +1,12 @@
 <!doctype html>
-<html lang="en">
+<html lang="pt-br">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
-    <link rel="icon" href="/docs/4.0/assets/img/favicons/favicon.ico">
 
     <title>Dashboard Template for Bootstrap</title>
-
-    <link rel="canonical" href="https://getbootstrap.com/docs/4.0/examples/dashboard/">
 
     <!-- Bootstrap core CSS -->
     <link href="../resources/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -19,6 +16,24 @@
   </head>
 
   <body>
+          <!-- Inicialização do Firebase -->
+        <!-- update the version number as needed -->
+        <script defer src="/__/firebase/8.1.1/firebase-app.js"></script>
+        <!-- include only the Firebase features as you need -->
+        <script defer src="/__/firebase/8.1.1/firebase-auth.js"></script>
+        <script defer src="/__/firebase/8.1.1/firebase-database.js"></script>
+        <script defer src="/__/firebase/8.1.1/firebase-firestore.js"></script>
+        <script defer src="/__/firebase/8.1.1/firebase-functions.js"></script>
+        <script defer src="/__/firebase/8.1.1/firebase-messaging.js"></script>
+        <script defer src="/__/firebase/8.1.1/firebase-storage.js"></script>
+        <script defer src="/__/firebase/8.1.1/firebase-analytics.js"></script>
+        <script defer src="/__/firebase/8.1.1/firebase-remote-config.js"></script>
+        <script defer src="/__/firebase/8.1.1/firebase-performance.js"></script>
+        <!-- 
+          initialize the SDK after all desired features are loaded, set useEmulator to false
+          to avoid connecting the SDK to running emulators.
+        -->
+        <script defer src="/__/firebase/init.js?useEmulator=true"></script>
         <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0">
         <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">Nome da empresa</a>
         
@@ -43,32 +58,32 @@
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="#">
-                  <span data-feather="file"></span>
-                  Orders
-                </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#">
-                  <span data-feather="shopping-cart"></span>
-                  Products
-                </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#">
                   <span data-feather="users"></span>
-                  Customers
+                  Alunos
                 </a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="#">
-                  <span data-feather="bar-chart-2"></span>
-                  Reports
+                  <span data-feather="plus-square"></span>
+                  Cadastrar turmas
                 </a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="#">
-                  <span data-feather="layers"></span>
-                  Integrations
+                  <span data-feather="user-plus"></span>
+                  Cadastrar alunos
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">
+                  <span data-feather="git-pull-request"></span>
+                  Transferência de alunos
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">
+                  <span data-feather="user-x"></span>
+                  Alunos desativados
                 </a>
               </li>
             </ul>
@@ -110,7 +125,7 @@
 
         <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
           <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
-            <h1 class="h2">Dashboard</h1>
+            <h1 class="h2">Secretaria</h1>
             <div class="btn-toolbar mb-2 mb-md-0">
               <div class="btn-group mr-2">
                 <button class="btn btn-sm btn-outline-secondary">Share</button>
@@ -123,136 +138,94 @@
             </div>
           </div>
 
-          <canvas class="my-4" id="myChart" width="900" height="380"></canvas>
-
-          <h2>Section title</h2>
-          <div class="table-responsive">
-            <table class="table table-striped table-sm">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Header</th>
-                  <th>Header</th>
-                  <th>Header</th>
-                  <th>Header</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>1,001</td>
-                  <td>Lorem</td>
-                  <td>ipsum</td>
-                  <td>dolor</td>
-                  <td>sit</td>
-                </tr>
-                <tr>
-                  <td>1,002</td>
-                  <td>amet</td>
-                  <td>consectetur</td>
-                  <td>adipiscing</td>
-                  <td>elit</td>
-                </tr>
-                <tr>
-                  <td>1,003</td>
-                  <td>Integer</td>
-                  <td>nec</td>
-                  <td>odio</td>
-                  <td>Praesent</td>
-                </tr>
-                <tr>
-                  <td>1,003</td>
-                  <td>libero</td>
-                  <td>Sed</td>
-                  <td>cursus</td>
-                  <td>ante</td>
-                </tr>
-                <tr>
-                  <td>1,004</td>
-                  <td>dapibus</td>
-                  <td>diam</td>
-                  <td>Sed</td>
-                  <td>nisi</td>
-                </tr>
-                <tr>
-                  <td>1,005</td>
-                  <td>Nulla</td>
-                  <td>quis</td>
-                  <td>sem</td>
-                  <td>at</td>
-                </tr>
-                <tr>
-                  <td>1,006</td>
-                  <td>nibh</td>
-                  <td>elementum</td>
-                  <td>imperdiet</td>
-                  <td>Duis</td>
-                </tr>
-                <tr>
-                  <td>1,007</td>
-                  <td>sagittis</td>
-                  <td>ipsum</td>
-                  <td>Praesent</td>
-                  <td>mauris</td>
-                </tr>
-                <tr>
-                  <td>1,008</td>
-                  <td>Fusce</td>
-                  <td>nec</td>
-                  <td>tellus</td>
-                  <td>sed</td>
-                </tr>
-                <tr>
-                  <td>1,009</td>
-                  <td>augue</td>
-                  <td>semper</td>
-                  <td>porta</td>
-                  <td>Mauris</td>
-                </tr>
-                <tr>
-                  <td>1,010</td>
-                  <td>massa</td>
-                  <td>Vestibulum</td>
-                  <td>lacinia</td>
-                  <td>arcu</td>
-                </tr>
-                <tr>
-                  <td>1,011</td>
-                  <td>eget</td>
-                  <td>nulla</td>
-                  <td>Class</td>
-                  <td>aptent</td>
-                </tr>
-                <tr>
-                  <td>1,012</td>
-                  <td>taciti</td>
-                  <td>sociosqu</td>
-                  <td>ad</td>
-                  <td>litora</td>
-                </tr>
-                <tr>
-                  <td>1,013</td>
-                  <td>torquent</td>
-                  <td>per</td>
-                  <td>conubia</td>
-                  <td>nostra</td>
-                </tr>
-                <tr>
-                  <td>1,014</td>
-                  <td>per</td>
-                  <td>inceptos</td>
-                  <td>himenaeos</td>
-                  <td>Curabitur</td>
-                </tr>
-                <tr>
-                  <td>1,015</td>
-                  <td>sodales</td>
-                  <td>ligula</td>
-                  <td>in</td>
-                  <td>libero</td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="container" onload="carregaDadosParaDashboard()">
+            <button type="button" class="btn btn-light">
+              Alunos cadastrados <span class="badge badge-primary" id="alunosCadastradosNum">0</span>
+            </button>
+            <button type="button" class="btn btn-light">
+              Alunos matriculados <span class="badge badge-success" id="alunosMatriculadosNum">0</span>
+            </button>
+            <button type="button" class="btn btn-light">
+              Alunos Desativados <span class="badge badge-danger" id="alunosDesativadosNum">0</span>
+            </button>
           </div>
+          <!-- Gráfico -->
+          <!-- <canvas class="my-4" id="myChart" width="900" height="380"></canvas> -->
+          <div class="container">
+            <div class="row">
+              <div class="col-sm-auto">
+                <h2>Tabela semanal de alunos</h2>
+                <div class="table-responsive">
+                  <table class="table table-striped table-sm">
+                    <thead>
+                      <tr>
+                        <th>Dia da semana</th>
+                        <th>Manhã</th>
+                        <th>Tarde</th>
+                        <th>Noite</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>Segunda - feira</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        
+                      </tr>
+                      <tr>
+                        <td>Terça - feira</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        
+                      </tr>
+                      <tr>
+                        <td>Quarta - feira</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        
+                      </tr>
+                      <tr>
+                        <td>Quinta - feira</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                      
+                      </tr>
+                      <tr>
+                        <td>Sexta - feira</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        
+                      </tr>
+                      <tr>
+                        <td>Sábado</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                      
+                      </tr>
+                      <tr>
+                        <td>Domingo</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="col">
+                3 of 3
+              </div>
+            </div>
+          </div>
+          
+          
         </main>
       </div>
     </div>
@@ -270,8 +243,9 @@
     <script>
       feather.replace()
     </script>
+    <script defer src="../js/secretaria.js"></script>
 
-    <!-- Graphs -->
+    <!-- Graphs 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
     <script>
       var ctx = document.getElementById("myChart");
@@ -301,6 +275,6 @@
           }
         }
       });
-    </script>
+    </script> -->
   </body>
 </html>
