@@ -17,12 +17,16 @@ firebase.auth().onAuthStateChanged((user) => {
     numerosRef.on('value', (snapshot) => {
         var numeros = snapshot.val()
         var tabelaSemanal = numeros.tabelaSemanal
+        
         alunosCadastradosNum.innerText = numeros.alunosCadastrados
         alunosMatriculadosNum.innerText = numeros.alunosMatriculados
         alunosDesativadosNum.innerText = numeros.alunosDesativados
 
         // Alimenta tabela com os números de alunos em cada semana
         var idCelulaTabela = ''
+        var totalManha = document.getElementById('totalManha').innerText = 0
+        var totalTarde = document.getElementById('totalTarde').innerText = 0
+        var totalNoite = document.getElementById('totalNoite').innerText = 0
         for (const dia in tabelaSemanal) {
             if (tabelaSemanal.hasOwnProperty(dia)) {
                 const horarios = tabelaSemanal[dia];
@@ -32,6 +36,9 @@ firebase.auth().onAuthStateChanged((user) => {
                         const numeroDeAlunos = horarios[horario];
                         idCelulaTabela += horario
                         document.getElementById(idCelulaTabela).innerText = numeroDeAlunos
+                        var numNaTabela = Number(document.getElementById('total' + horario).innerText)
+                        numNaTabela += numeroDeAlunos
+                        document.getElementById('total' + horario).innerText = numNaTabela
                         idCelulaTabela = dia
                     }
                 }
