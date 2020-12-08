@@ -37,11 +37,12 @@
         <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0">
         <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">Nome da empresa</a>
         
-        <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">
+        <input class="form-control form-control-dark w-100" type="text" placeholder="Pesquisar" aria-label="Pesquisar">
         <ul class="navbar-nav px-3">
-            <li class="nav-item active">
+            <li class="nav-item">
                 <a class="nav-link" href="../">Início <span class="sr-only">(current)</span></a>
             </li>
+            
         </ul>
         </nav>
 
@@ -51,37 +52,37 @@
           <div class="sidebar-sticky">
             <ul class="nav flex-column">
               <li class="nav-item">
-                <a class="nav-link active" href="#">
+                <a class="nav-link active" data-toggle="list" href="#abaDashboard" role="tab" aria-controls="home" onclick="abreDashboard()">
                   <span data-feather="home"></span>
                   Dashboard <span class="sr-only">(current)</span>
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#">
+                <a class="nav-link" data-toggle="list" href="#abaAlunos" role="tab" aria-controls="alunos">
                   <span data-feather="users"></span>
                   Alunos
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#">
+                <a class="nav-link" data-toggle="list" href="#abaCadastrarTurmas" role="tab" aria-controls="CadastrarTurmas">
                   <span data-feather="plus-square"></span>
                   Cadastrar turmas
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#">
+                <a class="nav-link" data-toggle="list" href="#abaCadastrarAlunos" role="tab" aria-controls="CadastrarAlunos">
                   <span data-feather="user-plus"></span>
                   Cadastrar alunos
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#">
+                <a class="nav-link" data-toggle="list" href="#abaTransferenciaAlunos" role="tab" aria-controls="TranferenciaAlunos">
                   <span data-feather="git-pull-request"></span>
                   Transferência de alunos
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#">
+                <a class="nav-link" data-toggle="list" href="#abaAlunosDesativados" role="tab" aria-controls="alunosDesativados">
                   <span data-feather="user-x"></span>
                   Alunos desativados
                 </a>
@@ -135,6 +136,7 @@
                 <span data-feather="calendar"></span>
                 This week
               </button>
+              <a class="btn" href="../login.html"><img src="../images/profile_placeholder.png" class="rounded float-right" width="40px" id="profilePic"></a>
             </div>
           </div>
 
@@ -149,81 +151,117 @@
               Alunos Desativados <span class="badge badge-danger" id="alunosDesativadosNum">0</span>
             </button>
           </div>
+          <hr>
           <!-- Gráfico -->
           <!-- <canvas class="my-4" id="myChart" width="900" height="380"></canvas> -->
-          <div class="container">
-            <div class="row">
-              <div class="col-sm-auto">
-                <h2>Tabela semanal de alunos</h2>
-                <div class="table-responsive">
-                  <table class="table table-striped table-sm">
-                    <thead>
-                      <tr>
-                        <th>Dia da semana</th>
-                        <th>Manhã</th>
-                        <th>Tarde</th>
-                        <th>Noite</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>Segunda - feira</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
+          <div class="tab-content" id="nav-tabContent">
+            <div class="container tab-pane fade show active" id="abaDashboard" role="tabpanel" aria-labelledby="Dashboard">
+              <div class="row">
+                <div class="col-sm-auto">
+                  <h2>Tabela semanal de alunos</h2>
+                  <div class="table-responsive">
+                    <table class="table table-striped table-sm">
+                      <thead>
+                        <tr>
+                          <th>Dia da semana</th>
+                          <th>Manhã</th>
+                          <th>Tarde</th>
+                          <th>Noite</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>Segunda - feira</td>
+                          <td id="segundaManha">0</td>
+                          <td id="segundaTarde">0</td>
+                          <td id="segundaNoite">0</td>
+                          
+                        </tr>
+                        <tr>
+                          <td>Terça - feira</td>
+                          <td id="tercaManha">0</td>
+                          <td id="tercaTarde">0</td>
+                          <td id="tercaNoite">0</td>
+                          
+                        </tr>
+                        <tr>
+                          <td>Quarta - feira</td>
+                          <td id="quartaManha">0</td>
+                          <td id="quartaTarde">0</td>
+                          <td id="quartaNoite">0</td>
+                          
+                        </tr>
+                        <tr>
+                          <td>Quinta - feira</td>
+                          <td id="quintaManha">0</td>
+                          <td id="quintaTarde">0</td>
+                          <td id="quintaNoite">0</td>
                         
-                      </tr>
-                      <tr>
-                        <td>Terça - feira</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
+                        </tr>
+                        <tr>
+                          <td>Sexta - feira</td>
+                          <td id="sextaManha">0</td>
+                          <td id="sextaTarde">0</td>
+                          <td id="sextaNoite">0</td>
+                          
+                        </tr>
+                        <tr>
+                          <td>Sábado</td>
+                          <td id="sabadoManha">0</td>
+                          <td id="sabadoTarde">0</td>
+                          <td id="sabadoNoite">0</td>
                         
-                      </tr>
-                      <tr>
-                        <td>Quarta - feira</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                        
-                      </tr>
-                      <tr>
-                        <td>Quinta - feira</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                      
-                      </tr>
-                      <tr>
-                        <td>Sexta - feira</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                        
-                      </tr>
-                      <tr>
-                        <td>Sábado</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                      
-                      </tr>
-                      <tr>
-                        <td>Domingo</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                        
-                      </tr>
-                    </tbody>
-                  </table>
+                        </tr>
+                        <tr>
+                          <td>Domingo</td>
+                          <td id="domingoManha">0</td>
+                          <td id="domingoTarde">0</td>
+                          <td id="domingoNoite">0</td>
+                          
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <div class="col">
+                  3 of 3
                 </div>
               </div>
-              <div class="col">
-                3 of 3
-              </div>
             </div>
+
+            <div class="container tab-pane fade" id="abaAlunos" role="tabpanel" aria-labelledby="Alunos">
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptates aliquam quae commodi ipsam iusto quod cumque molestias itaque velit ea ratione corporis numquam nam esse, tempore aspernatur excepturi quia odit.
+            </div>
+
+            <div class="container tab-pane fade" id="abaCadastrarTurmas" role="tabpanel" aria-labelledby="Cadastrar Alunos">
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptates aliquam quae commodi ipsam iusto quod cumque molestias itaque velit ea ratione corporis numquam nam esse, tempore aspernatur excepturi quia odit.
+              Lorem ipsum dolor, sit amet consectetur adipisicing elit. Molestiae a quae voluptatibus, ex illo ratione rerum esse odit ab nostrum optio ullam enim cum corporis. Necessitatibus natus facere quasi! Tempore?
+            </div>
+
+            <div class="container tab-pane fade" id="abaCadastrarAlunos" role="tabpanel" aria-labelledby="Cadastrar Alunos">
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Nobis deserunt fugiat architecto voluptate, libero dolore laudantium culpa tempore voluptas sunt rerum. Officiis saepe quidem quo quis eaque nobis quibusdam perspiciatis.
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Hic delectus nihil ullam praesentium earum, unde rem expedita nobis accusantium aspernatur voluptate molestiae nisi dolore, nam nulla consectetur voluptatum deserunt laborum.
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolorem veritatis voluptatum officiis necessitatibus officia rerum cum cumque facilis debitis, temporibus saepe amet similique? Reprehenderit at deleniti numquam temporibus quae asperiores!
+            </div>
+
+            <div class="container tab-pane fade" id="abaTransferenciaAlunos" role="tabpanel" aria-labelledby="Transferência de Alunos">
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Nobis deserunt fugiat architecto voluptate, libero dolore laudantium culpa tempore voluptas sunt rerum. Officiis saepe quidem quo quis eaque nobis quibusdam perspiciatis.
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Hic delectus nihil ullam praesentium earum, unde rem expedita nobis accusantium aspernatur voluptate molestiae nisi dolore, nam nulla consectetur voluptatum deserunt laborum.
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolorem veritatis voluptatum officiis necessitatibus officia rerum cum cumque facilis debitis, temporibus saepe amet similique? Reprehenderit at deleniti numquam temporibus quae asperiores!
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Recusandae, cupiditate blanditiis tenetur eos magni nemo voluptates maxime sint aliquam dicta corporis veniam, facilis facere sit earum ea assumenda accusamus ex?
+            </div>
+
+            <div class="container tab-pane fade" id="abaAlunosDesativados" role="tabpanel" aria-labelledby="Alunos Desativados">
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Nobis deserunt fugiat architecto voluptate, libero dolore laudantium culpa tempore voluptas sunt rerum. Officiis saepe quidem quo quis eaque nobis quibusdam perspiciatis.
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Hic delectus nihil ullam praesentium earum, unde rem expedit
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam quos deleniti eius, rem id officiis temporibus corrupti possimus modi dolor mollitia cupiditate dolore assumenda ea sint nesciunt sunt. Tempora, eius. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia sint id non, unde maxime dolores quia voluptatum animi enim, impedit perspiciatis explicabo quam distinctio dolorem? Numquam delectus beatae nesciunt explicabo?
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolorem veritatis voluptatum officiis necessitatibus officia rerum cum cumque facilis debitis, temporibus saepe amet similique? Reprehenderit at deleniti numquam temporibus quae asperiores!
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Commodi laborum recusandae animi inventore ab quia nulla eius esse. Maiores architecto soluta necessitatibus recusandae unde fugit porro ad est sed aut.
+            </div>
+
+
           </div>
+
           
           
         </main>

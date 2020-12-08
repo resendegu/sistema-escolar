@@ -1,22 +1,24 @@
 {
+  "rulesFile": "database.rules.json",
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
+  "functions": {
+    "predeploy": [
+      "npm --prefix \"$RESOURCE_DIR\" run lint"
+    ]
+  },
   "hosting": {
-    "site": "sistemaescolar",
     "public": "public",
     "ignore": [
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
-    ],
-    "rewrites": [
-      {
-        "source": "/verificadorDeAcesso",
-        "function": "verificadorDeAcesso"
-      },
-      {
-        "source": "/helloWorld",
-        "function": "helloWorld"
-      }
     ]
+  },
+  "storage": {
+    "rules": "storage.rules"
   },
   "emulators": {
     "auth": {
@@ -26,7 +28,7 @@
       "port": 5001
     },
     "firestore": {
-      "port": 8081
+      "port": 8080
     },
     "database": {
       "port": 9000
@@ -34,11 +36,11 @@
     "hosting": {
       "port": 5000
     },
-    "ui": {
-      "enabled": true
-    },
     "pubsub": {
       "port": 8085
+    },
+    "ui": {
+      "enabled": true
     }
   }
 }

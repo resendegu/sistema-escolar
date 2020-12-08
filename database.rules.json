@@ -1,0 +1,67 @@
+// These rules grant access to a node matching the authenticated
+// user's ID from the Firebase auth token
+{
+  	"rules": {
+      // Regra teste para lembrar como libera o acesso aos dados
+      "sistemaEscolar": {
+          ".write": false,
+          ".read": false,
+          //".read": "auth.uid != null && auth.token.master == true || auth.token.secretaria == true"
+          "numeros": {
+            ".write": false,
+            ".read":"auth.uid != null"
+          }
+        },
+      "felipe": {
+          ".write": true,
+          ".read": true
+        },
+    	"ServidorResende": {
+        ".read": "auth.token.email_verified == true",
+        ".write": "auth.token.email_verified == true",
+        "video": {
+          ".read": true
+        },
+        "verificacao": {
+          ".read": true
+        },
+        "seguranca": {
+          ".read": "auth.token.email_verified == true",
+          ".write": "auth.token.email_verified == true",
+        },
+        "chat": {
+          ".write": "auth != null",
+          ".read": true,
+        },
+        "contas": {
+          ".read": "auth != null",
+          ".write": true
+        },
+        "firevideo": {
+          ".write": true,
+          ".read": true
+        },
+        "teste": {
+          ".write": true,
+          ".read": true
+        },
+        "salas": {
+          ".write": "auth.token.email_verified == true",
+          ".read": "auth.token.email_verified == true",
+        },
+        "links": {
+          ".write": true,
+          ".read": true
+        },
+        "provaonline": {
+          ".write": true,
+          ".read": true
+        },
+          "amongus": {
+          ".write": true,
+          ".read": true
+        }
+          
+  	}
+	}
+}
