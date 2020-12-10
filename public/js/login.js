@@ -13,7 +13,6 @@ var uiConfig = {
       uiShown: function() {
         // The widget is rendered.
         // Hide the loader.
-        loader.style.visibility = 'hidden';
       }
     },
     // Will use popup for IDP Providers sign-in flow instead of the default, redirect.
@@ -35,6 +34,7 @@ var uiConfig = {
 //document.addEventListener('DOMContentLoaded', function() {
     firebase.auth().onAuthStateChanged((user) => {
         if (user) {
+            document.getElementById('loginContainer').style.display = 'none'
             document.getElementById('logado').style.visibility = 'visible'
             document.getElementById('nome').innerText = user.displayName
             if (user.photoURL) {
@@ -52,10 +52,76 @@ var uiConfig = {
                 document.getElementById('painelAdm').remove()
             })
         } else {
-            ui.start("#firebaseui-auth-container", uiConfig)
+            document.getElementById('loginContainer').style.display = 'block'
+            loader.style.visibility = 'hidden';
         }
     })
 //})
+
+function liberaAreaCadastro(abre=true) {
+    if (abre) {
+        document.getElementById('cadastroNovoUsuario').style.display = 'block'
+        document.getElementById('btnEntrar').style.display = 'none'
+        document.getElementById('btnEntrar').disabled = true
+        document.getElementById('btnCadastrar').disabled = false
+        document.getElementById('cadastrarEntrar').style.display = 'none'
+    } else {
+        document.getElementById('cadastroNovoUsuario').style.display = 'none'
+        document.getElementById('btnEntrar').style.display = 'block'
+        document.getElementById('btnEntrar').disabled = false
+        document.getElementById('btnCadastrar').disabled = true
+        document.getElementById('cadastrarEntrar').style.display = 'block'
+        document.getElementById('senhaRepetida').value = ''
+        
+    }
+}
+
+document.querySelector('#areaLogin').addEventListener('submit', (e) => {
+    loader.style.display = 'block'
+    e.preventDefault()
+    const formData = new FormData(e.target);
+    console.log(formData.get('email'))
+    // Now you can use formData.get('foo'), for example.
+    // Don't forget e.preventDefault() if you want to stop normal form .submission
+    firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION)
+  .then(function() {
+      if (formData.get('dataNascimento') == '' || formData.get('nome') == '') {
+        loader.style.visibility = 'hidden';
+        AstNotif.notify('Dados incompletos', 'Digite todos os dados obrigatórios corretamente')
+      } else {
+        if (formData.get('senhaRepetida') != '') {
+            if (formData.get('senhaRepetida') == formData.get('senha')) {
+                loader.style.visibility = 'hidden';
+                return firebase.auth().createUserWithEmailAndPassword(formData.get('email'), formData.get('senha'))
+            } else {
+                loader.style.visibility = 'hidden';
+                AstNotif.notify('As senhas não conferem', 'Digite a senha novamente')
+            }
+            
+        } else {
+            loader.style.visibility = 'hidden';
+            return firebase.auth().signInWithEmailAndPassword(formData.get('email'), formData.get('senha'));
+        }
+      }
+    
+    
+  })
+  .catch(function(error) {
+    // Handle Errors here.
+    var errorCode = error.code;
+    var errorMessage = error.message;
+    if (error.message == 'The email address is already in use by another account.') {
+        AstNotif.dialog('Erro', 'Este email já está cadastrado.')
+    } else {
+        AstNotif.dialog('Erro', error.message)
+    }
+    loader.style.visibility = 'hidden';
+  });
+});
+function entrar() {
+    
+}
+
 
 function sair() {
     firebase.auth().signOut().then(function() {

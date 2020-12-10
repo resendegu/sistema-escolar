@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
-    <meta name="author" content="">
+    <meta name="author" content="Gustavo Resende">
 
     <title>Secretaria</title>
 
@@ -13,6 +13,7 @@
 
     <!-- Custom styles for this template -->
     <link href="../css/dashboard.css" rel="stylesheet">
+
   </head>
 
   <body>
@@ -61,6 +62,12 @@
                 <a class="nav-link" data-toggle="list" href="#abaAlunos" role="tab" aria-controls="alunos">
                   <span data-feather="users"></span>
                   Alunos
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" data-toggle="list" href="#abaTurmas" role="tab" aria-controls="turmas">
+                  <span data-feather="database"></span>
+                  Turmas
                 </a>
               </li>
               <li class="nav-item">
@@ -141,15 +148,19 @@
           </div>
 
           <div class="container" onload="carregaDadosParaDashboard()">
-            <button type="button" class="btn btn-light">
+            <button type="button" class="btn btn-light btn-sm">
               Alunos cadastrados <span class="badge badge-primary" id="alunosCadastradosNum">0</span>
             </button>
-            <button type="button" class="btn btn-light">
+            <button type="button" class="btn btn-light btn-sm">
               Alunos matriculados <span class="badge badge-success" id="alunosMatriculadosNum">0</span>
             </button>
-            <button type="button" class="btn btn-light">
+            <button type="button" class="btn btn-light btn-sm">
               Alunos Desativados <span class="badge badge-danger" id="alunosDesativadosNum">0</span>
             </button>
+            <button type="button" class="btn btn-light btn-sm">
+              Turmas Cadastradas <span class="badge badge-success" id="turmasCadastradasNum">0</span>
+            </button>
+            
           </div>
           <hr>
           <!-- Gráfico -->
@@ -231,6 +242,11 @@
                 </div>
                 <div class="col">
                   <h2>Aniversariantes do mês</h2>
+                  <div class="overflow-auto" style="height: fit-content; max-height: 300px;">
+                    <div class="list-group" id="listaAniversarios">
+                      
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -239,10 +255,144 @@
               Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptates aliquam quae commodi ipsam iusto quod cumque molestias itaque velit ea ratione corporis numquam nam esse, tempore aspernatur excepturi quia odit.
             </div>
 
-            <div class="container tab-pane fade" id="abaCadastrarTurmas" role="tabpanel" aria-labelledby="Cadastrar Alunos">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptates aliquam quae commodi ipsam iusto quod cumque molestias itaque velit ea ratione corporis numquam nam esse, tempore aspernatur excepturi quia odit.
-              Lorem ipsum dolor, sit amet consectetur adipisicing elit. Molestiae a quae voluptatibus, ex illo ratione rerum esse odit ab nostrum optio ullam enim cum corporis. Necessitatibus natus facere quasi! Tempore?
+            <div class="container tab-pane fade" id="abaTurmas" role="tabpanel" aria-labelledby="Turmas">
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptates aliquam quae commodi ipsam iusto quod cumque molestias itaque velit ea ratione corporis numquam nam esse, tempore aspernatur excepturi quia odit. Lorem ipsum dolor, sit amet consectetur adipisicing elit. Impedit voluptatum aliquam quibusdam ratione consequatur molestias in optio maiores harum ducimus doloribus error id blanditiis magnam, veritatis, deleniti, fuga amet architecto.
             </div>
+
+            <div class="container tab-pane fade" id="abaCadastrarTurmas" role="tabpanel" aria-labelledby="Cadastrar Turmas">
+              <label class="h3">Cadastrar turmas</label>
+              <label class="text-muted float-right h5" id="codigoNivel"></label><label class="text-muted float-right h5" id="codigoFaixa"></label><label class="text-muted float-right h5" id="codigoLivros"></label><label class="text-muted float-right h5" id="codigoDia"></label><label class="text-muted float-right h5" id="codigoHorario"></label>
+              <hr>
+              <div class="row">
+                <div class="col-3">
+                  <h6>Nível da turma</h6>
+                  <div class="list-group" id="myList" role="tablist">
+                    <a class="list-group-item list-group-item-action" data-toggle="list" id="B" href="#basico" role="tab" onclick="nivel('B')">B - Básico</a>
+                    <a class="list-group-item list-group-item-action" data-toggle="list" id="I" href="#intermediario" role="tab" onclick="nivel('I')">I - Intermediário</a>
+                    <a class="list-group-item list-group-item-action" data-toggle="list" id="A" href="#avancado" role="tab" onclick="nivel('A')">A - Avançado</a>
+                    <a class="list-group-item list-group-item-action" data-toggle="list" id="KIDS" href="#kids" role="tab" onclick="nivel('KIDS')">KIDS</a>
+                  </div>
+                </div>
+                <div class="col">
+                  <br>
+                  <div class="tab-content" id="nav-tabContent">
+                    <div class="tab-pane fade" id="basico" role="tabpanel" aria-labelledby="Nível Básico">
+                      <div class="input-group prepend">
+                        <div class="input-group-prepend">
+                          <label class="input-group-text" for="inputGroupSelect01">Nivelamento</label>
+                        </div>
+                        <select class="custom-select" id="inputGroupSelect01" onchange="faixa(this.value)">
+                          <option selected hidden>Faixa etária...</option>
+                          <option value="A">A - Adults</option>
+                          <option value="T">T - Teens</option>
+                        </select>
+                      </div>
+                      <br>
+                      <h6>Livros da turma</h6>
+                      <div class="input-group-text">
+                        <input type="checkbox" id="livro1" value="1" onclick="livro(1, this.checked)">
+                        &nbsp;Livro 1&nbsp;&nbsp;&nbsp;
+                        <input type="checkbox" value="" id="livro2" value="2" onclick="livro(2, this.checked)">
+                        &nbsp;Livro 2&nbsp;&nbsp;&nbsp;
+                        <input type="checkbox" id="livro3" value="3" onclick="livro(3, this.checked)">
+                        &nbsp;Livro 3&nbsp;&nbsp;&nbsp;
+                        <input type="checkbox" id="livro4" value="4" onclick="livro(4, this.checked)">
+                        &nbsp;Livro 4&nbsp;&nbsp;&nbsp;
+                      </div>
+                    </div>
+
+                    <div class="tab-pane fade" id="intermediario" role="tabpanel" aria-labelledby="list-profile-list">
+                      <div class="input-group prepend">
+                        <div class="input-group-prepend">
+                          <label class="input-group-text" for="inputGroupSelect01">Nivelamento</label>
+                        </div>
+                        <select class="custom-select" id="inputGroupSelect01" onchange="faixa(this.value)">
+                          <option selected hidden>Faixa etária...</option>
+                          <option value="A">A - Adults</option>
+                          <option value="T">T - Teens</option>
+                        </select>
+                      </div>
+                      <br>
+                      <h6>Livros da turma</h6>
+                      <div class="input-group-text">
+                        <input type="checkbox" id="livro5" value="5" onclick="livro(5, this.checked)">
+                        &nbsp;Livro 5&nbsp;&nbsp;&nbsp;
+                        <input type="checkbox" id="livro6" value="6" onclick="livro(6, this.checked)">
+                        &nbsp;Livro 6&nbsp;&nbsp;&nbsp;
+                      </div>
+                    </div>
+        
+                    <div class="tab-pane fade" id="avancado" role="tabpanel" aria-labelledby="list-profile-list">
+                      <div class="input-group prepend">
+                        <div class="input-group-prepend">
+                          <label class="input-group-text" for="inputGroupSelect01">Nivelamento</label>
+                        </div>
+                        <select class="custom-select" id="inputGroupSelect01" onchange="faixa(this.value)">
+                          <option selected hidden>Faixa etária...</option>
+                          <option value="A">A - Adults</option>
+                          <option value="T">T - Teens</option>
+                        </select>
+                      </div>
+                      <br>
+                      <h6>Livros da turma</h6>
+                      <div class="input-group-text">
+                        <input type="checkbox" id="livro7" value="7" onclick="livro(7, this.checked)">
+                        &nbsp;Livro 7&nbsp;&nbsp;&nbsp;
+                        <input type="checkbox" id="livro8" value="8" onclick="livro(8, this.checked)">
+                        &nbsp;Livro 8&nbsp;&nbsp;&nbsp;
+                      </div>
+                    </div>
+        
+                    <div class="tab-pane fade" id="kids" role="tabpanel" aria-labelledby="list-profile-list">
+                      <input class="form-control" type="text" placeholder="Readonly input here…" value="KIDS" readonly>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <hr>
+              <div class="row">
+                <div class="col-sm">
+                  <div class="input-group prepend">
+                    <div class="input-group-prepend">
+                      <label class="input-group-text" for="inputGroupSelect01">Dia da semana</label>
+                    </div>
+                    <select class="custom-select" id="inputGroupSelect01" onchange="diaSemana(this.value)">
+                      <option selected value="?" hidden>Escolha o dia de aula...</option>
+                      <option value="1">Segunda-feira</option>
+                      <option value="2">Terça-feira</option>
+                      <option value="3">Quarta-feira</option>
+                      <option value="4">Quinta-feira</option>
+                      <option value="5">Sexta-feira</option>
+                      <option value="6">Sábado</option>
+                      <option value="0">Domingo</option>
+                    </select>
+                  </div>
+                  <div class="input-group prepend">
+                    <div class="input-group-prepend">
+                      <label class="input-group-text" for="inputGroupSelect01">Horário</label>
+                    </div>
+                    <input type="number" name="horario" id="horario" onchange="horario(this.value)">
+                  </div>
+                </div>
+                <div class="col-sm">
+                  <div class="col-sm">
+                    <div class="input-group prepend">
+                      <div class="input-group-prepend">
+                        <label class="input-group-text" for="inputGroupSelect01">Professor referência</label>
+                      </div>
+                      <select class="custom-select" id="professorTurma" onchange="professorReferencia(this.value)">
+                        <option selected hidden>Escolha o dia de aula...</option>
+                        
+                      </select>
+                    </div>
+                </div>
+                <br>
+                <button type="button" class="btn btn-primary btn-block" id="btnCadastrarTurma" disabled>Cadastrar turma</button>
+              </div>
+            
+              
+            </div>
+            
 
             <div class="container tab-pane fade" id="abaCadastrarAlunos" role="tabpanel" aria-labelledby="Cadastrar Alunos">
               Lorem ipsum dolor sit amet consectetur adipisicing elit. Nobis deserunt fugiat architecto voluptate, libero dolore laudantium culpa tempore voluptas sunt rerum. Officiis saepe quidem quo quis eaque nobis quibusdam perspiciatis.
