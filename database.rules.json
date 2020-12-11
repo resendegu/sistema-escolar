@@ -10,6 +10,10 @@
           "numeros": {
             ".write": false,
             ".read":"auth.uid != null"
+          },
+          "usuarios": {
+            ".write": "auth.uid == $user_id",
+            ".read":"auth.uid != null"
           }
         },
       "felipe": {

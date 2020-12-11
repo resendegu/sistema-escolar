@@ -51,8 +51,8 @@ exports.liberaERemoveAcessos = functions.https.onCall((data, context) => {
         throw new functions.https.HttpsError('permission-denied', 'Você não têm permissão para realizar esta ação.')
     }
     
-    
 })
+
 
 exports.apagaContas = functions.https.onCall((data, context) => {
     if (context.auth.token.master == true) {
@@ -65,6 +65,7 @@ exports.apagaContas = functions.https.onCall((data, context) => {
         throw new functions.https.HttpsError('permission-denied', 'Você não tem permissão para executar essa ação')
     }
 })
+
 
 exports.deletaUsersAutomatico = functions.auth.user().onDelete((user) => {
     console.log(user)
@@ -141,5 +142,23 @@ exports.cadastroUser = functions.auth.user().onCreate((user) => {
 })
 
 exports.cadastraTurma = functions.https.onCall((data, context) => {
+    console.log(data)
+})
 
+exports.cadastraAniversarios = functions.database.ref('sistemaEscolar/usuarios/{uid}/dataNascimento').onWrite((snapshot, context) => {
+    console.log('aqui', snapshot.after.val())
+    var data = snapshot.after.val()
+    admin.auth().getUserByEmail(data.email).then((user) => {
+        admin.database().ref('sistemaEscolar/aniversarios/' + (data.mes - 1)).push({
+            nome: user.displayName,
+            email: user.email,
+            dataNascimento: {dia: data.dia, mes: data.mes, ano: data.ano}
+        }).then(() => {
+            return {message: 'Aniversario cadastrado'}
+        }).catch(error => {
+            throw new functions.https.HttpsError('unknown', error.message, error)
+        })
+    }).catch(error => {
+        throw new functions.https.HttpsError('unknown', error.message, error)
+    })
 })

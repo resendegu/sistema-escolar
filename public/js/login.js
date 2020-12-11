@@ -31,7 +31,6 @@ var uiConfig = {
     privacyPolicyUrl: ''
 };
 
-//document.addEventListener('DOMContentLoaded', function() {
     firebase.auth().onAuthStateChanged((user) => {
         if (user) {
             document.getElementById('loginContainer').style.display = 'none'
@@ -56,7 +55,7 @@ var uiConfig = {
             loader.style.visibility = 'hidden';
         }
     })
-//})
+
 
 function liberaAreaCadastro(abre=true) {
     if (abre) {
@@ -80,30 +79,63 @@ document.querySelector('#areaLogin').addEventListener('submit', (e) => {
     loader.style.display = 'block'
     e.preventDefault()
     const formData = new FormData(e.target);
-    console.log(formData.get('email'))
+    var nome = formData.get('nome')
+    var senha = formData.get('senha')
+    var senhaRepetida = formData.get('senhaRepetida')
+    var dia = formData.get('dia')
+    var mes = formData.get('mês')
+    var ano = formData.get('ano')
+    var email = formData.get('email')
+    var foto = formData.get('foto')
     // Now you can use formData.get('foo'), for example.
     // Don't forget e.preventDefault() if you want to stop normal form .submission
     firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION)
   .then(function() {
-      if (formData.get('dataNascimento') == '' || formData.get('nome') == '') {
+      if (senhaRepetida != '' && (mes == '' || nome == '')) {
         loader.style.visibility = 'hidden';
-        AstNotif.notify('Dados incompletos', 'Digite todos os dados obrigatórios corretamente')
+        throw new Error('Dados incompletos. Digite todos os dados obrigatórios corretamente')
       } else {
-        if (formData.get('senhaRepetida') != '') {
-            if (formData.get('senhaRepetida') == formData.get('senha')) {
+        if (senhaRepetida != '') {
+            if (senhaRepetida == senha) {
                 loader.style.visibility = 'hidden';
-                return firebase.auth().createUserWithEmailAndPassword(formData.get('email'), formData.get('senha'))
+                return firebase.auth().createUserWithEmailAndPassword(email, senha)
             } else {
                 loader.style.visibility = 'hidden';
-                AstNotif.notify('As senhas não conferem', 'Digite a senha novamente')
+                throw new Error('As senhas não conferem. Tente novamente')
             }
             
         } else {
             loader.style.visibility = 'hidden';
-            return firebase.auth().signInWithEmailAndPassword(formData.get('email'), formData.get('senha'));
+            return firebase.auth().signInWithEmailAndPassword(email, senha);
         }
       }
     
+    
+  }).then(() => {
+      if (senhaRepetida != '') {
+        var user = firebase.auth().currentUser;
+        user.updateProfile({
+            displayName: nome
+        }).then(function() {
+            firebase.database().ref('sistemaEscolar/usuarios/' + user.uid + '/nome').set(nome).then(() => {
+              firebase.database().ref('sistemaEscolar/listaDeUsuarios/' + user.uid + '/nome').set(nome).then(() => {
+                  firebase.database().ref('sistemaEscolar/usuarios/' + user.uid + '/dataNascimento').set({dia: Number(dia), mes: Number(mes), ano: Number(ano), email: email}).then(() => {
+                      window.location.reload()
+                  }).catch(error => {
+                      AstNotif.dialog('Erro', error.message)
+                  })
+                  
+              }).catch(error => {
+                  AstNotif.dialog('Erro', error.message)
+              })
+            }).catch(error => {
+                AstNotif.dialog('Erro', error.message)
+            })
+            
+        }).catch(function(error) {
+            AstNotif.dialog('Erro ao atualizar dados do usuário', error.message)
+        })
+      }
     
   })
   .catch(function(error) {
@@ -112,15 +144,15 @@ document.querySelector('#areaLogin').addEventListener('submit', (e) => {
     var errorMessage = error.message;
     if (error.message == 'The email address is already in use by another account.') {
         AstNotif.dialog('Erro', 'Este email já está cadastrado.')
+    } else if (error.message == 'There is no user record corresponding to this identifier. The user may have been deleted.') {
+        AstNotif.dialog('Erro', 'Não foi encontrado uma conta com este email. Confira o email ou se cadastre no sistema.')
     } else {
         AstNotif.dialog('Erro', error.message)
     }
     loader.style.visibility = 'hidden';
   });
 });
-function entrar() {
-    
-}
+
 
 
 function sair() {

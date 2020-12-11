@@ -55,14 +55,7 @@ firebase.auth().onAuthStateChanged((user) => {
         for (const key in meses[mesAtual]) {
             if (meses[mesAtual].hasOwnProperty(key)) {
                 const aniversario = meses[mesAtual][key];
-                document.getElementById('listaAniversarios').innerHTML += `<button class="list-group-item list-group-item-action">${aniversario.nome} no dia ${aniversario.dia}</button>`
-            }
-        }
-        
-        for (const mes in meses) {
-            if (meses.hasOwnProperty(mes)) {
-                const listaAniversarios = meses[mes];
-                
+                document.getElementById('listaAniversarios').innerHTML += `<button class="list-group-item list-group-item-action">${aniversario.nome} no dia ${aniversario.dataNascimento.dia}</button>`
             }
         }
     })
