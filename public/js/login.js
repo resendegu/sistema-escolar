@@ -1,3 +1,5 @@
+const { error } = require("firebase-functions/lib/logger");
+
 var listaUsersRef = firebase.database().ref('sistemaEscolar/listaDeUsuarios')
 var ui = new firebaseui.auth.AuthUI(firebase.auth())
 var loader = document.getElementById('loader')
@@ -120,7 +122,12 @@ document.querySelector('#areaLogin').addEventListener('submit', (e) => {
             firebase.database().ref('sistemaEscolar/usuarios/' + user.uid + '/nome').set(nome).then(() => {
               firebase.database().ref('sistemaEscolar/listaDeUsuarios/' + user.uid + '/nome').set(nome).then(() => {
                   firebase.database().ref('sistemaEscolar/usuarios/' + user.uid + '/dataNascimento').set({dia: Number(dia), mes: Number(mes), ano: Number(ano), email: email}).then(() => {
-                      window.location.reload()
+                      firebase.auth().signOut().then(function() {
+                        window.location.reload()
+                      }).catch(error => {
+                        AstNotif.dialog('Erro', error.message)
+                      })
+                      
                   }).catch(error => {
                       AstNotif.dialog('Erro', error.message)
                   })
@@ -240,11 +247,10 @@ function acessaUsuario(uid) {
 }
 
 function liberaAcesso(uid, acesso, checked) {
+    var liberaERemoveAcessos = firebase.functions().httpsCallable('liberaERemoveAcessos')
     if (acesso == 'master') {
         var confirma = confirm('Você está modificando um acesso de administrador master do sistema. Você deseja continuar?')
         if (confirma) {
-            var liberaERemoveAcessos = firebase.functions().httpsCallable('liberaERemoveAcessos')
-
             liberaERemoveAcessos({uid: uid, acesso: acesso, checked: checked}).then(function(result) {
                 AstNotif.notify(result.data.acesso, '')
             })
@@ -252,8 +258,6 @@ function liberaAcesso(uid, acesso, checked) {
             acessaUsuario(uid)
         }
     } else {
-        var liberaERemoveAcessos = firebase.functions().httpsCallable('liberaERemoveAcessos')
-
         liberaERemoveAcessos({uid: uid, acesso: acesso, checked: checked}).then(function(result) {
             AstNotif.notify(result.data.acesso, '')
         })

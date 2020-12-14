@@ -1,7 +1,8 @@
 var secretariaRef = firebase.database().ref('sistemaEscolar/secretaria')
 var numerosRef = firebase.database().ref('sistemaEscolar/numeros')
 var aniversariosRef = firebase.database().ref('sistemaEscolar/aniversarios')
-
+var listaDeUsuariosRef = firebase.database().ref('sistemaEscolar/listaDeUsuarios')
+var listaDeProfessores = firebase.database().ref('sistemaEscolar/listaDeProfessores')
 
 firebase.auth().onAuthStateChanged((user) => {
     try {
@@ -152,10 +153,24 @@ function junta() {
         document.getElementById('btnCadastrarTurma').disabled = true
     }
 }
-var professor
-function professorReferencia(email) {
-    console.log(email)
-    professor = email
+var professorReferencia
+
+function carregaProfessores() {
+    var professorTurmaSelect = document.getElementById('professorTurma')
+    listaDeProfessores.on('value', (snapshot) => {
+        let professores = snapshot.val()
+        professorTurmaSelect.innerHTML = '<option selected hidden>Escolha o professor...</option>'
+        for (const uid in professores) {
+            if (Object.hasOwnProperty.call(professores, uid)) {
+                const professor = professores[uid];
+                professorTurmaSelect.innerHTML += `<option value="${uid}">${professor.nome} (${professor.email})</option>`
+            }
+        }
+    })
+}
+function professorReferencia(uid) {
+    console.log(uid)
+    professor = uid
 }
 
 // Função de cadastro de turma no banco de dados

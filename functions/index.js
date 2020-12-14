@@ -26,8 +26,8 @@ exports.liberaERemoveAcessos = functions.https.onCall((data, context) => {
                         if (data.checked) {
                             console.log(admin.firestore.Timestamp.now().toDate())
                             if (data.acesso == 'professores') {
-                                admin.auth().getUser(data.uid).then(user => {
-                                    admin.database().ref(`sistemaEscolar/listaDeProfessores/${data.uid}/`)
+                                return admin.auth().getUser(data.uid).then(user => {
+                                    return admin.database().ref(`sistemaEscolar/listaDeProfessores/${data.uid}/`)
                                     .set({nome: user.displayName, email: user.email, timestamp: admin.firestore.Timestamp.now()}).then(() => {
                                         return {acesso: 'Acesso concedido'}
                                     }).catch(error => {
@@ -39,7 +39,17 @@ exports.liberaERemoveAcessos = functions.https.onCall((data, context) => {
                             }
                             
                         } else {
-                            return {acesso: 'Acesso removido!'}
+                            if (data.acesso == 'professores') {
+                                return admin.database().ref(`sistemaEscolar/listaDeProfessores/${data.uid}/`)
+                                .remove().then(() => {
+                                    return {acesso: 'Acesso removido'}
+                                }).catch(error => {
+                                    throw new functions.https.HttpsError('unknown', error.message, error)
+                                })
+                            } else {
+                                return {acesso: 'Acesso removido!'}
+                            }
+                            
                         }
                     })
                 })    
