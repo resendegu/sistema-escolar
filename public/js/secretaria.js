@@ -72,18 +72,19 @@ var codPadrao = ''
 function nivel(niv) {
     console.log(niv)
     nivelTurma = niv
-    let botoesNiveis = ['B', 'I', 'A', 'KIDS']
-    for (const i in botoesNiveis) {
-        const id = botoesNiveis[i]
-        document.getElementById(id).style.display = 'none'
-    }
-    document.getElementById(niv).style.display = 'block'
+    
     junta()
 }
 
 function faixa(faix) {
     console.log(faix)
     faixaEtaria = faix
+    let botoesFaixas = ['A', 'T', 'KIDS']
+    for (const i in botoesFaixas) {
+        const id = botoesFaixas[i]
+        document.getElementById(id).style.display = 'none'
+    }
+    document.getElementById(faix).style.display = 'block'
     junta()
 }
 
@@ -159,7 +160,7 @@ function carregaProfessores() {
     var professorTurmaSelect = document.getElementById('professorTurma')
     listaDeProfessores.on('value', (snapshot) => {
         let professores = snapshot.val()
-        professorTurmaSelect.innerHTML = '<option selected hidden>Escolha o professor...</option>'
+        professorTurmaSelect.innerHTML = '<option selected hidden>Escolha o(a) professor(a)...</option>'
         for (const uid in professores) {
             if (Object.hasOwnProperty.call(professores, uid)) {
                 const professor = professores[uid];

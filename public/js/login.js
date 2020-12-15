@@ -1,4 +1,4 @@
-const { error } = require("firebase-functions/lib/logger");
+
 
 var listaUsersRef = firebase.database().ref('sistemaEscolar/listaDeUsuarios')
 var ui = new firebaseui.auth.AuthUI(firebase.auth())
@@ -50,7 +50,7 @@ var uiConfig = {
                 
             }).catch(function(error) {
                 loader.style.visibility = 'hidden'
-                document.getElementById('painelAdm').remove()
+                document.getElementById('painelAdm').style.display = 'none'
             })
         } else {
             document.getElementById('loginContainer').style.display = 'block'

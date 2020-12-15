@@ -330,26 +330,26 @@
               <hr>
               <div class="row">
                 <div class="col-md-auto">
-                  <h6>Nível da turma</h6>
+                  <h6>Faixa etária</h6>
                   <div class="list-group" id="myList" role="tablist">
-                    <a class="list-group-item list-group-item-action" data-toggle="list" id="B" href="#basico" role="tab" onclick="nivel('B')">B - Básico</a>
-                    <a class="list-group-item list-group-item-action" data-toggle="list" id="I" href="#intermediario" role="tab" onclick="nivel('I')">I - Intermediário</a>
-                    <a class="list-group-item list-group-item-action" data-toggle="list" id="A" href="#avancado" role="tab" onclick="nivel('A')">A - Avançado</a>
-                    <a class="list-group-item list-group-item-action" data-toggle="list" id="KIDS" href="#kids" role="tab" onclick="nivel('KIDS')">KIDS</a>
+                    <a class="list-group-item list-group-item-action" data-toggle="list" id="KIDS" href="#kids" role="tab" onclick="faixa('KIDS')">KIDS</a>
+                    <a class="list-group-item list-group-item-action" data-toggle="list" id="T" href="#teens" role="tab" onclick="faixa('T')">TEENS</a>
+                    <a class="list-group-item list-group-item-action" data-toggle="list" id="A" href="#adults" role="tab" onclick="faixa('A')">ADULTS</a>
                   </div>
                 </div>
                 <div class="col">
                   <br>
                   <div class="tab-content" id="nav-tabContent">
-                    <div class="tab-pane fade" id="basico" role="tabpanel" aria-labelledby="Nível Básico">
+                    <div class="tab-pane fade" id="teens" role="tabpanel" aria-labelledby="Teens">
                       <div class="input-group prepend">
                         <div class="input-group-prepend">
                           <label class="input-group-text" for="inputGroupSelect01">Nivelamento</label>
                         </div>
-                        <select class="custom-select" id="inputGroupSelect01" onchange="faixa(this.value)">
-                          <option selected hidden>Faixa etária...</option>
-                          <option value="A">A - Adults</option>
-                          <option value="T">T - Teens</option>
+                        <select class="custom-select" id="inputGroupSelect01" onchange="nivel(this.value)">
+                          <option selected hidden>Nível da turma...</option>
+                          <option value="B">B - Básico</option>
+                          <option value="I">I - Intermediário</option>
+                          <option value="A">A - Avançado</option>
                         </select>
                       </div>
                       <br>
@@ -366,46 +366,42 @@
                       </div>
                     </div>
 
-                    <div class="tab-pane fade" id="intermediario" role="tabpanel" aria-labelledby="list-profile-list">
+                    <div class="tab-pane fade" id="adults" role="tabpanel" aria-labelledby="list-profile-list">
                       <div class="input-group prepend">
                         <div class="input-group-prepend">
                           <label class="input-group-text" for="inputGroupSelect01">Nivelamento</label>
                         </div>
-                        <select class="custom-select" id="inputGroupSelect01" onchange="faixa(this.value)">
-                          <option selected hidden>Faixa etária...</option>
-                          <option value="A">A - Adults</option>
-                          <option value="T">T - Teens</option>
+                        <select class="custom-select" id="inputGroupSelect01" onchange="nivel(this.value)">
+                          <option selected hidden>Nível da turma...</option>
+                          <option value="B">B - Básico</option>
+                          <option value="I">I - Intermediário</option>
+                          <option value="A">A - Avançado</option>
                         </select>
                       </div>
                       <br>
                       <h6>Livros da turma</h6>
                       <div class="input-group-text">
-                        <input type="checkbox" id="livro5" value="5" onclick="livro(5, this.checked)">
+                        <input type="checkbox" id="livro1" value="1" onclick="livro(this.value, this.checked)">
+                        &nbsp;Livro 1&nbsp;&nbsp;&nbsp;
+                        <input type="checkbox" id="livro2" value="2" onclick="livro(this.value, this.checked)">
+                        &nbsp;Livro 2&nbsp;&nbsp;&nbsp;
+                        <input type="checkbox" id="livro3" value="3" onclick="livro(this.value, this.checked)">
+                        &nbsp;Livro 3&nbsp;&nbsp;&nbsp;
+                        <input type="checkbox" id="livro4" value="4" onclick="livro(this.value, this.checked)">
+                        &nbsp;Livro 4&nbsp;&nbsp;&nbsp;
+                        <input type="checkbox" id="livro5" value="5" onclick="livro(this.value, this.checked)">
                         &nbsp;Livro 5&nbsp;&nbsp;&nbsp;
-                        <input type="checkbox" id="livro6" value="6" onclick="livro(6, this.checked)">
+                        <input type="checkbox" id="livro6" value="6" onclick="livro(this.value, this.checked)">
                         &nbsp;Livro 6&nbsp;&nbsp;&nbsp;
+                        <input type="checkbox" id="livro7" value="7" onclick="livro(this.value, this.checked)">
+                        &nbsp;Livro 7&nbsp;&nbsp;&nbsp;
+                        <input type="checkbox" id="livro8" value="8" onclick="livro(this.value, this.checked)">
+                        &nbsp;Livro 8&nbsp;&nbsp;&nbsp;
                       </div>
                     </div>
         
                     <div class="tab-pane fade" id="avancado" role="tabpanel" aria-labelledby="list-profile-list">
-                      <div class="input-group prepend">
-                        <div class="input-group-prepend">
-                          <label class="input-group-text" for="inputGroupSelect01">Nivelamento</label>
-                        </div>
-                        <select class="custom-select" id="inputGroupSelect01" onchange="faixa(this.value)">
-                          <option selected hidden>Faixa etária...</option>
-                          <option value="A">A - Adults</option>
-                          <option value="T">T - Teens</option>
-                        </select>
-                      </div>
-                      <br>
-                      <h6>Livros da turma</h6>
-                      <div class="input-group-text">
-                        <input type="checkbox" id="livro7" value="7" onclick="livro(7, this.checked)">
-                        &nbsp;Livro 7&nbsp;&nbsp;&nbsp;
-                        <input type="checkbox" id="livro8" value="8" onclick="livro(8, this.checked)">
-                        &nbsp;Livro 8&nbsp;&nbsp;&nbsp;
-                      </div>
+                      Obsoleto
                     </div>
         
                     <div class="tab-pane fade" id="kids" role="tabpanel" aria-labelledby="list-profile-list">
@@ -443,10 +439,10 @@
                   <div class="col-sm">
                     <div class="input-group prepend">
                       <div class="input-group-prepend">
-                        <label class="input-group-text" for="inputGroupSelect01">Professor referência</label>
+                        <label class="input-group-text" for="inputGroupSelect01">Professor(a) referência</label>
                       </div>
                       <select class="custom-select" id="professorTurma" onchange="professorReferencia(this.value)">
-                        <option selected hidden>Escolha o professor...</option>
+                        <option selected hidden>Escolha o(a) professor(a)...</option>
                         
                       </select>
                     </div>
