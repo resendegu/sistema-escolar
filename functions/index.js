@@ -12,7 +12,9 @@ exports.verificadorDeAcesso = functions.https.onCall((data, context) => {
             throw new functions.https.HttpsError('permission-denied', 'Acesso não liberado.')
         }
     } catch (error) {
-        throw new functions.https.HttpsError('permission-denied', 'Você não tem permissão para acesso. Você deve contatar um Administrador Master do sistema para liberação de acessos.')
+        console.log(error)
+        throw new functions.https.HttpsError('permission-denied', 'Você não tem permissão para acesso. Você deve contatar um Administrador Master do sistema para liberação de acessos.', error)
+        
     }
     
 })

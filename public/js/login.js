@@ -1,37 +1,6 @@
-
-
 var listaUsersRef = firebase.database().ref('sistemaEscolar/listaDeUsuarios')
-var ui = new firebaseui.auth.AuthUI(firebase.auth())
 var loader = document.getElementById('loader')
-//firebase.auth().signInWithEmailAndPassword('gustavo@teste.com', 'galo1234')
-var uiConfig = {
-    callbacks: {
-      signInSuccessWithAuthResult: function(authResult, redirectUrl) {
-        // User successfully signed in.
-        // Return type determines whether we continue the redirect automatically
-        // or whether we leave that to developer to handle.
-        return true;
-      },
-      uiShown: function() {
-        // The widget is rendered.
-        // Hide the loader.
-      }
-    },
-    // Will use popup for IDP Providers sign-in flow instead of the default, redirect.
-    signInFlow: 'popup',
-    signInSuccessUrl: 'login.html',
-    signInOptions: [
-      // Leave the lines as is for the providers you want to offer your users.
-      {
-        provider: firebase.auth.EmailAuthProvider.PROVIDER_ID,
-        requireDisplayName: true
-      }
-    ],
-    // Terms of service url.
-    tosUrl: '',
-    // Privacy policy url.
-    privacyPolicyUrl: ''
-};
+
 
     firebase.auth().onAuthStateChanged((user) => {
         if (user) {
@@ -126,21 +95,26 @@ document.querySelector('#areaLogin').addEventListener('submit', (e) => {
                         window.location.reload()
                       }).catch(error => {
                         AstNotif.dialog('Erro', error.message)
+                        console.log(error)
                       })
                       
                   }).catch(error => {
                       AstNotif.dialog('Erro', error.message)
+                      console.log(error)
                   })
                   
               }).catch(error => {
                   AstNotif.dialog('Erro', error.message)
+                  console.log(error)
               })
             }).catch(error => {
                 AstNotif.dialog('Erro', error.message)
+                console.log(error)
             })
             
         }).catch(function(error) {
             AstNotif.dialog('Erro ao atualizar dados do usuário', error.message)
+            console.log(error)
         })
       }
     
@@ -155,6 +129,7 @@ document.querySelector('#areaLogin').addEventListener('submit', (e) => {
         AstNotif.dialog('Erro', 'Não foi encontrado uma conta com este email. Confira o email ou se cadastre no sistema.')
     } else {
         AstNotif.dialog('Erro', error.message)
+        console.log(error)
     }
     loader.style.visibility = 'hidden';
   });
@@ -172,7 +147,7 @@ function sair() {
 }
 
 function listaUsuarios() {
-    listaUsersRef.on('value', snapshot => {
+    listaUsersRef.once('value').then(snapshot => {
         var corpo = `<div class="overflow-auto" style="height: 120px;">
         <div class="list-group" id="arquivos">`
         var lista = []
@@ -192,16 +167,15 @@ function listaUsuarios() {
             corpo,
             '<button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>'
         )
-    }).catch(error => {
+    }).catch(error =>{
         console.log(error)
-        ASTNotif.dialog('Ocorreu um erro', error.message)
     })
 }
 
 function acessaUsuario(uid) {
     let acoesUser = document.getElementById('acoesUser')
     listaUsersRef.child(uid).on('value', (snapshot) => {
-        var dados = snapshot.val()
+        const dados = snapshot.val()
         acoesUser.innerHTML = `
         <h6>Gerenciamento de usuários</h6>
         Marque as caixas para liberar os acessos para ${dados.email}

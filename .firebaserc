@@ -1,5 +1,6 @@
 {
   "projects": {
-    "default": "guresende"
+    "sistemaescolar": "sistemaescolar13",
+    "default": "sistemaescolar13"
   }
 }
