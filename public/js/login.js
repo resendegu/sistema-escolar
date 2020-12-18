@@ -232,7 +232,9 @@ function liberaAcesso(uid, acesso, checked) {
             acessaUsuario(uid)
         }
     } else {
+        loader.style.visibility = 'visible'
         liberaERemoveAcessos({uid: uid, acesso: acesso, checked: checked}).then(function(result) {
+            loader.style.visibility = 'hidden'
             AstNotif.notify(result.data.acesso, '')
         })
     }

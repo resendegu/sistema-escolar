@@ -14,6 +14,9 @@
     <!-- Custom styles for this template -->
     <link href="../css/dashboard.css" rel="stylesheet">
 
+      <!-- Carregando arquivos da biblioteca AST-Notif. Créditos: https://github.com/anandastoon/AST-Notif -->
+    <link rel="stylesheet" href="../resources/AST-Notif/css/ast-notif.min.css">
+    <link rel="shortcut icon" href="../images/domain.png" type="image/x-icon">
   </head>
 
   <body>
@@ -347,22 +350,22 @@
                         </div>
                         <select class="custom-select" id="inputGroupSelect01" onchange="nivel(this.value)">
                           <option selected hidden>Nível da turma...</option>
-                          <option value="B">B - Básico</option>
-                          <option value="I">I - Intermediário</option>
-                          <option value="A">A - Avançado</option>
+                          <option value="B">B - Basic</option>
+                          <option value="I">I - Intermediate</option>
+                          <option value="A">A - Advanced</option>
                         </select>
                       </div>
                       <br>
                       <h6>Livros da turma</h6>
                       <div class="input-group-text">
                         <input type="checkbox" id="livro1" value="1" onclick="livro(1, this.checked)">
-                        &nbsp;Livro 1&nbsp;&nbsp;&nbsp;
+                        &nbsp;Book 1&nbsp;&nbsp;&nbsp;
                         <input type="checkbox" value="" id="livro2" value="2" onclick="livro(2, this.checked)">
-                        &nbsp;Livro 2&nbsp;&nbsp;&nbsp;
+                        &nbsp;Book 2&nbsp;&nbsp;&nbsp;
                         <input type="checkbox" id="livro3" value="3" onclick="livro(3, this.checked)">
-                        &nbsp;Livro 3&nbsp;&nbsp;&nbsp;
+                        &nbsp;Book 3&nbsp;&nbsp;&nbsp;
                         <input type="checkbox" id="livro4" value="4" onclick="livro(4, this.checked)">
-                        &nbsp;Livro 4&nbsp;&nbsp;&nbsp;
+                        &nbsp;Book 4&nbsp;&nbsp;&nbsp;
                       </div>
                     </div>
 
@@ -373,30 +376,30 @@
                         </div>
                         <select class="custom-select" id="inputGroupSelect01" onchange="nivel(this.value)">
                           <option selected hidden>Nível da turma...</option>
-                          <option value="B">B - Básico</option>
-                          <option value="I">I - Intermediário</option>
-                          <option value="A">A - Avançado</option>
+                          <option value="B">B - Basic</option>
+                          <option value="I">I - Intermediate</option>
+                          <option value="A">A - Advanced</option>
                         </select>
                       </div>
                       <br>
                       <h6>Livros da turma</h6>
                       <div class="input-group-text">
-                        <input type="checkbox" id="livro1" value="1" onclick="livro(this.value, this.checked)">
-                        &nbsp;Livro 1&nbsp;&nbsp;&nbsp;
-                        <input type="checkbox" id="livro2" value="2" onclick="livro(this.value, this.checked)">
-                        &nbsp;Livro 2&nbsp;&nbsp;&nbsp;
-                        <input type="checkbox" id="livro3" value="3" onclick="livro(this.value, this.checked)">
-                        &nbsp;Livro 3&nbsp;&nbsp;&nbsp;
-                        <input type="checkbox" id="livro4" value="4" onclick="livro(this.value, this.checked)">
-                        &nbsp;Livro 4&nbsp;&nbsp;&nbsp;
-                        <input type="checkbox" id="livro5" value="5" onclick="livro(this.value, this.checked)">
-                        &nbsp;Livro 5&nbsp;&nbsp;&nbsp;
-                        <input type="checkbox" id="livro6" value="6" onclick="livro(this.value, this.checked)">
-                        &nbsp;Livro 6&nbsp;&nbsp;&nbsp;
-                        <input type="checkbox" id="livro7" value="7" onclick="livro(this.value, this.checked)">
-                        &nbsp;Livro 7&nbsp;&nbsp;&nbsp;
-                        <input type="checkbox" id="livro8" value="8" onclick="livro(this.value, this.checked)">
-                        &nbsp;Livro 8&nbsp;&nbsp;&nbsp;
+                        <input type="checkbox" id="livroA1" value="1" onclick="livro(this.value, this.checked)">
+                        &nbsp;Book 1&nbsp;&nbsp;&nbsp;
+                        <input type="checkbox" id="livroA2" value="2" onclick="livro(this.value, this.checked)">
+                        &nbsp;Book 2&nbsp;&nbsp;&nbsp;
+                        <input type="checkbox" id="livroA3" value="3" onclick="livro(this.value, this.checked)">
+                        &nbsp;Book 3&nbsp;&nbsp;&nbsp;
+                        <input type="checkbox" id="livroA4" value="4" onclick="livro(this.value, this.checked)">
+                        &nbsp;Book 4&nbsp;&nbsp;&nbsp;
+                        <input type="checkbox" id="livroA5" disabled value="5" onclick="livro(this.value, this.checked)">
+                        &nbsp;Book 5&nbsp;&nbsp;&nbsp;
+                        <input type="checkbox" id="livroA6" disabled value="6" onclick="livro(this.value, this.checked)">
+                        &nbsp;Book 6&nbsp;&nbsp;&nbsp;
+                        <input type="checkbox" id="livroA7" disabled value="7" onclick="livro(this.value, this.checked)">
+                        &nbsp;Book 7&nbsp;&nbsp;&nbsp;
+                        <input type="checkbox" id="livroA8" disabled value="8" onclick="livro(this.value, this.checked)">
+                        &nbsp;Book 8&nbsp;&nbsp;&nbsp;
                       </div>
                     </div>
         
@@ -414,19 +417,16 @@
               <div class="row">
                 <div class="col-sm">
                   <div class="input-group prepend">
-                    <div class="input-group-prepend">
-                      <label class="input-group-text" for="inputGroupSelect01">Dia da semana</label>
+                    <div class="input-group-text">
+                      <label for="inputGroupSelect01">Dias da semana: &nbsp;</label>
+                      <input type="checkbox" value="0" onchange="diaSemana(this.value, this.checked)">Domingo &nbsp;
+                      <input type="checkbox" value="1" onchange="diaSemana(this.value, this.checked)">Segunda &nbsp;
+                      <input type="checkbox" value="2" onchange="diaSemana(this.value, this.checked)">Terça &nbsp;
+                      <input type="checkbox" value="3" onchange="diaSemana(this.value, this.checked)">Quarta &nbsp;
+                      <input type="checkbox" value="4" onchange="diaSemana(this.value, this.checked)">Quinta &nbsp;
+                      <input type="checkbox" value="5" onchange="diaSemana(this.value, this.checked)">Sexta &nbsp;
+                      <input type="checkbox" value="6" onchange="diaSemana(this.value, this.checked)">Sábado &nbsp;
                     </div>
-                    <select class="custom-select" id="inputGroupSelect01" onchange="diaSemana(this.value)">
-                      <option selected value="?" hidden>Escolha o dia de aula...</option>
-                      <option value="1">Segunda-feira</option>
-                      <option value="2">Terça-feira</option>
-                      <option value="3">Quarta-feira</option>
-                      <option value="4">Quinta-feira</option>
-                      <option value="5">Sexta-feira</option>
-                      <option value="6">Sábado</option>
-                      <option value="0">Domingo</option>
-                    </select>
                   </div>
                   <div class="input-group prepend">
                     <div class="input-group-prepend">
@@ -449,7 +449,7 @@
                   </div>
                 </div>
                 <br>
-                <button type="button" class="btn btn-primary btn-block" id="btnCadastrarTurma" disabled>Cadastrar turma</button>
+                <button type="button" onclick="cadastrarTurma()" class="btn btn-primary btn-block" id="btnCadastrarTurma" disabled>Cadastrar turma</button>
               </div>
             
               
@@ -501,6 +501,9 @@
     </script>
     <script defer src="../js/secretaria.js"></script>
     <script src="../js/app.js"></script>
+    <!-- Carregando outros arquivos da biblioteca AST-Notif. Créditos: https://github.com/anandastoon/AST-Notif -->
+    <script defer src="../resources/AST-Notif/js/ast-notif.min.js"></script>
+
 
     <!-- Graphs 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>

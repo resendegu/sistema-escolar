@@ -154,7 +154,25 @@ exports.cadastroUser = functions.auth.user().onCreate((user) => {
 })
 
 exports.cadastraTurma = functions.https.onCall((data, context) => {
+    /**{codigoSala: codPadrao, professor: professor, diasDaSemana: diasDaSemana, livros: books, nivelTurma: nivelTurma, faixaTurma: faixaEtaria, hora: horarioCurso} */
     console.log(data)
+    if (context.auth.token.secretaria == true) {
+        var dados = data
+        return admin.auth().getUser(data.professor).then(function(user) {
+            dados.professor = [{nome: user.displayName, email: user.email}]
+            dados.timestamp = admin.firestore.Timestamp.now()
+            return admin.database().ref(`sistemaEscolar/turmas/${data.codigoSala}/`).set(dados).then(() => {
+                return {answer: 'Turma cadastrada com sucesso.'}
+            }).catch(error => {
+                throw new functions.https.HttpsError(error.code, error.message, error)
+            })
+        }).catch(function(error) {
+            throw new functions.https.HttpsError('unknown', error.message, error)
+        })
+        
+    } else {
+        throw new functions.https.HttpsError('permission-denied', 'Você não possui permissão para fazer alterações nesta área.')
+    }
 })
 
 exports.cadastraAniversarios = functions.database.ref('sistemaEscolar/usuarios/{uid}/dataNascimento').onWrite((snapshot, context) => {

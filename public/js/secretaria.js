@@ -66,26 +66,59 @@ firebase.auth().onAuthStateChanged((user) => {
 var nivelTurma = ''
 var faixaEtaria = ''
 var livros = {1: false, 2: false, 3: false, 4: false, 5: false, 6: false, 7: false, 8: false}
-var diaDaSemana = ''
+var diaDaSemana = {SUN: false, MON: false, TUE: false, WED: false, THU: false, FRI: false, SAT: false}
 var horarioCurso = ''
 var codPadrao = ''
 function nivel(niv) {
     console.log(niv)
+    livros = {1: false, 2: false, 3: false, 4: false, 5: false, 6: false, 7: false, 8: false}
     nivelTurma = niv
-    
+    if (niv == 'B') {
+        document.getElementById('livroA5').disabled = true
+        document.getElementById('livroA6').disabled = true
+        document.getElementById('livroA7').disabled = true
+        document.getElementById('livroA8').disabled = true
+        document.getElementById('livroA5').checked = false
+        document.getElementById('livroA6').checked = false
+        document.getElementById('livroA7').checked = false
+        document.getElementById('livroA8').checked = false
+    }
+    if (niv == 'I') {
+        document.getElementById('livroA5').disabled = false
+        document.getElementById('livroA6').disabled = false
+        document.getElementById('livroA7').disabled = true
+        document.getElementById('livroA8').disabled = true
+        document.getElementById('livroA7').checked = false
+        document.getElementById('livroA8').checked = false
+    }
+    if (niv == 'A') {
+        document.getElementById('livroA5').disabled = false
+        document.getElementById('livroA6').disabled = false
+        document.getElementById('livroA7').disabled = false
+        document.getElementById('livroA8').disabled = false
+    }
     junta()
 }
 
 function faixa(faix) {
+    nivelTurma = ''
+    faixaEtaria = ''
+    livros = {1: false, 2: false, 3: false, 4: false, 5: false, 6: false, 7: false, 8: false}
+    codPadrao = ''
+
     console.log(faix)
     faixaEtaria = faix
+    /**
     let botoesFaixas = ['A', 'T', 'KIDS']
     for (const i in botoesFaixas) {
         const id = botoesFaixas[i]
         document.getElementById(id).style.display = 'none'
     }
     document.getElementById(faix).style.display = 'block'
+     */
+    
     junta()
+    
 }
 
 function livro(numLivro, checked) {
@@ -98,29 +131,29 @@ function livro(numLivro, checked) {
     junta()
 }
 
-function diaSemana(dia) {
+function diaSemana(dia, checked) {
     console.log(dia)
     switch (dia) {
         case '0':
-            diaDaSemana = 'SUN'
+            diaDaSemana.SUN = checked
             break;
         case '1':
-            diaDaSemana = 'MON'
+            diaDaSemana.MON = checked
             break;
         case '2':
-            diaDaSemana = 'TUE'
+            diaDaSemana.TUE = checked
             break;
         case '3':
-            diaDaSemana = 'WED'
+            diaDaSemana.WED = checked
             break;
         case '4':
-            diaDaSemana = 'THU'
+            diaDaSemana.THU = checked
             break;
         case '5':
-            diaDaSemana = 'FRI'
+            diaDaSemana.FRI = checked
             break;
         case '6':
-            diaDaSemana = 'SAT'
+            diaDaSemana.SAT = checked
             break;
         default:
             diaDaSemana = '?'
@@ -134,18 +167,32 @@ function horario(hora) {
     horarioCurso = hora
     junta()
 }
-
+var diasDaSemana = []
+var books = []
 function junta() {
     codPadrao = nivelTurma + faixaEtaria
+    books = []
     for (const livro in livros) {
         if (livros.hasOwnProperty(livro)) {
             const checked = livros[livro];
             if (checked) {
                 codPadrao = codPadrao + livro
+                books.push(livro)
             }
         }
     }
-    codPadrao = codPadrao + '-' + diaDaSemana + horarioCurso
+    codPadrao += '-'
+    diasDaSemana = []
+    for (const key in diaDaSemana) {
+        if (Object.hasOwnProperty.call(diaDaSemana, key)) {
+            const check = diaDaSemana[key];
+            if (check) {
+                codPadrao += key
+                diasDaSemana.push(key)
+            }
+        }
+    }
+    codPadrao += horarioCurso
     document.getElementById('codigoNivel').innerText = codPadrao
     console.log(codPadrao.length)
     if (codPadrao.length >= 9) {
@@ -157,6 +204,7 @@ function junta() {
 var professorReferencia
 
 function carregaProfessores() {
+    console.log('carregando')
     var professorTurmaSelect = document.getElementById('professorTurma')
     listaDeProfessores.on('value', (snapshot) => {
         let professores = snapshot.val()
@@ -177,5 +225,11 @@ function professorReferencia(uid) {
 // Função de cadastro de turma no banco de dados
 function cadastrarTurma(confima=false) {
     var cadastraTurma = firebase.functions().httpsCallable('cadastraTurma')
-    cadastraTurma({codigoSala: codPadrao, professor: professor})
+    cadastraTurma({codigoSala: codPadrao, professor: professor, diasDaSemana: diasDaSemana, livros: books, nivelTurma: nivelTurma, faixaTurma: faixaEtaria, hora: horarioCurso})
+    .then(function(result) {
+        console.log(result)
+        AstNotif.dialog('Sucesso', result.data.answer)
+    }).catch(function(error) {
+        AstNotif.dialog('Erro', error.message)
+    })
 }
