@@ -3,6 +3,7 @@ var numerosRef = firebase.database().ref('sistemaEscolar/numeros')
 var aniversariosRef = firebase.database().ref('sistemaEscolar/aniversarios')
 var listaDeUsuariosRef = firebase.database().ref('sistemaEscolar/listaDeUsuarios')
 var listaDeProfessores = firebase.database().ref('sistemaEscolar/listaDeProfessores')
+var turmasRef = firebase.database().ref('sistemaEscolar/turmas')
 
 firebase.auth().onAuthStateChanged((user) => {
     try {
@@ -18,10 +19,10 @@ firebase.auth().onAuthStateChanged((user) => {
         var numeros = snapshot.val()
         var tabelaSemanal = numeros.tabelaSemanal
         
-        alunosCadastradosNum.innerText = numeros.alunosCadastrados
-        alunosMatriculadosNum.innerText = numeros.alunosMatriculados
-        alunosDesativadosNum.innerText = numeros.alunosDesativados
-        turmasCadastradasNum.innerText = numeros.turmasCadastradas
+        alunosCadastradosNum.innerText = numeros.alunosCadastrados != undefined ? numeros.alunosCadastrados : 0
+        alunosMatriculadosNum.innerText = numeros.alunosMatriculados != undefined ? numeros.alunosMatriculados : 0
+        alunosDesativadosNum.innerText = numeros.alunosDesativados != undefined ? numeros.alunosDesativados : 0
+        turmasCadastradasNum.innerText = numeros.turmasCadastradas != undefined ? numeros.turmasCadastradas : 0
 
         // Alimenta tabela com os números de alunos em cada semana
         var idCelulaTabela = ''
@@ -34,7 +35,7 @@ firebase.auth().onAuthStateChanged((user) => {
                 idCelulaTabela += dia
                 for (const horario in horarios) {
                     if (horarios.hasOwnProperty(horario)) {
-                        const numeroDeAlunos = horarios[horario];
+                        const numeroDeAlunos = horarios[horario]
                         idCelulaTabela += horario
                         document.getElementById(idCelulaTabela).innerText = numeroDeAlunos
                         var numNaTabela = Number(document.getElementById('total' + horario).innerText)
@@ -231,5 +232,28 @@ function cadastrarTurma(confima=false) {
         AstNotif.dialog('Sucesso', result.data.answer)
     }).catch(function(error) {
         AstNotif.dialog('Erro', error.message)
+        console.log(error)
+    })
+}
+
+// Funções da aba de turmas da secretaria
+function carregaTurmas() {
+    var selectTurmas = document.getElementById('selectTurmas')
+    turmasRef.once('value', (snapshot) => {
+        selectTurmas.innerHTML = '<option selected hidden>Escolha uma turma...</option>'
+        var turmas = snapshot.val()
+        for (const cod in turmas) {
+            if (Object.hasOwnProperty.call(turmas, cod)) {
+                const infoDaTurma = turmas[cod];
+                selectTurmas.innerHTML += `<option value="${cod}">Turma ${cod} (Prof. ${infoDaTurma.professor[0].nome})</option>`
+            }
+        }
+    })
+}
+
+function abreTurma(cod) {
+    turmasRef.child(cod).once('value', (snapshot) => {
+        // TODO: Mostrar na tela as informações da turma
+        console.log(snapshot.val())
     })
 }

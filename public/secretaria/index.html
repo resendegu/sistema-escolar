@@ -60,7 +60,7 @@
                   </a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" data-toggle="list" href="#abaTurmas" role="tab" aria-controls="turmas">
+                  <a class="nav-link" data-toggle="list" href="#abaTurmas" role="tab" aria-controls="turmas" onclick="carregaTurmas()">
                     <span data-feather="database"></span>
                     Turmas
                   </a>
@@ -133,7 +133,7 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" data-toggle="list" href="#abaTurmas" role="tab" aria-controls="turmas">
+                <a class="nav-link" data-toggle="list" href="#abaTurmas" role="tab" aria-controls="turmas" onclick="carregaTurmas()">
                   <span data-feather="database"></span>
                   Turmas
                 </a>
@@ -251,52 +251,50 @@
                       <tbody>
                         <tr>
                           <td>Segunda - feira</td>
-                          <td id="segundaManha">0</td>
-                          <td id="segundaTarde">0</td>
-                          <td id="segundaNoite">0</td>
+                          <td id="MONManha">0</td>
+                          <td id="MONTarde">0</td>
+                          <td id="MONNoite">0</td>
                           
                         </tr>
                         <tr>
                           <td>Terça - feira</td>
-                          <td id="tercaManha">0</td>
-                          <td id="tercaTarde">0</td>
-                          <td id="tercaNoite">0</td>
+                          <td id="TUEManha">0</td>
+                          <td id="TUETarde">0</td>
+                          <td id="TUENoite">0</td>
                           
                         </tr>
                         <tr>
                           <td>Quarta - feira</td>
-                          <td id="quartaManha">0</td>
-                          <td id="quartaTarde">0</td>
-                          <td id="quartaNoite">0</td>
-                          
+                          <td id="WEDManha">0</td>
+                          <td id="WEDTarde">0</td>
+                          <td id="WEDNoite">0</td>
                         </tr>
                         <tr>
                           <td>Quinta - feira</td>
-                          <td id="quintaManha">0</td>
-                          <td id="quintaTarde">0</td>
-                          <td id="quintaNoite">0</td>
+                          <td id="THUManha">0</td>
+                          <td id="THUTarde">0</td>
+                          <td id="THUNoite">0</td>
                         
                         </tr>
                         <tr>
                           <td>Sexta - feira</td>
-                          <td id="sextaManha">0</td>
-                          <td id="sextaTarde">0</td>
-                          <td id="sextaNoite">0</td>
+                          <td id="FRIManha">0</td>
+                          <td id="FRITarde">0</td>
+                          <td id="FRINoite">0</td>
                           
                         </tr>
                         <tr>
                           <td>Sábado</td>
-                          <td id="sabadoManha">0</td>
-                          <td id="sabadoTarde">0</td>
-                          <td id="sabadoNoite">0</td>
-                        
+                          <td id="FRIManha">0</td>
+                          <td id="FRITarde">0</td>
+                          <td id="FRINoite">0</td>
+          
                         </tr>
                         <tr>
                           <td>Domingo</td>
-                          <td id="domingoManha">0</td>
-                          <td id="domingoTarde">0</td>
-                          <td id="domingoNoite">0</td>
-                          
+                          <td id="SUNManha">0</td>
+                          <td id="SUNTarde">0</td>
+                          <td id="SUNNoite">0</td>
                         </tr>
                         <tr>
                           <td><b>Total</b></td>
@@ -324,7 +322,17 @@
             </div>
 
             <div class="container tab-pane fade" id="abaTurmas" role="tabpanel" aria-labelledby="Turmas">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptates aliquam quae commodi ipsam iusto quod cumque molestias itaque velit ea ratione corporis numquam nam esse, tempore aspernatur excepturi quia odit. Lorem ipsum dolor, sit amet consectetur adipisicing elit. Impedit voluptatum aliquam quibusdam ratione consequatur molestias in optio maiores harum ducimus doloribus error id blanditiis magnam, veritatis, deleniti, fuga amet architecto.
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <label class="input-group-text" for="inputGroupSelect01">Turmas Cadastradas</label>
+                </div>
+                <select class="custom-select" id="selectTurmas" onchange="abreTurma(this.value)">
+                  <option selected hidden>Escolha uma turma...</option>
+                </select>
+              </div>
+              <div class="container" id="areaInfoTurma">
+
+              </div>
             </div>
 
             <div class="container tab-pane fade" id="abaCadastrarTurmas" role="tabpanel" aria-labelledby="Cadastrar Turmas">
@@ -413,38 +421,43 @@
                   </div>
                 </div>
               </div>
-              <hr>
               <div class="row">
                 <div class="col-sm">
-                  <div class="input-group prepend">
-                    <div class="input-group-text">
-                      <label for="inputGroupSelect01">Dias da semana: &nbsp;</label>
-                      <input type="checkbox" value="0" onchange="diaSemana(this.value, this.checked)">Domingo &nbsp;
-                      <input type="checkbox" value="1" onchange="diaSemana(this.value, this.checked)">Segunda &nbsp;
-                      <input type="checkbox" value="2" onchange="diaSemana(this.value, this.checked)">Terça &nbsp;
-                      <input type="checkbox" value="3" onchange="diaSemana(this.value, this.checked)">Quarta &nbsp;
-                      <input type="checkbox" value="4" onchange="diaSemana(this.value, this.checked)">Quinta &nbsp;
-                      <input type="checkbox" value="5" onchange="diaSemana(this.value, this.checked)">Sexta &nbsp;
-                      <input type="checkbox" value="6" onchange="diaSemana(this.value, this.checked)">Sábado &nbsp;
-                    </div>
-                  </div>
-                  <div class="input-group prepend">
-                    <div class="input-group-prepend">
-                      <label class="input-group-text" for="inputGroupSelect01">Horário</label>
-                    </div>
-                    <input type="number" name="horario" id="horario" onchange="horario(this.value)">
-                  </div>
+                    <fieldset>
+                      
+                      <div class="row">
+                        <div class="col-5">
+                          <label for="inputGroupSelect01">Dias da semana: &nbsp;</label>
+                          <br><input type="checkbox" value="0" onchange="diaSemana(this.value, this.checked)">Domingo &nbsp; 
+                          <br><input type="checkbox" value="1" onchange="diaSemana(this.value, this.checked)">Segunda &nbsp; 
+                          <br><input type="checkbox" value="2" onchange="diaSemana(this.value, this.checked)">Terça &nbsp; 
+                          <br><input type="checkbox" value="3" onchange="diaSemana(this.value, this.checked)">Quarta &nbsp;
+                        </div>
+                        <div class="col-5">
+                          <br>
+                          <br><input type="checkbox" value="4" onchange="diaSemana(this.value, this.checked)">Quinta &nbsp; 
+                          <br><input type="checkbox" value="5" onchange="diaSemana(this.value, this.checked)">Sexta &nbsp; 
+                          <br><input type="checkbox" value="6" onchange="diaSemana(this.value, this.checked)">Sábado &nbsp;
+                        </div>
+                      </div>
+                    </fieldset>
                 </div>
                 <div class="col-sm">
                   <div class="col-sm">
                     <div class="input-group prepend">
                       <div class="input-group-prepend">
-                        <label class="input-group-text" for="inputGroupSelect01">Professor(a) referência</label>
+                        <label class="input-group-text" for="inputGroupSelect01">Prof. referência</label>
                       </div>
                       <select class="custom-select" id="professorTurma" onchange="professorReferencia(this.value)">
                         <option selected hidden>Escolha o(a) professor(a)...</option>
                         
                       </select>
+                    </div>
+                    <div class="input-group prepend">
+                      <div class="input-group-prepend">
+                        <label class="input-group-text" for="inputGroupSelect01">Horário</label>
+                      </div>
+                      <input type="number" name="horario" id="horario" onchange="horario(this.value)">
                     </div>
                   </div>
                 </div>

@@ -158,10 +158,25 @@ exports.cadastraTurma = functions.https.onCall((data, context) => {
     console.log(data)
     if (context.auth.token.secretaria == true) {
         var dados = data
+        var horario
+        if (dados.hora >= 12 && dados.hora <= 17) {
+            horario = 'Tarde'
+        } else if (dados.hora >= 18 && dados.hora <= 23) {
+            horario = 'Noite'
+        } else if (dados.hora >= 5 && dados.hora <= 11) {
+            horario = 'Manha'
+        } else {
+            throw new functions.https.HttpsError('invalid-argument', 'Você deve passar um horário válido')
+        }
         return admin.auth().getUser(data.professor).then(function(user) {
             dados.professor = [{nome: user.displayName, email: user.email}]
             dados.timestamp = admin.firestore.Timestamp.now()
             return admin.database().ref(`sistemaEscolar/turmas/${data.codigoSala}/`).set(dados).then(() => {
+                admin.database().ref(`sistemaEscolar/numeros/turmasCadastradas`).transaction(function (current_value) {
+                    return (current_value || 0) + 1
+                }).catch(function (error) {
+                    throw new functions.https.HttpsError('unknown', error.message, error)
+                })
                 return {answer: 'Turma cadastrada com sucesso.'}
             }).catch(error => {
                 throw new functions.https.HttpsError(error.code, error.message, error)
