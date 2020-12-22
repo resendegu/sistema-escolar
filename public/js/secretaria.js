@@ -254,8 +254,17 @@ function carregaTurmas() {
 }
 
 function abreTurma(cod) {
+    var codigoDaTurmaLabel = document.getElementById('codigoDaTurma')
+    var areaInfoTurma = document.getElementById('areaInfoTurma')
     turmasRef.child(cod).once('value', (snapshot) => {
         // TODO: Mostrar na tela as informações da turma
         console.log(snapshot.val())
+        let dadosDaTurma = snapshot.val()
+        codigoDaTurmaLabel.innerText = dadosDaTurma.codigoSala
+        areaInfoTurma.style.visibility = 'visible'
+        document.getElementById('nivel' + dadosDaTurma.faixaTurma).className = 'list-group-item list-group-item-action active'
+        while (condition) {
+            
+        }
     })
 }

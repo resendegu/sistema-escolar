@@ -330,8 +330,19 @@
                   <option selected hidden>Escolha uma turma...</option>
                 </select>
               </div>
-              <div class="container" id="areaInfoTurma">
-                
+              <div class="container" id="areaInfoTurma" style="visibility: hidden;">
+                <label class="h3">Turma</label>
+                <label class="text-muted float-right h5" id="codigoDaTurma"></label>
+                <div class="col-md-auto">
+                  <h6>Faixa etária</h6>
+                  <div class="row">
+                    <div class="list-group" id="myList" role="tablist">
+                      <a class="list-group-item list-group-item-action" data-toggle="list" id="nivelKIDS" href="#kids" role="tab" onclick="faixa('KIDS')">KIDS</a>
+                      <a class="list-group-item list-group-item-action" data-toggle="list" id="nivelT" href="#teens" role="tab" onclick="faixa('T')">TEENS</a>
+                      <a class="list-group-item list-group-item-action" data-toggle="list" id="nivelA" href="#adults" role="tab" onclick="faixa('A')">ADULTS</a>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
