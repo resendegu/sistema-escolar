@@ -225,11 +225,13 @@ function professorReferencia(uid) {
 
 // Função de cadastro de turma no banco de dados
 function cadastrarTurma(confima=false) {
+    //AstNotif.dialog('Aguarde', "<img src='../images/carregamento.gif' width=100px>")
     var cadastraTurma = firebase.functions().httpsCallable('cadastraTurma')
     cadastraTurma({codigoSala: codPadrao, professor: professor, diasDaSemana: diasDaSemana, livros: books, nivelTurma: nivelTurma, faixaTurma: faixaEtaria, hora: horarioCurso})
     .then(function(result) {
         console.log(result)
         AstNotif.dialog('Sucesso', result.data.answer)
+
     }).catch(function(error) {
         AstNotif.dialog('Erro', error.message)
         console.log(error)

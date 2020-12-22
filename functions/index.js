@@ -171,16 +171,24 @@ exports.cadastraTurma = functions.https.onCall((data, context) => {
         return admin.auth().getUser(data.professor).then(function(user) {
             dados.professor = [{nome: user.displayName, email: user.email}]
             dados.timestamp = admin.firestore.Timestamp.now()
-            return admin.database().ref(`sistemaEscolar/turmas/${data.codigoSala}/`).set(dados).then(() => {
-                admin.database().ref(`sistemaEscolar/numeros/turmasCadastradas`).transaction(function (current_value) {
-                    return (current_value || 0) + 1
-                }).catch(function (error) {
-                    throw new functions.https.HttpsError('unknown', error.message, error)
-                })
-                return {answer: 'Turma cadastrada com sucesso.'}
-            }).catch(error => {
-                throw new functions.https.HttpsError(error.code, error.message, error)
+            return admin.database().ref(`sistemaEscolar/turmas/${data.codigoSala}/`).once('value').then(snapshot =>{
+                if (snapshot.exists() == false) {
+                    return admin.database().ref(`sistemaEscolar/turmas/${data.codigoSala}/`).set(dados).then(() => {
+                        admin.database().ref(`sistemaEscolar/numeros/turmasCadastradas`).transaction(function (current_value) {
+                            return (current_value || 0) + 1
+                        }).catch(function (error) {
+                            throw new functions.https.HttpsError('unknown', error.message, error)
+                        })
+                        return {answer: 'Turma cadastrada com sucesso.'}
+                        }).catch(error => {
+                            throw new functions.https.HttpsError(error.code, error.message, error)
+                        })
+                } else {
+                    throw new functions.https.HttpsError('already-exists', 'Uma turma com o mesmo código já foi criada.')
+                }
+                
             })
+                
         }).catch(function(error) {
             throw new functions.https.HttpsError('unknown', error.message, error)
         })
