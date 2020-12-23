@@ -263,8 +263,5 @@ function abreTurma(cod) {
         codigoDaTurmaLabel.innerText = dadosDaTurma.codigoSala
         areaInfoTurma.style.visibility = 'visible'
         document.getElementById('nivel' + dadosDaTurma.faixaTurma).className = 'list-group-item list-group-item-action active'
-        while (condition) {
-            
-        }
     })
 }
