@@ -256,12 +256,114 @@ function carregaTurmas() {
 function abreTurma(cod) {
     var codigoDaTurmaLabel = document.getElementById('codigoDaTurma')
     var areaInfoTurma = document.getElementById('areaInfoTurma')
-    turmasRef.child(cod).once('value', (snapshot) => {
+    turmasRef.child(cod).on('value', (snapshot) => {
         // TODO: Mostrar na tela as informações da turma
         console.log(snapshot.val())
         let dadosDaTurma = snapshot.val()
         codigoDaTurmaLabel.innerText = dadosDaTurma.codigoSala
         areaInfoTurma.style.visibility = 'visible'
-        document.getElementById('nivel' + dadosDaTurma.faixaTurma).className = 'list-group-item list-group-item-action active'
+        // Área separação KIDS, TEENS, ADULTS
+        var faixa
+        if (dadosDaTurma.faixaTurma == 'A') {
+            faixa = 'ADULTS'
+        } else if(dadosDaTurma.faixaTurma == 'T') {
+            faixa = 'TEENS'
+        } else {
+            faixa = dadosDaTurma.faixaTurma
+        }
+        document.getElementById('mostraFaixa').innerHTML = `<a class="list-group-item list-group-item-action active" data-toggle="list" role="tab">${faixa}</a>`
+        // Mostra dias de aula da turma
+        document.getElementById('mostraDiasTurma').innerText = 'Dia(s) de Aula:'
+        for (const key in dadosDaTurma.diasDaSemana) {
+            if (Object.hasOwnProperty.call(dadosDaTurma.diasDaSemana, key)) {
+                const dia = dadosDaTurma.diasDaSemana[key];
+                document.getElementById('mostraDiasTurma').innerText += ' ' + dia + ' '
+            }
+        }
+        document.getElementById('mostraHorarioTurma').innerText = 'Horário de aula: '+ dadosDaTurma.hora + 'h'
+        
+        document.getElementById('mostraLivrosTurma').innerText = 'Livros cadastrados: '
+        for (const key in dadosDaTurma.livros) {
+            if (Object.hasOwnProperty.call(dadosDaTurma.livros, key)) {
+                const numLivro = dadosDaTurma.livros[key];
+                document.getElementById('mostraLivrosTurma').innerText += ` Book ${numLivro} |`
+            }
+        }
+
+        document.getElementById('timestampTurmaCadastrada').innerText = 'Turma cadastrada em:  ' + new Date(dadosDaTurma.timestamp._seconds * 1000)
+
+        document.getElementById('mostraProfessoresCadastrados').innerHTML = `<button class="btn btn-primary" onclick="modalAddProfTurma('${cod}')"><span data-feather="user-plus"></span> Adicionar professores</button><ul class="items" id="ulProfCadastrados"></ul>`
+        for (const key in dadosDaTurma.professor) {
+            if (Object.hasOwnProperty.call(dadosDaTurma.professor, key)) {
+                const professor = dadosDaTurma.professor[key];
+                document.getElementById('ulProfCadastrados').innerHTML += `
+                    <li class="item-dismissible">${professor.nome} (${professor.email})<span class="close" data-toggle="tooltip" data-placement="top" title="Retirar prof. desta turma?" onclick="retiraProf('${professor.email}', '${professor.nome}', '${dadosDaTurma.codigoSala}')">&times;</span></li>
+                `
+            }
+        }
+    })
+}
+
+function retiraProf(email, nome, codSala, confirma=false) {
+    if (confirma) {
+        document.getElementById('ast-dialog-bg').remove()
+        turmasRef.child(codSala).child('professor').once('value', (snapshot) => {
+            let listaProf = snapshot.val()
+            console.log(listaProf)
+            for (const key in listaProf) {
+                if (Object.hasOwnProperty.call(listaProf, key)) {
+                    const professor = listaProf[key];
+                    if (professor.email == email) {
+                        listaProf.splice(key, 1)
+                        console.log(listaProf)
+                    }
+                }
+            }
+            turmasRef.child(codSala).child('professor').set(listaProf).then(() => {
+                AstNotif.notify('Sucesso', 'Professor deletado com sucesso')
+            })
+
+        })
+    } else {
+        AstNotif.dialog('Confirmação', `Você está prestes à retirar o acesso desta turma de ${nome} (${email}). Você confirma esta ação?<br><br> <button type="button" class="btn btn-danger" onclick="retiraProf('${email}', '${nome}', '${codSala}', true)">Sim, confirmo</button>`, {positive: 'Voltar', negative: ''})
+    }
+}
+
+function modalAddProfTurma(codSala) {
+    AstNotif.dialog('Adicionar professores nesta turma', `
+    Por favor, tenha o cuidado de escolher um(a) professor(a) que ainda não está vinculado na turma atual.
+    <div class="input-group prepend">
+        <div class="input-group-prepend">
+        <label class="input-group-text" for="inputGroupSelect01">Prof.</label>
+        </div>
+        <select class="custom-select" id="selectAddProfessorTurma" onchange="novoProf(this.value, '${codSala}')">
+        <option selected hidden>Escolha o(a) professor(a)...</option>
+        
+        </select>
+    </div>
+    `, {positive: 'Voltar', negative: ''})
+    listaDeProfessores.once('value', (snapshot) => {
+        let listaProf = snapshot.val()
+        console.log(listaProf)
+        for (const key in listaProf) {
+            if (Object.hasOwnProperty.call(listaProf, key)) {
+                const professor = listaProf[key];
+                document.getElementById('selectAddProfessorTurma').innerHTML += `<option value="${professor.email}">${professor.nome} (${professor.email})</option>`
+            }
+        }
+    })
+    
+}
+
+function novoProf(email, codSala) {
+    document.getElementById('ast-dialog-bg').remove()
+    var addNovoProfTurma = firebase.functions().httpsCallable('addNovoProfTurma')
+    addNovoProfTurma({emailProf: email, codSala: codSala})
+    .then(function(result) {
+        console.log(result)
+        AstNotif.dialog('Sucesso', result.data.answer)
+    }).catch(function(error) {
+        AstNotif.dialog('Erro', error.message)
+        console.log(error)
     })
 }

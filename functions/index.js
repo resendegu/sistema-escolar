@@ -1,5 +1,6 @@
 const functions = require('firebase-functions');
-const admin = require('firebase-admin')
+const admin = require('firebase-admin');
+const { auth } = require('firebase-admin');
 admin.initializeApp()
 
 exports.verificadorDeAcesso = functions.https.onCall((data, context) => {
@@ -214,4 +215,25 @@ exports.cadastraAniversarios = functions.database.ref('sistemaEscolar/usuarios/{
     }).catch(error => {
         throw new functions.https.HttpsError('unknown', error.message, error)
     })
+})
+
+exports.addNovoProfTurma = functions.https.onCall((data, context) => {
+    if (context.auth.token.secretaria == true) {
+        return admin.auth().getUserByEmail(data.emailProf).then(function(user) {
+           return admin.database().ref('sistemaEscolar/turmas').child(data.codSala).child('professor').once('value', (snapshot) => {
+                let listaProf = snapshot.val()
+                listaProf.push({email: data.emailProf, nome: user.displayName})
+                return admin.database().ref('sistemaEscolar/turmas').child(data.codSala).child('professor').set(listaProf).then(() => {
+                    return {answer: 'Professor adicionado com sucesso'}
+                }).catch(error => {
+                    throw new functions.https.HttpsError('unknown', error.message, error)
+                })
+           })
+        }).catch(function(error){
+            throw new functions.https.HttpsError('unknown', error.message, error)
+        })
+    } else {
+        throw new functions.https.HttpsError('permission-denied', 'Você não possui permissão para fazer alterações nesta área.')
+    }
+
 })

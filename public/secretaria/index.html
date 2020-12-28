@@ -13,6 +13,7 @@
 
     <!-- Custom styles for this template -->
     <link href="../css/dashboard.css" rel="stylesheet">
+    <link href="../css/list-items.css" rel="stylesheet">
 
       <!-- Carregando arquivos da biblioteca AST-Notif. Créditos: https://github.com/anandastoon/AST-Notif -->
     <link rel="stylesheet" href="../resources/AST-Notif/css/ast-notif.min.css">
@@ -37,7 +38,7 @@
           initialize the SDK after all desired features are loaded, set useEmulator to false
           to avoid connecting the SDK to running emulators.
         -->
-        <script defer src="/__/firebase/init.js?useEmulator=true"></script>
+        <script defer src="/__/firebase/init.js"></script>
         <nav class="navbar navbar-light navbar-expand-lg sticky-top bg-light flex-md-nowrap p-0">
         <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="../">Nome da empresa</a>
         <ul class="navbar-nav">
@@ -333,16 +334,34 @@
               <div class="container" id="areaInfoTurma" style="visibility: hidden;">
                 <label class="h3">Turma</label>
                 <label class="text-muted float-right h5" id="codigoDaTurma"></label>
-                <div class="col-md-auto">
-                  <h6>Faixa etária</h6>
-                  <div class="row">
-                    <div class="list-group" id="myList" role="tablist">
-                      <a class="list-group-item list-group-item-action" data-toggle="list" id="nivelKIDS" href="#kids" role="tab" onclick="faixa('KIDS')">KIDS</a>
-                      <a class="list-group-item list-group-item-action" data-toggle="list" id="nivelT" href="#teens" role="tab" onclick="faixa('T')">TEENS</a>
-                      <a class="list-group-item list-group-item-action" data-toggle="list" id="nivelA" href="#adults" role="tab" onclick="faixa('A')">ADULTS</a>
+                <div class="row">
+                  <div class="col-md-auto">
+                    <h6>Faixa etária</h6>
+                    <div class="row">
+                      &nbsp;&nbsp;&nbsp;<div class="list-group" id="mostraFaixa" role="tablist">
+                        <a class="list-group-item list-group-item-action" data-toggle="list" id="nivelKIDS" href="#kids" role="tab" onclick="faixa('KIDS')">KIDS</a>
+                        <a class="list-group-item list-group-item-action" data-toggle="list" id="nivelT" href="#teens" role="tab" onclick="faixa('T')">TEENS</a>
+                        <a class="list-group-item list-group-item-action" data-toggle="list" id="nivelA" href="#adults" role="tab" onclick="faixa('A')">ADULTS</a>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-auto">
+                    <label id="mostraDiasTurma"></label>
+                    <br>
+                    <label id="mostraHorarioTurma"></label>
+                    <br>
+                    <label id="mostraLivrosTurma"></label>
+                  </div>
+                  <div class="col-lg">
+                    <div>
+                      <label>Professores cadastrados na turma:</label> <br>
+                      <div id="mostraProfessoresCadastrados" class="items-container"></div>
                     </div>
                   </div>
                 </div>
+                <hr>
+                <p class="text-muted float-md-right" id="timestampTurmaCadastrada"></p>
+                
               </div>
             </div>
 
