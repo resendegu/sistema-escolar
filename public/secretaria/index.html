@@ -488,9 +488,95 @@
             
 
             <div class="container tab-pane fade" id="abaCadastrarAlunos" role="tabpanel" aria-labelledby="Cadastrar Alunos">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Nobis deserunt fugiat architecto voluptate, libero dolore laudantium culpa tempore voluptas sunt rerum. Officiis saepe quidem quo quis eaque nobis quibusdam perspiciatis.
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Hic delectus nihil ullam praesentium earum, unde rem expedita nobis accusantium aspernatur voluptate molestiae nisi dolore, nam nulla consectetur voluptatum deserunt laborum.
-              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolorem veritatis voluptatum officiis necessitatibus officia rerum cum cumque facilis debitis, temporibus saepe amet similique? Reprehenderit at deleniti numquam temporibus quae asperiores!
+              <label class="h3">Cadastro de alunos</label>
+              <form>
+                <div class="form-row">
+                  <div class="form-group col-auto">
+                    <label for="inputEmail4">Matrícula</label>
+                    <input type="number" class="form-control" id="inputEmail4" placeholder="Email">
+                  </div>
+                  <div class="form-group col-md-5">
+                    <label for="inputPassword4">Nome</label>
+                    <input type="name" class="form-control" id="inputPassword4" placeholder="Nome">
+                  </div>
+                  <div class="form-group col-sm-1">
+                    <label for="inputEmail4">Sexo</label>
+                    <input type="text" class="form-control" id="inputEmail4" placeholder="Sexo">
+                  </div>
+                  <div class="form-group col-auto">
+                    <label for="inputPassword4">Data de nasc.</label>
+                    <input type="date" class="form-control" id="inputPassword4" placeholder="Password">
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group col-auto">
+                    <label for="inputAddress">Turma</label>
+                    <input type="text" class="form-control" id="inputAddress" placeholder="Turma">
+                  </div>
+                  <div class="form-group col-md-5">
+                    <label for="inputAddress">Prof. Referência</label>
+                    <input type="text" class="form-control" id="inputAddress" placeholder="Prof.">
+                  </div>
+                  <div class="form-group col-auto">
+                    <label for="inputAddress">Horário e dias da semana</label>
+                    <input type="text" class="form-control" id="inputAddress" placeholder="20h Segunda e Terça">
+                  </div>
+                  <div class="form-group col-auto">
+                    <legend class="col-form-label col-auto pt-0">Curso de inglês para:</legend>
+                    <div class="col-auto">
+                      <div class="form-check">
+                        <input class="form-check-input" type="radio" name="faixaEtaria" id="faixaKIDS" value="KIDS" checked>
+                        <label class="form-check-label" for="gridRadios1">
+                          KIDS
+                        </label>
+                      </div>
+                      <div class="form-check">
+                        <input class="form-check-input" type="radio" name="faixaEtaria" id="faixaTEENS" value="T">
+                        <label class="form-check-label" for="gridRadios2">
+                          TEENS
+                        </label>
+                      </div>
+                      <div class="form-check">
+                        <input class="form-check-input" type="radio" name="faixaEtaria" id="faixaADULTS" value="A">
+                        <label class="form-check-label" for="gridRadios3">
+                          ADULTS
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+            
+                <div class="form-row">
+                  <div class="form-group col-md-7">
+                    <label for="inputAddress2">Endereço</label>
+                    <input type="text" class="form-control" id="inputAddress2" placeholder="Apartamneto, casa, andar, endereço">
+                  </div>
+                  <div class="form-group col-md-4">
+                    <label for="inputCity">Bairro</label>
+                    <input type="text" class="form-control" id="inputCity">
+                  </div>
+                  <div class="form-group col-md-3">
+                    <label for="inputState">Cidade</label>
+                    <select id="inputState" class="form-control">
+                      <option selected>Choose...</option>
+                      <option>...</option>
+                    </select>
+                  </div>
+                  <div class="form-group col-md-2">
+                    <label for="inputZip">Zip</label>
+                    <input type="text" class="form-control" id="inputZip">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="gridCheck">
+                    <label class="form-check-label" for="gridCheck">
+                      Check me out
+                    </label>
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Sign in</button>
+              </form>
             </div>
 
             <div class="container tab-pane fade" id="abaTransferenciaAlunos" role="tabpanel" aria-labelledby="Transferência de Alunos">
