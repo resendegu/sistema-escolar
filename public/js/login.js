@@ -14,12 +14,12 @@ var loader = document.getElementById('loader')
             var verificadorDeAcesso = firebase.functions().httpsCallable('verificadorDeAcesso')
             verificadorDeAcesso({acesso: 'master'}).then(function(result) {
                 console.log(result)
-                loader.style.visibility = 'hidden'
                 document.getElementById('painelAdm').style.display = 'block'
+                loader.style.visibility = 'hidden'
                 
             }).catch(function(error) {
-                loader.style.visibility = 'hidden'
                 document.getElementById('painelAdm').style.display = 'none'
+                loader.style.visibility = 'hidden'
             })
         } else {
             document.getElementById('loginContainer').style.display = 'block'
@@ -47,7 +47,7 @@ function liberaAreaCadastro(abre=true) {
 }
 
 document.querySelector('#areaLogin').addEventListener('submit', (e) => {
-    loader.style.display = 'block'
+    loader.style.visibility = 'visible'
     e.preventDefault()
     const formData = new FormData(e.target);
     var nome = formData.get('nome')
@@ -76,7 +76,7 @@ document.querySelector('#areaLogin').addEventListener('submit', (e) => {
             }
             
         } else {
-            loader.style.visibility = 'hidden';
+            loader.style.visibility = 'visible'
             return firebase.auth().signInWithEmailAndPassword(email, senha);
         }
       }
