@@ -15,15 +15,15 @@ var loader = document.getElementById('loader')
             verificadorDeAcesso({acesso: 'master'}).then(function(result) {
                 console.log(result)
                 document.getElementById('painelAdm').style.display = 'block'
-                loader.style.visibility = 'hidden'
+                loader.style.display = 'none'
                 
             }).catch(function(error) {
                 document.getElementById('painelAdm').style.display = 'none'
-                loader.style.visibility = 'hidden'
+                loader.style.display = 'none'
             })
         } else {
             document.getElementById('loginContainer').style.display = 'block'
-            loader.style.visibility = 'hidden';
+            loader.style.display = 'none';
         }
     })
 
@@ -47,7 +47,7 @@ function liberaAreaCadastro(abre=true) {
 }
 
 document.querySelector('#areaLogin').addEventListener('submit', (e) => {
-    loader.style.visibility = 'visible'
+    loader.style.display = 'block'
     e.preventDefault()
     const formData = new FormData(e.target);
     var nome = formData.get('nome')
@@ -63,20 +63,20 @@ document.querySelector('#areaLogin').addEventListener('submit', (e) => {
     firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION)
   .then(function() {
       if (senhaRepetida != '' && (mes == '' || nome == '')) {
-        loader.style.visibility = 'hidden';
+        loader.style.display = 'none';
         throw new Error('Dados incompletos. Digite todos os dados obrigatórios corretamente')
       } else {
         if (senhaRepetida != '') {
             if (senhaRepetida == senha) {
-                loader.style.visibility = 'hidden';
+                loader.style.display = 'none';
                 return firebase.auth().createUserWithEmailAndPassword(email, senha)
             } else {
-                loader.style.visibility = 'hidden';
+                loader.style.display = 'none';
                 throw new Error('As senhas não conferem. Tente novamente')
             }
             
         } else {
-            loader.style.visibility = 'visible'
+            loader.style.display = 'block'
             return firebase.auth().signInWithEmailAndPassword(email, senha);
         }
       }
@@ -131,7 +131,7 @@ document.querySelector('#areaLogin').addEventListener('submit', (e) => {
         AstNotif.dialog('Erro', error.message)
         console.log(error)
     }
-    loader.style.visibility = 'hidden';
+    loader.style.display = 'none';
   });
 });
 
@@ -232,9 +232,9 @@ function liberaAcesso(uid, acesso, checked) {
             acessaUsuario(uid)
         }
     } else {
-        loader.style.visibility = 'visible'
+        loader.style.display = 'block'
         liberaERemoveAcessos({uid: uid, acesso: acesso, checked: checked}).then(function(result) {
-            loader.style.visibility = 'hidden'
+            loader.style.display = 'none'
             AstNotif.notify(result.data.acesso, '')
         })
     }

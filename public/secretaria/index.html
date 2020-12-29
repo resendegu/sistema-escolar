@@ -13,6 +13,7 @@
 
     <!-- Custom styles for this template -->
     <link href="../css/dashboard.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/loader.css">
     <link href="../css/list-items.css" rel="stylesheet">
 
       <!-- Carregando arquivos da biblioteca AST-Notif. Créditos: https://github.com/anandastoon/AST-Notif -->
@@ -39,6 +40,7 @@
           to avoid connecting the SDK to running emulators.
         -->
         <script defer src="/__/firebase/init.js"></script>
+        
         <nav class="navbar navbar-light navbar-expand-lg sticky-top bg-light flex-md-nowrap p-0">
         <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="../">Nome da empresa</a>
         <ul class="navbar-nav">
@@ -113,9 +115,11 @@
             </li>
           </ul>
         </div>
-        </nav>
-      
-
+      </nav>
+      <!-- Loader -->
+<div id="loader" class="window-loader">
+    <div class="loader"></div>
+</div>
     <div class="container-fluid">
       <div class="row">
         <nav class="col-md-2 d-none d-md-block bg-light sidebar">
@@ -327,7 +331,7 @@
                 <div class="input-group-prepend">
                   <label class="input-group-text" for="inputGroupSelect01">Turmas Cadastradas</label>
                 </div>
-                <select class="custom-select" id="selectTurmas" onchange="abreTurma(this.value)">
+                <select class="custom-select" id="selectTurmas" onchange="abreTurma(this.value)" style="visibility: hidden;">
                   <option selected hidden>Escolha uma turma...</option>
                 </select>
               </div>

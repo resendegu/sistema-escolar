@@ -9,6 +9,8 @@
   <!-- Carregando arquivos da biblioteca AST-Notif. Créditos: https://github.com/anandastoon/AST-Notif -->
   <link rel="stylesheet" href="resources/AST-Notif/css/ast-notif.min.css">
   <link rel="shortcut icon" href="images/domain.png" type="image/x-icon">
+
+  <link rel="stylesheet" href="css/loader.css">
   
   <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/4.6.1/firebase-ui-auth.css" />
 </head>
@@ -66,7 +68,10 @@
         </div>
       </nav>
   </header>
-
+<!-- Loader -->
+<div id="loader" class="window-loader">
+  <div class="loader"></div>
+</div>
   <!-- Parte principal -->
   <div class="modal" tabindex="-1" role="dialog" id="modal">
     <div class="modal-dialog" role="document">
@@ -88,7 +93,6 @@
     </div>
   </div>
   <div class="container">
-    <img src="./images/carregamento.gif" class="rounded mx-auto d-block" alt="Carregando" width="60px" id="loader" style="position: absolute; margin-top: 150px; margin-left: 600px; z-index: 400;">
     <div class="container" id="loginContainer" style="display: none;">
       <form id="areaLogin">
         <div class="form-row">

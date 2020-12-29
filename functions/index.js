@@ -222,6 +222,9 @@ exports.addNovoProfTurma = functions.https.onCall((data, context) => {
         return admin.auth().getUserByEmail(data.emailProf).then(function(user) {
            return admin.database().ref('sistemaEscolar/turmas').child(data.codSala).child('professor').once('value').then(snapshot => {
                 var listaProf = snapshot.val()
+                if (listaProf == null) {
+                    var listaProf = []
+                }
                 listaProf.push({email: data.emailProf, nome: user.displayName})
                 return admin.database().ref('sistemaEscolar/turmas').child(data.codSala).child('professor').set(listaProf).then(() => {
                     return {answer: 'Professor adicionado com sucesso'}

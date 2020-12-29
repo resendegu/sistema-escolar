@@ -4,10 +4,14 @@ var aniversariosRef = firebase.database().ref('sistemaEscolar/aniversarios')
 var listaDeUsuariosRef = firebase.database().ref('sistemaEscolar/listaDeUsuarios')
 var listaDeProfessores = firebase.database().ref('sistemaEscolar/listaDeProfessores')
 var turmasRef = firebase.database().ref('sistemaEscolar/turmas')
+var loader = document.getElementById('loader')
 
 firebase.auth().onAuthStateChanged((user) => {
+    loader.style.display = 'block'
     try {
-        document.getElementById('profilePic').src = user.photoURL
+        if (user.photoURL != null) {
+            document.getElementById('profilePic').src = user.photoURL
+        } 
     } catch (error) {
         console.log(error)
     }
@@ -47,9 +51,11 @@ firebase.auth().onAuthStateChanged((user) => {
                 idCelulaTabela = ''
             }
         }
+        loader.style.display = 'none'
     })
 
     aniversariosRef.on('value', (snapshot) => {
+        loader.style.display = 'block'
         var meses = snapshot.val()
         var dataLocal = new Date()
         var mesAtual = dataLocal.getMonth()
@@ -60,6 +66,7 @@ firebase.auth().onAuthStateChanged((user) => {
                 document.getElementById('listaAniversarios').innerHTML += `<button class="list-group-item list-group-item-action">${aniversario.nome} no dia ${aniversario.dataNascimento.dia}</button>`
             }
         }
+        loader.style.display = 'none'
     })
 })
 
@@ -205,6 +212,7 @@ function junta() {
 var professorReferencia
 
 function carregaProfessores() {
+    loader.style.display = 'block'
     console.log('carregando')
     var professorTurmaSelect = document.getElementById('professorTurma')
     listaDeProfessores.on('value', (snapshot) => {
@@ -216,6 +224,7 @@ function carregaProfessores() {
                 professorTurmaSelect.innerHTML += `<option value="${uid}">${professor.nome} (${professor.email})</option>`
             }
         }
+        loader.style.display = 'none'
     })
 }
 function professorReferencia(uid) {
@@ -225,21 +234,24 @@ function professorReferencia(uid) {
 
 // Função de cadastro de turma no banco de dados
 function cadastrarTurma(confima=false) {
+    loader.style.display = 'block'
     //AstNotif.dialog('Aguarde', "<img src='../images/carregamento.gif' width=100px>")
     var cadastraTurma = firebase.functions().httpsCallable('cadastraTurma')
     cadastraTurma({codigoSala: codPadrao, professor: professor, diasDaSemana: diasDaSemana, livros: books, nivelTurma: nivelTurma, faixaTurma: faixaEtaria, hora: horarioCurso})
     .then(function(result) {
         console.log(result)
         AstNotif.dialog('Sucesso', result.data.answer)
-
+        loader.style.display = 'none'
     }).catch(function(error) {
         AstNotif.dialog('Erro', error.message)
         console.log(error)
+        loader.style.display = 'none'
     })
 }
 
 // Funções da aba de turmas da secretaria
 function carregaTurmas() {
+    loader.style.display = 'block'
     var selectTurmas = document.getElementById('selectTurmas')
     turmasRef.once('value', (snapshot) => {
         selectTurmas.innerHTML = '<option selected hidden>Escolha uma turma...</option>'
@@ -247,13 +259,21 @@ function carregaTurmas() {
         for (const cod in turmas) {
             if (Object.hasOwnProperty.call(turmas, cod)) {
                 const infoDaTurma = turmas[cod];
-                selectTurmas.innerHTML += `<option value="${cod}">Turma ${cod} (Prof. ${infoDaTurma.professor[0].nome})</option>`
+                if (infoDaTurma.professor == undefined) {
+                    var profReferencia = 'Não cadastrado'
+                } else {
+                    var profReferencia = infoDaTurma.professor[0].nome
+                }
+                selectTurmas.innerHTML += `<option value="${cod}">Turma ${cod} (Prof. ${profReferencia})</option>`
             }
         }
+        document.getElementById('selectTurmas').style.visibility = 'visible'
+        loader.style.display = 'none'
     })
 }
 
 function abreTurma(cod) {
+    loader.style.display = 'block'
     var codigoDaTurmaLabel = document.getElementById('codigoDaTurma')
     var areaInfoTurma = document.getElementById('areaInfoTurma')
     turmasRef.child(cod).on('value', (snapshot) => {
@@ -301,11 +321,13 @@ function abreTurma(cod) {
                 `
             }
         }
+        loader.style.display = 'none'
     })
 }
 
 function retiraProf(email, nome, codSala, confirma=false) {
     if (confirma) {
+        loader.style.display = 'block'
         document.getElementById('ast-dialog-bg').remove()
         turmasRef.child(codSala).child('professor').once('value', (snapshot) => {
             let listaProf = snapshot.val()
@@ -320,6 +342,7 @@ function retiraProf(email, nome, codSala, confirma=false) {
                 }
             }
             turmasRef.child(codSala).child('professor').set(listaProf).then(() => {
+                loader.style.display = 'none'
                 AstNotif.notify('Sucesso', 'Professor deletado com sucesso')
             })
 
@@ -330,6 +353,7 @@ function retiraProf(email, nome, codSala, confirma=false) {
 }
 
 function modalAddProfTurma(codSala) {
+    loader.style.display = 'block'
     AstNotif.dialog('Adicionar professores nesta turma', `
     Por favor, tenha o cuidado de escolher um(a) professor(a) que ainda não está vinculado na turma atual.
     <div class="input-group prepend">
@@ -351,19 +375,23 @@ function modalAddProfTurma(codSala) {
                 document.getElementById('selectAddProfessorTurma').innerHTML += `<option value="${professor.email}">${professor.nome} (${professor.email})</option>`
             }
         }
+        loader.style.display = 'none'
     })
     
 }
 
 function novoProf(email, codSala) {
+    loader.style.display = 'block'
     document.getElementById('ast-dialog-bg').remove()
     var addNovoProfTurma = firebase.functions().httpsCallable('addNovoProfTurma')
     addNovoProfTurma({emailProf: email, codSala: codSala})
     .then(function(result) {
         console.log(result)
         AstNotif.dialog('Sucesso', result.data.answer)
+        loader.style.display = 'none'
     }).catch(function(error) {
         AstNotif.dialog('Erro', error.message)
         console.log(error)
+        loader.style.display = 'none'
     })
 }
