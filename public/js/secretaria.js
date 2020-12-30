@@ -395,3 +395,96 @@ function novoProf(email, codSala) {
         loader.style.display = 'none'
     })
 }
+
+function preencheEndereco(numCep) {
+    loader.style.display = 'block'
+    let enderecoAluno = document.getElementById('enderecoAluno')
+    let bairroAluno = document.getElementById('bairroAluno')
+    let cidadeAluno = document.getElementById('cidadeAluno')
+    let cepAluno = document.getElementById('cepAluno')
+    let estadoAluno = document.getElementById('estadoAluno')
+    getAddress(numCep).then(function(result){
+        if (result.street == undefined) {
+            AstNotif.dialog('Erro ao buscar CEP', 'Verifique o CEP digitado e tente novamente.')
+        } else {
+            enderecoAluno.value = result.street
+            bairroAluno.value = result.neighborhood
+            cidadeAluno.value = result.city
+            estadoAluno.value = result.state
+            document.getElementById('numeroAluno').focus()
+        }
+        loader.style.display = 'none'
+        
+    }).catch(function(error){
+        AstNotif.dialog('Erro ao buscar CEP', error.message)
+        console.log(error)
+        loader.style.display = 'none'
+    })
+}
+
+// Funções do cadastro de alunos
+let turmasLocal = {}
+function carregaProfsETurmas() {
+    turmasLocal = {}
+    loader.style.display = 'block'
+    let turmaAluno = document.getElementById('turmaAluno')
+    
+    turmasRef.once('value', (snapshot) => {
+        turmaAluno.innerHTML = '<option selected hidden>Escolha uma turma...</option>'
+        let turmas = snapshot.val()
+        turmasLocal = snapshot.val()
+        for (const cod in turmas) {
+            if (Object.hasOwnProperty.call(turmas, cod)) {
+                const infoDaTurma = turmas[cod];
+                
+                turmaAluno.innerHTML += `<option value="${cod}">${cod}</option>`
+            }
+        }
+        loader.style.display = 'none'
+    })
+}
+
+function mostraProfsAlunoESetaTurma(codTurma) {
+    if (codTurma != 'Escolha uma turma...') {
+    let profAluno = document.getElementById('profAluno')
+    let horaEDiasAluno = document.getElementById('horaEDiasAluno')
+    profAluno.disabled = false
+    profAluno.innerHTML = '<option selected hidden>Escolha um prof.</option>'
+    document.getElementById('faixa' + turmasLocal[codTurma].faixaTurma).checked = true
+    horaEDiasAluno.value = turmasLocal[codTurma].hora + 'h'
+    for (const index in turmasLocal[codTurma].diasDaSemana) {
+        if (Object.hasOwnProperty.call(turmasLocal[codTurma].diasDaSemana, index)) {
+            const dia = turmasLocal[codTurma].diasDaSemana[index];
+            horaEDiasAluno.value += ',' + dia
+        }
+    }
+
+    for (const index in turmasLocal[codTurma].professor) {
+        if (Object.hasOwnProperty.call(turmasLocal[codTurma].professor, index)) {
+            const professor = turmasLocal[codTurma].professor[index];
+            profAluno.innerHTML += `<option value="${professor.email}">${professor.nome} (${professor.email})</option>`
+        }
+    }
+    }
+    
+}
+
+function setaRespFinan(num) { 
+    let nomeResponsavelFinanceiroAluno = document.getElementById('nomeResponsavelFinanceiroAluno')
+    let relacaoFinanceiroAluno = document.getElementById('relacaoFinanceiroAluno')
+    let numeroComercialFinanceiroAluno = document.getElementById('numeroComercialFinanceiroAluno')
+    let numeroCelularFinanceiroAluno = document.getElementById('numeroCelularFinanceiroAluno')
+    nomeResponsavelFinanceiroAluno.value = document.getElementById('nomeResponsavelAluno' + num).value
+    relacaoFinanceiroAluno.value = document.getElementById('relacaoAluno' + num).value
+    numeroComercialFinanceiroAluno.value = document.getElementById('numeroComercialAluno' + num).value
+    numeroCelularFinanceiroAluno.value = document.getElementById('numeroCelularAluno' + num).value
+
+    document.getElementById('nomeResponsavelAluno' + num).focus()
+}
+
+document.getElementById('matriculaAluno').addEventListener('change', function () {
+    var input = document.getElementById('matriculaAluno');
+    
+    input.value="00000"+input.value.replace(/\D/g,'');
+    input.value=input.value.slice(-5,-1)+input.value.slice(-1);
+});

@@ -75,7 +75,7 @@
                   </a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" data-toggle="list" href="#abaCadastrarAlunos" role="tab" aria-controls="CadastrarAlunos">
+                  <a class="nav-link" data-toggle="list" href="#abaCadastrarAlunos" role="tab" aria-controls="CadastrarAlunos" onclick="carregaProfsETurmas()">
                     <span data-feather="user-plus"></span>
                     Cadastrar alunos
                   </a>
@@ -150,7 +150,7 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" data-toggle="list" href="#abaCadastrarAlunos" role="tab" aria-controls="CadastrarAlunos">
+                <a class="nav-link" data-toggle="list" href="#abaCadastrarAlunos" role="tab" aria-controls="CadastrarAlunos" onclick="carregaProfsETurmas()">
                   <span data-feather="user-plus"></span>
                   Cadastrar alunos
                 </a>
@@ -497,33 +497,43 @@
                 <div class="form-row">
                   <div class="form-group col-auto">
                     <label for="inputEmail4">Matrícula</label>
-                    <input type="number" class="form-control" id="inputEmail4" placeholder="Email">
+                    <input type="number" class="form-control" id="matriculaAluno" placeholder="Número de matrícula">
                   </div>
                   <div class="form-group col-md-5">
                     <label for="inputPassword4">Nome</label>
-                    <input type="name" class="form-control" id="inputPassword4" placeholder="Nome">
+                    <input type="name" class="form-control" id="nomeAluno" placeholder="Nome">
                   </div>
                   <div class="form-group col-sm-1">
                     <label for="inputEmail4">Sexo</label>
-                    <input type="text" class="form-control" id="inputEmail4" placeholder="Sexo">
+                    <select class="form-control" name="sexoAluno" id="sexoAluno" placeholder="Sexo">
+                      <option hidden selected>...</option>
+                      <option value="F">F</option>
+                      <option value="M">M</option>
+                    </select>
                   </div>
                   <div class="form-group col-auto">
                     <label for="inputPassword4">Data de nasc.</label>
-                    <input type="date" class="form-control" id="inputPassword4" placeholder="Password">
+                    <input type="date" class="form-control" id="dataNascimentoAluno" placeholder="Password" onchange="console.log(this.value)">
                   </div>
                 </div>
                 <div class="form-row">
                   <div class="form-group col-auto">
                     <label for="inputAddress">Turma</label>
-                    <input type="text" class="form-control" id="inputAddress" placeholder="Turma">
+                    <select class="form-control " name="turmaAluno" id="turmaAluno" onclick="mostraProfsAlunoESetaTurma(this.value)">
+                      <option hidden selected>Escolha a turma...</option>
+                      
+                    </select>
                   </div>
-                  <div class="form-group col-md-5">
+                  <div class="form-group col-md-4">
                     <label for="inputAddress">Prof. Referência</label>
-                    <input type="text" class="form-control" id="inputAddress" placeholder="Prof.">
+                    <select class="form-control" disabled name="profAluno" id="profAluno">
+                      <option hidden selected>...</option>
+                      
+                    </select>
                   </div>
                   <div class="form-group col-auto">
                     <label for="inputAddress">Horário e dias da semana</label>
-                    <input type="text" class="form-control" id="inputAddress" placeholder="20h Segunda e Terça">
+                    <input type="text" class="form-control" id="horaEDiasAluno" placeholder="Ex.: 20h,MON,THU">
                   </div>
                   <div class="form-group col-auto">
                     <legend class="col-form-label col-auto pt-0">Curso de inglês para:</legend>
@@ -535,13 +545,13 @@
                         </label>
                       </div>
                       <div class="form-check">
-                        <input class="form-check-input" type="radio" name="faixaEtaria" id="faixaTEENS" value="T">
+                        <input class="form-check-input" type="radio" name="faixaEtaria" id="faixaT" value="T">
                         <label class="form-check-label" for="gridRadios2">
                           TEENS
                         </label>
                       </div>
                       <div class="form-check">
-                        <input class="form-check-input" type="radio" name="faixaEtaria" id="faixaADULTS" value="A">
+                        <input class="form-check-input" type="radio" name="faixaEtaria" id="faixaA" value="A">
                         <label class="form-check-label" for="gridRadios3">
                           ADULTS
                         </label>
@@ -549,28 +559,134 @@
                     </div>
                   </div>
                 </div>
-            
+
+                <div class="form-row col-md-4">
+                  <label for="inputZip">CEP (somente números)</label>
+                  <input type="number" class="form-control" id="cepAluno" placeholder="CEP" onchange="preencheEndereco(this.value)">
+                  <small id="emailHelp" class="form-text text-muted">O CEP é opcional, mas quando inserido preenche o endereço automaticamente.</small>
+                </div>
                 <div class="form-row">
-                  <div class="form-group col-md-7">
-                    <label for="inputAddress2">Endereço</label>
-                    <input type="text" class="form-control" id="inputAddress2" placeholder="Apartamneto, casa, andar, endereço">
+                  <div class="form-group col-md-5">
+                    <label for="inputAddress2">Rua</label>
+                    <input type="text" class="form-control" id="enderecoAluno" placeholder="Endereço">
                   </div>
-                  <div class="form-group col-md-4">
+                  <div class="form-group col-md-1">
+                    <label for="inputAddress2">Número</label>
+                    <input type="number" class="form-control" id="numeroAluno" placeholder="Núm.">
+                  </div>
+                  <div class="form-group col-md-2">
                     <label for="inputCity">Bairro</label>
-                    <input type="text" class="form-control" id="inputCity">
+                    <input type="text" class="form-control" id="bairroAluno" placeholder="Bairro">
                   </div>
-                  <div class="form-group col-md-3">
+                  <div class="form-group col-md-2">
                     <label for="inputState">Cidade</label>
-                    <select id="inputState" class="form-control">
-                      <option selected>Choose...</option>
-                      <option>...</option>
+                    <input type="text" class="form-control" id="cidadeAluno" placeholder="Cidade">
+                  </div>
+                  <div class="form-group col-md-1">
+                    <label for="inputState">Estado</label>
+                    <input type="text" class="form-control" id="estadoAluno" placeholder="Estado">
+                  </div>
+                </div>
+                <br>
+                <div class="form-row">
+                  <div class="form-group col-md-4">
+                    <label for="inputAddress">Nome dos pais ou do Tutor 1</label>
+                    <input type="text" class="form-control" id="nomeResponsavelAluno1" placeholder="Nome">
+                  </div>
+                  <div class="form-group col-md-2">
+                    <label for="inputAddress">Relação</label>
+                    <br>
+                    <select class="form-control form-control-md" name="relacaoAluno1" id="relacaoAluno1">
+                      <option hidden selected>Escolha...</option>
+                      <option value="Mãe">Mãe</option>
+                      <option value="Pai">Pai</option>
+                      <option value="Tio/Tia">Tio/Tia</option>
+                      <option value="Avô/Avó">Avô/Avó</option>
+                      <option value="Outros">Outros</option>
                     </select>
                   </div>
                   <div class="form-group col-md-2">
-                    <label for="inputZip">Zip</label>
-                    <input type="text" class="form-control" id="inputZip">
+                    <label for="inputAddress">Número comercial</label>
+                    <input type="text" class="form-control" id="numeroComercialAluno1" placeholder="Comercial">
+                  </div>
+                  <div class="form-group col-md-2">
+                    <label for="inputAddress">Número Celular</label>
+                    <input type="text" class="form-control" id="numeroCelularAluno1" placeholder="Celular">
+                  </div>
+                  <div class="form-group col-md-auto">
+                    <br><br>
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="responsavelFinanceiro" id="responsavelFinanceiro1" onclick="setaRespFinan('1')">
+                      <label class="form-check-label" for="responsavelFinanceiro1">
+                        Responsável financeiro
+                      </label>
+                    </div>
                   </div>
                 </div>
+
+                <div class="form-row">
+                  <div class="form-group col-md-4">
+                    <label for="inputAddress">Nome dos pais ou do Tutor 2</label>
+                    <input type="text" class="form-control" id="nomeResponsavelAluno2" placeholder="Nome">
+                  </div>
+                  <div class="form-group col-md-2">
+                    <label for="inputAddress">Relação</label>
+                    <br>
+                    <select class="form-control form-control-md" name="relacaoAluno2" id="relacaoAluno2">
+                      <option hidden selected>Escolha...</option>
+                      <option value="Mãe">Mãe</option>
+                      <option value="Pai">Pai</option>
+                      <option value="Tio/Tia">Tio/Tia</option>
+                      <option value="Avô/Avó">Avô/Avó</option>
+                      <option value="Outros">Outros</option>
+                    </select>
+                  </div>
+                  <div class="form-group col-md-2">
+                    <label for="inputAddress">Número comercial</label>
+                    <input type="text" class="form-control" id="numeroComercialAluno2" placeholder="Comercial">
+                  </div>
+                  <div class="form-group col-md-2">
+                    <label for="inputAddress">Número Celular</label>
+                    <input type="text" class="form-control" id="numeroCelularAluno2" placeholder="Celular">
+                  </div>
+                  <div class="form-group col-md-auto">
+                    <br><br>
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="responsavelFinanceiro" id="responsavelFinanceiro2" onclick="setaRespFinan('2')">
+                      <label class="form-check-label" for="responsavelFinanceiro2">
+                        Responsável financeiro
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group col-md-4">
+                    <label for="inputAddress">Responsável financeiro e pedagógico</label>
+                    <input type="text" class="form-control" id="nomeResponsavelFinanceiroAluno" placeholder="Nome">
+                  </div>
+                  <div class="form-group col-md-2">
+                    <label for="inputAddress">Relação</label>
+                    <br>
+                    <select class="form-control form-control-md" name="relacaoFinanceiroAluno" id="relacaoFinanceiroAluno">
+                      <option hidden selected>Escolha...</option>
+                      <option value="Mãe">Mãe</option>
+                      <option value="Pai">Pai</option>
+                      <option value="Tio/Tia">Tio/Tia</option>
+                      <option value="Avô/Avó">Avô/Avó</option>
+                      <option value="Outros">Outros</option>
+                    </select>
+                  </div>
+                  <div class="form-group col-md-2">
+                    <label for="inputAddress">Número comercial</label>
+                    <input type="text" class="form-control" id="numeroComercialFinanceiroAluno" placeholder="Comercial">
+                  </div>
+                  <div class="form-group col-md-2">
+                    <label for="inputAddress">Número Celular</label>
+                    <input type="text" class="form-control" id="numeroCelularFinanceiroAluno" placeholder="Celular">
+                  </div>
+                </div>
+
                 <div class="form-group">
                   <div class="form-check">
                     <input class="form-check-input" type="checkbox" id="gridCheck">
@@ -579,7 +695,7 @@
                     </label>
                   </div>
                 </div>
-                <button type="submit" class="btn btn-primary">Sign in</button>
+                <button type="submit" class="btn btn-primary" id="cadastrarAluno">Cadastrar Aluno</button>
               </form>
             </div>
 

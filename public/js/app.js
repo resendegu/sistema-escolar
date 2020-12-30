@@ -19,3 +19,14 @@ function abrirModal(id='modal', titulo, corpo, botoes) {
     document.getElementById('botoes').innerHTML = botoes
     $('#' + id).modal()
 }
+
+async function getAddress(numCep) {
+    try {
+        const resp = await fetch('https://brasilapi.com.br/api/cep/v1/' + numCep)
+        const address = await resp.json();
+        return address;
+    } catch (error) {
+        console.log(error)
+        throw new Error(error);
+    }
+}
