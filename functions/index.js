@@ -242,3 +242,32 @@ exports.addNovoProfTurma = functions.https.onCall((data, context) => {
     }
 
 })
+
+exports.cadastraAluno = functions.https.onCall((data, context) => {
+    if (context.auth.token.secretaria == true) {
+        let dadosAluno = data.dados
+        return admin.auth().getUserByEmail(dadosAluno.profAluno).then((user) => {
+            return admin.database().ref('sistemaEscolar/usuarios/' + user.uid + '/professor/listaDeAlunos/' + dadosAluno.matriculaAluno).set({nome: dadosAluno.nomeAluno, email: dadosAluno.emailAluno}).then(() => {
+                return admin.database().ref('sistemaEscolar/alunos/' + dadosAluno.matriculaAluno).set(dadosAluno).then(() => {
+                    return admin.database().ref('sistemaEscolar/turmas').child(dadosAluno.turmaAluno + '/alunos').child(dadosAluno.matriculaAluno).set({nome: dadosAluno.nomeAluno, prof: dadosAluno.profAluno, notas: {prova1: 0, prova2: 0, fala: 0, audicao: 0, leitura: 0, escrita: 0, atividadesExtras: 0}}).then(() => {
+                        return admin.database().ref('sistemaEscolar/ultimaMatricula').set(dadosAluno.matriculaAluno).then(() => {
+                            return {answer: 'Aluno cadastrado e distribuído nas turmas e nos professores com sucesso!'}
+                        }).catch(error => {
+                            throw new functions.https.HttpsError('unknown', error.message, error)
+                        })
+                    }).catch(error => {
+                        throw new functions.https.HttpsError('unknown', error.message, error)
+                    })
+                }).catch(error => {
+                    throw new functions.https.HttpsError('unknown', error.message, error)
+                })
+            }).catch(error => {
+                throw new functions.https.HttpsError('unknown', error.message, error)
+            })
+        }).catch(error => {
+            throw new functions.https.HttpsError('unknown', error.message, error)
+        })
+    } else {
+        throw new functions.https.HttpsError('permission-denied', 'Você não possui permissão para fazer alterações nesta área.')
+    }
+})

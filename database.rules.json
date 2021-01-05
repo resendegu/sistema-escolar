@@ -11,64 +11,29 @@
             ".write": false,
             ".read":"auth.uid != null"
           },
+          "turmas": {
+            ".write": "auth.uid != null",
+            ".read":"auth.uid != null"
+          },
+            "listaDeUsuarios": {
+              ".read": "auth.token.master == true",
+              ".write": "auth.uid != null"
+          },
+          "aniversarios": {
+              ".read": "auth.uid != null",
+              ".write": "auth.uid != null"
+          },
+          "listaDeProfessores": {
+              ".read": "auth.uid != null",
+              ".write": "auth.uid != null"
+          },
           "usuarios": {
             "$user_id":{
               ".write": "auth.uid == $user_id",
               ".read": "auth.uid != null"
-            }
-            
+            } 
           }
         },
-      "felipe": {
-          ".write": true,
-          ".read": true
-        },
-    	"ServidorResende": {
-        ".read": "auth.token.email_verified == true",
-        ".write": "auth.token.email_verified == true",
-        "video": {
-          ".read": true
-        },
-        "verificacao": {
-          ".read": true
-        },
-        "seguranca": {
-          ".read": "auth.token.email_verified == true",
-          ".write": "auth.token.email_verified == true",
-        },
-        "chat": {
-          ".write": "auth != null",
-          ".read": true,
-        },
-        "contas": {
-          ".read": "auth != null",
-          ".write": true
-        },
-        "firevideo": {
-          ".write": true,
-          ".read": true
-        },
-        "teste": {
-          ".write": true,
-          ".read": true
-        },
-        "salas": {
-          ".write": "auth.token.email_verified == true",
-          ".read": "auth.token.email_verified == true",
-        },
-        "links": {
-          ".write": true,
-          ".read": true
-        },
-        "provaonline": {
-          ".write": true,
-          ".read": true
-        },
-          "amongus": {
-          ".write": true,
-          ".read": true
-        }
-          
-  	}
-	}
+    }
+      
 }

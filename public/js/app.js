@@ -1,3 +1,4 @@
+var perf = firebase.performance()
 // Código padrão para todas as páginas do site
 
 function usuarioAtual() {
@@ -19,6 +20,7 @@ function abrirModal(id='modal', titulo, corpo, botoes) {
     document.getElementById('botoes').innerHTML = botoes
     $('#' + id).modal()
 }
+
 
 async function getAddress(numCep) {
     try {

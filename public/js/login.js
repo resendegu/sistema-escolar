@@ -1,9 +1,11 @@
 var listaUsersRef = firebase.database().ref('sistemaEscolar/listaDeUsuarios')
 var loader = document.getElementById('loader')
+var storageUserRef = firebase.storage().ref('/users');
 
 
     firebase.auth().onAuthStateChanged((user) => {
         if (user) {
+            storageUserRef = storageUserRef.child(user.uid) 
             document.getElementById('loginContainer').style.display = 'none'
             document.getElementById('logado').style.visibility = 'visible'
             document.getElementById('nome').innerText = user.displayName
@@ -58,6 +60,11 @@ document.querySelector('#areaLogin').addEventListener('submit', (e) => {
     var ano = formData.get('ano')
     var email = formData.get('email')
     var foto = formData.get('foto')
+    console.log(foto)
+    var urlFoto
+    if (foto.name == "") {
+        urlFoto = null
+    }
     // Now you can use formData.get('foo'), for example.
     // Don't forget e.preventDefault() if you want to stop normal form .submission
     firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION)
@@ -70,6 +77,8 @@ document.querySelector('#areaLogin').addEventListener('submit', (e) => {
             if (senhaRepetida == senha) {
                 loader.style.display = 'none';
                 return firebase.auth().createUserWithEmailAndPassword(email, senha)
+                
+                
             } else {
                 loader.style.display = 'none';
                 throw new Error('As senhas não conferem. Tente novamente')
@@ -85,37 +94,50 @@ document.querySelector('#areaLogin').addEventListener('submit', (e) => {
   }).then(() => {
       if (senhaRepetida != '') {
         var user = firebase.auth().currentUser;
-        user.updateProfile({
-            displayName: nome
-        }).then(function() {
-            firebase.database().ref('sistemaEscolar/usuarios/' + user.uid + '/nome').set(nome).then(() => {
-              firebase.database().ref('sistemaEscolar/listaDeUsuarios/' + user.uid + '/nome').set(nome).then(() => {
-                  firebase.database().ref('sistemaEscolar/usuarios/' + user.uid + '/dataNascimento').set({dia: Number(dia), mes: Number(mes), ano: Number(ano), email: email}).then(() => {
-                      firebase.auth().signOut().then(function() {
-                        window.location.reload()
+        storageUserRef.child('profilePic.jpg').put(foto).then(function(snapshot) {
+            console.log(snapshot)
+            snapshot.ref.getDownloadURL().then(function (URL) {
+                urlFoto = URL
+                user.updateProfile({
+                    displayName: nome,
+                    photoURL: urlFoto
+                }).then(function() {
+                    firebase.database().ref('sistemaEscolar/usuarios/' + user.uid + '/nome').set(nome).then(() => {
+                      firebase.database().ref('sistemaEscolar/listaDeUsuarios/' + user.uid + '/nome').set(nome).then(() => {
+                          firebase.database().ref('sistemaEscolar/usuarios/' + user.uid + '/dataNascimento').set({dia: Number(dia), mes: Number(mes), ano: Number(ano), email: email}).then(() => {
+                              firebase.auth().signOut().then(function() {
+                                window.location.reload()
+                              }).catch(error => {
+                                AstNotif.dialog('Erro', error.message)
+                                console.log(error)
+                              })
+                              
+                          }).catch(error => {
+                              AstNotif.dialog('Erro', error.message)
+                              console.log(error)
+                          })
+                          
                       }).catch(error => {
+                          AstNotif.dialog('Erro', error.message)
+                          console.log(error)
+                      })
+                    }).catch(error => {
                         AstNotif.dialog('Erro', error.message)
                         console.log(error)
-                      })
-                      
-                  }).catch(error => {
-                      AstNotif.dialog('Erro', error.message)
-                      console.log(error)
-                  })
-                  
-              }).catch(error => {
-                  AstNotif.dialog('Erro', error.message)
-                  console.log(error)
-              })
-            }).catch(error => {
-                AstNotif.dialog('Erro', error.message)
-                console.log(error)
+                    })
+                    
+                }).catch(function(error) {
+                    AstNotif.dialog('Erro ao atualizar dados do usuário', error.message)
+                    console.log(error)
+                })
             })
             
         }).catch(function(error) {
-            AstNotif.dialog('Erro ao atualizar dados do usuário', error.message)
-            console.log(error)
+            loader.style.display = 'none'
+            console.error(error)
+            AstNotif.dialog('Erro', error.message)
         })
+        
       }
     
   })
@@ -255,4 +277,32 @@ function apagarConta(uid, sure=false) {
     } else {
         AstNotif.dialog('Confirmação', `Você têm certeza que deseja apagar este usuário, os dados serão mantidos mas esta conta perderá acesso à todas as áreas que foram designadas. <br><br> <button type="button" class="btn btn-danger" onclick="apagarConta('${uid}', true)">Apagar esta conta agora</button>`, {positive: 'Voltar', negative: ''})
     }
+}
+
+function alteraFoto() {
+    let alteraFoto = document.getElementById('alteraFoto')
+    alteraFoto.click()
+}
+
+function uploadFoto(foto) {
+    console.log(foto)
+    loader.style.display = 'block'
+    let userAtual = usuarioAtual()
+    storageUserRef.child('profilePic').put(foto[0]).then(function(snapshot) {
+        snapshot.ref.getDownloadURL().then(function(url) {
+            console.log(url)
+            userAtual.updateProfile({
+                photoURL: url
+            }).then(function() {
+                userAtual = usuarioAtual()
+                document.getElementById('foto').src = userAtual.photoURL
+                AstNotif.notify('Foto atualizada!', 'Sua foto foi enviada aos servidores com sucesso!')
+                loader.style.display = 'none'
+            })
+        })
+    }).catch(function(error){
+        AstNotif.dialog('Erro', error.message)
+        console.log(error)
+        loader.style.display = 'none'
+    })
 }

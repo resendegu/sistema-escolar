@@ -4,70 +4,77 @@ var aniversariosRef = firebase.database().ref('sistemaEscolar/aniversarios')
 var listaDeUsuariosRef = firebase.database().ref('sistemaEscolar/listaDeUsuarios')
 var listaDeProfessores = firebase.database().ref('sistemaEscolar/listaDeProfessores')
 var turmasRef = firebase.database().ref('sistemaEscolar/turmas')
+var ultimaMatriculaRef = firebase.database().ref('sistemaEscolar/ultimaMatricula')
 var loader = document.getElementById('loader')
 
 firebase.auth().onAuthStateChanged((user) => {
-    loader.style.display = 'block'
-    try {
-        if (user.photoURL != null) {
-            document.getElementById('profilePic').src = user.photoURL
-        } 
-    } catch (error) {
-        console.log(error)
-    }
-    var alunosCadastradosNum = document.getElementById('alunosCadastradosNum')
-    var alunosMatriculadosNum = document.getElementById('alunosMatriculadosNum')
-    var alunosDesativadosNum = document.getElementById('alunosDesativadosNum')
-    var turmasCadastradasNum = document.getElementById('turmasCadastradasNum')
-    numerosRef.on('value', (snapshot) => {
-        var numeros = snapshot.val()
-        var tabelaSemanal = numeros.tabelaSemanal
-        
-        alunosCadastradosNum.innerText = numeros.alunosCadastrados != undefined ? numeros.alunosCadastrados : 0
-        alunosMatriculadosNum.innerText = numeros.alunosMatriculados != undefined ? numeros.alunosMatriculados : 0
-        alunosDesativadosNum.innerText = numeros.alunosDesativados != undefined ? numeros.alunosDesativados : 0
-        turmasCadastradasNum.innerText = numeros.turmasCadastradas != undefined ? numeros.turmasCadastradas : 0
-
-        // Alimenta tabela com os números de alunos em cada semana
-        var idCelulaTabela = ''
-        var totalManha = document.getElementById('totalManha').innerText = 0
-        var totalTarde = document.getElementById('totalTarde').innerText = 0
-        var totalNoite = document.getElementById('totalNoite').innerText = 0
-        for (const dia in tabelaSemanal) {
-            if (tabelaSemanal.hasOwnProperty(dia)) {
-                const horarios = tabelaSemanal[dia];
-                idCelulaTabela += dia
-                for (const horario in horarios) {
-                    if (horarios.hasOwnProperty(horario)) {
-                        const numeroDeAlunos = horarios[horario]
-                        idCelulaTabela += horario
-                        document.getElementById(idCelulaTabela).innerText = numeroDeAlunos
-                        var numNaTabela = Number(document.getElementById('total' + horario).innerText)
-                        numNaTabela += numeroDeAlunos
-                        document.getElementById('total' + horario).innerText = numNaTabela
-                        idCelulaTabela = dia
-                    }
-                }
-                idCelulaTabela = ''
-            }
-        }
+    if (user == null) {
         loader.style.display = 'none'
-    })
-
-    aniversariosRef.on('value', (snapshot) => {
+        AstNotif.dialog('Login não identificado', 'Você não está logado, vá para a tela de <a href="../login.html">login</a> para logar ou se cadastrar.')
+    } else {
         loader.style.display = 'block'
-        var meses = snapshot.val()
-        var dataLocal = new Date()
-        var mesAtual = dataLocal.getMonth()
-        document.getElementById('listaAniversarios').innerHTML = ''
-        for (const key in meses[mesAtual]) {
-            if (meses[mesAtual].hasOwnProperty(key)) {
-                const aniversario = meses[mesAtual][key];
-                document.getElementById('listaAniversarios').innerHTML += `<button class="list-group-item list-group-item-action">${aniversario.nome} no dia ${aniversario.dataNascimento.dia}</button>`
-            }
+        try {
+            if (user.photoURL != null) {
+                document.getElementById('profilePic').src = user.photoURL
+            } 
+        } catch (error) {
+            console.log(error)
         }
-        loader.style.display = 'none'
-    })
+        var alunosCadastradosNum = document.getElementById('alunosCadastradosNum')
+        var alunosMatriculadosNum = document.getElementById('alunosMatriculadosNum')
+        var alunosDesativadosNum = document.getElementById('alunosDesativadosNum')
+        var turmasCadastradasNum = document.getElementById('turmasCadastradasNum')
+        numerosRef.on('value', (snapshot) => {
+            var numeros = snapshot.val()
+            var tabelaSemanal = numeros.tabelaSemanal
+            
+            alunosCadastradosNum.innerText = numeros.alunosCadastrados != undefined ? numeros.alunosCadastrados : 0
+            alunosMatriculadosNum.innerText = numeros.alunosMatriculados != undefined ? numeros.alunosMatriculados : 0
+            alunosDesativadosNum.innerText = numeros.alunosDesativados != undefined ? numeros.alunosDesativados : 0
+            turmasCadastradasNum.innerText = numeros.turmasCadastradas != undefined ? numeros.turmasCadastradas : 0
+
+            // Alimenta tabela com os números de alunos em cada semana
+            var idCelulaTabela = ''
+            var totalManha = document.getElementById('totalManha').innerText = 0
+            var totalTarde = document.getElementById('totalTarde').innerText = 0
+            var totalNoite = document.getElementById('totalNoite').innerText = 0
+            for (const dia in tabelaSemanal) {
+                if (tabelaSemanal.hasOwnProperty(dia)) {
+                    const horarios = tabelaSemanal[dia];
+                    idCelulaTabela += dia
+                    for (const horario in horarios) {
+                        if (horarios.hasOwnProperty(horario)) {
+                            const numeroDeAlunos = horarios[horario]
+                            idCelulaTabela += horario
+                            document.getElementById(idCelulaTabela).innerText = numeroDeAlunos
+                            var numNaTabela = Number(document.getElementById('total' + horario).innerText)
+                            numNaTabela += numeroDeAlunos
+                            document.getElementById('total' + horario).innerText = numNaTabela
+                            idCelulaTabela = dia
+                        }
+                    }
+                    idCelulaTabela = ''
+                }
+            }
+            loader.style.display = 'none'
+        })
+
+        aniversariosRef.on('value', (snapshot) => {
+            loader.style.display = 'block'
+            var meses = snapshot.val()
+            var dataLocal = new Date()
+            var mesAtual = dataLocal.getMonth()
+            document.getElementById('listaAniversarios').innerHTML = ''
+            for (const key in meses[mesAtual]) {
+                if (meses[mesAtual].hasOwnProperty(key)) {
+                    const aniversario = meses[mesAtual][key];
+                    document.getElementById('listaAniversarios').innerHTML += `<button class="list-group-item list-group-item-action">${aniversario.nome} no dia ${aniversario.dataNascimento.dia}</button>`
+                }
+            }
+            loader.style.display = 'none'
+        })
+    }
+    
 })
 
 // Funções para cadastro de turmas
@@ -215,7 +222,7 @@ function carregaProfessores() {
     loader.style.display = 'block'
     console.log('carregando')
     var professorTurmaSelect = document.getElementById('professorTurma')
-    listaDeProfessores.on('value', (snapshot) => {
+    listaDeProfessores.once('value').then(snapshot => {
         let professores = snapshot.val()
         professorTurmaSelect.innerHTML = '<option selected hidden>Escolha o(a) professor(a)...</option>'
         for (const uid in professores) {
@@ -225,6 +232,10 @@ function carregaProfessores() {
             }
         }
         loader.style.display = 'none'
+    }).catch(error => {
+        loader.style.display = 'none'
+        console.error(error)
+        AstNotif.dialog('Erro', error.message)
     })
 }
 function professorReferencia(uid) {
@@ -253,7 +264,7 @@ function cadastrarTurma(confima=false) {
 function carregaTurmas() {
     loader.style.display = 'block'
     var selectTurmas = document.getElementById('selectTurmas')
-    turmasRef.once('value', (snapshot) => {
+    turmasRef.once('value').then(snapshot => {
         selectTurmas.innerHTML = '<option selected hidden>Escolha uma turma...</option>'
         var turmas = snapshot.val()
         for (const cod in turmas) {
@@ -269,6 +280,10 @@ function carregaTurmas() {
         }
         document.getElementById('selectTurmas').style.visibility = 'visible'
         loader.style.display = 'none'
+    }).catch(error => {
+        loader.style.display = 'none'
+        console.error(error)
+        AstNotif.dialog('Erro', error.message)
     })
 }
 
@@ -412,6 +427,7 @@ function preencheEndereco(numCep) {
             cidadeAluno.value = result.city
             estadoAluno.value = result.state
             document.getElementById('numeroAluno').focus()
+            AstNotif.toast('Dados de endereço preenchidos com sucesso!')
         }
         loader.style.display = 'none'
         
@@ -428,8 +444,9 @@ function carregaProfsETurmas() {
     turmasLocal = {}
     loader.style.display = 'block'
     let turmaAluno = document.getElementById('turmaAluno')
+    let matriculaAluno = document.getElementById('matriculaAluno')
     
-    turmasRef.once('value', (snapshot) => {
+    turmasRef.once('value').then(snapshot => {
         turmaAluno.innerHTML = '<option selected hidden>Escolha uma turma...</option>'
         let turmas = snapshot.val()
         turmasLocal = snapshot.val()
@@ -441,7 +458,20 @@ function carregaProfsETurmas() {
             }
         }
         loader.style.display = 'none'
+    }).catch(error => {
+        loader.style.display = 'none'
+        console.error(error)
+        AstNotif.dialog('Erro', error.message)
     })
+    ultimaMatriculaRef.once('value').then(snapshot => {
+        matriculaAluno.value = snapshot.val() + 1
+        arrumaNumMatricula()
+    }).catch(error => {
+        loader.style.display = 'none'
+        console.log(error)
+        AstNotif.dialog('Erro', error.message)
+    })
+
 }
 
 function mostraProfsAlunoESetaTurma(codTurma) {
@@ -465,6 +495,10 @@ function mostraProfsAlunoESetaTurma(codTurma) {
             profAluno.innerHTML += `<option value="${professor.email}">${professor.nome} (${professor.email})</option>`
         }
     }
+    if (turmasLocal[codTurma].professor == undefined) {
+        profAluno.innerHTML += `<option selected>Não há professores cadastrados na turma</option>`
+        profAluno.disabled = true
+    }
     }
     
 }
@@ -482,9 +516,118 @@ function setaRespFinan(num) {
     document.getElementById('nomeResponsavelAluno' + num).focus()
 }
 
-document.getElementById('matriculaAluno').addEventListener('change', function () {
+document.getElementById('matriculaAluno').addEventListener('change', arrumaNumMatricula)
+function arrumaNumMatricula() {
     var input = document.getElementById('matriculaAluno');
     
     input.value="00000"+input.value.replace(/\D/g,'');
     input.value=input.value.slice(-5,-1)+input.value.slice(-1);
-});
+}
+
+function verificaCPF(strCPF) {
+    let cpfAluno = document.getElementById('cpfAluno')
+    var Soma;
+    var Resto;
+    Soma = 0;
+  if (strCPF == "00000000000") {
+    AstNotif.dialog('CPF inválido.', 'Digite e Verifique as informações de CPF novamente.')
+    cpfAluno.value = ''
+  } 
+
+  for (i=1; i<=9; i++) Soma = Soma + parseInt(strCPF.substring(i-1, i)) * (11 - i);
+  Resto = (Soma * 10) % 11;
+
+    if ((Resto == 10) || (Resto == 11))  Resto = 0;
+    if (Resto != parseInt(strCPF.substring(9, 10)) ) {
+        AstNotif.dialog('CPF inválido.', 'Digite e Verifique as informações de CPF novamente.')
+        cpfAluno.value = ''
+    } 
+
+  Soma = 0;
+    for (i = 1; i <= 10; i++) Soma = Soma + parseInt(strCPF.substring(i-1, i)) * (12 - i);
+    Resto = (Soma * 10) % 11;
+
+    if ((Resto == 10) || (Resto == 11))  Resto = 0;
+    if (Resto != parseInt(strCPF.substring(10, 11) ) ) {
+        AstNotif.dialog('CPF inválido.', 'Digite e Verifique as informações de CPF novamente.')
+        cpfAluno.value = ''
+    } 
+    return true;
+}
+
+// JS PDF
+function criaPDFAluno() {
+    const doc = new jsPDF();
+
+    doc.text("Hello, world!", 10, 10);
+    doc.save("a4.pdf");
+}
+
+// Esperando o submit para o cadastro efetivo
+document.querySelector('#formCadastroAluno').addEventListener('submit', (e) => {
+    e.preventDefault()
+    loader.style.display = 'block'
+    const dados = new FormData(e.target);
+    var dadosAluno = {}
+    // Dados pessoais
+    dadosAluno.matriculaAluno = dados.get('matriculaAluno')
+    dadosAluno.nomeAluno = dados.get('nomeAluno')
+    dadosAluno.dataNascimentoAluno = dados.get('dataNascimentoAluno')
+    dadosAluno.telefoneAluno = dados.get('telefoneAluno')
+    dadosAluno.celularAluno = dados.get('celularAluno')
+    dadosAluno.emailAluno = dados.get('emailAluno')
+    dadosAluno.rgAluno = dados.get('rgAluno')
+    dadosAluno.cpfAluno = dados.get('cpfAluno')
+    // Dados para o curso
+    dadosAluno.turmaAluno = dados.get('turmaAluno')
+    dadosAluno.profAluno = dados.get('profAluno')
+    dadosAluno.horaEDiasAluno = dados.get('horaEDiasAluno')
+    dadosAluno.faixaEtaria = dados.get('faixaEtaria')
+    // Dados de endereço
+    dadosAluno.cepAluno = dados.get('cepAluno')
+    dadosAluno.enderecoAluno = dados.get('enderecoAluno')
+    dadosAluno.numeroAluno = dados.get('numeroAluno')
+    dadosAluno.bairroAluno = dados.get('bairroAluno')
+    dadosAluno.cidadeAluno = dados.get('cidadeAluno')
+    dadosAluno.estadoAluno = dados.get('estadoAluno')
+    // Dados de Filiação Responsavel 1
+    dadosAluno.nomeResponsavelAluno1 = dados.get('nomeResponsavelAluno1')
+    dadosAluno.relacaoAluno1 = dados.get('relacaoAluno1')
+    dadosAluno.numeroComercialResponsavel1 = dados.get('numeroComercialResponsavel1')
+    dadosAluno.numeroCelularResponsavel1 = dados.get('numeroCelularResponsavel1')
+    dadosAluno.rgResponsavel1 = dados.get('rgResponsavel1')
+    dadosAluno.cpfResponsavel1 = dados.get('cpfResponsavel1')
+    // Dados de Filiação responsável 2
+    dadosAluno.nomeResponsavelAluno2 = dados.get('nomeResponsavelAluno2')
+    dadosAluno.relacaoAluno2 = dados.get('relacaoAluno2')
+    dadosAluno.numeroComercialResponsavel2 = dados.get('numeroComercialResponsavel2')
+    dadosAluno.numeroCelularResponsavel2 = dados.get('numeroCelularResponsavel2')
+    dadosAluno.rgResponsavel2 = dados.get('rgResponsavel2')
+    dadosAluno.cpfResponsavel2 = dados.get('cpfResponsavel2')
+    // Dados de Filiação Responsável financeiro
+    dadosAluno.nomeResponsavelFinanceiroAluno = dados.get('nomeResponsavelFinanceiroAluno')
+    dadosAluno.relacaoFinanceiroAluno = dados.get('relacaoFinanceiroAluno')
+    dadosAluno.numeroComercialFinanceiroAluno = dados.get('numeroComercialFinanceiroAluno')
+    dadosAluno.numeroCelularFinanceiroAluno = dados.get('numeroCelularFinanceiroAluno')
+    dadosAluno.rgFinanceiroAluno = dados.get('rgFinanceiroAluno')
+    dadosAluno.cpfFinanceiroAluno = dados.get('cpfFinanceiroAluno')
+    // Dados de Filiação responsável pedagógico/didático
+    dadosAluno.nomeResponsavelPedagogicoAluno = dados.get('nomeResponsavelPedagogicoAluno')
+    dadosAluno.relacaoPedagogicoAluno = dados.get('relacaoPedagogicoAluno')
+    dadosAluno.numeroComercialPedagogicoAluno = dados.get('numeroComercialPedagogicoAluno')
+    dadosAluno.numeroCelularPedagogicoAluno = dados.get('numeroCelularPedagogicoAluno')
+    dadosAluno.rgPedagogicoAluno = dados.get('rgPedagogicoAluno')
+    dadosAluno.cpfPedgogicoAluno = dados.get('cpfPedgogicoAluno')
+    // Gera ou não o PDF do aluno
+    dadosAluno.geraPDFAluno = dados.get('geraPDFAluno')
+    console.log(dadosAluno)
+    let cadastraAluno = firebase.functions().httpsCallable('cadastraAluno')
+    cadastraAluno({dados: dadosAluno}).then(function(result) {
+        loader.style.display = 'none'
+        AstNotif.dialog('Sucesso', result.data.answer)
+    }).catch(function(error) {
+        AstNotif.dialog('Erro', error.message)
+        console.log(error)
+        loader.style.display = 'none'
+    })
+})

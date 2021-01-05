@@ -37,7 +37,7 @@
     initialize the SDK after all desired features are loaded, set useEmulator to false
     to avoid connecting the SDK to running emulators.
   -->
-  <script defer src="/__/firebase/init.js?useEmulator=true"></script>
+  <script defer src="/__/firebase/init.js"></script>
   <script src="https://www.gstatic.com/firebasejs/ui/4.6.1/firebase-ui-auth__pt_br.js"></script>
   
   <!-- Conteúdo do site - Website content -->
@@ -127,7 +127,7 @@
             </div>
             <div class="form-group col">
               <label for="inputZip">Foto</label>
-              <input type="file" name="foto" class="form-control" id="inputZip">
+              <input type="file" name="foto" class="form-control">
               <small id="passwordHelpBlock" class="form-text text-muted">
                 Opcional, mas facilitará sua identificação no sistema. Você pode alterar sua foto depois.
               </small>
@@ -151,6 +151,7 @@
               <br>
                 <br><br><br>
                 <button onclick="alteraFoto()" class="btn btn-primary btn-sm">Alterar foto</button>
+                <input type="file" accept="image/*" name="foto" id="alteraFoto" style="visibility: hidden" onchange="uploadFoto(this.files)">
                 <br><br>
                 <button type="button" id="sair" onclick="sair()" class="btn btn-warning btn-block">Sair</button>
               </div>
