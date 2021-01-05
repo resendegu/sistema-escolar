@@ -464,7 +464,7 @@ function carregaProfsETurmas() {
         AstNotif.dialog('Erro', error.message)
     })
     ultimaMatriculaRef.once('value').then(snapshot => {
-        matriculaAluno.value = snapshot.val() + 1
+        matriculaAluno.value = Number(snapshot.val()) + 1
         arrumaNumMatricula()
     }).catch(error => {
         loader.style.display = 'none'
