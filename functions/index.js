@@ -246,6 +246,7 @@ exports.addNovoProfTurma = functions.https.onCall((data, context) => {
 exports.cadastraAluno = functions.https.onCall((data, context) => {
     if (context.auth.token.secretaria == true) {
         let dadosAluno = data.dados
+        dadosAluno.timestamp = admin.firestore.Timestamp.now()
         return admin.auth().getUserByEmail(dadosAluno.profAluno).then((user) => {
             return admin.database().ref('sistemaEscolar/usuarios/' + user.uid + '/professor/listaDeAlunos/' + dadosAluno.matriculaAluno).set({nome: dadosAluno.nomeAluno, email: dadosAluno.emailAluno}).then(() => {
                 return admin.database().ref('sistemaEscolar/alunos/' + dadosAluno.matriculaAluno).set(dadosAluno).then(() => {
