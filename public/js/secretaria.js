@@ -16,11 +16,12 @@ firebase.auth().onAuthStateChanged((user) => {
         try {
             if (user.photoURL != null) {
                 document.getElementById('profilePic').src = user.photoURL
+                document.getElementById('username').innerHTML = "Olá,<br>" + user.displayName.split(' ')[0]
             } 
         } catch (error) {
             console.log(error)
         }
-        var alunosCadastradosNum = document.getElementById('alunosCadastradosNum')
+        //var alunosCadastradosNum = document.getElementById('alunosCadastradosNum')
         var alunosMatriculadosNum = document.getElementById('alunosMatriculadosNum')
         var alunosDesativadosNum = document.getElementById('alunosDesativadosNum')
         var turmasCadastradasNum = document.getElementById('turmasCadastradasNum')
@@ -28,7 +29,7 @@ firebase.auth().onAuthStateChanged((user) => {
             var numeros = snapshot.val()
             var tabelaSemanal = numeros.tabelaSemanal
             
-            alunosCadastradosNum.innerText = numeros.alunosCadastrados != undefined ? numeros.alunosCadastrados : 0
+            //alunosCadastradosNum.innerText = numeros.alunosCadastrados != undefined ? numeros.alunosCadastrados : 0
             alunosMatriculadosNum.innerText = numeros.alunosMatriculados != undefined ? numeros.alunosMatriculados : 0
             alunosDesativadosNum.innerText = numeros.alunosDesativados != undefined ? numeros.alunosDesativados : 0
             turmasCadastradasNum.innerText = numeros.turmasCadastradas != undefined ? numeros.turmasCadastradas : 0

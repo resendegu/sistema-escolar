@@ -113,6 +113,9 @@
             <li class="nav-item">
               <a class="nav-link" href="professores.html">&nbsp;&nbsp;Professores</a>
             </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" onclick="window.location.reload(true)">&nbsp;&nbsp;Atualizar sistemas</a>
+            </li>
           </ul>
         </div>
       </nav>
@@ -208,22 +211,23 @@
           <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
             <h1 class="h2">Secretaria</h1>
             <div class="btn-toolbar mb-2 mb-md-0">
-              <div class="btn-group mr-2">
+              <!--<div class="btn-group mr-2">
                 <button class="btn btn-sm btn-outline-secondary">Share</button>
                 <button class="btn btn-sm btn-outline-secondary">Export</button>
               </div>
               <button class="btn btn-sm btn-outline-secondary dropdown-toggle">
                 <span data-feather="calendar"></span>
                 This week
-              </button>
+              </button>-->
+              <label for="profilePic" class="text-muted float-right" id="username"></label>
               <a class="btn" href="../login.html"><img src="../images/profile_placeholder.png" class="rounded float-right" width="40px" id="profilePic"></a>
             </div>
           </div>
 
           <div class="container" onload="carregaDadosParaDashboard()">
-            <button type="button" class="btn btn-light btn-sm">
+            <!--<button type="button" class="btn btn-light btn-sm">
               Alunos cadastrados <span class="badge badge-primary" id="alunosCadastradosNum">0</span>
-            </button>
+            </button>-->
             <button type="button" class="btn btn-light btn-sm">
               Alunos matriculados <span class="badge badge-success" id="alunosMatriculadosNum">0</span>
             </button>
