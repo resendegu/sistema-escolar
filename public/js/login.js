@@ -4,6 +4,7 @@ var storageUserRef = firebase.storage().ref('/users');
 
 
     firebase.auth().onAuthStateChanged((user) => {
+        loader.style.display = 'block'
         if (user) {
             storageUserRef = storageUserRef.child(user.uid) 
             document.getElementById('loginContainer').style.display = 'none'
