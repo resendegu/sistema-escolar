@@ -6,6 +6,7 @@ var listaDeProfessores = firebase.database().ref('sistemaEscolar/listaDeProfesso
 var turmasRef = firebase.database().ref('sistemaEscolar/turmas')
 var ultimaMatriculaRef = firebase.database().ref('sistemaEscolar/ultimaMatricula')
 var loader = document.getElementById('loader')
+var loaderMsg = document.getElementById('loaderMsg')
 
 firebase.auth().onAuthStateChanged((user) => {
     if (user == null) {
@@ -13,6 +14,7 @@ firebase.auth().onAuthStateChanged((user) => {
         AstNotif.dialog('Login não identificado', 'Você não está logado, vá para a tela de <a href="../login.html">login</a> para logar ou se cadastrar.')
     } else {
         loader.style.display = 'block'
+        loaderMsg.innerText = 'Buscando informações do usuário...'
         try {
             if (user.photoURL != null) {
                 document.getElementById('profilePic').src = user.photoURL
@@ -26,6 +28,7 @@ firebase.auth().onAuthStateChanged((user) => {
         var alunosDesativadosNum = document.getElementById('alunosDesativadosNum')
         var turmasCadastradasNum = document.getElementById('turmasCadastradasNum')
         numerosRef.on('value', (snapshot) => {
+            loaderMsg.innerText = 'Buscando informações da dashboard'
             var numeros = snapshot.val()
             var tabelaSemanal = numeros.tabelaSemanal
             
@@ -231,6 +234,7 @@ var professorReferencia
 
 function carregaProfessores() {
     loader.style.display = 'block'
+    loaderMsg.innerText = 'Carregando professores...'
     console.log('carregando')
     var professorTurmaSelect = document.getElementById('professorTurma')
     listaDeProfessores.once('value').then(snapshot => {
@@ -257,6 +261,7 @@ function professorReferencia(uid) {
 // Função de cadastro de turma no banco de dados
 function cadastrarTurma(confima=false) {
     loader.style.display = 'block'
+    loaderMsg.innerText = 'Enviando informações da turma ao servidor...'
     //AstNotif.dialog('Aguarde', "<img src='../images/carregamento.gif' width=100px>")
     var cadastraTurma = firebase.functions().httpsCallable('cadastraTurma')
     cadastraTurma({codigoSala: codPadrao, professor: professor, diasDaSemana: diasDaSemana, livros: books, nivelTurma: nivelTurma, faixaTurma: faixaEtaria, hora: horarioCurso})
@@ -274,6 +279,7 @@ function cadastrarTurma(confima=false) {
 // Funções da aba de turmas da secretaria
 function carregaTurmas() {
     loader.style.display = 'block'
+    loaderMsg.innerText = 'Carregando informações das turmas...'
     var selectTurmas = document.getElementById('selectTurmas')
     turmasRef.once('value').then(snapshot => {
         selectTurmas.innerHTML = '<option selected hidden>Escolha uma turma...</option>'
@@ -300,6 +306,7 @@ function carregaTurmas() {
 
 function abreTurma(cod) {
     loader.style.display = 'block'
+    loaderMsg.innerText = 'Abrindo turma...'
     var codigoDaTurmaLabel = document.getElementById('codigoDaTurma')
     var areaInfoTurma = document.getElementById('areaInfoTurma')
     turmasRef.child(cod).on('value', (snapshot) => {
@@ -354,6 +361,7 @@ function abreTurma(cod) {
 function retiraProf(email, nome, codSala, confirma=false) {
     if (confirma) {
         loader.style.display = 'block'
+        loaderMsg.innerText = 'Removendo professor da turma...'
         document.getElementById('ast-dialog-bg').remove()
         turmasRef.child(codSala).child('professor').once('value', (snapshot) => {
             let listaProf = snapshot.val()
@@ -380,6 +388,7 @@ function retiraProf(email, nome, codSala, confirma=false) {
 
 function modalAddProfTurma(codSala) {
     loader.style.display = 'block'
+    loaderMsg.innerText = 'Aguarde...'
     AstNotif.dialog('Adicionar professores nesta turma', `
     Por favor, tenha o cuidado de escolher um(a) professor(a) que ainda não está vinculado na turma atual.
     <div class="input-group prepend">
@@ -408,6 +417,7 @@ function modalAddProfTurma(codSala) {
 
 function novoProf(email, codSala) {
     loader.style.display = 'block'
+    loaderMsg.innerText = 'Adicionando professor na turma...'
     document.getElementById('ast-dialog-bg').remove()
     var addNovoProfTurma = firebase.functions().httpsCallable('addNovoProfTurma')
     addNovoProfTurma({emailProf: email, codSala: codSala})
@@ -424,6 +434,7 @@ function novoProf(email, codSala) {
 
 function preencheEndereco(numCep) {
     loader.style.display = 'block'
+    loaderMsg.innerText = 'Buscando enderenço com o CEP...'
     let enderecoAluno = document.getElementById('enderecoAluno')
     let bairroAluno = document.getElementById('bairroAluno')
     let cidadeAluno = document.getElementById('cidadeAluno')
@@ -454,6 +465,7 @@ let turmasLocal = {}
 function carregaProfsETurmas() {
     turmasLocal = {}
     loader.style.display = 'block'
+    loaderMsg.innerText = 'Carregando dados de turmas e professores...'
     let turmaAluno = document.getElementById('turmaAluno')
     let matriculaAluno = document.getElementById('matriculaAluno')
     
@@ -599,6 +611,7 @@ function criaPDFAluno() {
 document.querySelector('#formCadastroAluno').addEventListener('submit', (e) => {
     e.preventDefault()
     loader.style.display = 'block'
+    loaderMsg.innerText = 'Enviando dados do aluno ao servidor...'
     const dados = new FormData(e.target);
     var dadosAluno = {}
     // Dados pessoais
@@ -663,3 +676,21 @@ document.querySelector('#formCadastroAluno').addEventListener('submit', (e) => {
         loader.style.display = 'none'
     })
 })
+
+function calculaIdade(dataNasc) {
+    loader.style.display = 'block'
+    loaderMsg.innerText = 'Buscando data atual do servidor...'
+    console.log(dataNasc)
+    let nascimento = dataNasc.split('-')
+    console.log(nascimento)
+    let diaAtual
+    var timestamp = firebase.functions().httpsCallable('timestamp')
+    timestamp().then(function(result){
+        console.log(result.data.timestamp)
+        loader.style.display = 'none'
+    }).catch(function(error){
+        AstNotif.dialog('Erro', error.message)
+        console.log(error)
+        loader.style.display = 'none'
+    })
+}

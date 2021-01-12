@@ -11,6 +11,13 @@
     margin: auto;
     margin-top: 300px;
   }
+#loaderMsg{
+  position: absolute;
+    z-index: 3001;
+    margin: auto;
+    margin-top: 450px;
+    margin-left: 40%;
+}
   
   /* Safari */
   @-webkit-keyframes spin {
