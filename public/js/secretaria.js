@@ -39,6 +39,13 @@ firebase.auth().onAuthStateChanged((user) => {
             var totalManha = document.getElementById('totalManha').innerText = 0
             var totalTarde = document.getElementById('totalTarde').innerText = 0
             var totalNoite = document.getElementById('totalNoite').innerText = 0
+            var totalMON = document.getElementById('totalMON').innerText = 0
+            var totalTUE = document.getElementById('totalTUE').innerText = 0
+            var totalWED = document.getElementById('totalWED').innerText = 0
+            var totalTHU = document.getElementById('totalTHU').innerText = 0
+            var totalFRI = document.getElementById('totalFRI').innerText = 0
+            var totalSAT = document.getElementById('totalSAT').innerText = 0
+            var totalSUN = document.getElementById('totalSUN').innerText = 0
             for (const dia in tabelaSemanal) {
                 if (tabelaSemanal.hasOwnProperty(dia)) {
                     const horarios = tabelaSemanal[dia];
@@ -50,7 +57,10 @@ firebase.auth().onAuthStateChanged((user) => {
                             document.getElementById(idCelulaTabela).innerText = numeroDeAlunos
                             var numNaTabela = Number(document.getElementById('total' + horario).innerText)
                             numNaTabela += numeroDeAlunos
+                            var numNaTabelaDiario = Number(document.getElementById('total' + dia).innerText)
+                            numNaTabelaDiario += numeroDeAlunos
                             document.getElementById('total' + horario).innerText = numNaTabela
+                            document.getElementById('total' + dia).innerText = numNaTabelaDiario
                             idCelulaTabela = dia
                         }
                     }
@@ -60,7 +70,7 @@ firebase.auth().onAuthStateChanged((user) => {
             loader.style.display = 'none'
         })
 
-        aniversariosRef.on('value', (snapshot) => {
+        aniversariosRef.on('value', snapshot => {
             loader.style.display = 'block'
             var meses = snapshot.val()
             var dataLocal = new Date()
@@ -509,12 +519,33 @@ function setaRespFinan(num) {
     let relacaoFinanceiroAluno = document.getElementById('relacaoFinanceiroAluno')
     let numeroComercialFinanceiroAluno = document.getElementById('numeroComercialFinanceiroAluno')
     let numeroCelularFinanceiroAluno = document.getElementById('numeroCelularFinanceiroAluno')
+    let rgResponsavelFinan = document.getElementById('rgFinanceiroAluno')
+    let cpfFinanceiroAluno = document.getElementById('cpfFinanceiroAluno')  
     nomeResponsavelFinanceiroAluno.value = document.getElementById('nomeResponsavelAluno' + num).value
     relacaoFinanceiroAluno.value = document.getElementById('relacaoAluno' + num).value
-    numeroComercialFinanceiroAluno.value = document.getElementById('numeroComercialAluno' + num).value
-    numeroCelularFinanceiroAluno.value = document.getElementById('numeroCelularAluno' + num).value
+    numeroComercialFinanceiroAluno.value = document.getElementById('numeroComercialResponsavel' + num).value
+    numeroCelularFinanceiroAluno.value = document.getElementById('numeroCelularResponsavel' + num).value
+    rgResponsavelFinan.value = document.getElementById('rgResponsavel' + num).value
+    cpfFinanceiroAluno.value = document.getElementById('cpfResponsavel' + num).value
 
-    document.getElementById('nomeResponsavelAluno' + num).focus()
+    document.getElementById('emailResponsavelFinanceiro').focus()
+}
+
+function setaRespPedag(num) { 
+    let nomeResponsavelFinanceiroAluno = document.getElementById('nomeResponsavelPedagogicoAluno')
+    let relacaoFinanceiroAluno = document.getElementById('relacaoPedagogicoAluno')
+    let numeroComercialFinanceiroAluno = document.getElementById('numeroComercialPedagogicoAluno')
+    let numeroCelularFinanceiroAluno = document.getElementById('numeroCelularPedagogicoAluno')
+    let rgResponsavelFinan = document.getElementById('rgPedagogicoAluno')
+    let cpfFinanceiroAluno = document.getElementById('cpfPedagogicoAluno')  
+    nomeResponsavelFinanceiroAluno.value = document.getElementById('nomeResponsavelAluno' + num).value
+    relacaoFinanceiroAluno.value = document.getElementById('relacaoAluno' + num).value
+    numeroComercialFinanceiroAluno.value = document.getElementById('numeroComercialResponsavel' + num).value
+    numeroCelularFinanceiroAluno.value = document.getElementById('numeroCelularResponsavel' + num).value
+    rgResponsavelFinan.value = document.getElementById('rgResponsavel' + num).value
+    cpfFinanceiroAluno.value = document.getElementById('cpfResponsavel' + num).value
+
+    document.getElementById('emailResponsavelPedagogico').focus()
 }
 
 document.getElementById('matriculaAluno').addEventListener('change', arrumaNumMatricula)

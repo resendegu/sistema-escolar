@@ -157,7 +157,7 @@ exports.cadastroUser = functions.auth.user().onCreate((user) => {
 exports.cadastraTurma = functions.https.onCall((data, context) => {
     /**{codigoSala: codPadrao, professor: professor, diasDaSemana: diasDaSemana, livros: books, nivelTurma: nivelTurma, faixaTurma: faixaEtaria, hora: horarioCurso} */
     console.log(data)
-    if (context.auth.token.secretaria == true) {
+    if (context.auth.token.master == true || context.auth.token.secretaria == true) {
         var dados = data
         var horario
         if (dados.hora >= 12 && dados.hora <= 17) {
@@ -218,7 +218,7 @@ exports.cadastraAniversarios = functions.database.ref('sistemaEscolar/usuarios/{
 })
 
 exports.addNovoProfTurma = functions.https.onCall((data, context) => {
-    if (context.auth.token.secretaria == true) {
+    if (context.auth.token.master == true || context.auth.token.secretaria == true) {
         return admin.auth().getUserByEmail(data.emailProf).then(function(user) {
            return admin.database().ref('sistemaEscolar/turmas').child(data.codSala).child('professor').once('value').then(snapshot => {
                 var listaProf = snapshot.val()
@@ -244,7 +244,7 @@ exports.addNovoProfTurma = functions.https.onCall((data, context) => {
 })
 
 exports.cadastraAluno = functions.https.onCall((data, context) => {
-    if (context.auth.token.secretaria == true) {
+    if (context.auth.token.master == true || context.auth.token.secretaria == true) {
         let dadosAluno = data.dados
         dadosAluno.timestamp = admin.firestore.Timestamp.now()
         return admin.auth().getUserByEmail(dadosAluno.profAluno).then((user) => {
@@ -258,7 +258,7 @@ exports.cadastraAluno = functions.https.onCall((data, context) => {
                                     numAtual = 0
                                 }
                                 let num = numAtual++
-                                return admin.database().ref('sistemaEscolar/numeros/alunosCadastrados').set(num).then(() => {
+                                return admin.database().ref('sistemaEscolar/numeros/alunosMatriculados').set(num).then(() => {
                                     
                                     let horaEDias = dadosAluno.horaEDiasAluno.split(',') // Output: ['20h', 'MON', 'WED' ...]
                                     let hora = horaEDias[0]
@@ -276,7 +276,7 @@ exports.cadastraAluno = functions.https.onCall((data, context) => {
                                     for (const index in dias) {
                                         if (Object.hasOwnProperty.call(dias, index)) {
                                             const dia = dias[index];
-                                            admin.database().ref('sistemaEscolar/numeros/tabelaSemanal/' + dia + '/' + horario + '/num').transaction(function(current_value){
+                                            admin.database().ref('sistemaEscolar/numeros/tabelaSemanal/' + dia + '/' + horario).transaction(function(current_value){
                                                 if (current_value === null){
                                                     return 1
                                                 } else {
