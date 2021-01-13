@@ -504,19 +504,27 @@
               <label class="h3">Cadastro de alunos</label>
               <hr>
               <form id="formCadastroAluno">
+                <input type='reset' class="btn btn-warning btn-sm" value='Limpar todos os campos'/>
+                <a class="btn btn-info btn-sm" onclick="carregaProfsETurmas()"><span data-feather="refresh-cw"></span> Atualizar número de matrícula e turmas</a>
+                <br> <br>
                 <label class="h6">Dados pessoais</label>
                 <div class="form-row">
-                  <div class="form-group col-auto">
+                  <div class="form-group col-sm-2">
                     <label for="inputEmail4">Matrícula</label>
                     <input type="number" class="form-control" id="matriculaAluno" name="matriculaAluno" placeholder="Número de matrícula">
                   </div>
-                  <div class="form-group col-md-5">
+                  <div class="form-group col-md-4">
                     <label for="inputPassword4">Nome</label>
                     <input type="name" class="form-control" id="nomeAluno" name="nomeAluno" placeholder="Nome">
                   </div>
                   <div class="form-group col-auto">
                     <label for="inputPassword4">Data de nascimento</label>
                     <input type="date" class="form-control" id="dataNascimentoAluno" name="dataNascimentoAluno" placeholder="Data" onchange="calculaIdade(this.value)">
+                    
+                  </div>
+                  <div class="form-group col-auto">
+                    <br><br>
+                    <label for="dataNascimentoAluno" class="text-muted" id="idadeCalculada">Idade:</label>
                   </div>
                 </div>
                 <div class="form-row">

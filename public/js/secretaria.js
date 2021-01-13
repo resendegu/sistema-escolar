@@ -463,9 +463,10 @@ function preencheEndereco(numCep) {
 // Funções do cadastro de alunos
 let turmasLocal = {}
 function carregaProfsETurmas() {
+    document.getElementById('formCadastroAluno')
     turmasLocal = {}
     loader.style.display = 'block'
-    loaderMsg.innerText = 'Carregando dados de turmas e professores...'
+    loaderMsg.innerText = 'Carregando dados de matrícula, de turmas e professores...'
     let turmaAluno = document.getElementById('turmaAluno')
     let matriculaAluno = document.getElementById('matriculaAluno')
     
@@ -608,10 +609,11 @@ function criaPDFAluno() {
 }
 
 // Esperando o submit para o cadastro efetivo
+var idadeAluno
 document.querySelector('#formCadastroAluno').addEventListener('submit', (e) => {
     e.preventDefault()
     loader.style.display = 'block'
-    loaderMsg.innerText = 'Enviando dados do aluno ao servidor...'
+    loaderMsg.innerText = 'Processando dados...'
     const dados = new FormData(e.target);
     var dadosAluno = {}
     // Dados pessoais
@@ -666,15 +668,26 @@ document.querySelector('#formCadastroAluno').addEventListener('submit', (e) => {
     // Gera ou não o PDF do aluno
     dadosAluno.geraPDFAluno = dados.get('geraPDFAluno')
     console.log(dadosAluno)
-    let cadastraAluno = firebase.functions().httpsCallable('cadastraAluno')
-    cadastraAluno({dados: dadosAluno}).then(function(result) {
+    if ((dadosAluno.cpfResponsavel1 == '' || dadosAluno.rgResponsavel1 == '' || dadosAluno.numeroCelularResponsavel1 == '' || dadosAluno.nomeResponsavelAluno1 == '') && idadeAluno.years < 18) {
+        AstNotif.dialog('Confira os campos', 'O aluno é menor de idade. É obrigatório o preenchimento dos dados do responsável número 1 do aluno.')
         loader.style.display = 'none'
-        AstNotif.dialog('Sucesso', result.data.answer)
-    }).catch(function(error) {
-        AstNotif.dialog('Erro', error.message)
-        console.log(error)
+    } else if (((dadosAluno.cpfFinanceiroAluno == '' || dadosAluno.numeroCelularFinanceiroAluno == '' || dadosAluno.nomeResponsavelFinanceiroAluno == '') || (dadosAluno.cpfPedgogicoAluno == '' || dadosAluno.numeroCelularPedagogicoAluno == '' || dadosAluno.nomeResponsavelPedagogicoAluno == '')) && idadeAluno.years < 18) {
+        AstNotif.dialog('Confira os campos', 'O aluno é menor de idade. Cofira os campos de responsáveis financeiro e pedagógico do aluno, eles são obrigatórios quando o aluno é menor de idade.')
         loader.style.display = 'none'
-    })
+    } else {
+        loaderMsg.innerText = 'Enviando dados para o servidor...'
+        let cadastraAluno = firebase.functions().httpsCallable('cadastraAluno')
+        cadastraAluno({dados: dadosAluno}).then(function(result) {
+            loader.style.display = 'none'
+            AstNotif.dialog('Sucesso', result.data.answer)
+            carregaProfsETurmas()
+        }).catch(function(error) {
+            AstNotif.dialog('Erro', error.message)
+            console.log(error)
+            loader.style.display = 'none'
+        })
+    }
+    
 })
 
 function calculaIdade(dataNasc) {
@@ -682,12 +695,31 @@ function calculaIdade(dataNasc) {
     loaderMsg.innerText = 'Buscando data atual do servidor...'
     console.log(dataNasc)
     let nascimento = dataNasc.split('-')
+    let nascimentoObj = new Date()
+    nascimentoObj.setDate(Number(nascimento[2]))
+    nascimentoObj.setFullYear(Number(nascimento[0]))
+    nascimentoObj.setMonth(Number(nascimento[1]) - 1)
+    for (const key in nascimento) {
+        if (Object.hasOwnProperty.call(nascimento, key)) {
+            const element = nascimento[key];
+            nascimento[key] = parseInt(element)
+        }
+    }
     console.log(nascimento)
     let diaAtual
     var timestamp = firebase.functions().httpsCallable('timestamp')
     timestamp().then(function(result){
         console.log(result.data.timestamp)
         loader.style.display = 'none'
+        let dataAtualCompleta = new Date(result.data.timestamp._seconds * 1000)
+        let dataAtual = []
+        dataAtual.push(dataAtualCompleta.getFullYear())
+        dataAtual.push(dataAtualCompleta.getMonth() + 1)
+        dataAtual.push(dataAtualCompleta.getDate())
+        console.log(dataAtual, nascimento)
+        idadeAluno = calcularIdadePrecisa(nascimentoObj, dataAtualCompleta)
+        console.log(idadeAluno)
+        document.getElementById('idadeCalculada').innerText = `Idade: ${idadeAluno.years} ano(s), ${idadeAluno.months} mes(es), ${idadeAluno.days} dia(s)`
     }).catch(function(error){
         AstNotif.dialog('Erro', error.message)
         console.log(error)
