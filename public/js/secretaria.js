@@ -463,7 +463,6 @@ function preencheEndereco(numCep) {
 // Funções do cadastro de alunos
 let turmasLocal = {}
 function carregaProfsETurmas() {
-    document.getElementById('formCadastroAluno')
     turmasLocal = {}
     loader.style.display = 'block'
     loaderMsg.innerText = 'Carregando dados de matrícula, de turmas e professores...'
@@ -680,6 +679,7 @@ document.querySelector('#formCadastroAluno').addEventListener('submit', (e) => {
         cadastraAluno({dados: dadosAluno}).then(function(result) {
             loader.style.display = 'none'
             AstNotif.dialog('Sucesso', result.data.answer)
+            document.getElementById('resetForm').click()
             carregaProfsETurmas()
         }).catch(function(error) {
             AstNotif.dialog('Erro', error.message)
