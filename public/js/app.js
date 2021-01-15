@@ -1,5 +1,16 @@
 var perf = firebase.performance()
 // Código padrão para todas as páginas do site
+var updatesRef = firebase.database().ref('sistemaEscolar/updates')
+
+function update() {
+	let versao = 0.49
+	updatesRef.on('value', (snapshot) => {
+		let dados = snapshot.val()
+		if (versao < dados.versao) {
+			abrirModal('modal', 'Atualização do site', `<b>Uma atualização foi lançada:</b><br>Nova versão: ${dados.versao}<br>Sua versão: ${versao}<br>Descrição do novo Update: ${dados.descricao}<br>Importância: ${dados.prioridade}<br>Data do lançamento: ${dados.data}<br><br><a class="btn btn-primary" onclick="window.location.reload(true)">Clique aqui para atualizar</a><br>Caso você tenha clicado para atualizar mas continua vendo esta mensagem, segure a tecla shift e aperte o botão recarregar do navegador para atualizar.`, `<button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>`)
+		}
+	})
+}
 
 function usuarioAtual() {
     let user = firebase.auth().currentUser;
@@ -75,4 +86,9 @@ function calcularIdadePrecisa(data, now) {
 			days: dateAge
 		};
 	return age;
+}
+
+function maiusculo(element) {
+	element.value = element.value.toUpperCase()
+	console.log('tudo bom?')
 }

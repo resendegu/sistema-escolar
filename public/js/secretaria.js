@@ -5,10 +5,14 @@ var listaDeUsuariosRef = firebase.database().ref('sistemaEscolar/listaDeUsuarios
 var listaDeProfessores = firebase.database().ref('sistemaEscolar/listaDeProfessores')
 var turmasRef = firebase.database().ref('sistemaEscolar/turmas')
 var ultimaMatriculaRef = firebase.database().ref('sistemaEscolar/ultimaMatricula')
+var alunosRef = firebase.database().ref('sistemaEscolar/alunos')
+
 var loader = document.getElementById('loader')
 var loaderMsg = document.getElementById('loaderMsg')
 
+
 firebase.auth().onAuthStateChanged((user) => {
+    update()
     if (user == null) {
         loader.style.display = 'none'
         AstNotif.dialog('Login não identificado', 'Você não está logado, vá para a tela de <a href="../login.html">login</a> para logar ou se cadastrar.')
@@ -27,13 +31,24 @@ firebase.auth().onAuthStateChanged((user) => {
         var alunosMatriculadosNum = document.getElementById('alunosMatriculadosNum')
         var alunosDesativadosNum = document.getElementById('alunosDesativadosNum')
         var turmasCadastradasNum = document.getElementById('turmasCadastradasNum')
+        alunosRef.on('value', (snapshot) => {
+            let students = snapshot.val()
+            let c = 0
+            for (const matricula in students) {
+                if (Object.hasOwnProperty.call(students, matricula)) {
+                    const dados = students[matricula];
+                    c++
+                }
+            }
+            alunosMatriculadosNum.innerText = c
+        })
         numerosRef.on('value', (snapshot) => {
             loaderMsg.innerText = 'Buscando informações da dashboard'
             var numeros = snapshot.val()
             var tabelaSemanal = numeros.tabelaSemanal
             
             //alunosCadastradosNum.innerText = numeros.alunosCadastrados != undefined ? numeros.alunosCadastrados : 0
-            alunosMatriculadosNum.innerText = numeros.alunosMatriculados != undefined ? numeros.alunosMatriculados : 0
+            
             alunosDesativadosNum.innerText = numeros.alunosDesativados != undefined ? numeros.alunosDesativados : 0
             turmasCadastradasNum.innerText = numeros.turmasCadastradas != undefined ? numeros.turmasCadastradas : 0
 
@@ -57,6 +72,7 @@ firebase.auth().onAuthStateChanged((user) => {
                         if (horarios.hasOwnProperty(horario)) {
                             const numeroDeAlunos = horarios[horario]
                             idCelulaTabela += horario
+                            console.log(idCelulaTabela)
                             document.getElementById(idCelulaTabela).innerText = numeroDeAlunos
                             var numNaTabela = Number(document.getElementById('total' + horario).innerText)
                             numNaTabela += numeroDeAlunos
@@ -502,7 +518,7 @@ function mostraProfsAlunoESetaTurma(codTurma) {
     let profAluno = document.getElementById('profAluno')
     let horaEDiasAluno = document.getElementById('horaEDiasAluno')
     profAluno.disabled = false
-    profAluno.innerHTML = '<option selected hidden>Escolha um prof.</option>'
+    profAluno.innerHTML = ''
     document.getElementById('faixa' + turmasLocal[codTurma].faixaTurma).checked = true
     horaEDiasAluno.value = turmasLocal[codTurma].hora + 'h'
     for (const index in turmasLocal[codTurma].diasDaSemana) {
@@ -689,8 +705,9 @@ document.querySelector('#formCadastroAluno').addEventListener('submit', (e) => {
     }
     
 })
-
+var diaAtualServidor
 function calculaIdade(dataNasc) {
+    idadeAluno = 0
     loader.style.display = 'block'
     loaderMsg.innerText = 'Buscando data atual do servidor...'
     console.log(dataNasc)

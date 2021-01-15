@@ -252,15 +252,22 @@ exports.cadastraAluno = functions.https.onCall((data, context) => {
                 return admin.database().ref('sistemaEscolar/alunos/' + dadosAluno.matriculaAluno).set(dadosAluno).then(() => {
                     return admin.database().ref('sistemaEscolar/turmas').child(dadosAluno.turmaAluno + '/alunos').child(dadosAluno.matriculaAluno).set({nome: dadosAluno.nomeAluno, prof: dadosAluno.profAluno, notas: {prova1: 0, prova2: 0, fala: 0, audicao: 0, leitura: 0, escrita: 0, atividadesExtras: 0}}).then(() => {
                         return admin.database().ref('sistemaEscolar/ultimaMatricula').set(dadosAluno.matriculaAluno).then(() => {
-                            return admin.database().ref('sistemaEscolar/numeros/alunosMatriculados').once('value').then((snapshot) => {
-                                let numAtual = Number(snapshot.val())
-                                if (snapshot.val() == null) {
-                                    numAtual = 0
+                            admin.database().ref('sistemaEscolar/numeros/alunosMatriculados').transaction(function (current_value) {
+                                let numAtual = Number(current_value)
+                                if (current_value == null) {
+                                    return 1
+                                } else {
+                                    return numAtual++
                                 }
-                                let num = numAtual++
-                                return admin.database().ref('sistemaEscolar/numeros/alunosMatriculados').set(num).then(() => {
-                                    
-                                    let horaEDias = dadosAluno.horaEDiasAluno.split(',') // Output: ['20h', 'MON', 'WED' ...]
+                            }, function(error, comitted, snapshot){
+                                if (error) {
+                                    throw new functions.https.HttpsError(error.code, error.message, error)
+                                } else if(!comitted) {
+                                    throw new functions.https.HttpsError('already-exists', 'Já existe. isso pode ser um erro')
+                                }
+                                
+                            })
+                            let horaEDias = dadosAluno.horaEDiasAluno.split(',') // Output: ['20h', 'MON', 'WED' ...]
                                     let hora = horaEDias[0]
                                     hora = hora.split('h')
                                     hora = Number(hora[0])
@@ -292,13 +299,6 @@ exports.cadastraAluno = functions.https.onCall((data, context) => {
                                         }
                                     }
                                     return {answer: 'Aluno cadastrado e distribuído nas turmas e nos professores com sucesso!'}
-                                }).catch(error => {
-                                    throw new functions.https.HttpsError(error.code, error.message, error)
-                                })
-                                
-                            }).catch(error => {
-                                throw new functions.https.HttpsError(error.code, error.message, error)
-                            })
                             
                         }).catch(error => {
                             throw new functions.https.HttpsError('unknown', error.message, error)
@@ -313,7 +313,7 @@ exports.cadastraAluno = functions.https.onCall((data, context) => {
                 throw new functions.https.HttpsError('unknown', error.message, error)
             })
         }).catch(error => {
-            throw new functions.https.HttpsError('unknown', error.message, error)
+            throw new functions.https.HttpsError('unknown', 'Confira se está cadastrando o professor corretamente.', error)
         })
     } else {
         throw new functions.https.HttpsError('permission-denied', 'Você não possui permissão para fazer alterações nesta área.')

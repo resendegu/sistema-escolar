@@ -125,6 +125,25 @@
   <label id="loaderMsg" class="text-white-50 bg-dark">Aguarde...</label>
     <div class="loader"></div>
 </div>
+<div class="modal" tabindex="-1" role="dialog" id="modal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="titulo">Modal title</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" id="corpo">
+        <p>Modal body text goes here.</p>
+      </div>
+      <div class="modal-footer" id="botoes">
+        <button type="button" class="btn btn-primary">Save changes</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
     <div class="container-fluid">
       <div class="row">
         <nav class="col-md-2 d-none d-md-block bg-light sidebar">
@@ -298,9 +317,9 @@
                         </tr>
                         <tr>
                           <td>Sábado</td>
-                          <td id="FRIManha">0</td>
-                          <td id="FRITarde">0</td>
-                          <td id="FRINoite">0</td>
+                          <td id="SATManha">0</td>
+                          <td id="SATTarde">0</td>
+                          <td id="SATNoite">0</td>
                           <td id="totalSAT">0</td>
                         </tr>
                         <tr>
@@ -515,11 +534,11 @@
                   </div>
                   <div class="form-group col-md-4">
                     <label for="inputPassword4">Nome</label>
-                    <input type="name" class="form-control" id="nomeAluno" name="nomeAluno" placeholder="Nome">
+                    <input type="name" class="form-control" id="nomeAluno" name="nomeAluno" placeholder="Nome" onblur="maiusculo(this)">
                   </div>
                   <div class="form-group col-auto">
                     <label for="inputPassword4">Data de nascimento</label>
-                    <input type="date" class="form-control" id="dataNascimentoAluno" name="dataNascimentoAluno" placeholder="Data" onchange="calculaIdade(this.value)">
+                    <input type="date" class="form-control" id="dataNascimentoAluno" name="dataNascimentoAluno" placeholder="Data" onblur="calculaIdade(this.value)">
                     
                   </div>
                   <div class="form-group col-auto">
@@ -544,7 +563,7 @@
                 <div class="form-row">
                   <div class="form-group col-auto">
                     <label for="inputEmail4">RG</label>
-                    <input type="number" class="form-control" id="rgAluno" name="rgAluno" placeholder="RG">
+                    <input type="text" class="form-control" id="rgAluno" name="rgAluno" placeholder="RG">
                   </div>
                   <div class="form-group col-auto">
                     <label for="inputPassword4">CPF</label>
@@ -631,10 +650,10 @@
                 </div>
                 <hr>
                 <label class="h6">Dados de filiação</label>
-                <div class="form-row">
+                <div class="form-row border border-secondary rounded">
                   <div class="form-group col-md-4">
                     <label for="inputAddress">Filiação ou Responsável legal 1</label>
-                    <input type="text" class="form-control" id="nomeResponsavelAluno1" name="nomeResponsavelAluno1" placeholder="Nome">
+                    <input type="text" class="form-control" id="nomeResponsavelAluno1" name="nomeResponsavelAluno1" placeholder="Nome" onblur="maiusculo(this)">
                   </div>
                   <div class="form-group col-md-2">
                     <label for="inputAddress">Relação</label>
@@ -658,7 +677,7 @@
                   </div>
                   <div class="form-group col-auto">
                     <label for="inputEmail4">RG</label>
-                    <input type="number" class="form-control" id="rgResponsavel1" name="rgResponsavel1" placeholder="RG">
+                    <input type="text" class="form-control" id="rgResponsavel1" name="rgResponsavel1" placeholder="RG">
                   </div>
                   <div class="form-group col-auto">
                     <label for="inputPassword4">CPF</label>
@@ -669,18 +688,19 @@
                   <div class="form-group col-md-auto">
                     <br>
                     <div class="form-group col-md-auto">
-                      <a class="btn btn-outline-primary btn-sm" name="responsavelFinanceiro" id="responsavelFinanceiro1" onclick="setaRespFinan('1')">Resp. Financeiro</a>
+                      <a class="btn btn-outline-primary btn-sm" name="responsavelFinanceiro" id="responsavelFinanceiro1" onclick="setaRespFinan('1')">Copiar dados p/ Resp. Financeiro</a>
                       <br>
-                      <a class="btn btn-outline-primary btn-sm" name="responsavelPedagogico" id="responsavelPedagogico1" onclick="setaRespPedag('1')">Resp. Pedagógico</a>
+                      <a class="btn btn-outline-success btn-sm" name="responsavelPedagogico" id="responsavelPedagogico1" onclick="setaRespPedag('1')">Copiar dados p/ Resp. Pedagógico</a>
                       
                     </div>
                   </div>
                 </div>
-
-                <div class="form-row">
+                <br>
+                
+                <div class="form-row border border-secondary rounded">
                   <div class="form-group col-md-4">
                     <label for="inputAddress">Filiação ou Responsável legal 2</label>
-                    <input type="text" class="form-control" id="nomeResponsavelAluno2" name="nomeResponsavelAluno2" placeholder="Nome">
+                    <input type="text" class="form-control" id="nomeResponsavelAluno2" name="nomeResponsavelAluno2" placeholder="Nome" onblur="maiusculo(this)">
                   </div>
                   <div class="form-group col-md-2">
                     <label for="inputAddress">Relação</label>
@@ -704,7 +724,7 @@
                   </div>
                   <div class="form-group col-auto">
                     <label for="inputEmail4">RG</label>
-                    <input type="number" class="form-control" id="rgResponsavel2" name="rgResponsavel2" placeholder="RG">
+                    <input type="text" class="form-control" id="rgResponsavel2" name="rgResponsavel2" placeholder="RG">
                   </div>
                   <div class="form-group col-auto">
                     <label for="inputPassword4">CPF</label>
@@ -714,17 +734,19 @@
                   &nbsp;&nbsp;&nbsp;
                   <div class="form-group col-md-auto">
                     <br>
-                    <a class="btn btn-outline-primary btn-sm" name="responsavelFinanceiro" id="responsavelFinanceiro2" onclick="setaRespFinan('2')">Resp. Financeiro</a>
+                    <a class="btn btn-outline-primary btn-sm" name="responsavelFinanceiro" id="responsavelFinanceiro2" onclick="setaRespFinan('2')">Copiar dados p/ Resp. Financeiro</a>
                     <br>
-                    <a class="btn btn-outline-primary btn-sm" name="responsavelPedagogico" id="responsavelPedagogico2" onclick="setaRespPedag('2')">Resp. Pedagogico</a>
+                    <a class="btn btn-outline-success btn-sm" name="responsavelPedagogico" id="responsavelPedagogico2" onclick="setaRespPedag('2')">Copiar dados p/ Resp. Pedagogico</a>
                     
                   </div>
                 </div>
-
-                <div class="form-row">
+                <br>
+                <hr>
+                <label class="h6">Dados de Responsáveis diretos do aluno</label>
+                <div class="form-row border border-primary rounded">
                   <div class="form-group col-md-4">
                     <label for="inputAddress">Responsável financeiro</label>
-                    <input type="text" class="form-control" id="nomeResponsavelFinanceiroAluno" name="nomeResponsavelFinanceiroAluno" placeholder="Nome">
+                    <input type="text" class="form-control" id="nomeResponsavelFinanceiroAluno" name="nomeResponsavelFinanceiroAluno" placeholder="Nome" onblur="maiusculo(this)">
                   </div>
                   <div class="form-group col-md-2">
                     <label for="inputAddress">Relação</label>
@@ -752,7 +774,7 @@
                   </div>
                   <div class="form-group col-auto">
                     <label for="inputEmail4">RG</label>
-                    <input type="number" class="form-control" id="rgFinanceiroAluno" name="rgFinanceiroAluno" placeholder="RG">
+                    <input type="text" class="form-control" id="rgFinanceiroAluno" name="rgFinanceiroAluno" placeholder="RG">
                   </div>
                   <div class="form-group col-auto">
                     <label for="inputPassword4">CPF</label>
@@ -760,11 +782,11 @@
                     <small id="cpfHelp4" class="form-text text-muted">Digite um CPF válido, existe um algoritmo de validação neste campo.</small>
                   </div>
                 </div>
-
-                <div class="form-row">
+                <br>
+                <div class="form-row border border-success rounded">
                   <div class="form-group col-md-4">
                     <label for="inputAddress">Responsável pedagógico/didático</label>
-                    <input type="text" class="form-control" id="nomeResponsavelPedagogicoAluno" placeholder="Nome">
+                    <input type="text" class="form-control" id="nomeResponsavelPedagogicoAluno" placeholder="Nome" onblur="maiusculo(this)">
                   </div>
                   <div class="form-group col-md-2">
                     <label for="inputAddress">Relação</label>
@@ -792,7 +814,7 @@
                   </div>
                   <div class="form-group col-auto">
                     <label for="inputEmail4">RG</label>
-                    <input type="number" class="form-control" id="rgPedagogicoAluno" name="rgPedagogicoAluno" placeholder="RG">
+                    <input type="text" class="form-control" id="rgPedagogicoAluno" name="rgPedagogicoAluno" placeholder="RG">
                   </div>
                   <div class="form-group col-auto">
                     <label for="inputPassword4">CPF</label>
