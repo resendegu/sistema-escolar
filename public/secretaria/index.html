@@ -24,17 +24,17 @@
   <body>
           <!-- Inicialização do Firebase -->
         <!-- update the version number as needed -->
-        <script defer src="/__/firebase/8.1.1/firebase-app.js"></script>
+        <script defer src="/__/firebase/8.2.3/firebase-app.js"></script>
         <!-- include only the Firebase features as you need -->
-        <script defer src="/__/firebase/8.1.1/firebase-auth.js"></script>
-        <script defer src="/__/firebase/8.1.1/firebase-database.js"></script>
-        <!-- <script defer src="/__/firebase/8.1.1/firebase-firestore.js"></script> -->
-        <script defer src="/__/firebase/8.1.1/firebase-functions.js"></script>
-        <!-- <script defer src="/__/firebase/8.1.1/firebase-messaging.js"></script> -->
-        <script defer src="/__/firebase/8.1.1/firebase-storage.js"></script>
-        <script defer src="/__/firebase/8.1.1/firebase-analytics.js"></script>
+        <script defer src="/__/firebase/8.2.3/firebase-auth.js"></script>
+        <script defer src="/__/firebase/8.2.3/firebase-database.js"></script>
+        <!-- <script defer src="/__/firebase/8.2.3/firebase-firestore.js"></script> -->
+        <script defer src="/__/firebase/8.2.3/firebase-functions.js"></script>
+        <!-- <script defer src="/__/firebase/8.2.3/firebase-messaging.js"></script> -->
+        <script defer src="/__/firebase/8.2.3/firebase-storage.js"></script>
+        <script defer src="/__/firebase/8.2.3/firebase-analytics.js"></script>
         <!-- <script defer src="/__/firebase/8.1.1/firebase-remote-config.js"></script> -->
-        <script defer src="/__/firebase/8.1.1/firebase-performance.js"></script>
+        <script defer src="/__/firebase/8.2.3/firebase-performance.js"></script>
         <!-- 
           initialize the SDK after all desired features are loaded, set useEmulator to false
           to avoid connecting the SDK to running emulators.
@@ -351,7 +351,16 @@
             </div>
 
             <div class="container tab-pane fade" id="abaAlunos" role="tabpanel" aria-labelledby="Alunos">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptates aliquam quae commodi ipsam iusto quod cumque molestias itaque velit ea ratione corporis numquam nam esse, tempore aspernatur excepturi quia odit.
+              <label class="h3">Alunos</label>
+              <br>
+              <div class="col">
+                <h2>Aniversariantes do mês</h2>
+                <div class="overflow-auto" style="height: fit-content; max-height: 300px;">
+                  <div class="list-group" id="listaAniversarios">
+                    
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div class="container tab-pane fade" id="abaTurmas" role="tabpanel" aria-labelledby="Turmas">
@@ -742,7 +751,7 @@
                 </div>
                 <br>
                 <hr>
-                <label class="h6">Dados de Responsáveis diretos do aluno</label>
+                <label class="h6">Dados do responsável Financeiro</label>
                 <div class="form-row border border-primary rounded">
                   <div class="form-group col-md-4">
                     <label for="inputAddress">Responsável financeiro</label>
@@ -783,7 +792,9 @@
                   </div>
                 </div>
                 <br>
+                <label class="h6">Dados do responsável Financeiro</label>
                 <div class="form-row border border-success rounded">
+                  
                   <div class="form-group col-md-4">
                     <label for="inputAddress">Responsável pedagógico/didático</label>
                     <input type="text" class="form-control" id="nomeResponsavelPedagogicoAluno" placeholder="Nome" onblur="maiusculo(this)">

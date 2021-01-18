@@ -689,6 +689,8 @@ document.querySelector('#formCadastroAluno').addEventListener('submit', (e) => {
     } else if (((dadosAluno.cpfFinanceiroAluno == '' || dadosAluno.numeroCelularFinanceiroAluno == '' || dadosAluno.nomeResponsavelFinanceiroAluno == '') || (dadosAluno.cpfPedgogicoAluno == '' || dadosAluno.numeroCelularPedagogicoAluno == '' || dadosAluno.nomeResponsavelPedagogicoAluno == '')) && idadeAluno.years < 18) {
         AstNotif.dialog('Confira os campos', 'O aluno é menor de idade. Cofira os campos de responsáveis financeiro e pedagógico do aluno, eles são obrigatórios quando o aluno é menor de idade.')
         loader.style.display = 'none'
+    } else if (cpf) {
+
     } else {
         loaderMsg.innerText = 'Enviando dados para o servidor...'
         let cadastraAluno = firebase.functions().httpsCallable('cadastraAluno')

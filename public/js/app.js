@@ -3,7 +3,7 @@ var perf = firebase.performance()
 var updatesRef = firebase.database().ref('sistemaEscolar/updates')
 
 function update() {
-	let versao = 0.49
+	let versao = 0.50
 	updatesRef.on('value', (snapshot) => {
 		let dados = snapshot.val()
 		if (versao < dados.versao) {
