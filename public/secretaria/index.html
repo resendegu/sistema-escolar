@@ -57,8 +57,8 @@
                   </a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" data-toggle="list" href="#abaAlunos" role="tab" aria-controls="alunos">
-                    <span data-feather="users"></span>
+                  <a class="nav-link" data-toggle="list" href="#abaAlunos" role="tab" aria-controls="alunos" onclick="carregaListaDeAlunos()">
+                    <span data-feather="users" ></span>
                     Alunos
                   </a>
                 </li>
@@ -156,8 +156,8 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" data-toggle="list" href="#abaAlunos" role="tab" aria-controls="alunos">
-                  <span data-feather="users"></span>
+                <a class="nav-link" data-toggle="list" href="#abaAlunos" role="tab" aria-controls="alunos" onclick="carregaListaDeAlunos()">
+                  <span data-feather="users" ></span>
                   Alunos
                 </a>
               </li>
@@ -354,9 +354,30 @@
               <label class="h3">Alunos</label>
               <br>
               <div class="col">
-                <h2>Aniversariantes do mês</h2>
+                <h5>Lista de alunos</h5>
+                <div class="container">
+                  <div class="row">
+                    <div class="form-group col-md-4">
+                      <label for="inputAddress">Campo de busca</label>
+                      <input class="form-control" type="search" placeholder="Digite a busca..." aria-label="Search" onchange="carregaListaDeAlunos(maiusculo(this))">
+                    </div>
+                    <div class="form-group col-md-4">
+                      <label for="inputAddress">Buscar por:</label>
+                      <select class="form-control" name="tipoDeBusca" id="tipoDeBusca" onchange="alteraTipoDeBusca(this.value)">
+                        <option selected value="nomeAluno">Nome do aluno</option>
+                        <option value="matriculaAluno">Número de matrícula</option>
+                        <option value="cpfAluno">CPF do aluno</option>
+                        <option value="rgAluno">RG do aluno</option>
+                        <option value="emailAluno">E-mail do aluno</option>
+                        <option value="celularAluno">Celular do aluno</option>
+                        <option value="telefoneAluno">Telefone do aluno</option>
+                      </select>
+                      
+                    </div>
+                  </div> 
+                </div>
                 <div class="overflow-auto" style="height: fit-content; max-height: 300px;">
-                  <div class="list-group" id="listaAniversarios">
+                  <div class="list-group" id="listaAlunos">
                     
                   </div>
                 </div>

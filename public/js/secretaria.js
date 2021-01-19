@@ -745,3 +745,44 @@ function calculaIdade(dataNasc) {
         loader.style.display = 'none'
     })
 }
+var tipoDeBusca = 'nomeAluno'
+function alteraTipoDeBusca(tipo) {
+    tipoDeBusca = tipo
+}
+
+var alunos
+function carregaListaDeAlunos(filtro='') {
+    console.log(filtro)
+    loader.style.display = 'block'
+    loaderMsg.innerText = 'Carregando lista de alunos...'
+    let listaAlunos = document.getElementById('listaAlunos')
+    if (filtro == '') {
+        document.getElementById('listaAlunos').innerHTML = ''
+        alunosRef.on('value', (snapshot) => {
+            alunos = snapshot.val()
+            for (const matricula in alunos) {
+                if (Object.hasOwnProperty.call(alunos, matricula)) {
+                    const aluno = alunos[matricula];
+                    document.getElementById('listaAlunos').innerHTML += `<button class="list-group-item list-group-item-action">${matricula}: ${aluno.nomeAluno}, turma ${aluno.turmaAluno}</button>`
+                }
+            }
+            loader.style.display = 'none'
+        })
+    } else {
+        document.getElementById('listaAlunos').innerHTML = ''
+        alunosRef.orderByChild(tipoDeBusca).startAt(filtro).once('value').then(snapshot => {
+            alunos = snapshot.val()
+            for (const matricula in alunos) {
+                if (Object.hasOwnProperty.call(alunos, matricula)) {
+                    const aluno = alunos[matricula];
+                    document.getElementById('listaAlunos').innerHTML += `<button class="list-group-item list-group-item-action">${matricula}: ${aluno.nomeAluno}, turma ${aluno.turmaAluno}</button>`
+                }
+            }
+            loader.style.display = 'none'
+        }).catch(error => {
+            console.log(error)
+            AstNotif.dialog('Erro', error.message)
+        })
+    }
+    
+}

@@ -3,7 +3,7 @@ var perf = firebase.performance()
 var updatesRef = firebase.database().ref('sistemaEscolar/updates')
 
 function update() {
-	let versao = 0.50
+	let versao = 0.52
 	updatesRef.on('value', (snapshot) => {
 		let dados = snapshot.val()
 		if (versao < dados.versao) {
@@ -90,5 +90,5 @@ function calcularIdadePrecisa(data, now) {
 
 function maiusculo(element) {
 	element.value = element.value.toUpperCase()
-	console.log('tudo bom?')
+	return element.value.toUpperCase()
 }
