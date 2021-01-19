@@ -683,14 +683,15 @@ document.querySelector('#formCadastroAluno').addEventListener('submit', (e) => {
     // Gera ou não o PDF do aluno
     dadosAluno.geraPDFAluno = dados.get('geraPDFAluno')
     console.log(dadosAluno)
-    if ((dadosAluno.cpfResponsavel1 == '' || dadosAluno.rgResponsavel1 == '' || dadosAluno.numeroCelularResponsavel1 == '' || dadosAluno.nomeResponsavelAluno1 == '') && idadeAluno.years < 18) {
+    if ((dadosAluno.cpfResponsavel1 == '' || dadosAluno.rgResponsavel1 == '' || dadosAluno.numeroCelularResponsavel1 == '' || dadosAluno.nomeResponsavelAluno1 == '')&& idadeAluno != undefined && idadeAluno.years < 18) {
         AstNotif.dialog('Confira os campos', 'O aluno é menor de idade. É obrigatório o preenchimento dos dados do responsável número 1 do aluno.')
         loader.style.display = 'none'
     } else if (((dadosAluno.cpfFinanceiroAluno == '' || dadosAluno.numeroCelularFinanceiroAluno == '' || dadosAluno.nomeResponsavelFinanceiroAluno == '') || (dadosAluno.cpfPedgogicoAluno == '' || dadosAluno.numeroCelularPedagogicoAluno == '' || dadosAluno.nomeResponsavelPedagogicoAluno == '')) && idadeAluno.years < 18) {
         AstNotif.dialog('Confira os campos', 'O aluno é menor de idade. Cofira os campos de responsáveis financeiro e pedagógico do aluno, eles são obrigatórios quando o aluno é menor de idade.')
         loader.style.display = 'none'
-    } else if (cpf) {
-
+    } else if (dadosAluno.cpfAluno == '' || dadosAluno.rgAluno == '') {
+        AstNotif.dialog('Confira os campos', 'Os dados de RG e CPF do aluno não podem estar em branco.')
+        loader.style.display = 'none'
     } else {
         loaderMsg.innerText = 'Enviando dados para o servidor...'
         let cadastraAluno = firebase.functions().httpsCallable('cadastraAluno')
@@ -763,7 +764,7 @@ function carregaListaDeAlunos(filtro='') {
             for (const matricula in alunos) {
                 if (Object.hasOwnProperty.call(alunos, matricula)) {
                     const aluno = alunos[matricula];
-                    document.getElementById('listaAlunos').innerHTML += `<button class="list-group-item list-group-item-action">${matricula}: ${aluno.nomeAluno}, turma ${aluno.turmaAluno}</button>`
+                    document.getElementById('listaAlunos').innerHTML += `<button class="list-group-item list-group-item-action" onclick="abreDadosDoAluno('${matricula}')">${matricula}: ${aluno.nomeAluno} (${aluno.turmaAluno})</button>`
                 }
             }
             loader.style.display = 'none'
@@ -775,7 +776,7 @@ function carregaListaDeAlunos(filtro='') {
             for (const matricula in alunos) {
                 if (Object.hasOwnProperty.call(alunos, matricula)) {
                     const aluno = alunos[matricula];
-                    document.getElementById('listaAlunos').innerHTML += `<button class="list-group-item list-group-item-action">${matricula}: ${aluno.nomeAluno}, turma ${aluno.turmaAluno}</button>`
+                    document.getElementById('listaAlunos').innerHTML += `<button class="list-group-item list-group-item-action" onclick="abreDadosDoAluno('${matricula}')">${matricula}: ${aluno.nomeAluno} (${aluno.turmaAluno})</button>`
                 }
             }
             loader.style.display = 'none'
@@ -785,4 +786,12 @@ function carregaListaDeAlunos(filtro='') {
         })
     }
     
+}
+
+function abreDadosDoAluno(matricula) {
+    const dados = alunos[matricula]
+    document.getElementById('mostraNomeAluno').innerText = dados.nomeAluno
+    document.getElementById('mostraCpfAluno').innerText = dados.cpfAluno
+    document.getElementById('mostraRgAluno').innerText = dados.rgAluno
+    document.getElementById('mostraCelularTelefone').innerText = `${dados.celularAluno}/${dados.telefoneAluno}`
 }
