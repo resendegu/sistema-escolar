@@ -10,6 +10,9 @@ var alunosRef = firebase.database().ref('sistemaEscolar/alunos')
 var loader = document.getElementById('loader')
 var loaderMsg = document.getElementById('loaderMsg')
 
+$(function () {
+    $('[data-toggle="tooltip"]').tooltip()
+  })
 
 firebase.auth().onAuthStateChanged((user) => {
     update()
@@ -804,9 +807,14 @@ function abreDadosDoAluno(matricula) {
         console.log(error)
     })
     document.getElementById('mostraHoraEDiasAluno').innerText = dados.horaEDiasAluno
-    document.getElementById('mostraTurmaAluno').innerText = dados.turmaAluno
+    document.getElementById('mostraTurmaAluno').innerHTML = dados.turmaAluno
     document.getElementById('mostraEmailAluno').innerText = dados.emailAluno
     document.getElementById('mostraMatriculaAluno').innerText = dados.matriculaAluno
     document.getElementById('mostraEnderecoAluno').innerText = `${dados.enderecoAluno}, ${dados.numeroAluno}, ${dados.bairroAluno}, ${dados.cidadeAluno}, ${dados.estadoAluno}. CEP ${dados.cepAluno}.`
 
 }
+
+document.querySelector('#transfereAluno').addEventListener('submit', (e) => {
+    e.preventDefault()
+    AstNotif.dialog('Oiii...', 'Aqui é o Gustavo, e essa área ainda não foi desenvolvida ok! Volte aqui mais tarde.')
+})
