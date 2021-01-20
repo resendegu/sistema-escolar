@@ -400,13 +400,13 @@
                                     <form id="transfereAluno" onkeydown="return event.key != 'Enter';">
                                       <div class="form-group col-auto">
                                         <label for="inputAddress">Turma</label>
-                                        <select class="form-control" name="turmaAluno" id="turmaAluno" onclick="mostraProfsAlunoESetaTurma(this.value)">
+                                        <select class="form-control" name="turmaAlunoTransferencia" id="turmaAlunoTransferencia" onclick="mostraProfsAlunoESetaTurma(this.value)">
                                           <option hidden selected>Escolha a turma...</option>
                                           
                                         </select>
                                         <label for="inputAddress">Prof. Referência</label>
                                         <!-- <img src="../images/profile_placeholder.png" id="fotoProfAbaCadastroAluno" class="rounded" width="32px" style="margin-right: 10px;"> -->
-                                        <select class="form-control" disabled name="profAluno" id="profAluno">
+                                        <select class="form-control" disabled name="profAlunoTransferencia" id="profAlunoTransferencia">
                                           <option hidden selected>...</option>
                                           
                                         </select>
@@ -594,6 +594,26 @@
                       <label>Professores cadastrados na turma:</label> <br>
                       <div id="mostraProfessoresCadastrados" class="items-container"></div>
                     </div>
+                  </div>
+                </div>
+                <div class="container">
+                  <div class="row">
+                    <div class="form-group col-auto">
+                      <label for="inputAddress">Campo de busca</label>
+                      <input class="form-control" type="search" placeholder="Digite a busca..." aria-label="Search" onchange="carregaListaDeAlunosDaTurma(`${document.getElementById('selectTurmas').value}`, maiusculo(this))">
+                    </div>
+                    <div class="form-group col-auto">
+                      <label for="inputAddress">Buscar por:</label>
+                      <select class="form-control" name="tipoDeBuscaDaTurma" id="tipoDeBuscaDaTurma" onchange="alteraTipoDeBusca(this.value)">
+                        <option selected value="nome">Nome do aluno</option>
+                      </select>
+                      
+                    </div>
+                  </div> 
+                </div>
+                <div class="overflow-auto" style="height: fit-content; max-height: 280px;">
+                  <div class="list-group" id="listaAlunosDaTurma">
+                    
                   </div>
                 </div>
                 <hr>

@@ -14,6 +14,10 @@ $(function () {
     $('[data-toggle="tooltip"]').tooltip()
   })
 
+  $(function () {
+    $('[data-toggle="popover"]').popover()
+  })
+
 firebase.auth().onAuthStateChanged((user) => {
     update()
     if (user == null) {
@@ -323,9 +327,48 @@ function carregaTurmas() {
     })
 }
 
+var alunosSelecionadosTurma = {}
+function carregaListaDeAlunosDaTurma(turma, filtro='') {
+    tipoDeBusca = 'nome'
+    console.log(filtro)
+    loader.style.display = 'block'
+    loaderMsg.innerText = 'Carregando lista de alunos...'
+    let listaAlunos = document.getElementById('listaAlunos')
+    if (filtro == '') {
+        document.getElementById('listaAlunosDaTurma').innerHTML = ''
+        turmasRef.child(turma + '/alunos').on('value', (snapshot) => {
+            alunos = snapshot.val()
+            for (const matricula in alunos) {
+                if (Object.hasOwnProperty.call(alunos, matricula)) {
+                    const aluno = alunos[matricula];
+                    document.getElementById('listaAlunosDaTurma').innerHTML += `<button class="list-group-item list-group-item-action" onclick="abreDadosDoAlunoDaTurma('${matricula}')"><input type="checkbox" name="${matricula}" onclick="this.checked ? alunosSelecionadosTurma[${matricula}] = '${aluno.nome}' : alunosSelecionadosTurma[${matricula}] = ''"> ${matricula}: ${aluno.nome}</button>`
+                }
+            }
+            loader.style.display = 'none'
+        })
+    } else {
+        document.getElementById('listaAlunosDaTurma').innerHTML = ''
+        alunosRef.child(turma + '/alunos').orderByChild('nome').equalTo(filtro).once('value').then(snapshot => {
+            alunos = snapshot.val()
+            for (const matricula in alunos) {
+                if (Object.hasOwnProperty.call(alunos, matricula)) {
+                    const aluno = alunos[matricula];
+                    document.getElementById('listaAlunosDaTurma').innerHTML += `<button class="list-group-item list-group-item-action" onclick="abreDadosDoAlunoDaTurma('${matricula}')"><input type="checkbox" name="${matricula}" onclick="this.checked ? alunosSelecionadosTurma[${matricula}] = '${aluno.nome}' : alunosSelecionadosTurma[${matricula}] = ''"> ${matricula}: ${aluno.nome}</button>`
+                }
+            }
+            loader.style.display = 'none'
+        }).catch(error => {
+            console.log(error)
+            AstNotif.dialog('Erro', error.message)
+        })
+    }
+    
+}
+
 function abreTurma(cod) {
     loader.style.display = 'block'
     loaderMsg.innerText = 'Abrindo turma...'
+    carregaListaDeAlunosDaTurma(cod)
     var codigoDaTurmaLabel = document.getElementById('codigoDaTurma')
     var areaInfoTurma = document.getElementById('areaInfoTurma')
     turmasRef.child(cod).on('value', (snapshot) => {
@@ -487,15 +530,17 @@ function carregaProfsETurmas() {
     loaderMsg.innerText = 'Carregando dados de matrícula, de turmas e professores...'
     let turmaAluno = document.getElementById('turmaAluno')
     let matriculaAluno = document.getElementById('matriculaAluno')
+    let turmaAlunoTransferencia = document.getElementById('turmaAlunoTransferencia')
     
     turmasRef.once('value').then(snapshot => {
         turmaAluno.innerHTML = '<option selected hidden>Escolha uma turma...</option>'
         let turmas = snapshot.val()
         turmasLocal = snapshot.val()
+        console.log(turmas)
         for (const cod in turmas) {
             if (Object.hasOwnProperty.call(turmas, cod)) {
                 const infoDaTurma = turmas[cod];
-                
+                turmaAlunoTransferencia.innerHTML += `<option value="${cod}">${cod}</option>`
                 turmaAluno.innerHTML += `<option value="${cod}">${cod}</option>`
             }
         }
@@ -686,7 +731,10 @@ document.querySelector('#formCadastroAluno').addEventListener('submit', (e) => {
     // Gera ou não o PDF do aluno
     dadosAluno.geraPDFAluno = dados.get('geraPDFAluno')
     console.log(dadosAluno)
-    if ((dadosAluno.cpfResponsavel1 == '' || dadosAluno.rgResponsavel1 == '' || dadosAluno.numeroCelularResponsavel1 == '' || dadosAluno.nomeResponsavelAluno1 == '')&& idadeAluno != undefined && idadeAluno.years < 18) {
+    if (dadosAluno.dataNascimentoAluno == '' || dadosAluno.nomeAluno == '') {
+        AstNotif.dialog('Confira os campos', 'A data de nascimento do aluno e o nome do aluno são obrigatórios.')
+        loader.style.display = 'none'
+    } else if((dadosAluno.cpfResponsavel1 == '' || dadosAluno.rgResponsavel1 == '' || dadosAluno.numeroCelularResponsavel1 == '' || dadosAluno.nomeResponsavelAluno1 == '')&& idadeAluno != undefined && idadeAluno.years < 18) {
         AstNotif.dialog('Confira os campos', 'O aluno é menor de idade. É obrigatório o preenchimento dos dados do responsável número 1 do aluno.')
         loader.style.display = 'none'
     } else if (((dadosAluno.cpfFinanceiroAluno == '' || dadosAluno.numeroCelularFinanceiroAluno == '' || dadosAluno.nomeResponsavelFinanceiroAluno == '') || (dadosAluno.cpfPedgogicoAluno == '' || dadosAluno.numeroCelularPedagogicoAluno == '' || dadosAluno.nomeResponsavelPedagogicoAluno == '')) && idadeAluno.years < 18) {
@@ -694,6 +742,9 @@ document.querySelector('#formCadastroAluno').addEventListener('submit', (e) => {
         loader.style.display = 'none'
     } else if (dadosAluno.cpfAluno == '' || dadosAluno.rgAluno == '') {
         AstNotif.dialog('Confira os campos', 'Os dados de RG e CPF do aluno não podem estar em branco.')
+        loader.style.display = 'none'
+    } else if (dadosAluno.turmaAluno == 'Escolha uma turma...') {
+        AstNotif.dialog('Confira os campos', 'É obrigatório matricular o aluno em uma turma.')
         loader.style.display = 'none'
     } else {
         loaderMsg.innerText = 'Enviando dados para o servidor...'
