@@ -15,6 +15,7 @@
     <link href="../css/dashboard.css" rel="stylesheet">
     <link rel="stylesheet" href="../css/loader.css">
     <link href="../css/list-items.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/secretaria.css">
 
       <!-- Carregando arquivos da biblioteca AST-Notif. Créditos: https://github.com/anandastoon/AST-Notif -->
     <link rel="stylesheet" href="../resources/AST-Notif/css/ast-notif.min.css">
@@ -354,14 +355,13 @@
               <label class="h3">Alunos</label>
               <br>
               <div class="col">
-                <h5>Lista de alunos</h5>
                 <div class="container">
                   <div class="row">
-                    <div class="form-group col-md-3">
+                    <div class="form-group col-auto">
                       <label for="inputAddress">Campo de busca</label>
                       <input class="form-control" type="search" placeholder="Digite a busca..." aria-label="Search" onchange="carregaListaDeAlunos(maiusculo(this))">
                     </div>
-                    <div class="form-group col-md-3">
+                    <div class="form-group col-auto">
                       <label for="inputAddress">Buscar por:</label>
                       <select class="form-control" name="tipoDeBusca" id="tipoDeBusca" onchange="alteraTipoDeBusca(this.value)">
                         <option selected value="nomeAluno">Nome do aluno</option>
@@ -376,22 +376,169 @@
                     </div>
                   </div> 
                 </div>
-                <div class="row">
-                  <div class="col-6">
-                    <div class="overflow-auto" style="height: fit-content; max-height: 300px;">
-                      <div class="list-group" id="listaAlunos">
-                        
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-md-auto">
-                    <label class="h5" id="mostraNomeAluno"></label><br>
-                    CPF: <label id="mostraCpfAluno"></label>&nbsp;RG: <label id="mostraRgAluno"></label><br>
-                    Celular/Telefone: <label id="mostraCelularTelefone"></label>
+                <div class="overflow-auto" style="height: fit-content; max-height: 280px;">
+                  <div class="list-group" id="listaAlunos">
+                    
                   </div>
                 </div>
+
                 
               </div>
+              <div class="container">
+                <div class="main-body">
+                      <div class="row gutters-sm">
+                        <div class="col-md-4 mb-3">
+                          <div class="card">
+                            <div class="card-body">
+                              <div class="d-flex flex-column align-items-center text-center">
+                                <img src="../images/profile_placeholder.png" alt="Imagem do aluno" class="rounded-circle" width="150" id="mostraFotoAluno">
+                                <div class="mt-3">
+                                  <h4 id="mostraNomeAluno">Nome</h4>
+                                  <p class="text-secondary mb-1" id="mostraIdadeAluno">Idade</p>
+                                  <p class="text-secondary mb-1" id="mostraTurmaAluno">Turma</p>
+                                  <p class="text-muted font-size-sm" id="mostraHoraEDiasAluno">Horário e dia de aula</p>
+                                  <button class="btn btn-primary">Follow Up</button>
+                                  <button class="btn btn-outline-primary" >Responsáveis</button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="card mt-3">
+                            <ul class="list-group list-group-flush">
+                              <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                                <h6 class="mb-0"><span data-feather="file-text"></span> CPF</h6>
+                                <span class="text-secondary" id="mostraCpfAluno">CPF do Aluno</span>
+                              </li>
+                              <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                                <h6 class="mb-0"><span data-feather="clipboard"></span> RG</h6>
+                                <span class="text-secondary" id="mostraRgAluno">RG do Aluno</span>
+                              </li>
+                              <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                                <h6 class="mb-0"><span data-feather="calendar"></span> Data de Nasc.</h6>
+                                <span class="text-secondary" id="mostraDataNascimentoAluno">@bootdey</span>
+                              </li>
+                              <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                                <h6 class="mb-0"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-instagram mr-2 icon-inline text-danger"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>Instagram</h6>
+                                <span class="text-secondary">bootdey</span>
+                              </li>
+                              <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                                <h6 class="mb-0"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-facebook mr-2 icon-inline text-primary"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>Facebook</h6>
+                                <span class="text-secondary">bootdey</span>
+                              </li>
+                            </ul>
+                          </div>
+                        </div>
+                        <div class="col-md-8">
+                          <div class="card mb-3">
+                            <div class="card-body">
+                              <div class="row">
+                                <div class="col-sm-3">
+                                  <h6 class="mb-0">Matrícula</h6>
+                                </div>
+                                <div class="col-sm-9 text-secondary" id="mostraMatriculaAluno">
+                                  00000
+                                </div>
+                              </div>
+                              <hr>
+                              <div class="row">
+                                <div class="col-sm-3">
+                                  <h6 class="mb-0">E-mail</h6>
+                                </div>
+                                <div class="col-sm-9 text-secondary" id="mostraEmailAluno">
+                                  exemplo@email.com
+                                </div>
+                              </div>
+                              <hr>
+                              <div class="row">
+                                <div class="col-sm-3">
+                                  <h6 class="mb-0">Telefone</h6>
+                                </div>
+                                <div class="col-sm-9 text-secondary" id="mostraTelefoneAluno">
+                                  XXXXXXXXXXX
+                                </div>
+                              </div>
+                              <hr>
+                              <div class="row">
+                                <div class="col-sm-3">
+                                  <h6 class="mb-0">Mobile</h6>
+                                </div>
+                                <div class="col-sm-9 text-secondary" id="mostraCelularAluno">
+                                  XXXXXXXXXXX
+                                </div>
+                              </div>
+                              <hr>
+                              <div class="row">
+                                <div class="col-sm-3">
+                                  <h6 class="mb-0">Endereço</h6>
+                                </div>
+                                <div class="col-sm-9 text-secondary" id="mostraEnderecoAluno">
+                                  Rua, Bairro, Cidade, Estado, Número
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="row gutters-sm">
+                            <div class="col-sm-6 mb-3">
+                              <div class="card h-100">
+                                <div class="card-body">
+                                  <h6 class="d-flex align-items-center mb-3"><i class="material-icons text-info mr-2">assignment</i>Project Status</h6>
+                                  <small>Web Design</small>
+                                  <div class="progress mb-3" style="height: 5px">
+                                    <div class="progress-bar bg-primary" role="progressbar" style="width: 80%" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
+                                  </div>
+                                  <small>Website Markup</small>
+                                  <div class="progress mb-3" style="height: 5px">
+                                    <div class="progress-bar bg-primary" role="progressbar" style="width: 72%" aria-valuenow="72" aria-valuemin="0" aria-valuemax="100"></div>
+                                  </div>
+                                  <small>One Page</small>
+                                  <div class="progress mb-3" style="height: 5px">
+                                    <div class="progress-bar bg-primary" role="progressbar" style="width: 89%" aria-valuenow="89" aria-valuemin="0" aria-valuemax="100"></div>
+                                  </div>
+                                  <small>Mobile Template</small>
+                                  <div class="progress mb-3" style="height: 5px">
+                                    <div class="progress-bar bg-primary" role="progressbar" style="width: 55%" aria-valuenow="55" aria-valuemin="0" aria-valuemax="100"></div>
+                                  </div>
+                                  <small>Backend API</small>
+                                  <div class="progress mb-3" style="height: 5px">
+                                    <div class="progress-bar bg-primary" role="progressbar" style="width: 66%" aria-valuenow="66" aria-valuemin="0" aria-valuemax="100"></div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col-sm-6 mb-3">
+                              <div class="card h-100">
+                                <div class="card-body">
+                                  <h6 class="d-flex align-items-center mb-3"><i class="material-icons text-info mr-2">assignment</i>Project Status</h6>
+                                  <small>Web Design</small>
+                                  <div class="progress mb-3" style="height: 5px">
+                                    <div class="progress-bar bg-primary" role="progressbar" style="width: 80%" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
+                                  </div>
+                                  <small>Website Markup</small>
+                                  <div class="progress mb-3" style="height: 5px">
+                                    <div class="progress-bar bg-primary" role="progressbar" style="width: 72%" aria-valuenow="72" aria-valuemin="0" aria-valuemax="100"></div>
+                                  </div>
+                                  <small>One Page</small>
+                                  <div class="progress mb-3" style="height: 5px">
+                                    <div class="progress-bar bg-primary" role="progressbar" style="width: 89%" aria-valuenow="89" aria-valuemin="0" aria-valuemax="100"></div>
+                                  </div>
+                                  <small>Mobile Template</small>
+                                  <div class="progress mb-3" style="height: 5px">
+                                    <div class="progress-bar bg-primary" role="progressbar" style="width: 55%" aria-valuenow="55" aria-valuemin="0" aria-valuemax="100"></div>
+                                  </div>
+                                  <small>Backend API</small>
+                                  <div class="progress mb-3" style="height: 5px">
+                                    <div class="progress-bar bg-primary" role="progressbar" style="width: 66%" aria-valuenow="66" aria-valuemin="0" aria-valuemax="100"></div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <hr>
+                    <p class="text-muted float-md-right" id="timestampDoAluno"></p>
+                </div>
             </div>
 
             <div class="container tab-pane fade" id="abaTurmas" role="tabpanel" aria-labelledby="Turmas">
@@ -562,7 +709,7 @@
             <div class="container tab-pane fade" id="abaCadastrarAlunos" role="tabpanel" aria-labelledby="Cadastrar Alunos">
               <label class="h3">Cadastro de alunos</label>
               <hr>
-              <form id="formCadastroAluno">
+              <form id="formCadastroAluno" onkeydown="return event.key != 'Enter';">
                 <input type='reset' class="btn btn-warning btn-sm" id="resetForm" value='Limpar todos os campos'/>
                 <a class="btn btn-info btn-sm" onclick="carregaProfsETurmas()"><span data-feather="refresh-cw"></span> Atualizar número de matrícula e turmas</a>
                 <br> <br>

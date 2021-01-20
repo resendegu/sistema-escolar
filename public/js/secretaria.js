@@ -726,25 +726,17 @@ function calculaIdade(dataNasc) {
         }
     }
     console.log(nascimento)
-    let diaAtual
-    var timestamp = firebase.functions().httpsCallable('timestamp')
-    timestamp().then(function(result){
-        console.log(result.data.timestamp)
-        loader.style.display = 'none'
-        let dataAtualCompleta = new Date(result.data.timestamp._seconds * 1000)
-        let dataAtual = []
-        dataAtual.push(dataAtualCompleta.getFullYear())
-        dataAtual.push(dataAtualCompleta.getMonth() + 1)
-        dataAtual.push(dataAtualCompleta.getDate())
-        console.log(dataAtual, nascimento)
-        idadeAluno = calcularIdadePrecisa(nascimentoObj, dataAtualCompleta)
-        console.log(idadeAluno)
-        document.getElementById('idadeCalculada').innerText = `Idade: ${idadeAluno.years} ano(s), ${idadeAluno.months} mes(es), ${idadeAluno.days} dia(s)`
-    }).catch(function(error){
-        AstNotif.dialog('Erro', error.message)
-        console.log(error)
-        loader.style.display = 'none'
-    })
+
+    
+        calcularIdadePrecisa(nascimentoObj).then(function(idade){
+            idadeAluno = idade
+            console.log(idadeAluno)
+            document.getElementById('idadeCalculada').innerText = `Idade: ${idadeAluno.years} ano(s), ${idadeAluno.months} mes(es), ${idadeAluno.days} dia(s)`
+            loader.style.display = 'none'
+        }).catch(function(error){
+            console.log(error)
+        })
+        
 }
 var tipoDeBusca = 'nomeAluno'
 function alteraTipoDeBusca(tipo) {
@@ -771,7 +763,7 @@ function carregaListaDeAlunos(filtro='') {
         })
     } else {
         document.getElementById('listaAlunos').innerHTML = ''
-        alunosRef.orderByChild(tipoDeBusca).startAt(filtro).once('value').then(snapshot => {
+        alunosRef.orderByChild(tipoDeBusca).equalTo(filtro).once('value').then(snapshot => {
             alunos = snapshot.val()
             for (const matricula in alunos) {
                 if (Object.hasOwnProperty.call(alunos, matricula)) {
@@ -788,10 +780,33 @@ function carregaListaDeAlunos(filtro='') {
     
 }
 
+var dadosResponsaveis
 function abreDadosDoAluno(matricula) {
     const dados = alunos[matricula]
+    dadosResponsaveis = ``
     document.getElementById('mostraNomeAluno').innerText = dados.nomeAluno
     document.getElementById('mostraCpfAluno').innerText = dados.cpfAluno
     document.getElementById('mostraRgAluno').innerText = dados.rgAluno
-    document.getElementById('mostraCelularTelefone').innerText = `${dados.celularAluno}/${dados.telefoneAluno}`
+    document.getElementById('mostraCelularAluno').innerText = dados.celularAluno
+    document.getElementById('mostraTelefoneAluno').innerText = dados.telefoneAluno
+    document.getElementById('timestampDoAluno').innerText = 'Aluno cadastrado em: ' + new Date(dados.timestamp._seconds * 1000)
+    document.getElementById('mostraDataNascimentoAluno').innerText = dados.dataNascimentoAluno
+
+    let nascimento = dados.dataNascimentoAluno.split('-')
+    let nascimentoObj = new Date()
+    nascimentoObj.setDate(Number(nascimento[2]))
+    nascimentoObj.setFullYear(Number(nascimento[0]))
+    nascimentoObj.setMonth(Number(nascimento[1]) - 1)
+    calcularIdadePrecisa(nascimentoObj).then(function(idade){
+        document.getElementById('mostraIdadeAluno').innerText = `${idade.years} anos, ${idade.months} mês(es), e ${idade.days} dias`
+    }).catch(function(error){
+        AstNotif.dialog('Erro', error.message)
+        console.log(error)
+    })
+    document.getElementById('mostraHoraEDiasAluno').innerText = dados.horaEDiasAluno
+    document.getElementById('mostraTurmaAluno').innerText = dados.turmaAluno
+    document.getElementById('mostraEmailAluno').innerText = dados.emailAluno
+    document.getElementById('mostraMatriculaAluno').innerText = dados.matriculaAluno
+    document.getElementById('mostraEnderecoAluno').innerText = `${dados.enderecoAluno}, ${dados.numeroAluno}, ${dados.bairroAluno}, ${dados.cidadeAluno}, ${dados.estadoAluno}. CEP ${dados.cepAluno}.`
+
 }

@@ -1,9 +1,11 @@
 var perf = firebase.performance()
 // Código padrão para todas as páginas do site
 var updatesRef = firebase.database().ref('sistemaEscolar/updates')
+var loader = document.getElementById('loader')
+var loaderMsg = document.getElementById('loaderMsg')
 
 function update() {
-	let versao = 0.54
+	let versao = 0.55
 	updatesRef.on('value', (snapshot) => {
 		let dados = snapshot.val()
 		if (versao < dados.versao) {
@@ -50,42 +52,53 @@ async function getAddress(numCep) {
 * @params data - String referente à data de nascimento da pessoa, no formato dd/mm/yyyy
 * @return Retorna uma string com a idade da pessoa em anos.
 */
-function calcularIdadePrecisa(data, now) {
-	var yearNow = now.getYear();
-	var monthNow = now.getMonth();
-	var dateNow = now.getDate();
+function calcularIdadePrecisa(data) {
+	loader.style.display = 'block'
+	loaderMsg.innerText = 'Buscando e calculando datas...'
+	let timestampNow = firebase.functions().httpsCallable('timestamp')
+	return timestampNow().then(function(result){
+		var now = new Date(result.data.timestamp._seconds * 1000)
 
-	var yearDob = data.getYear();
-	var monthDob = data.getMonth();
-	var dateDob = data.getDate();
-	var age = {};
-	yearAge = yearNow - yearDob;
+		var yearNow = now.getYear();
+		var monthNow = now.getMonth();
+		var dateNow = now.getDate();
 
-	if (monthNow >= monthDob)
-		var monthAge = monthNow - monthDob;
-	else {
-		yearAge--;
-		var monthAge = 12 + monthNow -monthDob;
-	}
+		var yearDob = data.getYear();
+		var monthDob = data.getMonth();
+		var dateDob = data.getDate();
+		var age = {};
+		yearAge = yearNow - yearDob;
 
-	if (dateNow >= dateDob)
-		var dateAge = dateNow - dateDob;
-	else {
-		monthAge--;
-	    var dateAge = 31 + dateNow - dateDob;
+		if (monthNow >= monthDob)
+			var monthAge = monthNow - monthDob;
+		else {
+			yearAge--;
+			var monthAge = 12 + monthNow -monthDob;
+		}
 
-	    if (monthAge < 0) {
-	      monthAge = 11;
-	      yearAge--;
-	    }
-	  }
+		if (dateNow >= dateDob)
+			var dateAge = dateNow - dateDob;
+		else {
+			monthAge--;
+			var dateAge = 31 + dateNow - dateDob;
 
-	age = {
-			years: yearAge,
-			months: monthAge,
-			days: dateAge
-		};
-	return age;
+			if (monthAge < 0) {
+			monthAge = 11;
+			yearAge--;
+			}
+		}
+
+		age = {
+				years: yearAge,
+				months: monthAge,
+				days: dateAge
+			};
+		loader.style.display = 'none'
+		return age;
+	}).catch(function(error){
+		throw new Error(error)
+	})
+	
 }
 
 function maiusculo(element) {
