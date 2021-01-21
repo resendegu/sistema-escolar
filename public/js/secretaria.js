@@ -6,6 +6,7 @@ var listaDeProfessores = firebase.database().ref('sistemaEscolar/listaDeProfesso
 var turmasRef = firebase.database().ref('sistemaEscolar/turmas')
 var ultimaMatriculaRef = firebase.database().ref('sistemaEscolar/ultimaMatricula')
 var alunosRef = firebase.database().ref('sistemaEscolar/alunos')
+var followUpRef = firebase.database().ref('sistemaEscolar/followUp')
 
 var loader = document.getElementById('loader')
 var loaderMsg = document.getElementById('loaderMsg')
@@ -792,6 +793,8 @@ function calculaIdade(dataNasc) {
         })
         
 }
+
+//Funções da aba Alunos
 var tipoDeBusca = 'nomeAluno'
 function alteraTipoDeBusca(tipo) {
     tipoDeBusca = tipo
@@ -869,3 +872,74 @@ document.querySelector('#transfereAluno').addEventListener('submit', (e) => {
     e.preventDefault()
     AstNotif.dialog('Oiii...', 'Aqui é o Gustavo, e essa área ainda não foi desenvolvida ok! Volte aqui mais tarde.')
 })
+
+function followUpAluno(matricula) {
+    if (matricula == '00000' || matricula == '') {
+        AstNotif.dialog('Atenção', 'Você deve clicar em um aluno para descrever um follow up.')
+    } else {
+        followUpRef.on('value', (snapshot) => {
+            const aluno = alunos[matricula]
+            let id
+            let followUpSalvos
+            if (snapshot.exists() == false) {
+                id = 0
+            } else {
+                followUpSalvos = snapshot.val()
+                for (const idFollow in followUpSalvos) {
+                    if (Object.hasOwnProperty.call(followUpSalvos, idFollow)) {
+                        const followUp = followUpSalvos[idFollow];
+                        id = Number(idFollow) + 1
+                    }
+                }
+            }
+            abrirModal('modal', 'Adicionar um Follow Up', `
+                <form id="adicionarFollowUpAluno" >
+                    <label>Nome: ${aluno.nomeAluno}</label> | <label>Matrícula: ${aluno.matriculaAluno}</label>
+
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="basic-addon3">ID do FollowUp</span>
+                        </div>
+                        <input type="text" class="form-control" id="idFollowUpAluno" name="idFollowUpAluno" aria-describedby="basic-addon3" readonly value="${id}">
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="tituloFollowUpAluno" >Título</span>
+                        </div>
+                        <input type="text" class="form-control" name="tituloFollowUpAluno" id="basic-url" aria-describedby="basic-addon3">
+                    </div>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">Descrição</span>
+                        </div>
+                        <textarea class="form-control" aria-label="With textarea" name="descricaoFollowUp"></textarea>
+                    </div>
+                    <br>
+                    <button class="btn btn-primary" type="submit" id="salvarFollowUpAluno">Salvar Follow Up</button>
+                    <input type="text" name="matriculaFollowUp" id="matriculaFollowUp" value="${aluno.matriculaAluno}" style="display: none">
+                    <input type="text" name="nomeFollowUp" id="nomeFollowUp" value="${aluno.nomeAluno}" style="display: none">
+                </form>`,
+                `<button class="btn btn-secondary" data-dismiss="modal">Cancelar</button><button class="btn btn-primary">Ver todos os Follow Up</button>`
+            )
+            document.querySelector('#adicionarFollowUpAluno').addEventListener('submit', (e) => {
+                e.preventDefault()
+                const dados = new FormData(e.target);
+                let dadosFollowUp = {}
+                dadosFollowUp.nome = dados.get('nomeFollowUp')
+                dadosFollowUp.matricula = dados.get('matriculaFollowUp')
+                dadosFollowUp.descricao = dados.get('descricaoFollowUp')
+                dadosFollowUp.titulo = dados.get('tituloFollowUpAluno')
+                dadosFollowUp.id = dados.get('idFollowUpAluno')
+                console.log(dadosFollowUp)
+                followUpRef.child(dadosFollowUp.id).set(dadosFollowUp).then(() => {
+                    AstNotif.notify('Sucesso', 'O FollowUp foi salvo com sucesso.', 'agora', {length: -1})
+                }).catch(error =>{
+                    AstNotif.dialog('Erro', error.message)
+                    console.log(error)
+                })
+            })
+        })
+        
+    }
+}
+
