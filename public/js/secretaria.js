@@ -839,6 +839,7 @@ function carregaListaDeAlunos(filtro='') {
 
 var dadosResponsaveis
 function abreDadosDoAluno(matricula) {
+    document.getElementById('rolaTelaAbaixoAlunos').style.display = 'block'
     const dados = alunos[matricula]
     dadosResponsaveis = ``
     document.getElementById('mostraNomeAluno').innerText = dados.nomeAluno
@@ -865,7 +866,8 @@ function abreDadosDoAluno(matricula) {
     document.getElementById('mostraEmailAluno').innerText = dados.emailAluno
     document.getElementById('mostraMatriculaAluno').innerText = dados.matriculaAluno
     document.getElementById('mostraEnderecoAluno').innerText = `${dados.enderecoAluno}, ${dados.numeroAluno}, ${dados.bairroAluno}, ${dados.cidadeAluno}, ${dados.estadoAluno}. CEP ${dados.cepAluno}.`
-
+    document.getElementById('rolaTelaAbaixoAlunos').focus()
+    document.getElementById('rolaTelaAbaixoAlunos').style.display = 'none'
 }
 
 document.querySelector('#transfereAluno').addEventListener('submit', (e) => {
@@ -874,8 +876,10 @@ document.querySelector('#transfereAluno').addEventListener('submit', (e) => {
 })
 
 function followUpAluno(matricula) {
+    
     if (matricula == '00000' || matricula == '') {
         AstNotif.dialog('Atenção', 'Você deve clicar em um aluno para descrever um follow up.')
+        loader.style.display = 'none'
     } else {
         followUpRef.on('value', (snapshot) => {
             const aluno = alunos[matricula]
@@ -919,10 +923,12 @@ function followUpAluno(matricula) {
                     <input type="text" name="matriculaFollowUp" id="matriculaFollowUp" value="${aluno.matriculaAluno}" style="display: none">
                     <input type="text" name="nomeFollowUp" id="nomeFollowUp" value="${aluno.nomeAluno}" style="display: none">
                 </form>`,
-                `<button class="btn btn-secondary" data-dismiss="modal">Cancelar</button><button class="btn btn-primary">Ver todos os Follow Up</button>`
+                `<button class="btn btn-secondary" data-dismiss="modal">Cancelar</button><button class="btn btn-primary" data-dismiss="modal" onclick="carregaFollowUps('${aluno.matriculaAluno}')">Ver todos os Follow Up do aluno</button>`
             )
             document.querySelector('#adicionarFollowUpAluno').addEventListener('submit', (e) => {
                 e.preventDefault()
+                loader.style.display = 'block'
+                loaderMsg.innerText = 'Carregando dados do FollowUp...'
                 const dados = new FormData(e.target);
                 let dadosFollowUp = {}
                 dadosFollowUp.nome = dados.get('nomeFollowUp')
@@ -930,12 +936,15 @@ function followUpAluno(matricula) {
                 dadosFollowUp.descricao = dados.get('descricaoFollowUp')
                 dadosFollowUp.titulo = dados.get('tituloFollowUpAluno')
                 dadosFollowUp.id = dados.get('idFollowUpAluno')
+                dadosFollowUp.autor = usuarioAtual().displayName
                 console.log(dadosFollowUp)
                 followUpRef.child(dadosFollowUp.id).set(dadosFollowUp).then(() => {
                     AstNotif.notify('Sucesso', 'O FollowUp foi salvo com sucesso.', 'agora', {length: -1})
+                    loader.style.display = 'none'
                 }).catch(error =>{
                     AstNotif.dialog('Erro', error.message)
                     console.log(error)
+                    loader.style.display = 'none'
                 })
             })
         })
@@ -943,3 +952,49 @@ function followUpAluno(matricula) {
     }
 }
 
+function carregaFollowUps(matricula='') {
+    loader.style.display = 'block'
+    loaderMsg.innerText = 'Carregando Follow Up...'
+    followUpRef.orderByChild('matricula').equalTo(matricula).once('value').then(snapshot => {
+        abrirModal('modal', `FollowUp(s) cadastrado(s)`,
+            `
+            <label id="nomeAlunoDoFollowUp"></label>
+            <div class="overflow-auto" style="height: fit-content; max-height: 280px;">
+                <div class="list-group" id="listaFollowUpAluno">
+
+                </div>
+            </div>
+            `
+            , `<button class="btn btn-secondary" data-dismiss="modal">Cancelar</button>`
+        )
+        let listaFollowUpAluno = document.getElementById('listaFollowUpAluno')
+        listaFollowUpAluno.innerHTML = ''
+        for (const id in snapshot.val()) {
+            if (Object.hasOwnProperty.call(snapshot.val(), id)) {
+                const followUp = snapshot.val()[id];
+                document.getElementById('nomeAlunoDoFollowUp').innerText = followUp.nome + ' | ' + followUp.matricula
+                listaFollowUpAluno.innerHTML += `<button class="list-group-item list-group-item-action" onclick="verFollowUp('${id}')"><b>Título:</b> ${followUp.titulo}</button>`
+            }
+        }
+        loader.style.display = 'none'
+    }).catch((error) => {
+        console.log(error)
+        AstNotif.dialog('Erro', error.message)
+        loader.style.display = 'none'
+    })
+}
+
+function verFollowUp(id) {
+    loader.style.display = 'block'
+    loaderMsg.innerText = 'Carregando FollowUp...'
+    followUpRef.child(id).once('value').then(snapshot => {
+        AstNotif.dialog(snapshot.val().titulo, snapshot.val().descricao + ' <br><br> <b>Autor do FollowUp:</b> ' + snapshot.val().autor, {positive: "OK",negative: ''})
+
+        loader.style.display = 'none'
+    }).catch(error => {
+        AstNotif.dialog('Erro', error.message)
+        console.log(error)
+        loader.style.display = 'none'
+    })
+    
+}
