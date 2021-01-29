@@ -1,4 +1,5 @@
 var perf = firebase.performance()
+firebase.analytics();
 // Código padrão para todas as páginas do site
 var updatesRef = firebase.database().ref('sistemaEscolar/updates')
 var loader = document.getElementById('loader')

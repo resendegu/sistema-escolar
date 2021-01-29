@@ -337,24 +337,27 @@ function carregaListaDeAlunosDaTurma(turma, filtro='') {
     let listaAlunos = document.getElementById('listaAlunos')
     if (filtro == '') {
         document.getElementById('listaAlunosDaTurma').innerHTML = ''
-        turmasRef.child(turma + '/alunos').on('value', (snapshot) => {
+        turmasRef.child(turma + '/alunos').once('value').then(snapshot => {
             alunos = snapshot.val()
             for (const matricula in alunos) {
                 if (Object.hasOwnProperty.call(alunos, matricula)) {
                     const aluno = alunos[matricula];
-                    document.getElementById('listaAlunosDaTurma').innerHTML += `<button class="list-group-item list-group-item-action" onclick="abreDadosDoAlunoDaTurma('${matricula}')"><input type="checkbox" name="${matricula}" onclick="this.checked ? alunosSelecionadosTurma[${matricula}] = '${aluno.nome}' : alunosSelecionadosTurma[${matricula}] = ''"> ${matricula}: ${aluno.nome}</button>`
+                    document.getElementById('listaAlunosDaTurma').innerHTML += `<div class="row"><div class="col-1" style="width: "><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" name="${matricula}" onclick="this.checked ? alunosSelecionadosTurma[${matricula}] = '${aluno.nome}' : alunosSelecionadosTurma[${matricula}] = ''"></div><div class="col-md"><button class="list-group-item list-group-item-action" onclick="abreDadosDoAlunoDaTurma('${matricula}')"> ${matricula}: ${aluno.nome}</button></div></div>`
                 }
             }
             loader.style.display = 'none'
+        }).catch(error => {
+            console.log(error)
+            AstNotif.dialog('Erro', error.message)
         })
     } else {
         document.getElementById('listaAlunosDaTurma').innerHTML = ''
-        alunosRef.child(turma + '/alunos').orderByChild('nome').equalTo(filtro).once('value').then(snapshot => {
+        turmasRef.child(turma + '/alunos').orderByChild('nome').equalTo(filtro).once('value').then(snapshot => {
             alunos = snapshot.val()
             for (const matricula in alunos) {
                 if (Object.hasOwnProperty.call(alunos, matricula)) {
                     const aluno = alunos[matricula];
-                    document.getElementById('listaAlunosDaTurma').innerHTML += `<button class="list-group-item list-group-item-action" onclick="abreDadosDoAlunoDaTurma('${matricula}')"><input type="checkbox" name="${matricula}" onclick="this.checked ? alunosSelecionadosTurma[${matricula}] = '${aluno.nome}' : alunosSelecionadosTurma[${matricula}] = ''"> ${matricula}: ${aluno.nome}</button>`
+                    document.getElementById('listaAlunosDaTurma').innerHTML += `<div class="row"><div class="col-sm-1"><input type="checkbox" name="${matricula}" onclick="this.checked ? alunosSelecionadosTurma[${matricula}] = '${aluno.nome}' : alunosSelecionadosTurma[${matricula}] = ''"></div><div class="col-md"><button class="list-group-item list-group-item-action" onclick="abreDadosDoAlunoDaTurma('${matricula}')"> ${matricula}: ${aluno.nome}</button></div></div>`
                 }
             }
             loader.style.display = 'none'
