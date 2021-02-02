@@ -6,7 +6,7 @@ var loader = document.getElementById('loader')
 var loaderMsg = document.getElementById('loaderMsg')
 
 function update() {
-	let versao = 0.58
+	let versao = 0.59
 	updatesRef.on('value', (snapshot) => {
 		let dados = snapshot.val()
 		if (versao < dados.versao) {
