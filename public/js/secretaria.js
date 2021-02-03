@@ -329,8 +329,14 @@ function carregaTurmas() {
 }
 
 var alunosSelecionadosTurma = {}
+document.getElementById('btnTransfereAlunosTurma').addEventListener('click', transfereAlunos(alunosSelecionadosTurma))
+function transfereAlunos(alunos) {
+    
+}
+
 function carregaListaDeAlunosDaTurma(turma, filtro='') {
     tipoDeBusca = 'nome'
+    alunosSelecionadosTurma.codTurma = turma
     console.log(filtro)
     loader.style.display = 'block'
     loaderMsg.innerText = 'Carregando lista de alunos...'
@@ -342,7 +348,7 @@ function carregaListaDeAlunosDaTurma(turma, filtro='') {
             for (const matricula in alunos) {
                 if (Object.hasOwnProperty.call(alunos, matricula)) {
                     const aluno = alunos[matricula];
-                    document.getElementById('listaAlunosDaTurma').innerHTML += `<div class="row"><div class="col-1" ><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" name="${matricula}" onclick="this.checked ? alunosSelecionadosTurma[${matricula}] = '${aluno.nome}' : alunosSelecionadosTurma[${matricula}] = ''"></div><div class="col-md"><button class="list-group-item list-group-item-action" onclick="abreDadosDoAlunoDaTurma('${matricula}')"> ${matricula}: ${aluno.nome}</button></div></div>`
+                    document.getElementById('listaAlunosDaTurma').innerHTML += `<div class="row"><div class="col-1" ><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" name="${matricula}" onclick="this.checked ? alunosSelecionadosTurma[${matricula}] = '${aluno.nome}' : alunosSelecionadosTurma[${matricula}] = ''"></div><div class="col-5"><button class="list-group-item list-group-item-action" onclick="abreDadosDoAlunoDaTurma('${matricula}')"> ${matricula}: ${aluno.nome}</button></div></div>`
                 }
             }
             loader.style.display = 'none'
