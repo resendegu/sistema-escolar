@@ -106,3 +106,10 @@ function maiusculo(element) {
 	element.value = element.value.toUpperCase()
 	return element.value.toUpperCase()
 }
+
+function formataNumMatricula(num) {
+    let numero = num
+    numero = "00000" + numero.replace(/\D/g, '');
+	numero = numero.slice(-5,-1) + numero.slice(-1);
+	return numero
+}

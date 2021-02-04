@@ -7,6 +7,7 @@ var turmasRef = firebase.database().ref('sistemaEscolar/turmas')
 var ultimaMatriculaRef = firebase.database().ref('sistemaEscolar/ultimaMatricula')
 var alunosRef = firebase.database().ref('sistemaEscolar/alunos')
 var followUpRef = firebase.database().ref('sistemaEscolar/followUp')
+var transfereAlunos = firebase.functions().httpsCallable('transfereAlunos')
 
 var loader = document.getElementById('loader')
 var loaderMsg = document.getElementById('loaderMsg')
@@ -300,6 +301,7 @@ function cadastrarTurma(confima=false) {
     })
 }
 
+var turmas
 // Funções da aba de turmas da secretaria
 function carregaTurmas() {
     loader.style.display = 'block'
@@ -307,7 +309,7 @@ function carregaTurmas() {
     var selectTurmas = document.getElementById('selectTurmas')
     turmasRef.once('value').then(snapshot => {
         selectTurmas.innerHTML = '<option selected hidden>Escolha uma turma...</option>'
-        var turmas = snapshot.val()
+        turmas = snapshot.val()
         for (const cod in turmas) {
             if (Object.hasOwnProperty.call(turmas, cod)) {
                 const infoDaTurma = turmas[cod];
@@ -329,9 +331,63 @@ function carregaTurmas() {
 }
 
 var alunosSelecionadosTurma = {}
-document.getElementById('btnTransfereAlunosTurma').addEventListener('click', transfereAlunos(alunosSelecionadosTurma))
-function transfereAlunos(alunos) {
-    
+document.getElementById('btnTransfereAlunosTurma').addEventListener('click', transfereAlunosConfirma)
+function transfereAlunosConfirma() {
+    let nomes = ''
+    let turma
+    for (const matricula in alunosSelecionadosTurma) {
+        if (Object.hasOwnProperty.call(alunosSelecionadosTurma, matricula)) {
+            const aluno = alunosSelecionadosTurma[matricula];
+            if (matricula == 'codTurma') {
+                turma = aluno
+            } else if(matricula == undefined || aluno == undefined) {
+
+            } else {
+                nomes += formataNumMatricula(matricula) + ': ' + aluno + '<br>'
+            }
+            
+        }
+    }
+    abrirModal('modal', 'Confirmação', 
+        `Você selecionou os alunos listados abaixo da turma ${turma}. <br> ${nomes} <br><b>Você deseja transferi-los para qual turma?</b><br>(Aviso: Caso o professor da turma que se quer transferir seja diferente, as notas serão e todas outras informações que foram feitas pelo professor atual serão transferidas também.)
+        <select class="custom-select" id="selectTurmasTransfere">
+            <option selected hidden>Escolha uma turma...</option>
+        </select>
+        `
+        , `<button type="button" class="btn btn-warning" onclick="transfereDaTurma()">Transferir</button><button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>`
+    )
+    let selectTurmasTransfere = document.getElementById('selectTurmasTransfere')
+    for (const cod in turmas) {
+        if (Object.hasOwnProperty.call(turmas, cod)) {
+            const infoDaTurma = turmas[cod];
+            if (infoDaTurma.professor == undefined) {
+                var profReferencia = 'Não cadastrado'
+            } else {
+                var profReferencia = infoDaTurma.professor[0].nome
+            }
+            selectTurmasTransfere.innerHTML += `<option value="${cod}">Turma ${cod} (Prof. ${profReferencia})</option>`
+        }
+    }
+}
+
+function transfereDaTurma() {
+    loader.style.display = 'block'
+    loaderMsg.innerText = 'Transferindo alunos...'
+    let selectTurmasTransfere = document.getElementById('selectTurmasTransfere')
+    alunosSelecionadosTurma.codTurmaParaTransferir = selectTurmasTransfere.value
+    if (alunosSelecionadosTurma.codTurma == alunosSelecionadosTurma.codTurmaParaTransferir) {
+        AstNotif.dialog('Erro', 'Você deve escolher uma turma diferente da atual para transferência dos alunos.')
+        loader.style.display = 'none'
+    } else {
+        transfereAlunos(alunosSelecionadosTurma).then(function(result){
+            AstNotif.dialog('Função em andamento', result.data.message)
+            loader.style.display = 'none'
+        }).catch(function(error){
+            AstNotif.dialog('Erro', error.message)
+            console.error(error)
+            loader.style.display = 'none'
+        })
+    }
 }
 
 function carregaListaDeAlunosDaTurma(turma, filtro='') {

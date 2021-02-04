@@ -334,3 +334,14 @@ exports.timestamp = functions.https.onCall((data, context) => {
         throw new functions.https.HttpsError('permission-denied', 'Você não tem permissão.')
     }
 })
+
+exports.transfereAlunos = functions.https.onCall((data, context) => {
+    if (context.auth.token.master == true || context.auth.token.secretaria == true) {
+        let dados = data
+        let turmaAtual = dados.codTurma
+        let turmaParaTransferir = dados.codTurmaParaTransferir
+        return {message: 'Ainda não está pronto'}
+    } else {
+        throw new functions.https.HttpsError('permission-denied', 'Você não tem permissão.')
+    }
+})
