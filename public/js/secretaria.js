@@ -404,7 +404,7 @@ function carregaListaDeAlunosDaTurma(turma, filtro='') {
             for (const matricula in alunos) {
                 if (Object.hasOwnProperty.call(alunos, matricula)) {
                     const aluno = alunos[matricula];
-                    document.getElementById('listaAlunosDaTurma').innerHTML += `<div class="row"><div class="col-1" ><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" name="${matricula}" onclick="this.checked ? alunosSelecionadosTurma[${matricula}] = '${aluno.nome}' : alunosSelecionadosTurma[${matricula}] = ''"></div><div class="col-5"><button class="list-group-item list-group-item-action" onclick="abreDadosDoAlunoDaTurma('${matricula}')"> ${matricula}: ${aluno.nome}</button></div></div>`
+                    document.getElementById('listaAlunosDaTurma').innerHTML += `<div class="row"><div class="col-1" ><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" name="${matricula}" onclick="this.checked ? alunosSelecionadosTurma[${matricula}] = '${aluno.nome}' : alunosSelecionadosTurma[${matricula}] = ''"></div><div class="col-md"><button class="list-group-item list-group-item-action" onclick="document.getElementById('btnAbaAlunos').click(), document.getElementById('btnAbaAlunosResponsivo').click(), abreDadosDoAluno('${matricula}') "> ${matricula}: ${aluno.nome}</button></div></div>`
                 }
             }
             loader.style.display = 'none'
@@ -419,7 +419,7 @@ function carregaListaDeAlunosDaTurma(turma, filtro='') {
             for (const matricula in alunos) {
                 if (Object.hasOwnProperty.call(alunos, matricula)) {
                     const aluno = alunos[matricula];
-                    document.getElementById('listaAlunosDaTurma').innerHTML += `<div class="row"><div class="col-sm-1"><input type="checkbox" name="${matricula}" onclick="this.checked ? alunosSelecionadosTurma[${matricula}] = '${aluno.nome}' : alunosSelecionadosTurma[${matricula}] = ''"></div><div class="col-md"><button class="list-group-item list-group-item-action" onclick="abreDadosDoAlunoDaTurma('${matricula}')"> ${matricula}: ${aluno.nome}</button></div></div>`
+                    document.getElementById('listaAlunosDaTurma').innerHTML += `<div class="row"><div class="col-sm-1"><input type="checkbox" name="${matricula}" onclick="this.checked ? alunosSelecionadosTurma[${matricula}] = '${aluno.nome}' : alunosSelecionadosTurma[${matricula}] = ''"></div><div class="col-md"><button class="list-group-item list-group-item-action" onclick="document.getElementById('btnAbaAlunos').click(), document.getElementById('btnAbaAlunosResponsivo').click(), abreDadosDoAluno('${matricula}') "> ${matricula}: ${aluno.nome}</button></div></div>`
                 }
             }
             loader.style.display = 'none'

@@ -336,10 +336,43 @@ exports.timestamp = functions.https.onCall((data, context) => {
 })
 
 exports.transfereAlunos = functions.https.onCall((data, context) => {
+    function formataNumMatricula(num) {
+        let numero = num
+        numero = "00000" + numero.replace(/\D/g, '');
+        numero = numero.slice(-5,-1) + numero.slice(-1);
+        return numero
+    }
     if (context.auth.token.master == true || context.auth.token.secretaria == true) {
         let dados = data
         let turmaAtual = dados.codTurma
         let turmaParaTransferir = dados.codTurmaParaTransferir
+        let alunos = {} //Aqui onde será guardado os alunos e os dados dos mesmos, da turma para serem transferidos para outra turma
+        
+        admin.database().ref(`sistemaEscolar/turmas/${turmaAtual}/alunos`).once('value').then(snapshot => {
+            let alunosTurma = snapshot.val()
+            for (const matricula in dados) {
+                if (Object.hasOwnProperty.call(dados, matricula)) {
+                    const nomeAluno = dados[matricula];
+                    alunos[formataNumMatricula(matricula)] = alunosTurma[matricula]
+                }
+            }
+            admin.database().ref(`sistemaEscolar/turmas/${turmaParaTransferir}/alunos`).update(alunos).then(() => {
+                async function removeAlunos() {
+                    for (const matricula in alunos) {
+                        if (Object.hasOwnProperty.call(alunos, matricula)) {
+                            const dadosAluno = alunos[matricula];
+                            
+                        }
+                    }
+                }
+                
+            }).catch(error => {
+                throw new functions.https.HttpsError(error.code, error.message, error)
+            })
+        }).catch(error => {
+            throw new functions.https.HttpsError(error.code, error.message, error)
+        })
+
         return {message: 'Ainda não está pronto'}
     } else {
         throw new functions.https.HttpsError('permission-denied', 'Você não tem permissão.')
