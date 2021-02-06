@@ -379,9 +379,15 @@ function transfereDaTurma() {
         AstNotif.dialog('Erro', 'Você deve escolher uma turma diferente da atual para transferência dos alunos.')
         loader.style.display = 'none'
     } else {
+        console.log(alunosSelecionadosTurma)
         transfereAlunos(alunosSelecionadosTurma).then(function(result){
-            AstNotif.dialog('Função em andamento', result.data.message)
+            AstNotif.dialog('Sucesso', result.data.answer)
             loader.style.display = 'none'
+            alunosSelecionadosTurma = {}
+            carregaTurmas()
+            document.getElementById('listaAlunosDaTurma').innerHTML = ''
+            document.getElementById('ulProfCadastrados').innerHTML = ''
+            $('#modal').modal('hide')
         }).catch(function(error){
             AstNotif.dialog('Erro', error.message)
             console.error(error)
@@ -629,29 +635,15 @@ function carregaProfsETurmas() {
 
 function mostraProfsAlunoESetaTurma(codTurma) {
     if (codTurma != 'Escolha uma turma...') {
-    let profAluno = document.getElementById('profAluno')
-    let horaEDiasAluno = document.getElementById('horaEDiasAluno')
-    profAluno.disabled = false
-    profAluno.innerHTML = ''
-    document.getElementById('faixa' + turmasLocal[codTurma].faixaTurma).checked = true
-    horaEDiasAluno.value = turmasLocal[codTurma].hora + 'h'
-    for (const index in turmasLocal[codTurma].diasDaSemana) {
-        if (Object.hasOwnProperty.call(turmasLocal[codTurma].diasDaSemana, index)) {
-            const dia = turmasLocal[codTurma].diasDaSemana[index];
-            horaEDiasAluno.value += ',' + dia
+        let horaEDiasAluno = document.getElementById('horaEDiasAluno')
+        document.getElementById('faixa' + turmasLocal[codTurma].faixaTurma).checked = true
+        horaEDiasAluno.value = turmasLocal[codTurma].hora + 'h'
+        for (const index in turmasLocal[codTurma].diasDaSemana) {
+            if (Object.hasOwnProperty.call(turmasLocal[codTurma].diasDaSemana, index)) {
+                const dia = turmasLocal[codTurma].diasDaSemana[index];
+                horaEDiasAluno.value += ',' + dia
+            }
         }
-    }
-
-    for (const index in turmasLocal[codTurma].professor) {
-        if (Object.hasOwnProperty.call(turmasLocal[codTurma].professor, index)) {
-            const professor = turmasLocal[codTurma].professor[index];
-            profAluno.innerHTML += `<option value="${professor.email}">${professor.nome} (${professor.email})</option>`
-        }
-    }
-    if (turmasLocal[codTurma].professor == undefined) {
-        profAluno.innerHTML += `<option selected>Não há professores cadastrados na turma</option>`
-        profAluno.disabled = true
-    }
     }
     
 }
@@ -904,6 +896,7 @@ function carregaListaDeAlunos(filtro='') {
 
 var dadosResponsaveis
 function abreDadosDoAluno(matricula) {
+    document.getElementById('infoDoAluno').style.display = 'block'
     document.getElementById('rolaTelaAbaixoAlunos').style.display = 'block'
     const dados = alunos[matricula]
     dadosResponsaveis = ``

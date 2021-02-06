@@ -82,12 +82,6 @@
                   </a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" data-toggle="list" href="#abaTransferenciaAlunos" role="tab" aria-controls="TranferenciaAlunos">
-                    <span data-feather="git-pull-request"></span>
-                    Transferência de alunos
-                  </a>
-                </li>
-                <li class="nav-item">
                   <a class="nav-link" data-toggle="list" href="#abaAlunosDesativados" role="tab" aria-controls="alunosDesativados">
                     <span data-feather="user-x"></span>
                     Alunos desativados
@@ -163,7 +157,7 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" data-toggle="list" href="#abaTurmas" role="tab" aria-controls="turmas" onclick="carregaTurmas()">
+                <a class="nav-link" data-toggle="list" href="#abaTurmas" role="tab" aria-controls="turmas" id="btnAbaTurmas" onclick="carregaTurmas()">
                   <span data-feather="database"></span>
                   Turmas
                 </a>
@@ -181,13 +175,7 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" data-toggle="list" href="#abaTransferenciaAlunos" role="tab" aria-controls="TranferenciaAlunos">
-                  <span data-feather="git-pull-request"></span>
-                  Transferência de alunos
-                </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" data-toggle="list" href="#abaAlunosDesativados" role="tab" aria-controls="alunosDesativados">
+                <a class="nav-link" data-toggle="list" href="#abaAlunosDesativados" role="tab" id="btnAbaAlunosDesativados" aria-controls="alunosDesativados">
                   <span data-feather="user-x"></span>
                   Alunos desativados
                 </a>
@@ -250,13 +238,13 @@
             <!--<button type="button" class="btn btn-light btn-sm">
               Alunos cadastrados <span class="badge badge-primary" id="alunosCadastradosNum">0</span>
             </button>-->
-            <button type="button" class="btn btn-light btn-sm">
+            <button type="button" class="btn btn-light btn-sm" onclick="document.getElementById('btnAbaAlunos').click()">
               Alunos matriculados <span class="badge badge-success" id="alunosMatriculadosNum">0</span>
             </button>
-            <button type="button" class="btn btn-light btn-sm">
+            <button type="button" class="btn btn-light btn-sm" onclick="document.getElementById('btnAbaAlunosDesativados').click()">
               Alunos Desativados <span class="badge badge-danger" id="alunosDesativadosNum">0</span>
             </button>
-            <button type="button" class="btn btn-light btn-sm">
+            <button type="button" class="btn btn-light btn-sm" onclick="document.getElementById('btnAbaTurmas').click()">
               Turmas Cadastradas <span class="badge badge-success" id="turmasCadastradasNum">0</span>
             </button>
             
@@ -384,7 +372,7 @@
 
                 
               </div>
-              <div class="container">
+              <div class="container" id="infoDoAluno" style="display: none;">
                 <div class="main-body">
                       <div class="row gutters-sm">
                         <div class="col-md-4 mb-3">
@@ -810,15 +798,7 @@
                       
                     </select>
                   </div>
-                  <div class="form-group col-md-4">
-                    <label for="inputAddress">Prof. Referência</label>
-                    <!-- <img src="../images/profile_placeholder.png" id="fotoProfAbaCadastroAluno" class="rounded" width="32px" style="margin-right: 10px;"> -->
-                    <select class="form-control" disabled name="profAluno" id="profAluno">
-                      <option hidden selected>...</option>
-                      
-                    </select>
-                    
-                  </div>
+                  
                   
                   <div class="form-group col-auto">
                     <label for="inputAddress">Horário e dias da semana</label>
