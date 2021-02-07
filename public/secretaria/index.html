@@ -15,6 +15,7 @@
     <link href="../css/dashboard.css" rel="stylesheet">
     <link rel="stylesheet" href="../css/loader.css">
     <link href="../css/list-items.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/secretaria.css">
 
       <!-- Carregando arquivos da biblioteca AST-Notif. Créditos: https://github.com/anandastoon/AST-Notif -->
     <link rel="stylesheet" href="../resources/AST-Notif/css/ast-notif.min.css">
@@ -22,19 +23,39 @@
   </head>
 
   <body>
+
+    <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" id="modal">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="titulo">Modal title</h5>
+            <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button> -->
+          </div>
+          <div class="modal-body" id="corpo">
+            <p>Modal body text goes here.</p>
+          </div>
+          <div class="modal-footer" id="botoes">
+            <button type="button" class="btn btn-primary">Save changes</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
           <!-- Inicialização do Firebase -->
         <!-- update the version number as needed -->
-        <script defer src="/__/firebase/8.1.1/firebase-app.js"></script>
+        <script defer src="/__/firebase/8.2.3/firebase-app.js"></script>
         <!-- include only the Firebase features as you need -->
-        <script defer src="/__/firebase/8.1.1/firebase-auth.js"></script>
-        <script defer src="/__/firebase/8.1.1/firebase-database.js"></script>
-        <!-- <script defer src="/__/firebase/8.1.1/firebase-firestore.js"></script> -->
-        <script defer src="/__/firebase/8.1.1/firebase-functions.js"></script>
-        <!-- <script defer src="/__/firebase/8.1.1/firebase-messaging.js"></script> -->
-        <script defer src="/__/firebase/8.1.1/firebase-storage.js"></script>
-        <script defer src="/__/firebase/8.1.1/firebase-analytics.js"></script>
+        <script defer src="/__/firebase/8.2.3/firebase-auth.js"></script>
+        <script defer src="/__/firebase/8.2.3/firebase-database.js"></script>
+        <!-- <script defer src="/__/firebase/8.2.3/firebase-firestore.js"></script> -->
+        <script defer src="/__/firebase/8.2.3/firebase-functions.js"></script>
+        <!-- <script defer src="/__/firebase/8.2.3/firebase-messaging.js"></script> -->
+        <script defer src="/__/firebase/8.2.3/firebase-storage.js"></script>
+        <script defer src="/__/firebase/8.2.3/firebase-analytics.js"></script>
         <!-- <script defer src="/__/firebase/8.1.1/firebase-remote-config.js"></script> -->
-        <script defer src="/__/firebase/8.1.1/firebase-performance.js"></script>
+        <script defer src="/__/firebase/8.2.3/firebase-performance.js"></script>
         <!-- 
           initialize the SDK after all desired features are loaded, set useEmulator to false
           to avoid connecting the SDK to running emulators.
@@ -51,14 +72,14 @@
             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
               <ul class="nav flex-column">
                 <li class="nav-item">
-                  <a class="nav-link active" data-toggle="list" href="#abaDashboard" role="tab" aria-controls="home" onclick="abreDashboard()">
+                  <a class="nav-link active" data-toggle="list" href="#abaDashboard" role="tab" aria-controls="home">
                     <span data-feather="home"></span>
                     Dashboard <span class="sr-only">(current)</span>
                   </a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" data-toggle="list" href="#abaAlunos" role="tab" aria-controls="alunos">
-                    <span data-feather="users"></span>
+                  <a class="nav-link" data-toggle="list" href="#abaAlunos" role="tab" aria-controls="alunos" id="btnAbaAlunosResponsivo" onclick="carregaListaDeAlunos()">
+                    <span data-feather="users" ></span>
                     Alunos
                   </a>
                 </li>
@@ -78,12 +99,6 @@
                   <a class="nav-link" data-toggle="list" href="#abaCadastrarAlunos" role="tab" aria-controls="CadastrarAlunos" onclick="carregaProfsETurmas()">
                     <span data-feather="user-plus"></span>
                     Cadastrar alunos
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" data-toggle="list" href="#abaTransferenciaAlunos" role="tab" aria-controls="TranferenciaAlunos">
-                    <span data-feather="git-pull-request"></span>
-                    Transferência de alunos
                   </a>
                 </li>
                 <li class="nav-item">
@@ -125,25 +140,26 @@
   <label id="loaderMsg" class="text-white-50 bg-dark">Aguarde...</label>
     <div class="loader"></div>
 </div>
+
     <div class="container-fluid">
       <div class="row">
         <nav class="col-md-2 d-none d-md-block bg-light sidebar">
           <div class="sidebar-sticky">
             <ul class="nav flex-column">
               <li class="nav-item">
-                <a class="nav-link active" data-toggle="list" href="#abaDashboard" role="tab" aria-controls="home" onclick="abreDashboard()">
+                <a class="nav-link active" data-toggle="list" href="#abaDashboard" role="tab" aria-controls="home">
                   <span data-feather="home"></span>
                   Dashboard <span class="sr-only">(current)</span>
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" data-toggle="list" href="#abaAlunos" role="tab" aria-controls="alunos">
-                  <span data-feather="users"></span>
+                <a class="nav-link" data-toggle="list" href="#abaAlunos" role="tab" aria-controls="alunos" id="btnAbaAlunos" onclick="carregaListaDeAlunos()">
+                  <span data-feather="users" ></span>
                   Alunos
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" data-toggle="list" href="#abaTurmas" role="tab" aria-controls="turmas" onclick="carregaTurmas()">
+                <a class="nav-link" data-toggle="list" href="#abaTurmas" role="tab" aria-controls="turmas" id="btnAbaTurmas" onclick="carregaTurmas()">
                   <span data-feather="database"></span>
                   Turmas
                 </a>
@@ -161,13 +177,7 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" data-toggle="list" href="#abaTransferenciaAlunos" role="tab" aria-controls="TranferenciaAlunos">
-                  <span data-feather="git-pull-request"></span>
-                  Transferência de alunos
-                </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" data-toggle="list" href="#abaAlunosDesativados" role="tab" aria-controls="alunosDesativados">
+                <a class="nav-link" data-toggle="list" href="#abaAlunosDesativados" role="tab" id="btnAbaAlunosDesativados" aria-controls="alunosDesativados">
                   <span data-feather="user-x"></span>
                   Alunos desativados
                 </a>
@@ -230,13 +240,13 @@
             <!--<button type="button" class="btn btn-light btn-sm">
               Alunos cadastrados <span class="badge badge-primary" id="alunosCadastradosNum">0</span>
             </button>-->
-            <button type="button" class="btn btn-light btn-sm">
+            <button type="button" class="btn btn-light btn-sm" onclick="document.getElementById('btnAbaAlunos').click()">
               Alunos matriculados <span class="badge badge-success" id="alunosMatriculadosNum">0</span>
             </button>
-            <button type="button" class="btn btn-light btn-sm">
+            <button type="button" class="btn btn-light btn-sm" onclick="document.getElementById('btnAbaAlunosDesativados').click()">
               Alunos Desativados <span class="badge badge-danger" id="alunosDesativadosNum">0</span>
             </button>
-            <button type="button" class="btn btn-light btn-sm">
+            <button type="button" class="btn btn-light btn-sm" onclick="document.getElementById('btnAbaTurmas').click()">
               Turmas Cadastradas <span class="badge badge-success" id="turmasCadastradasNum">0</span>
             </button>
             
@@ -298,9 +308,9 @@
                         </tr>
                         <tr>
                           <td>Sábado</td>
-                          <td id="FRIManha">0</td>
-                          <td id="FRITarde">0</td>
-                          <td id="FRINoite">0</td>
+                          <td id="SATManha">0</td>
+                          <td id="SATTarde">0</td>
+                          <td id="SATNoite">0</td>
                           <td id="totalSAT">0</td>
                         </tr>
                         <tr>
@@ -332,7 +342,196 @@
             </div>
 
             <div class="container tab-pane fade" id="abaAlunos" role="tabpanel" aria-labelledby="Alunos">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptates aliquam quae commodi ipsam iusto quod cumque molestias itaque velit ea ratione corporis numquam nam esse, tempore aspernatur excepturi quia odit.
+              <label class="h3">Alunos</label>
+              <br>
+              <div class="col">
+                <div class="container">
+                  <div class="row">
+                    <div class="form-group col-auto">
+                      <label for="inputAddress">Campo de busca</label>
+                      <input class="form-control" type="search" placeholder="Digite a busca..." aria-label="Search" onchange="carregaListaDeAlunos(maiusculo(this))">
+                    </div>
+                    <div class="form-group col-auto">
+                      <label for="inputAddress">Buscar por:</label>
+                      <select class="form-control" name="tipoDeBusca" id="tipoDeBusca" onchange="alteraTipoDeBusca(this.value)">
+                        <option selected value="nomeAluno">Nome do aluno</option>
+                        <option value="matriculaAluno">Número de matrícula</option>
+                        <option value="cpfAluno">CPF do aluno</option>
+                        <option value="rgAluno">RG do aluno</option>
+                        <option value="emailAluno">E-mail do aluno</option>
+                        <option value="celularAluno">Celular do aluno</option>
+                        <option value="telefoneAluno">Telefone do aluno</option>
+                      </select>
+                      
+                    </div>
+                  </div> 
+                </div>
+                <div class="overflow-auto" style="height: fit-content; max-height: 280px;">
+                  <div class="list-group" id="listaAlunos">
+                    
+                  </div>
+                </div>
+
+                
+              </div>
+              <div class="container" id="infoDoAluno" style="display: none;">
+                <div class="main-body">
+                      <div class="row gutters-sm">
+                        <div class="col-md-4 mb-3">
+                          <div class="card">
+                            <div class="card-body">
+                              <div class="d-flex flex-column align-items-center text-center">
+                                <img src="../images/profile_placeholder.png" alt="Imagem do aluno" class="rounded-circle" width="150" id="mostraFotoAluno">
+                                
+                                <div class="mt-3">
+                                  <h4 id="mostraNomeAluno">Nome</h4>
+                                  <p class="text-secondary mb-1" id="mostraIdadeAluno">Idade</p>
+                                  <input type="text" id="rolaTelaAbaixoAlunos" style="display: none;">
+                                  <label class="text-secondary mb-1" id="mostraTurmaAluno">Turma</label>
+                                  <p class="text-muted font-size-sm" id="mostraHoraEDiasAluno">Horário e dia de aula</p>
+                                  <button class="btn btn-primary" onclick="followUpAluno(`${document.getElementById('mostraMatriculaAluno').innerText}`)">Follow Up</button>
+                                  <button class="btn btn-outline-primary" onclick="mostraDadosResponsaveis()">Responsáveis</button>
+                                  
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="card mt-3">
+                            <ul class="list-group list-group-flush">
+                              <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                                <h6 class="mb-0"><span data-feather="file-text"></span> CPF</h6>
+                                <span class="text-secondary" id="mostraCpfAluno">CPF do Aluno</span>
+                              </li>
+                              <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                                <h6 class="mb-0"><span data-feather="clipboard"></span> RG</h6>
+                                <span class="text-secondary" id="mostraRgAluno">RG do Aluno</span>
+                              </li>
+                              <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                                <h6 class="mb-0"><span data-feather="calendar"></span> Data de Nasc.</h6>
+                                <span class="text-secondary" id="mostraDataNascimentoAluno">Data do Aluno</span>
+                              </li>
+                              <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                                <h6 class="mb-0"><span data-feather="file-text"></span> ...</h6>
+                                <span class="text-secondary">...</span>
+                              </li>
+                              <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                                <h6 class="mb-0"><span data-feather="file-text"></span>...</h6>
+                                <span class="text-secondary">...</span>
+                              </li>
+                            </ul>
+                          </div>
+                        </div>
+                        <div class="col-md-8">
+                          <div class="card mb-3">
+                            <div class="card-body">
+                              <div class="row">
+                                <div class="col-sm-3">
+                                  <h6 class="mb-0">Matrícula</h6>
+                                </div>
+                                <div class="col-sm-9 text-secondary" id="mostraMatriculaAluno">
+                                  00000
+                                </div>
+                              </div>
+                              <hr>
+                              <div class="row">
+                                <div class="col-sm-3">
+                                  <h6 class="mb-0">E-mail</h6>
+                                </div>
+                                <div class="col-sm-9 text-secondary" id="mostraEmailAluno">
+                                  exemplo@email.com
+                                </div>
+                              </div>
+                              <hr>
+                              <div class="row">
+                                <div class="col-sm-3">
+                                  <h6 class="mb-0">Telefone</h6>
+                                </div>
+                                <div class="col-sm-9 text-secondary" id="mostraTelefoneAluno">
+                                  XXXXXXXXXXX
+                                </div>
+                              </div>
+                              <hr>
+                              <div class="row">
+                                <div class="col-sm-3">
+                                  <h6 class="mb-0">Mobile</h6>
+                                </div>
+                                <div class="col-sm-9 text-secondary" id="mostraCelularAluno">
+                                  XXXXXXXXXXX
+                                </div>
+                              </div>
+                              <hr>
+                              <div class="row">
+                                <div class="col-sm-3">
+                                  <h6 class="mb-0">Endereço</h6>
+                                </div>
+                                <div class="col-sm-9 text-secondary" id="mostraEnderecoAluno">
+                                  Rua, Bairro, Cidade, Estado, Número
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="row gutters-sm">
+                            <div class="col-sm-6 mb-3">
+                              <div class="card h-100">
+                                <div class="card-body">
+                                  <h6 class="d-flex align-items-center mb-3"><i class="material-icons text-info mr-2">Desempenho</i>do aluno</h6>
+                                  <small>Audição</small>
+                                  <small id="pontosAudicao">1</small>
+                                  <div class="progress mb-3" style="height: 5px">
+                                    <div class="progress-bar bg-primary" id="barraPontosAudicao" role="progressbar" style="width: 80%" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
+                                  </div>
+                                  <small>Fala</small>
+                                  <small id="pontosFala">1</small>
+                                  <div class="progress mb-3" style="height: 5px">
+                                    <div class="progress-bar bg-primary" id="barraPontosFala" role="progressbar" style="width: 72%" aria-valuenow="72" aria-valuemin="0" aria-valuemax="100"></div>
+                                  </div>
+                                  <small>Escrita</small>
+                                  <small id="pontosEscrita">1</small>
+                                  <div class="progress mb-3" style="height: 5px">
+                                    <div class="progress-bar bg-primary" id="barraPontosEscrita" role="progressbar" style="width: 89%" aria-valuenow="89" aria-valuemin="0" aria-valuemax="100"></div>
+                                  </div>
+                                  <small>Leitura</small>
+                                  <small id="pontosLeitura">1</small>
+                                  <div class="progress mb-3" style="height: 5px">
+                                    <div class="progress-bar bg-primary" id="barraPontosLeitura" role="progressbar" style="width: 55%" aria-valuenow="55" aria-valuemin="0" aria-valuemax="100"></div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col-sm-6 mb-3">
+                              <div class="card h-100">
+                                <div class="card-body">
+                                  <h6 class="d-flex align-items-center mb-3"><i class="material-icons text-info mr-2">Notas</i>do aluno</h6>
+                                  <small>...</small>
+                                  <div class="progress mb-3" style="height: 5px">
+                                    <div class="progress-bar bg-primary" role="progressbar" style="width: 80%" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100">8</div>
+                                  </div>
+                                  <small>...</small>
+                                  <div class="progress mb-3" style="height: 5px">
+                                    <div class="progress-bar bg-primary" role="progressbar" style="width: 72%" aria-valuenow="72" aria-valuemin="0" aria-valuemax="100"></div>
+                                  </div>
+                                  <small>...</small>
+                                  <div class="progress mb-3" style="height: 5px">
+                                    <div class="progress-bar bg-primary" role="progressbar" style="width: 89%" aria-valuenow="89" aria-valuemin="0" aria-valuemax="100"></div>
+                                  </div>
+                                  <small>...</small>
+                                  <div class="progress mb-3" style="height: 5px">
+                                    <div class="progress-bar bg-primary" role="progressbar" style="width: 55%" aria-valuenow="55" aria-valuemin="0" aria-valuemax="100"></div>
+                                  </div>
+                                  <small>...</small>
+                                  <div class="progress mb-3" style="height: 5px">
+                                    <div class="progress-bar bg-primary" role="progressbar" style="width: 66%" aria-valuenow="66" aria-valuemin="0" aria-valuemax="100"></div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <hr>
+                    <p class="text-muted float-md-right" id="timestampDoAluno"></p>
+                </div>
             </div>
 
             <div class="container tab-pane fade" id="abaTurmas" role="tabpanel" aria-labelledby="Turmas">
@@ -372,6 +571,28 @@
                     </div>
                   </div>
                 </div>
+                <div class="container">
+                  <div class="row">
+                    <div class="form-group col-auto">
+                      <label for="inputAddress">Campo de busca</label>
+                      <input class="form-control" type="search" placeholder="Digite a busca..." aria-label="Search" onchange="carregaListaDeAlunosDaTurma(`${document.getElementById('selectTurmas').value}`, maiusculo(this))">
+                    </div>
+                    <div class="form-group col-auto">
+                      <label for="inputAddress">Buscar por:</label>
+                      <select class="form-control" name="tipoDeBuscaDaTurma" id="tipoDeBuscaDaTurma" onchange="alteraTipoDeBusca(this.value)">
+                        <option selected value="nome">Nome do aluno</option>
+                      </select>
+                      
+                    </div>
+                  </div> 
+                </div>
+                <div class="overflow-auto" style="height: fit-content; max-height: 280px;">
+                  <div class="list-group" id="listaAlunosDaTurma">
+                    
+                  </div>
+                </div>
+                <button type="button" class="btn btn-warning" id="btnTransfereAlunosTurma">Transferir alunos selecionados</button>
+                <button type="button" class="btn btn-danger" id="btnExcluirTurma" onclick="excluirTurma()">Excluir turma</button>
                 <hr>
                 <p class="text-muted float-md-right" id="timestampTurmaCadastrada"></p>
                 
@@ -503,7 +724,7 @@
             <div class="container tab-pane fade" id="abaCadastrarAlunos" role="tabpanel" aria-labelledby="Cadastrar Alunos">
               <label class="h3">Cadastro de alunos</label>
               <hr>
-              <form id="formCadastroAluno">
+              <form id="formCadastroAluno" onkeydown="return event.key != 'Enter';">
                 <input type='reset' class="btn btn-warning btn-sm" id="resetForm" value='Limpar todos os campos'/>
                 <a class="btn btn-info btn-sm" onclick="carregaProfsETurmas()"><span data-feather="refresh-cw"></span> Atualizar número de matrícula e turmas</a>
                 <br> <br>
@@ -515,11 +736,11 @@
                   </div>
                   <div class="form-group col-md-4">
                     <label for="inputPassword4">Nome</label>
-                    <input type="name" class="form-control" id="nomeAluno" name="nomeAluno" placeholder="Nome">
+                    <input type="name" class="form-control" id="nomeAluno" name="nomeAluno" placeholder="Nome" onblur="maiusculo(this)">
                   </div>
                   <div class="form-group col-auto">
                     <label for="inputPassword4">Data de nascimento</label>
-                    <input type="date" class="form-control" id="dataNascimentoAluno" name="dataNascimentoAluno" placeholder="Data" onchange="calculaIdade(this.value)">
+                    <input type="date" class="form-control" id="dataNascimentoAluno" name="dataNascimentoAluno" placeholder="Data" onblur="calculaIdade(this.value)">
                     
                   </div>
                   <div class="form-group col-auto">
@@ -544,7 +765,7 @@
                 <div class="form-row">
                   <div class="form-group col-auto">
                     <label for="inputEmail4">RG</label>
-                    <input type="number" class="form-control" id="rgAluno" name="rgAluno" placeholder="RG">
+                    <input type="text" class="form-control" id="rgAluno" name="rgAluno" placeholder="RG">
                   </div>
                   <div class="form-group col-auto">
                     <label for="inputPassword4">CPF</label>
@@ -562,15 +783,7 @@
                       
                     </select>
                   </div>
-                  <div class="form-group col-md-4">
-                    <label for="inputAddress">Prof. Referência</label>
-                    <!-- <img src="../images/profile_placeholder.png" id="fotoProfAbaCadastroAluno" class="rounded" width="32px" style="margin-right: 10px;"> -->
-                    <select class="form-control" disabled name="profAluno" id="profAluno">
-                      <option hidden selected>...</option>
-                      
-                    </select>
-                    
-                  </div>
+                  
                   
                   <div class="form-group col-auto">
                     <label for="inputAddress">Horário e dias da semana</label>
@@ -631,10 +844,10 @@
                 </div>
                 <hr>
                 <label class="h6">Dados de filiação</label>
-                <div class="form-row">
+                <div class="form-row border border-secondary rounded">
                   <div class="form-group col-md-4">
                     <label for="inputAddress">Filiação ou Responsável legal 1</label>
-                    <input type="text" class="form-control" id="nomeResponsavelAluno1" name="nomeResponsavelAluno1" placeholder="Nome">
+                    <input type="text" class="form-control" id="nomeResponsavelAluno1" name="nomeResponsavelAluno1" placeholder="Nome" onblur="maiusculo(this)">
                   </div>
                   <div class="form-group col-md-2">
                     <label for="inputAddress">Relação</label>
@@ -658,7 +871,7 @@
                   </div>
                   <div class="form-group col-auto">
                     <label for="inputEmail4">RG</label>
-                    <input type="number" class="form-control" id="rgResponsavel1" name="rgResponsavel1" placeholder="RG">
+                    <input type="text" class="form-control" id="rgResponsavel1" name="rgResponsavel1" placeholder="RG">
                   </div>
                   <div class="form-group col-auto">
                     <label for="inputPassword4">CPF</label>
@@ -669,18 +882,19 @@
                   <div class="form-group col-md-auto">
                     <br>
                     <div class="form-group col-md-auto">
-                      <a class="btn btn-outline-primary btn-sm" name="responsavelFinanceiro" id="responsavelFinanceiro1" onclick="setaRespFinan('1')">Resp. Financeiro</a>
+                      <a class="btn btn-outline-primary btn-sm" name="responsavelFinanceiro" id="responsavelFinanceiro1" onclick="setaRespFinan('1')">Copiar dados p/ Resp. Financeiro</a>
                       <br>
-                      <a class="btn btn-outline-primary btn-sm" name="responsavelPedagogico" id="responsavelPedagogico1" onclick="setaRespPedag('1')">Resp. Pedagógico</a>
+                      <a class="btn btn-outline-success btn-sm" name="responsavelPedagogico" id="responsavelPedagogico1" onclick="setaRespPedag('1')">Copiar dados p/ Resp. Pedagógico</a>
                       
                     </div>
                   </div>
                 </div>
-
-                <div class="form-row">
+                <br>
+                
+                <div class="form-row border border-secondary rounded">
                   <div class="form-group col-md-4">
                     <label for="inputAddress">Filiação ou Responsável legal 2</label>
-                    <input type="text" class="form-control" id="nomeResponsavelAluno2" name="nomeResponsavelAluno2" placeholder="Nome">
+                    <input type="text" class="form-control" id="nomeResponsavelAluno2" name="nomeResponsavelAluno2" placeholder="Nome" onblur="maiusculo(this)">
                   </div>
                   <div class="form-group col-md-2">
                     <label for="inputAddress">Relação</label>
@@ -704,7 +918,7 @@
                   </div>
                   <div class="form-group col-auto">
                     <label for="inputEmail4">RG</label>
-                    <input type="number" class="form-control" id="rgResponsavel2" name="rgResponsavel2" placeholder="RG">
+                    <input type="text" class="form-control" id="rgResponsavel2" name="rgResponsavel2" placeholder="RG">
                   </div>
                   <div class="form-group col-auto">
                     <label for="inputPassword4">CPF</label>
@@ -714,17 +928,19 @@
                   &nbsp;&nbsp;&nbsp;
                   <div class="form-group col-md-auto">
                     <br>
-                    <a class="btn btn-outline-primary btn-sm" name="responsavelFinanceiro" id="responsavelFinanceiro2" onclick="setaRespFinan('2')">Resp. Financeiro</a>
+                    <a class="btn btn-outline-primary btn-sm" name="responsavelFinanceiro" id="responsavelFinanceiro2" onclick="setaRespFinan('2')">Copiar dados p/ Resp. Financeiro</a>
                     <br>
-                    <a class="btn btn-outline-primary btn-sm" name="responsavelPedagogico" id="responsavelPedagogico2" onclick="setaRespPedag('2')">Resp. Pedagogico</a>
+                    <a class="btn btn-outline-success btn-sm" name="responsavelPedagogico" id="responsavelPedagogico2" onclick="setaRespPedag('2')">Copiar dados p/ Resp. Pedagogico</a>
                     
                   </div>
                 </div>
-
-                <div class="form-row">
+                <br>
+                <hr>
+                <label class="h6">Dados do responsável Financeiro</label>
+                <div class="form-row border border-primary rounded">
                   <div class="form-group col-md-4">
                     <label for="inputAddress">Responsável financeiro</label>
-                    <input type="text" class="form-control" id="nomeResponsavelFinanceiroAluno" name="nomeResponsavelFinanceiroAluno" placeholder="Nome">
+                    <input type="text" class="form-control" id="nomeResponsavelFinanceiroAluno" name="nomeResponsavelFinanceiroAluno" placeholder="Nome" onblur="maiusculo(this)">
                   </div>
                   <div class="form-group col-md-2">
                     <label for="inputAddress">Relação</label>
@@ -752,7 +968,7 @@
                   </div>
                   <div class="form-group col-auto">
                     <label for="inputEmail4">RG</label>
-                    <input type="number" class="form-control" id="rgFinanceiroAluno" name="rgFinanceiroAluno" placeholder="RG">
+                    <input type="text" class="form-control" id="rgFinanceiroAluno" name="rgFinanceiroAluno" placeholder="RG">
                   </div>
                   <div class="form-group col-auto">
                     <label for="inputPassword4">CPF</label>
@@ -760,11 +976,13 @@
                     <small id="cpfHelp4" class="form-text text-muted">Digite um CPF válido, existe um algoritmo de validação neste campo.</small>
                   </div>
                 </div>
-
-                <div class="form-row">
+                <br>
+                <label class="h6">Dados do responsável Financeiro</label>
+                <div class="form-row border border-success rounded">
+                  
                   <div class="form-group col-md-4">
                     <label for="inputAddress">Responsável pedagógico/didático</label>
-                    <input type="text" class="form-control" id="nomeResponsavelPedagogicoAluno" placeholder="Nome">
+                    <input type="text" class="form-control" id="nomeResponsavelPedagogicoAluno" name="nomeResponsavelPedagogicoAluno" placeholder="Nome" onblur="maiusculo(this)">
                   </div>
                   <div class="form-group col-md-2">
                     <label for="inputAddress">Relação</label>
@@ -792,7 +1010,7 @@
                   </div>
                   <div class="form-group col-auto">
                     <label for="inputEmail4">RG</label>
-                    <input type="number" class="form-control" id="rgPedagogicoAluno" name="rgPedagogicoAluno" placeholder="RG">
+                    <input type="text" class="form-control" id="rgPedagogicoAluno" name="rgPedagogicoAluno" placeholder="RG">
                   </div>
                   <div class="form-group col-auto">
                     <label for="inputPassword4">CPF</label>

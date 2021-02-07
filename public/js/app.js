@@ -1,5 +1,19 @@
 var perf = firebase.performance()
+firebase.analytics();
 // Código padrão para todas as páginas do site
+var updatesRef = firebase.database().ref('sistemaEscolar/updates')
+var loader = document.getElementById('loader')
+var loaderMsg = document.getElementById('loaderMsg')
+
+function update() {
+	let versao = 0.61
+	updatesRef.on('value', (snapshot) => {
+		let dados = snapshot.val()
+		if (versao < dados.versao) {
+			abrirModal('modal', 'Atualização do site', `<b>Uma atualização foi lançada:</b><br>Nova versão: ${dados.versao}<br>Sua versão: ${versao}<br>Descrição do novo Update: ${dados.descricao}<br>Importância: ${dados.prioridade}<br>Data do lançamento: ${dados.data}<br><br><a class="btn btn-primary" onclick="window.location.reload(true)">Clique aqui para atualizar</a><br>Caso você tenha clicado para atualizar mas continua vendo esta mensagem, segure a tecla shift e aperte o botão recarregar do navegador para atualizar.`, `<button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>`)
+		}
+	})
+}
 
 function usuarioAtual() {
     let user = firebase.auth().currentUser;
@@ -18,6 +32,7 @@ function abrirModal(id='modal', titulo, corpo, botoes) {
     document.getElementById('titulo').innerText = titulo
     document.getElementById('corpo').innerHTML = corpo
     document.getElementById('botoes').innerHTML = botoes
+	$('#' + id).modal({backdrop: 'static'})
     $('#' + id).modal()
 }
 
@@ -39,40 +54,63 @@ async function getAddress(numCep) {
 * @params data - String referente à data de nascimento da pessoa, no formato dd/mm/yyyy
 * @return Retorna uma string com a idade da pessoa em anos.
 */
-function calcularIdadePrecisa(data, now) {
-	var yearNow = now.getYear();
-	var monthNow = now.getMonth();
-	var dateNow = now.getDate();
+function calcularIdadePrecisa(data) {
+	loader.style.display = 'block'
+	loaderMsg.innerText = 'Buscando e calculando datas...'
+	let timestampNow = firebase.functions().httpsCallable('timestamp')
+	return timestampNow().then(function(result){
+		var now = new Date(result.data.timestamp._seconds * 1000)
 
-	var yearDob = data.getYear();
-	var monthDob = data.getMonth();
-	var dateDob = data.getDate();
-	var age = {};
-	yearAge = yearNow - yearDob;
+		var yearNow = now.getYear();
+		var monthNow = now.getMonth();
+		var dateNow = now.getDate();
 
-	if (monthNow >= monthDob)
-		var monthAge = monthNow - monthDob;
-	else {
-		yearAge--;
-		var monthAge = 12 + monthNow -monthDob;
-	}
+		var yearDob = data.getYear();
+		var monthDob = data.getMonth();
+		var dateDob = data.getDate();
+		var age = {};
+		yearAge = yearNow - yearDob;
 
-	if (dateNow >= dateDob)
-		var dateAge = dateNow - dateDob;
-	else {
-		monthAge--;
-	    var dateAge = 31 + dateNow - dateDob;
+		if (monthNow >= monthDob)
+			var monthAge = monthNow - monthDob;
+		else {
+			yearAge--;
+			var monthAge = 12 + monthNow -monthDob;
+		}
 
-	    if (monthAge < 0) {
-	      monthAge = 11;
-	      yearAge--;
-	    }
-	  }
+		if (dateNow >= dateDob)
+			var dateAge = dateNow - dateDob;
+		else {
+			monthAge--;
+			var dateAge = 31 + dateNow - dateDob;
 
-	age = {
-			years: yearAge,
-			months: monthAge,
-			days: dateAge
-		};
-	return age;
+			if (monthAge < 0) {
+			monthAge = 11;
+			yearAge--;
+			}
+		}
+
+		age = {
+				years: yearAge,
+				months: monthAge,
+				days: dateAge
+			};
+		loader.style.display = 'none'
+		return age;
+	}).catch(function(error){
+		throw new Error(error)
+	})
+	
+}
+
+function maiusculo(element) {
+	element.value = element.value.toUpperCase()
+	return element.value.toUpperCase()
+}
+
+function formataNumMatricula(num) {
+    let numero = num
+    numero = "00000" + numero.replace(/\D/g, '');
+	numero = numero.slice(-5,-1) + numero.slice(-1);
+	return numero
 }

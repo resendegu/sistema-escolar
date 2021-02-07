@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>Modelo</title>
+  <title>Espaço do desenvolvedor</title>
   <!-- Arquivos necessários para o Bootstrap -->
   <link rel="stylesheet" href="resources/bootstrap/css/bootstrap.min.css">
   <!-- Carregando arquivos da biblioteca AST-Notif. Créditos: https://github.com/anandastoon/AST-Notif -->
@@ -17,27 +17,27 @@
 
   <!-- Inicialização do Firebase -->
   <!-- update the version number as needed -->
-  <script defer src="/__/firebase/8.1.1/firebase-app.js"></script>
+  <script  src="/__/firebase/8.2.3/firebase-app.js"></script>
   <!-- include only the Firebase features as you need -->
-  <script defer src="/__/firebase/8.1.1/firebase-auth.js"></script>
-  <script defer src="/__/firebase/8.1.1/firebase-database.js"></script>
-  <script defer src="/__/firebase/8.1.1/firebase-firestore.js"></script>
-  <script defer src="/__/firebase/8.1.1/firebase-functions.js"></script>
-  <script defer src="/__/firebase/8.1.1/firebase-messaging.js"></script>
-  <script defer src="/__/firebase/8.1.1/firebase-storage.js"></script>
-  <script defer src="/__/firebase/8.1.1/firebase-analytics.js"></script>
-  <script defer src="/__/firebase/8.1.1/firebase-remote-config.js"></script>
-  <script defer src="/__/firebase/8.1.1/firebase-performance.js"></script>
+  <script  src="/__/firebase/8.2.3/firebase-auth.js"></script>
+  <script  src="/__/firebase/8.2.3/firebase-database.js"></script>
+  <script  src="/__/firebase/8.2.3/firebase-firestore.js"></script>
+  <script  src="/__/firebase/8.2.3/firebase-functions.js"></script>
+  <script  src="/__/firebase/8.2.3/firebase-messaging.js"></script>
+  <script  src="/__/firebase/8.2.3/firebase-storage.js"></script>
+  <script  src="/__/firebase/8.2.3/firebase-analytics.js"></script>
+  <script  src="/__/firebase/8.2.3/firebase-remote-config.js"></script>
+  <script  src="/__/firebase/8.2.3/firebase-performance.js"></script>
   <!-- 
     initialize the SDK after all desired features are loaded, set useEmulator to false
     to avoid connecting the SDK to running emulators.
   -->
-  <script defer src="/__/firebase/init.js?useEmulator=true"></script>
+  <script  src="/__/firebase/init.js?useEmulator=true"></script>
   
   <!-- Conteúdo do site - Website content -->
   <header>
     <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #e3f2fd;">
-      <a class="navbar-brand" href="./">Modelo</a>
+      <a class="navbar-brand" href="./">Espaço do desenvolvedor</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -72,8 +72,51 @@
 
   <!-- Parte principal -->
   <div class="container">
-    Lorem ipsum dolor, sit amet consectetur adipisicing elit. Impedit totam facilis quod, sed nihil, distinctio aperiam esse animi vitae iure voluptas laborum, assumenda tempore voluptatem corrupti? Eaque temporibus sint maiores!
+    <form id="update">
+      <div class="form-group">
+        <label for="exampleInputEmail1">Nova Versão</label>
+        <input type="text" class="form-control" id="versao" name="versao" placeholder="Versão">
+        <small id="emailHelp" class="form-text text-muted">Número da nova versão (Ex.: 0.51)</small>
+      </div>
+      <div class="form-group">
+        <label for="descricao">Descrição da nova versão</label>
+        <textarea class="form-control" id="descricao" name="descricao" rows="3"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="exampleInputPassword1">Data de lançamento</label>
+        <input type="date" class="form-control" id="data" name="data" placeholder="Lançamento">
+      </div>
+      <div class="form-group">
+        <label for="exampleFormControlSelect1">Prioridade</label>
+        <select class="form-control" id="prioridade" name="prioridade">
+          <option>Normal</option>
+          <option>Importante</option>
+          <option>Muito importante</option>
+          <option>Crítica</option>
+        </select>
+      </div>
+      <button type="submit" class="btn btn-primary">Lançar versão</button>
+    </form>
   </div>
+  <script>
+    var refUpdates = firebase.database().ref('sistemaEscolar/updates')
+    document.querySelector('#update').addEventListener('submit' , (e) => {
+      e.preventDefault()
+      const dados = new FormData(e.target);
+      let updateData = {}
+      updateData.data = dados.get('data')
+      updateData.descricao = dados.get('descricao')
+      updateData.prioridade = dados.get('prioridade')
+      updateData.versao = Number(dados.get('versao'))
+      console.log(updateData)
+      refUpdates.set(updateData).then(() =>{
+        AstNotif.toast('Versão lançada')
+      }).catch(error => {
+        console.log(error)
+        AstNotif.dialog('Erro', error.message)
+      })
+    })
+  </script>
 
   <!-- Carregando outros arquivos da biblioteca AST-Notif. Créditos: https://github.com/anandastoon/AST-Notif -->
   <script src="resources/AST-Notif/js/ast-notif.min.js"></script>
