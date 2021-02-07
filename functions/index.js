@@ -348,6 +348,7 @@ exports.transfereAlunos = functions.https.onCall((data, context) => {
         let turmaAtual = dados.codTurma
         let turmaParaTransferir = dados.codTurmaParaTransferir
         let alunos = {} //Aqui onde será guardado os alunos e os dados dos mesmos, da turma para serem transferidos para outra turma
+        var timestamp = admin.firestore.Timestamp.now()
         
         return admin.database().ref(`sistemaEscolar/turmas/${turmaAtual}/alunos/`).once('value').then(snapshot => {
             let alunosTurma = snapshot.val()
@@ -368,13 +369,17 @@ exports.transfereAlunos = functions.https.onCall((data, context) => {
                     for (const matricula in alunos) {
                         if (Object.hasOwnProperty.call(alunos, matricula)) {
                             const dadosAluno = alunos[matricula];
-                            await admin.database().ref(`sistemaEscolar/turmas/${turmaAtual}/historico`).push({dados: {matricula: matricula, dadosAluno: dadosAluno}, timestamp: admin.firestore.Timestamp.now(), operacao: 'Transferência de alunos'}).then(() => {
+                            await admin.database().ref(`sistemaEscolar/turmas/${turmaAtual}/historico`).push({dados: {matricula: matricula, dadosAluno: dadosAluno}, timestamp: timestamp, operacao: 'Transferência de alunos'}).then(() => {
                                 admin.database().ref(`sistemaEscolar/turmas/${turmaAtual}/alunos/${matricula}`).remove().then(() => {
                                     admin.database().ref(`sistemaEscolar/turmas/${turmaParaTransferir}/professor/0`).once('value').then(novoProfessor => {
                                         admin.database().ref(`sistemaEscolar/turmas/${turmaParaTransferir}/alunos/${matricula}/prof/`).set(novoProfessor.val()).then(() =>{
                                             admin.database().ref(`sistemaEscolar/alunos/${matricula}/profAluno/`).set(novoProfessor.val()).then(() =>{
                                                 admin.database().ref(`sistemaEscolar/alunos/${matricula}/turmaAluno/`).set(turmaParaTransferir).then(() =>{
-                                                
+                                                    admin.database().ref(`sistemaEscolar/alunos/${matricula}/historico/`).push({dados: {matricula: matricula, dadosAluno: dadosAluno}, timestamp: timestamp, operacao: 'Transferência de alunos'}).then(() =>{
+
+                                                    }).catch(error => {
+                                                        throw new functions.https.HttpsError('unknown', error.message, error)
+                                                    })
                                                 }).catch(error => {
                                                     throw new functions.https.HttpsError('unknown', error.message, error)
                                                 })
@@ -413,5 +418,18 @@ exports.transfereAlunos = functions.https.onCall((data, context) => {
         
     } else {
         throw new functions.https.HttpsError('permission-denied', 'Você não tem permissão.')
+    }
+})
+
+exports.excluiTurma = functions.https.onCall((data, context) => {
+    if (context.auth.token.master == true || context.auth.token.secretaria == true) {
+        let turma = data.codTurma
+        return admin.database().ref(`sistemaEscolar/turmas/${turma}`).remove().then(() => {
+            return {answer: 'A turma e todos os seus registros foram excluídos com sucesso.'}
+        }).catch(error => {
+            throw new functions.https.HttpsError('unknown', error.message, error)
+        })
+    } else {
+        throw new functions.https.HttpsError('permission-denied', 'Você não possui permissão para fazer alterações nesta área.')
     }
 })

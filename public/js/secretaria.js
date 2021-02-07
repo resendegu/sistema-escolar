@@ -51,6 +51,17 @@ firebase.auth().onAuthStateChanged((user) => {
             }
             alunosMatriculadosNum.innerText = c
         })
+        turmasRef.on('value', (snapshot) => {
+            let classrooms = snapshot.val()
+            let c = 0
+            for (const matricula in classrooms) {
+                if (Object.hasOwnProperty.call(classrooms, matricula)) {
+                    const dados = classrooms[matricula];
+                    c++
+                }
+            }
+            turmasCadastradasNum.innerText = c
+        })
         numerosRef.on('value', (snapshot) => {
             loaderMsg.innerText = 'Buscando informações da dashboard'
             var numeros = snapshot.val()
@@ -59,7 +70,7 @@ firebase.auth().onAuthStateChanged((user) => {
             //alunosCadastradosNum.innerText = numeros.alunosCadastrados != undefined ? numeros.alunosCadastrados : 0
             
             alunosDesativadosNum.innerText = numeros.alunosDesativados != undefined ? numeros.alunosDesativados : 0
-            turmasCadastradasNum.innerText = numeros.turmasCadastradas != undefined ? numeros.turmasCadastradas : 0
+            //turmasCadastradasNum.innerText = numeros.turmasCadastradas != undefined ? numeros.turmasCadastradas : 0
 
             // Alimenta tabela com os números de alunos em cada semana
             var idCelulaTabela = ''
@@ -304,6 +315,8 @@ function cadastrarTurma(confima=false) {
 var turmas
 // Funções da aba de turmas da secretaria
 function carregaTurmas() {
+    
+    document.getElementById("areaInfoTurma").style.visibility = 'hidden'
     loader.style.display = 'block'
     loaderMsg.innerText = 'Carregando informações das turmas...'
     var selectTurmas = document.getElementById('selectTurmas')
@@ -370,6 +383,30 @@ function transfereAlunosConfirma() {
     }
 }
 
+
+
+function excluirTurma(confirma=false) {
+    if (confirma) {
+        loader.style.display = 'block'
+        loaderMsg.innerText = 'Excluindo turma...'
+        let excluiTurma = firebase.functions().httpsCallable('excluiTurma')
+        excluiTurma({codTurma: alunosSelecionadosTurma.codTurma}).then(function(result) {
+            AstNotif.dialog('Sucesso', result.data.answer)
+            carregaTurmas()
+            loader.style.display = 'none'
+        }).catch(function(error) {
+            AstNotif.dialog('Erro', error.message)
+            console.log(error)
+            loader.style.display = 'none'
+        })
+    } else {
+        if (alunos == null) {
+            abrirModal('modal', 'Confirmação', 'Você está prestes à excluir uma turma. Ao excluir uma turma, todo o histórico gravado da turma será excluído! Depois de excluída, você poderá criar uma nova turma com o mesmo ID. Esta ação não pode ser revertida. <br><br> <b>Você têm certeza que deseja excluir esta turma?</b>', '<button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button><button type="button" class="btn btn-danger" data-dismiss="modal" onclick="excluirTurma(true)">Excluir</button>')
+        } else {
+            abrirModal('modal', 'Calma aí', 'Você não pode excluir uma turma com alunos cadastrados nela. Antes de excluir a turma, transfira os alunos para outra turma, ou desative os alunos.', '<button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>')
+        } 
+    }
+}
 function transfereDaTurma() {
     loader.style.display = 'block'
     loaderMsg.innerText = 'Transferindo alunos...'
@@ -387,6 +424,7 @@ function transfereDaTurma() {
             carregaTurmas()
             document.getElementById('listaAlunosDaTurma').innerHTML = ''
             document.getElementById('ulProfCadastrados').innerHTML = ''
+            document.getElementById('infoDaTurma').style.visibility = 'hidden'
             $('#modal').modal('hide')
         }).catch(function(error){
             AstNotif.dialog('Erro', error.message)
@@ -395,8 +433,9 @@ function transfereDaTurma() {
         })
     }
 }
-
+var alunos
 function carregaListaDeAlunosDaTurma(turma, filtro='') {
+    
     tipoDeBusca = 'nome'
     alunosSelecionadosTurma.codTurma = turma
     console.log(filtro)
@@ -449,6 +488,7 @@ function abreTurma(cod) {
         let dadosDaTurma = snapshot.val()
         codigoDaTurmaLabel.innerText = dadosDaTurma.codigoSala
         areaInfoTurma.style.visibility = 'visible'
+        
         // Área separação KIDS, TEENS, ADULTS
         var faixa
         if (dadosDaTurma.faixaTurma == 'A') {
@@ -489,6 +529,7 @@ function abreTurma(cod) {
             }
         }
         loader.style.display = 'none'
+        
     })
 }
 
@@ -602,7 +643,6 @@ function carregaProfsETurmas() {
     loaderMsg.innerText = 'Carregando dados de matrícula, de turmas e professores...'
     let turmaAluno = document.getElementById('turmaAluno')
     let matriculaAluno = document.getElementById('matriculaAluno')
-    let turmaAlunoTransferencia = document.getElementById('turmaAlunoTransferencia')
     
     turmasRef.once('value').then(snapshot => {
         turmaAluno.innerHTML = '<option selected hidden>Escolha uma turma...</option>'
@@ -612,7 +652,6 @@ function carregaProfsETurmas() {
         for (const cod in turmas) {
             if (Object.hasOwnProperty.call(turmas, cod)) {
                 const infoDaTurma = turmas[cod];
-                turmaAlunoTransferencia.innerHTML += `<option value="${cod}">${cod}</option>`
                 turmaAluno.innerHTML += `<option value="${cod}">${cod}</option>`
             }
         }
@@ -785,7 +824,7 @@ document.querySelector('#formCadastroAluno').addEventListener('submit', (e) => {
     dadosAluno.numeroComercialPedagogicoAluno = dados.get('numeroComercialPedagogicoAluno')
     dadosAluno.numeroCelularPedagogicoAluno = dados.get('numeroCelularPedagogicoAluno')
     dadosAluno.rgPedagogicoAluno = dados.get('rgPedagogicoAluno')
-    dadosAluno.cpfPedgogicoAluno = dados.get('cpfPedgogicoAluno')
+    dadosAluno.cpfPedagogicoAluno = dados.get('cpfPedagogicoAluno')
     // Gera ou não o PDF do aluno
     dadosAluno.geraPDFAluno = dados.get('geraPDFAluno')
     console.log(dadosAluno)
@@ -857,7 +896,7 @@ function alteraTipoDeBusca(tipo) {
     tipoDeBusca = tipo
 }
 
-var alunos
+
 function carregaListaDeAlunos(filtro='') {
     console.log(filtro)
     loader.style.display = 'block'
@@ -894,12 +933,43 @@ function carregaListaDeAlunos(filtro='') {
     
 }
 
-var dadosResponsaveis
+var dadosResponsaveis = {}
 function abreDadosDoAluno(matricula) {
     document.getElementById('infoDoAluno').style.display = 'block'
     document.getElementById('rolaTelaAbaixoAlunos').style.display = 'block'
     const dados = alunos[matricula]
-    dadosResponsaveis = ``
+    dadosResponsaveis = {
+        nomeResponsavelAluno1: dados.nomeResponsavelAluno1,
+        relacaoAluno1: dados.relacaoAluno1,
+        numeroComercialResponsavel1: dados.numeroComercialResponsavel1,
+        numeroCelularResponsavel1: dados.numeroCelularResponsavel1,
+        rgResponsavel1: dados.rgResponsavel1,
+        cpfResponsavel1: dados.cpfResponsavel1,
+        // Dados de Filiação responsável 2
+        nomeResponsavelAluno2: dados.nomeResponsavelAluno2,
+        relacaoAluno2: dados.relacaoAluno2,
+        numeroComercialResponsavel2: dados.numeroComercialResponsavel2,
+        numeroCelularResponsavel2: dados.numeroCelularResponsavel2,
+        rgResponsavel2: dados.rgResponsavel2,
+        cpfResponsavel2: dados.cpfResponsavel2,
+        // Dados de Filiação Responsável financeiro
+        nomeResponsavelFinanceiroAluno: dados.nomeResponsavelFinanceiroAluno,
+        relacaoFinanceiroAluno: dados.relacaoFinanceiroAluno,
+        numeroComercialFinanceiroAluno: dados.numeroComercialFinanceiroAluno,
+        numeroCelularFinanceiroAluno: dados.numeroCelularFinanceiroAluno,
+        rgFinanceiroAluno: dados.rgFinanceiroAluno,
+        cpfFinanceiroAluno: dados.cpfFinanceiroAluno,
+        // Dados de Filiação responsável pedagógico/didático
+        nomeResponsavelPedagogicoAluno: dados.nomeResponsavelPedagogicoAluno,
+        relacaoPedagogicoAluno: dados.relacaoPedagogicoAluno,
+        numeroComercialPedagogicoAluno: dados.numeroComercialPedagogicoAluno,
+        numeroCelularPedagogicoAluno: dados.numeroCelularPedagogicoAluno,
+        rgPedagogicoAluno: dados.rgPedagogicoAluno,
+        cpfPedgogicoAluno: dados.cpfPedgogicoAluno
+    }
+
+    
+    
     document.getElementById('mostraNomeAluno').innerText = dados.nomeAluno
     document.getElementById('mostraCpfAluno').innerText = dados.cpfAluno
     document.getElementById('mostraRgAluno').innerText = dados.rgAluno
@@ -926,12 +996,22 @@ function abreDadosDoAluno(matricula) {
     document.getElementById('mostraEnderecoAluno').innerText = `${dados.enderecoAluno}, ${dados.numeroAluno}, ${dados.bairroAluno}, ${dados.cidadeAluno}, ${dados.estadoAluno}. CEP ${dados.cepAluno}.`
     document.getElementById('rolaTelaAbaixoAlunos').focus()
     document.getElementById('rolaTelaAbaixoAlunos').style.display = 'none'
+    turmasRef.child(`${dados.turmaAluno}/alunos/${matricula}/notas`).once('value').then(snapshot => {
+        let notas = snapshot.val()
+        console.log(notas)
+        document.getElementById('pontosAudicao').innerText = notas.audicao
+        document.getElementById('pontosFala').innerText = notas.fala
+        document.getElementById('pontosEscrita').innerText = notas.escrita
+        document.getElementById('pontosLeitura').innerText = notas.leitura
+        document.getElementById('barraPontosAudicao').style.width = notas.audicao * 20 + '%'
+        document.getElementById('barraPontosFala').style.width = notas.fala * 20 + '%'
+        document.getElementById('barraPontosEscrita').style.width = notas.escrita * 20 + '%'
+        document.getElementById('barraPontosLeitura').style.width = notas.leitura * 20 + '%'
+    }).catch(error => {
+        AstNotif.dialog('Erro', error.message)
+        console.log(error)
+    })
 }
-
-document.querySelector('#transfereAluno').addEventListener('submit', (e) => {
-    e.preventDefault()
-    AstNotif.dialog('Oiii...', 'Aqui é o Gustavo, e essa área ainda não foi desenvolvida ok! Volte aqui mais tarde.')
-})
 
 function followUpAluno(matricula) {
     
@@ -1055,4 +1135,198 @@ function verFollowUp(id) {
         loader.style.display = 'none'
     })
     
+}
+function mostraDadosResponsaveis() {
+    abrirModal('modal', 'Dados dos reponsáveis', 
+        `
+        <label class="h6">Dados de filiação</label>
+        <div class="form-row border border-secondary rounded">
+          <div class="form-group col-md-4">
+            <label for="inputAddress">Filiação ou Responsável legal 1</label>
+            <input type="text" class="form-control" id="nomeResponsavelAluno1AbaAlunos" name="nomeResponsavelAluno1" placeholder="Nome"  onblur="maiusculo(this)">
+          </div>
+          <div class="form-group col-md-2">
+            <label for="inputAddress">Relação</label>
+            <br>
+            <select class="form-control form-control-md" name="relacaoAluno1" id="relacaoAluno1AbaAlunos">
+              <option hidden selected>Escolha...</option>
+              <option value="Mãe">Mãe</option>
+              <option value="Pai">Pai</option>
+              <option value="Tio/Tia">Tio/Tia</option>
+              <option value="Avô/Avó">Avô/Avó</option>
+              <option value="Outros">Outros</option>
+            </select>
+          </div>
+          <div class="form-group col-md-2">
+            <label for="inputAddress">Número comercial</label>
+            <input type="text" class="form-control" id="numeroComercialResponsavel1AbaAlunos" name="numeroComercialResponsavel1"  placeholder="Comercial">
+          </div>
+          <div class="form-group col-md-2">
+            <label for="inputAddress">Número Celular</label>
+            <input type="text" class="form-control" id="numeroCelularResponsavel1AbaAlunos" name="numeroCelularResponsavel1" placeholder="Celular">
+          </div>
+          <div class="form-group col-auto">
+            <label for="inputEmail4">RG</label>
+            <input type="text" class="form-control" id="rgResponsavel1AbaAlunos" name="rgResponsavel1" placeholder="RG">
+          </div>
+          <div class="form-group col-auto">
+            <label for="inputPassword4">CPF</label>
+            <input type="text" class="form-control" id="cpfResponsavel1AbaAlunos" name="cpfResponsavel1" placeholder="CPF" onchange="verificaCPF(this.value)">
+            <small id="cpfHelp" class="form-text text-muted">Digite um CPF válido, existe um algoritmo de validação neste campo.</small>
+          </div>
+        </div>
+        <br>
+        
+        <div class="form-row border border-secondary rounded">
+          <div class="form-group col-md-4">
+            <label for="inputAddress">Filiação ou Responsável legal 2</label>
+            <input type="text" class="form-control" id="nomeResponsavelAluno2AbaAlunos" name="nomeResponsavelAluno2" placeholder="Nome" onblur="maiusculo(this)">
+          </div>
+          <div class="form-group col-md-2">
+            <label for="inputAddress">Relação</label>
+            <br>
+            <select class="form-control form-control-md" name="relacaoAluno2" id="relacaoAluno2AbaAlunos">
+              <option hidden selected>Escolha...</option>
+              <option value="Mãe">Mãe</option>
+              <option value="Pai">Pai</option>
+              <option value="Tio/Tia">Tio/Tia</option>
+              <option value="Avô/Avó">Avô/Avó</option>
+              <option value="Outros">Outros</option>
+            </select>
+          </div>
+          <div class="form-group col-md-2">
+            <label for="inputAddress">Número comercial</label>
+            <input type="text" class="form-control" id="numeroComercialResponsavel2AbaAlunos" name="numeroComercialResponsavel2" placeholder="Comercial">
+          </div>
+          <div class="form-group col-md-2">
+            <label for="inputAddress">Número Celular</label>
+            <input type="text" class="form-control" id="numeroCelularResponsavel2AbaAlunos" name="numeroCelularResponsavel2" placeholder="Celular">
+          </div>
+          <div class="form-group col-auto">
+            <label for="inputEmail4">RG</label>
+            <input type="text" class="form-control" id="rgResponsavel2AbaAlunos" name="rgResponsavel2" placeholder="RG">
+          </div>
+          <div class="form-group col-auto">
+            <label for="inputPassword4">CPF</label>
+            <input type="text" class="form-control" id="cpfResponsavel2AbaAlunos" name="cpfResponsavel2" placeholder="CPF" onchange="verificaCPF(this.value)">
+            <small id="cpfHelp" class="form-text text-muted">Digite um CPF válido, existe um algoritmo de validação neste campo.</small>
+          </div>
+          &nbsp;&nbsp;&nbsp;
+        </div>
+        <br>
+        <hr>
+        <label class="h6">Dados do responsável Financeiro</label>
+        <div class="form-row border border-primary rounded">
+          <div class="form-group col-md-4">
+            <label for="inputAddress">Responsável financeiro</label>
+            <input type="text" class="form-control" id="nomeResponsavelFinanceiroAlunoAbaAlunos" name="nomeResponsavelFinanceiroAluno" placeholder="Nome" onblur="maiusculo(this)">
+          </div>
+          <div class="form-group col-md-2">
+            <label for="inputAddress">Relação</label>
+            <br>
+            <select class="form-control form-control-md" name="relacaoFinanceiroAluno" id="relacaoFinanceiroAlunoAbaAlunos">
+              <option hidden selected>Escolha...</option>
+              <option value="Mãe">Mãe</option>
+              <option value="Pai">Pai</option>
+              <option value="Tio/Tia">Tio/Tia</option>
+              <option value="Avô/Avó">Avô/Avó</option>
+              <option value="Outros">Outros</option>
+            </select>
+          </div>
+          <div class="form-group col-md-2">
+            <label for="inputAddress">Número comercial</label>
+            <input type="text" class="form-control" id="numeroComercialFinanceiroAlunoAbaAlunos" name="numeroComercialFinanceiroAluno" placeholder="Comercial">
+          </div>
+          <div class="form-group col-md-2">
+            <label for="inputAddress">Número Celular</label>
+            <input type="text" class="form-control" id="numeroCelularFinanceiroAlunoAbaAlunos" name="numeroCelularFinanceiroAluno" placeholder="Celular">
+          </div>
+          <div class="form-group col-md-5">
+            <label for="inputPassword4">Email</label>
+            <input type="email" class="form-control" id="emailResponsavelFinanceiroAbaAlunos" name="emailresponsavelFinanceiro" placeholder="Email">
+          </div>
+          <div class="form-group col-auto">
+            <label for="inputEmail4">RG</label>
+            <input type="text" class="form-control" id="rgFinanceiroAlunoAbaAlunos" name="rgFinanceiroAluno" placeholder="RG">
+          </div>
+          <div class="form-group col-auto">
+            <label for="inputPassword4">CPF</label>
+            <input type="text" class="form-control" id="cpfFinanceiroAlunoAbaAlunos" name="cpfFinanceiroAluno"  placeholder="CPF" onchange="verificaCPF(this.value)">
+            <small id="cpfHelp4" class="form-text text-muted">Digite um CPF válido, existe um algoritmo de validação neste campo.</small>
+          </div>
+        </div>
+        <br>
+        <label class="h6">Dados do responsável Financeiro</label>
+        <div class="form-row border border-success rounded">
+          
+          <div class="form-group col-md-4">
+            <label for="inputAddress">Responsável pedagógico/didático</label>
+            <input type="text" class="form-control" id="nomeResponsavelPedagogicoAlunoAbaAlunos" placeholder="Nome" onblur="maiusculo(this)">
+          </div>
+          <div class="form-group col-md-2">
+            <label for="inputAddress">Relação</label>
+            <br>
+            <select class="form-control form-control-md" name="relacaoPedagogicoAluno" id="relacaoPedagogicoAlunoAbaAlunos">
+              <option hidden selected>Escolha...</option>
+              <option value="Mãe">Mãe</option>
+              <option value="Pai">Pai</option>
+              <option value="Tio/Tia">Tio/Tia</option>
+              <option value="Avô/Avó">Avô/Avó</option>
+              <option value="Outros">Outros</option>
+            </select>
+          </div>
+          <div class="form-group col-md-2">
+            <label for="inputAddress">Número comercial</label>
+            <input type="text" class="form-control" id="numeroComercialPedagogicoAlunoAbaAlunos" name="numeroComercialPedagogicoAluno" placeholder="Comercial">
+          </div>
+          <div class="form-group col-md-2">
+            <label for="inputAddress">Número Celular</label>
+            <input type="text" class="form-control" id="numeroCelularPedagogicoAlunoAbaAlunos" name="numeroCelularPedagogicoAluno" placeholder="Celular">
+          </div>
+          <div class="form-group col-md-5">
+            <label for="inputPassword4">Email</label>
+            <input type="email" class="form-control" id="emailResponsavelPedagogicoAbaAlunos" name="emailResponsavelPedagogico" placeholder="Email">
+          </div>
+          <div class="form-group col-auto">
+            <label for="inputEmail4">RG</label>
+            <input type="text" class="form-control" id="rgPedagogicoAlunoAbaAlunos" name="rgPedagogicoAluno" placeholder="RG">
+          </div>
+          <div class="form-group col-auto">
+            <label for="inputPassword4">CPF</label>
+            <input type="text" class="form-control" id="cpfPedagogicoAlunoAbaAlunos" name="cpfPedgogicoAluno" placeholder="CPF" onchange="verificaCPF(this.value)">
+            <small id="cpfHelp3" class="form-text text-muted">Digite um CPF válido, existe um algoritmo de validação neste campo.</small>
+          </div>
+        </div>
+        `, 
+        `<button class="btn btn-secondary" data-dismiss="modal">Fechar</button>`
+    )
+
+    // Dados de Filiação Responsavel 1
+    document.getElementById('nomeResponsavelAluno1AbaAlunos').value = dadosResponsaveis.nomeResponsavelAluno1
+    document.getElementById('relacaoAluno1AbaAlunos').value = dadosResponsaveis.relacaoAluno1
+    document.getElementById('numeroComercialResponsavel1AbaAlunos').value = dadosResponsaveis.numeroComercialResponsavel1
+    document.getElementById('numeroCelularResponsavel1AbaAlunos').value = dadosResponsaveis.numeroCelularResponsavel1
+    document.getElementById('rgResponsavel1AbaAlunos').value = dadosResponsaveis.rgResponsavel1
+    document.getElementById('cpfResponsavel1AbaAlunos').value = dadosResponsaveis.cpfResponsavel1
+    // Dados de Filiação responsável 2
+    document.getElementById('nomeResponsavelAluno2AbaAlunos').value = dadosResponsaveis.nomeResponsavelAluno2
+    document.getElementById('relacaoAluno2AbaAlunos').value = dadosResponsaveis.relacaoAluno2
+    document.getElementById('numeroComercialResponsavel2AbaAlunos').value = dadosResponsaveis.numeroComercialResponsavel2
+    document.getElementById('numeroCelularResponsavel2AbaAlunos').value = dadosResponsaveis.numeroCelularResponsavel2
+    document.getElementById('rgResponsavel2AbaAlunos').value = dadosResponsaveis.rgResponsavel2
+    document.getElementById('cpfResponsavel2AbaAlunos').value = dadosResponsaveis.cpfResponsavel2
+    // Dados de Filiação Responsável financeiro
+    document.getElementById('nomeResponsavelFinanceiroAlunoAbaAlunos').value = dadosResponsaveis.nomeResponsavelFinanceiroAluno
+    document.getElementById('relacaoFinanceiroAlunoAbaAlunos').value = dadosResponsaveis.relacaoFinanceiroAluno
+    document.getElementById('numeroComercialFinanceiroAlunoAbaAlunos').value = dadosResponsaveis.numeroComercialFinanceiroAluno
+    document.getElementById('numeroCelularFinanceiroAlunoAbaAlunos').value = dadosResponsaveis.numeroCelularFinanceiroAluno
+    document.getElementById('rgFinanceiroAlunoAbaAlunos').value = dadosResponsaveis.rgFinanceiroAluno
+    document.getElementById('cpfFinanceiroAlunoAbaAlunos').value = dadosResponsaveis.cpfFinanceiroAluno
+    // Dados de Filiação responsável pedagógico/didático
+    document.getElementById('nomeResponsavelPedagogicoAlunoAbaAlunos').value = dadosResponsaveis.nomeResponsavelPedagogicoAluno
+    document.getElementById('relacaoPedagogicoAlunoAbaAlunos').value = dadosResponsaveis.relacaoPedagogicoAluno
+    document.getElementById('numeroComercialPedagogicoAlunoAbaAlunos').value = dadosResponsaveis.numeroComercialPedagogicoAluno
+    document.getElementById('numeroCelularPedagogicoAlunoAbaAlunos').value = dadosResponsaveis.numeroCelularPedagogicoAluno
+    document.getElementById('rgPedagogicoAlunoAbaAlunos').value = dadosResponsaveis.rgPedagogicoAluno
+    document.getElementById('cpfPedgogicoAlunoAbaAlunos').value = dadosResponsaveis.cpfPedgogicoAluno
 }

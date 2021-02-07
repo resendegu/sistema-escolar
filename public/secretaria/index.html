@@ -23,6 +23,26 @@
   </head>
 
   <body>
+
+    <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" id="modal">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="titulo">Modal title</h5>
+            <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button> -->
+          </div>
+          <div class="modal-body" id="corpo">
+            <p>Modal body text goes here.</p>
+          </div>
+          <div class="modal-footer" id="botoes">
+            <button type="button" class="btn btn-primary">Save changes</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
           <!-- Inicialização do Firebase -->
         <!-- update the version number as needed -->
         <script defer src="/__/firebase/8.2.3/firebase-app.js"></script>
@@ -52,7 +72,7 @@
             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
               <ul class="nav flex-column">
                 <li class="nav-item">
-                  <a class="nav-link active" data-toggle="list" href="#abaDashboard" role="tab" aria-controls="home" onclick="abreDashboard()">
+                  <a class="nav-link active" data-toggle="list" href="#abaDashboard" role="tab" aria-controls="home">
                     <span data-feather="home"></span>
                     Dashboard <span class="sr-only">(current)</span>
                   </a>
@@ -120,32 +140,14 @@
   <label id="loaderMsg" class="text-white-50 bg-dark">Aguarde...</label>
     <div class="loader"></div>
 </div>
-<div class="modal" tabindex="-1" role="dialog" id="modal">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="titulo">Modal title</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body" id="corpo">
-        <p>Modal body text goes here.</p>
-      </div>
-      <div class="modal-footer" id="botoes">
-        <button type="button" class="btn btn-primary">Save changes</button>
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
+
     <div class="container-fluid">
       <div class="row">
         <nav class="col-md-2 d-none d-md-block bg-light sidebar">
           <div class="sidebar-sticky">
             <ul class="nav flex-column">
               <li class="nav-item">
-                <a class="nav-link active" data-toggle="list" href="#abaDashboard" role="tab" aria-controls="home" onclick="abreDashboard()">
+                <a class="nav-link active" data-toggle="list" href="#abaDashboard" role="tab" aria-controls="home">
                   <span data-feather="home"></span>
                   Dashboard <span class="sr-only">(current)</span>
                 </a>
@@ -385,28 +387,10 @@
                                   <h4 id="mostraNomeAluno">Nome</h4>
                                   <p class="text-secondary mb-1" id="mostraIdadeAluno">Idade</p>
                                   <input type="text" id="rolaTelaAbaixoAlunos" style="display: none;">
-                                  <label class="text-secondary mb-1" id="mostraTurmaAluno">Turma</label><span data-feather="git-pull-request" data-toggle="tooltip" data-placement="top" title="Transferir aluno" onclick="document.getElementById('areaTransfereAluno').style.display = 'block', carregaProfsETurmas()"></span>
-                                  <div class="form-row" id="areaTransfereAluno" style="display: none;">
-                                    <form id="transfereAluno" onkeydown="return event.key != 'Enter';">
-                                      <div class="form-group col-auto">
-                                        <label for="inputAddress">Turma</label>
-                                        <select class="form-control" name="turmaAlunoTransferencia" id="turmaAlunoTransferencia" onclick="mostraProfsAlunoESetaTurma(this.value)">
-                                          <option hidden selected>Escolha a turma...</option>
-                                          
-                                        </select>
-                                        <label for="inputAddress">Prof. Referência</label>
-                                        <!-- <img src="../images/profile_placeholder.png" id="fotoProfAbaCadastroAluno" class="rounded" width="32px" style="margin-right: 10px;"> -->
-                                        <select class="form-control" disabled name="profAlunoTransferencia" id="profAlunoTransferencia">
-                                          <option hidden selected>...</option>
-                                          
-                                        </select>
-                                        <button class="btn btn-primary" type="submit">Transferir aluno</button>
-                                      </div>
-                                    </form>
-                                  </div>
+                                  <label class="text-secondary mb-1" id="mostraTurmaAluno">Turma</label>
                                   <p class="text-muted font-size-sm" id="mostraHoraEDiasAluno">Horário e dia de aula</p>
                                   <button class="btn btn-primary" onclick="followUpAluno(`${document.getElementById('mostraMatriculaAluno').innerText}`)">Follow Up</button>
-                                  <button class="btn btn-outline-primary" onclick="AstNotif.dialog('Oiii...', 'Aqui é o Gustavo, e essa área ainda não foi desenvolvida ok! Volte aqui mais tarde.')">Responsáveis</button>
+                                  <button class="btn btn-outline-primary" onclick="mostraDadosResponsaveis()">Responsáveis</button>
                                   
                                 </div>
                               </div>
@@ -492,24 +476,24 @@
                                 <div class="card-body">
                                   <h6 class="d-flex align-items-center mb-3"><i class="material-icons text-info mr-2">Desempenho</i>do aluno</h6>
                                   <small>Audição</small>
+                                  <small id="pontosAudicao">1</small>
                                   <div class="progress mb-3" style="height: 5px">
-                                    <div class="progress-bar bg-primary" role="progressbar" style="width: 80%" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
+                                    <div class="progress-bar bg-primary" id="barraPontosAudicao" role="progressbar" style="width: 80%" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
                                   </div>
                                   <small>Fala</small>
+                                  <small id="pontosFala">1</small>
                                   <div class="progress mb-3" style="height: 5px">
-                                    <div class="progress-bar bg-primary" role="progressbar" style="width: 72%" aria-valuenow="72" aria-valuemin="0" aria-valuemax="100"></div>
+                                    <div class="progress-bar bg-primary" id="barraPontosFala" role="progressbar" style="width: 72%" aria-valuenow="72" aria-valuemin="0" aria-valuemax="100"></div>
                                   </div>
                                   <small>Escrita</small>
+                                  <small id="pontosEscrita">1</small>
                                   <div class="progress mb-3" style="height: 5px">
-                                    <div class="progress-bar bg-primary" role="progressbar" style="width: 89%" aria-valuenow="89" aria-valuemin="0" aria-valuemax="100"></div>
+                                    <div class="progress-bar bg-primary" id="barraPontosEscrita" role="progressbar" style="width: 89%" aria-valuenow="89" aria-valuemin="0" aria-valuemax="100"></div>
                                   </div>
-                                  <small>...</small>
+                                  <small>Leitura</small>
+                                  <small id="pontosLeitura">1</small>
                                   <div class="progress mb-3" style="height: 5px">
-                                    <div class="progress-bar bg-primary" role="progressbar" style="width: 55%" aria-valuenow="55" aria-valuemin="0" aria-valuemax="100"></div>
-                                  </div>
-                                  <small>...I</small>
-                                  <div class="progress mb-3" style="height: 5px">
-                                    <div class="progress-bar bg-primary" role="progressbar" style="width: 66%" aria-valuenow="66" aria-valuemin="0" aria-valuemax="100"></div>
+                                    <div class="progress-bar bg-primary" id="barraPontosLeitura" role="progressbar" style="width: 55%" aria-valuenow="55" aria-valuemin="0" aria-valuemax="100"></div>
                                   </div>
                                 </div>
                               </div>
@@ -520,7 +504,7 @@
                                   <h6 class="d-flex align-items-center mb-3"><i class="material-icons text-info mr-2">Notas</i>do aluno</h6>
                                   <small>...</small>
                                   <div class="progress mb-3" style="height: 5px">
-                                    <div class="progress-bar bg-primary" role="progressbar" style="width: 80%" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
+                                    <div class="progress-bar bg-primary" role="progressbar" style="width: 80%" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100">8</div>
                                   </div>
                                   <small>...</small>
                                   <div class="progress mb-3" style="height: 5px">
@@ -608,6 +592,7 @@
                   </div>
                 </div>
                 <button type="button" class="btn btn-warning" id="btnTransfereAlunosTurma">Transferir alunos selecionados</button>
+                <button type="button" class="btn btn-danger" id="btnExcluirTurma" onclick="excluirTurma()">Excluir turma</button>
                 <hr>
                 <p class="text-muted float-md-right" id="timestampTurmaCadastrada"></p>
                 
@@ -997,7 +982,7 @@
                   
                   <div class="form-group col-md-4">
                     <label for="inputAddress">Responsável pedagógico/didático</label>
-                    <input type="text" class="form-control" id="nomeResponsavelPedagogicoAluno" placeholder="Nome" onblur="maiusculo(this)">
+                    <input type="text" class="form-control" id="nomeResponsavelPedagogicoAluno" name="nomeResponsavelPedagogicoAluno" placeholder="Nome" onblur="maiusculo(this)">
                   </div>
                   <div class="form-group col-md-2">
                     <label for="inputAddress">Relação</label>

@@ -32,6 +32,7 @@ function abrirModal(id='modal', titulo, corpo, botoes) {
     document.getElementById('titulo').innerText = titulo
     document.getElementById('corpo').innerHTML = corpo
     document.getElementById('botoes').innerHTML = botoes
+	$('#' + id).modal({backdrop: 'static'})
     $('#' + id).modal()
 }
 
