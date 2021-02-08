@@ -422,10 +422,9 @@ function transfereDaTurma() {
             loader.style.display = 'none'
             alunosSelecionadosTurma = {}
             carregaTurmas()
+            $('#modal').modal('hide')
             document.getElementById('listaAlunosDaTurma').innerHTML = ''
             document.getElementById('ulProfCadastrados').innerHTML = ''
-            document.getElementById('infoDaTurma').style.visibility = 'hidden'
-            $('#modal').modal('hide')
         }).catch(function(error){
             AstNotif.dialog('Erro', error.message)
             console.error(error)
@@ -935,6 +934,7 @@ function carregaListaDeAlunos(filtro='') {
 
 var dadosResponsaveis = {}
 function abreDadosDoAluno(matricula) {
+    carregaHistoricoAluno(matricula)
     document.getElementById('infoDoAluno').style.display = 'block'
     document.getElementById('rolaTelaAbaixoAlunos').style.display = 'block'
     const dados = alunos[matricula]
@@ -1329,4 +1329,26 @@ function mostraDadosResponsaveis() {
     document.getElementById('numeroCelularPedagogicoAlunoAbaAlunos').value = dadosResponsaveis.numeroCelularPedagogicoAluno
     document.getElementById('rgPedagogicoAlunoAbaAlunos').value = dadosResponsaveis.rgPedagogicoAluno
     document.getElementById('cpfPedgogicoAlunoAbaAlunos').value = dadosResponsaveis.cpfPedgogicoAluno
+}
+
+function carregaHistoricoAluno(matricula) {
+    let listaHistoricoAluno = document.getElementById('listaHistoricoAluno')
+    listaHistoricoAluno.innerHTML = ''
+    const historico = alunos[matricula].historico
+    for (const key in historico) {
+        if (Object.hasOwnProperty.call(historico, key)) {
+            const infos = historico[key];
+            if (infos.operacao == 'Transferência de alunos') {
+                listaHistoricoAluno.innerHTML += `<button class="list-group-item list-group-item-action" onclick="verOperacaoAluno('${matricula}', '${key}')"><b>Operação:</b> ${infos.operacao}: ${infos.dados.turmaAtual} --> ${infos.dados.turmaParaQualFoiTransferido}</button>`
+            }
+        }
+    }
+}
+
+function verOperacaoAluno(matricula, key) {
+    const infos = alunos[matricula].historico[key]
+    let corpo = `
+        
+    `
+    abrirModal('modal', 'Visualização da operação ' + infos.operacao, corpo, `<button class="btn btn-secondary" data-dismiss="modal">Fechar</button>`)
 }
