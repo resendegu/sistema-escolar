@@ -62,6 +62,17 @@ firebase.auth().onAuthStateChanged((user) => {
             }
             turmasCadastradasNum.innerText = c
         })
+        firebase.database().ref('sistemaEscolar/alunosDesativados').on('value', (snapshot) => {
+            let inactiveStudents = snapshot.val()
+            let c = 0
+            for (const matricula in inactiveStudents) {
+                if (Object.hasOwnProperty.call(inactiveStudents, matricula)) {
+                    const dados = inactiveStudents[matricula];
+                    c++
+                }
+            }
+            alunosDesativadosNum.innerText = c
+        })
         numerosRef.on('value', (snapshot) => {
             loaderMsg.innerText = 'Buscando informações da dashboard'
             var numeros = snapshot.val()
@@ -69,7 +80,7 @@ firebase.auth().onAuthStateChanged((user) => {
             
             //alunosCadastradosNum.innerText = numeros.alunosCadastrados != undefined ? numeros.alunosCadastrados : 0
             
-            alunosDesativadosNum.innerText = numeros.alunosDesativados != undefined ? numeros.alunosDesativados : 0
+            //alunosDesativadosNum.innerText = numeros.alunosDesativados != undefined ? numeros.alunosDesativados : 0
             //turmasCadastradasNum.innerText = numeros.turmasCadastradas != undefined ? numeros.turmasCadastradas : 0
 
             // Alimenta tabela com os números de alunos em cada semana
@@ -451,8 +462,9 @@ function carregaListaDeAlunosDaTurma(turma, filtro='') {
             for (const matricula in alunos) {
                 if (Object.hasOwnProperty.call(alunos, matricula)) {
                     const aluno = alunos[matricula];
-                    document.getElementById('listaAlunosDaTurma').innerHTML += `<div class="row"><div class="col-1" ><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" name="${matricula}" onclick="this.checked ? alunosSelecionadosTurma[${matricula}] = '${aluno.nome}' : alunosSelecionadosTurma[${matricula}] = '', verificaAlunosSelecionados()"></div><div class="col-md"><button class="list-group-item list-group-item-action" onclick="document.getElementById('btnAbaAlunos').click(), document.getElementById('btnAbaAlunosResponsivo').click(), abreDadosDoAluno('${matricula}') "> ${matricula}: ${aluno.nome}</button></div></div>`
+                    document.getElementById('listaAlunosDaTurma').innerHTML += `<div class="row"><div class="col-1" ><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" name="${matricula}" onclick="this.checked ? alunosSelecionadosTurma[${matricula}] = '${aluno.nome}' : alunosSelecionadosTurma[${matricula}] = '', verificaAlunosSelecionados()"></div><div class="col-md"><button class="list-group-item list-group-item-action" onclick="document.getElementById('btnAbaAlunos').click(), document.getElementById('btnAbaAlunosResponsivo').click(), abreDadosDoAluno('${matricula}'), setTimeout( function() {document.getElementById('rolaTelaAbaixoAlunos').style.display = 'block', document.getElementById('rolaTelaAbaixoAlunos').focus(), document.getElementById('rolaTelaAbaixoAlunos').style.display = 'none'}, 300 ); "> ${matricula}: ${aluno.nome}</button></div></div>`
                 }
+                
             }
             loader.style.display = 'none'
         }).catch(error => {
@@ -960,11 +972,18 @@ function carregaListaDeAlunos(filtro='') {
 }
 
 var dadosResponsaveis = {}
-function abreDadosDoAluno(matricula) {
+function abreDadosDoAluno(matricula, desativado=false, notasDesativado=false) {
     carregaHistoricoAluno(matricula)
     document.getElementById('infoDoAluno').style.display = 'block'
     document.getElementById('rolaTelaAbaixoAlunos').style.display = 'block'
-    const dados = alunos[matricula]
+    let dados
+    if (desativado != false) {
+        dados = desativado
+        document.getElementById('alunoDesativado').style.display = 'block'
+    } else {
+        dados = alunos[matricula]
+        document.getElementById('alunoDesativado').style.display = 'none'
+    }
     dadosResponsaveis = {
         nomeResponsavelAluno1: dados.nomeResponsavelAluno1,
         relacaoAluno1: dados.relacaoAluno1,
@@ -1025,6 +1044,9 @@ function abreDadosDoAluno(matricula) {
     document.getElementById('rolaTelaAbaixoAlunos').style.display = 'none'
     turmasRef.child(`${dados.turmaAluno}/alunos/${matricula}/notas`).once('value').then(snapshot => {
         let notas = snapshot.val()
+        if (desativado != false) {
+            notas = notasDesativado
+        }
         console.log(notas)
         document.getElementById('pontosAudicao').innerText = notas.audicao
         document.getElementById('pontosFala').innerText = notas.fala
@@ -1361,15 +1383,28 @@ function mostraDadosResponsaveis() {
 function carregaHistoricoAluno(matricula) {
     let listaHistoricoAluno = document.getElementById('listaHistoricoAluno')
     listaHistoricoAluno.innerHTML = ''
-    const historico = alunos[matricula].historico
-    for (const key in historico) {
-        if (Object.hasOwnProperty.call(historico, key)) {
-            const infos = historico[key];
-            if (infos.operacao == 'Transferência de alunos') {
-                listaHistoricoAluno.innerHTML += `<button class="list-group-item list-group-item-action" onclick="verOperacaoAluno('${matricula}', '${key}')"><b>Operação:</b> ${infos.operacao}: ${infos.dados.turmaAtual} --> ${infos.dados.turmaParaQualFoiTransferido}</button>`
+    try {
+        const historico = alunos[matricula].historico
+        for (const key in historico) {
+            if (Object.hasOwnProperty.call(historico, key)) {
+                const infos = historico[key];
+                if (infos.operacao == 'Transferência de alunos') {
+                    listaHistoricoAluno.innerHTML += `<button class="list-group-item list-group-item-action" onclick="verOperacaoAluno('${matricula}', '${key}')"><b>Operação:</b> ${infos.operacao}: ${infos.dados.turmaAtual} --> ${infos.dados.turmaParaQualFoiTransferido}</button>`
+                }
+            }
+        }
+    } catch (error) {
+        const historico = alunosDesativados[matricula].dadosAluno.historico
+        for (const key in historico) {
+            if (Object.hasOwnProperty.call(historico, key)) {
+                const infos = historico[key];
+                if (infos.operacao == 'Transferência de alunos') {
+                    listaHistoricoAluno.innerHTML += `<button class="list-group-item list-group-item-action" onclick="verOperacaoAluno('${matricula}', '${key}')"><b>Operação:</b> ${infos.operacao}: ${infos.dados.turmaAtual} --> ${infos.dados.turmaParaQualFoiTransferido}</button>`
+                }
             }
         }
     }
+    
 }
 
 function verOperacaoAluno(matricula, key) {
@@ -1402,7 +1437,9 @@ function desativaAlunos(confirma=false) {
         let ativaDesativaAlunos = firebase.functions().httpsCallable('ativaDesativaAlunos')
         ativaDesativaAlunos({codTurma: alunosSelecionadosTurma.codTurma, modo: 'desativa', alunos: nomes}).then(function(result){
             loader.style.display = 'none'
-            AstNotif.dialog(result.data.answer)
+            AstNotif.dialog('Sucesso', result.data.answer)
+            $('#modal').modal('hide')
+
         }).catch(function(error){
             AstNotif.dialog('Erro', error.message)
             loader.style.display = 'none'
@@ -1443,4 +1480,71 @@ function desativaAlunos(confirma=false) {
             $('[data-toggle="tooltip"]').tooltip()
         })
     }
+}
+
+// Funções da aba Alunos Desativados
+var tipoDeBuscaDesativados = 'nomeAluno'
+var alunosDesativados
+function carregaAlunosDesativados(filtro='') {
+    loader.style.display = 'block'
+    loaderMsg.innerText = 'Carregando alunos desativados...'
+    let alunosDesativadosRef = firebase.database().ref('sistemaEscolar/alunosDesativados')
+    let listaAlunosDesativados = document.getElementById('listaAlunosDesativados')
+    if (filtro == '') {
+        alunosDesativadosRef.once('value').then(snapshot => {
+            alunosDesativados = snapshot.val()
+            loader.style.display = 'none'
+            let alunos = snapshot.val()
+            listaAlunosDesativados.innerHTML = ''
+            for (const matricula in alunos) {
+                if (Object.hasOwnProperty.call(alunos, matricula)) {
+                    const dados = alunos[matricula];
+                    listaAlunosDesativados.innerHTML += `<button class="list-group-item list-group-item-action" onclick="abreDadosDoAlunoDesativado('${matricula}')">${matricula}: ${dados.dadosAluno.nomeAluno} (Última Turma: ${dados.dadosAluno.turmaAluno})</button>`
+                }
+            }
+            
+
+        }).catch(error =>{ 
+            AstNotif.dialog('Erro', error.message)
+            loader.style.display = 'none'
+        })
+    } else {
+        alunosDesativadosRef.orderByChild(tipoDeBusca).equalTo(filtro).once('value').then(snapshot => {
+            loader.style.display = 'none'
+            let alunos = snapshot.val()
+            
+            for (const matricula in alunos) {
+                if (Object.hasOwnProperty.call(alunos, matricula)) {
+                    const dados = alunos[matricula];
+                    listaAlunosDesativados.innerHTML = `<button class="list-group-item list-group-item-action" onclick="abreDadosDoAlunoDesativado('${matricula}')">${matricula}: ${dados.dadosAluno.nomeAluno} (Última Turma: ${dados.dadosAluno.turmaAluno})</button>`
+                }
+            }
+
+        }).catch(error => {
+            AstNotif.dialog('Erro', error.message)
+            loader.style.display = 'none'
+        })
+    }
+    
+    
+}
+
+function abreDadosDoAlunoDesativado(matricula) {
+    let dadosAluno = alunosDesativados[matricula].dadosAluno
+    let notas = alunosDesativados[matricula].dadosTurma.notas
+    console.log(dadosAluno)
+    document.getElementById('btnAbaAlunos').click()
+    abreDadosDoAluno(matricula, dadosAluno, notas)
+
+    
+    setTimeout( function() {
+        document.getElementById('rolaTelaAbaixoAlunos').style.display = 'block'
+        document.getElementById('rolaTelaAbaixoAlunos').focus()
+        document.getElementById('rolaTelaAbaixoAlunos').style.display = 'none'
+      }, 300 );
+    
+}
+
+function alteraTipoDeBuscaDesativados(tipo) {
+    tipoDeBuscaDesativados = tipo
 }

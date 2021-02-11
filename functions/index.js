@@ -435,6 +435,12 @@ exports.excluiTurma = functions.https.onCall((data, context) => {
 })
 
 exports.ativaDesativaAlunos = functions.https.onCall((data, context) => {
+    function formataNumMatricula(num) {
+        let numero = num
+        numero = "00000" + numero.replace(/\D/g, '');
+        numero = numero.slice(-5,-1) + numero.slice(-1);
+        return numero
+    }
     if (context.auth.token.master == true || context.auth.token.secretaria == true) {
         let alunos = data.alunos
         let turma = data.codTurma
@@ -443,16 +449,19 @@ exports.ativaDesativaAlunos = functions.https.onCall((data, context) => {
         } else if (data.modo == 'desativa') {
             async function desativaAlunos() {
                 let dadosAluno
-                for (const matricula in alunos) {
-                    if (Object.hasOwnProperty.call(alunos, matricula)) {
-                        const nome = alunos[matricula];
+                let dadosTurma
+                for (const matriculaNum in alunos) {
+                    if (Object.hasOwnProperty.call(alunos, matriculaNum)) {
+                        const nome = alunos[matriculaNum];
+                        let matricula = formataNumMatricula(matriculaNum)
                         await admin.database().ref(`sistemaEscolar/alunos/${matricula}`).once('value').then(snapshot => {
                             dadosAluno = snapshot.val()
+                            console.log(dadosAluno)
 
                             admin.database().ref(`sistemaEscolar/turmas/${turma}/alunos/${matricula}/`).once('value').then(snapshotTurma => {
-                                dadosAluno.turma.alunos[matricula] = snapshotTurma.val()
+                                dadosTurma = snapshotTurma.val()
 
-                                admin.database().ref(`sistemaEscolar/alunosDesativados/${matricula}/`).set(dadosAluno).then(() => {
+                                admin.database().ref(`sistemaEscolar/alunosDesativados/${matricula}/`).set({dadosAluno: dadosAluno, dadosTurma: dadosTurmaturmas}).then(() => {
                                     admin.database().ref(`sistemaEscolar/alunos/${matricula}`).remove().then(() => {
                                         admin.database().ref(`sistemaEscolar/turmas/${turma}/alunos/${matricula}/`).remove().then(() => {
                                         
@@ -475,7 +484,8 @@ exports.ativaDesativaAlunos = functions.https.onCall((data, context) => {
                 }
             }
 
-            return desativaAlunos().then(() => {
+
+            return desativaAlunos().then((error) => {
                 return {answer: 'Os alunos selecionados foram desativados com sucesso.'}
             }).catch(error => {
                 throw new functions.https.HttpsError('unknown', error.message, error)
