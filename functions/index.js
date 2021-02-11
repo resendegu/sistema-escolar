@@ -433,3 +433,60 @@ exports.excluiTurma = functions.https.onCall((data, context) => {
         throw new functions.https.HttpsError('permission-denied', 'Você não possui permissão para fazer alterações nesta área.')
     }
 })
+
+exports.ativaDesativaAlunos = functions.https.onCall((data, context) => {
+    if (context.auth.token.master == true || context.auth.token.secretaria == true) {
+        let alunos = data.alunos
+        let turma = data.codTurma
+        if (data.modo == 'ativa') {
+            
+        } else if (data.modo == 'desativa') {
+            async function desativaAlunos() {
+                let dadosAluno
+                for (const matricula in alunos) {
+                    if (Object.hasOwnProperty.call(alunos, matricula)) {
+                        const nome = alunos[matricula];
+                        await admin.database().ref(`sistemaEscolar/alunos/${matricula}`).once('value').then(snapshot => {
+                            dadosAluno = snapshot.val()
+
+                            admin.database().ref(`sistemaEscolar/turmas/${turma}/alunos/${matricula}/`).once('value').then(snapshotTurma => {
+                                dadosAluno.turma.alunos[matricula] = snapshotTurma.val()
+
+                                admin.database().ref(`sistemaEscolar/alunosDesativados/${matricula}/`).set(dadosAluno).then(() => {
+                                    admin.database().ref(`sistemaEscolar/alunos/${matricula}`).remove().then(() => {
+                                        admin.database().ref(`sistemaEscolar/turmas/${turma}/alunos/${matricula}/`).remove().then(() => {
+                                        
+                                        }).catch(error => {
+                                            throw new functions.https.HttpsError('unknown', error.message, error)
+                                        })
+                                    }).catch(error => {
+                                        throw new functions.https.HttpsError('unknown', error.message, error)
+                                    })
+                                }).catch(error => {
+                                    throw new functions.https.HttpsError('unknown', error.message, error)
+                                })
+                            }).catch(error => {
+                                throw new functions.https.HttpsError('unknown', error.message, error)
+                            })
+                        }).catch(error => {
+                            throw new functions.https.HttpsError('unknown', error.message, error)
+                        })
+                    }
+                }
+            }
+
+            return desativaAlunos().then(() => {
+                return {answer: 'Os alunos selecionados foram desativados com sucesso.'}
+            }).catch(error => {
+                throw new functions.https.HttpsError('unknown', error.message, error)
+            })
+            
+            
+        } else {
+            throw new functions.https.HttpsError('aborted', 'A operação foi abortada pois não foi passado o modo da operação')
+        }
+
+    } else {
+        throw new functions.https.HttpsError('permission-denied', 'Você não possui permissão para fazer alterações nesta área.')
+    }
+})

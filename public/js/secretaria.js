@@ -362,13 +362,16 @@ function transfereAlunosConfirma() {
         }
     }
     abrirModal('modal', 'Confirmação', 
-        `Você selecionou os alunos listados abaixo da turma ${turma}. <br> ${nomes} <br><b>Você deseja transferi-los para qual turma?</b><br>(Aviso: Caso o professor da turma que se quer transferir seja diferente, as notas serão e todas outras informações que foram feitas pelo professor atual serão transferidas também.)
+        `Você selecionou os alunos listados abaixo da turma ${turma}. <br> ${nomes} <br><b>Você deseja transferi-los para qual turma?</b><br>(Aviso: Caso o professor da turma que se quer transferir seja diferente, as notas e todas outras informações que foram feitas pelo professor atual serão transferidas também.)
         <select class="custom-select" id="selectTurmasTransfere">
             <option selected hidden>Escolha uma turma...</option>
         </select>
         `
-        , `<button type="button" class="btn btn-warning" onclick="transfereDaTurma()">Transferir</button><button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>`
+        , `<button type="button" data-toggle="tooltip" data-placement="top" title="A operação de transferência ficará gravada no sistema para futuras consultas." class="btn btn-info" onclick="transfereDaTurma()">Transferir</button><button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>`
     )
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+      })
     let selectTurmasTransfere = document.getElementById('selectTurmasTransfere')
     for (const cod in turmas) {
         if (Object.hasOwnProperty.call(turmas, cod)) {
@@ -448,7 +451,7 @@ function carregaListaDeAlunosDaTurma(turma, filtro='') {
             for (const matricula in alunos) {
                 if (Object.hasOwnProperty.call(alunos, matricula)) {
                     const aluno = alunos[matricula];
-                    document.getElementById('listaAlunosDaTurma').innerHTML += `<div class="row"><div class="col-1" ><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" name="${matricula}" onclick="this.checked ? alunosSelecionadosTurma[${matricula}] = '${aluno.nome}' : alunosSelecionadosTurma[${matricula}] = ''"></div><div class="col-md"><button class="list-group-item list-group-item-action" onclick="document.getElementById('btnAbaAlunos').click(), document.getElementById('btnAbaAlunosResponsivo').click(), abreDadosDoAluno('${matricula}') "> ${matricula}: ${aluno.nome}</button></div></div>`
+                    document.getElementById('listaAlunosDaTurma').innerHTML += `<div class="row"><div class="col-1" ><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" name="${matricula}" onclick="this.checked ? alunosSelecionadosTurma[${matricula}] = '${aluno.nome}' : alunosSelecionadosTurma[${matricula}] = '', verificaAlunosSelecionados()"></div><div class="col-md"><button class="list-group-item list-group-item-action" onclick="document.getElementById('btnAbaAlunos').click(), document.getElementById('btnAbaAlunosResponsivo').click(), abreDadosDoAluno('${matricula}') "> ${matricula}: ${aluno.nome}</button></div></div>`
                 }
             }
             loader.style.display = 'none'
@@ -463,7 +466,7 @@ function carregaListaDeAlunosDaTurma(turma, filtro='') {
             for (const matricula in alunos) {
                 if (Object.hasOwnProperty.call(alunos, matricula)) {
                     const aluno = alunos[matricula];
-                    document.getElementById('listaAlunosDaTurma').innerHTML += `<div class="row"><div class="col-sm-1"><input type="checkbox" name="${matricula}" onclick="this.checked ? alunosSelecionadosTurma[${matricula}] = '${aluno.nome}' : alunosSelecionadosTurma[${matricula}] = ''"></div><div class="col-md"><button class="list-group-item list-group-item-action" onclick="document.getElementById('btnAbaAlunos').click(), document.getElementById('btnAbaAlunosResponsivo').click(), abreDadosDoAluno('${matricula}') "> ${matricula}: ${aluno.nome}</button></div></div>`
+                    document.getElementById('listaAlunosDaTurma').innerHTML += `<div class="row"><div class="col-sm-1"><input type="checkbox" name="${matricula}" onclick="this.checked ? alunosSelecionadosTurma[${matricula}] = '${aluno.nome}' : alunosSelecionadosTurma[${matricula}] = '', verificaAlunosSelecionados()"></div><div class="col-md"><button class="list-group-item list-group-item-action" onclick="document.getElementById('btnAbaAlunos').click(), document.getElementById('btnAbaAlunosResponsivo').click(), abreDadosDoAluno('${matricula}') "> ${matricula}: ${aluno.nome}</button></div></div>`
                 }
             }
             loader.style.display = 'none'
@@ -471,6 +474,30 @@ function carregaListaDeAlunosDaTurma(turma, filtro='') {
             console.log(error)
             AstNotif.dialog('Erro', error.message)
         })
+    }
+    
+}
+
+function verificaAlunosSelecionados() {
+    let c = 0
+    for (const matricula in alunosSelecionadosTurma) {
+        if (Object.hasOwnProperty.call(alunosSelecionadosTurma, matricula)) {
+            const nome = alunosSelecionadosTurma[matricula];
+            
+            if (matricula == 'codTurma') {
+                
+            } else if (nome != "") {
+                c++
+            }
+            console.log(c)
+            if (c == 0) {
+                document.getElementById('btnTransfereAlunosTurma').disabled = true
+                document.getElementById('btnDesativaAlunos').disabled = true
+            } else {
+                document.getElementById('btnTransfereAlunosTurma').disabled = false
+                document.getElementById('btnDesativaAlunos').disabled = false
+            }
+        }
     }
     
 }
@@ -1351,4 +1378,69 @@ function verOperacaoAluno(matricula, key) {
         
     `
     abrirModal('modal', 'Visualização da operação ' + infos.operacao, corpo, `<button class="btn btn-secondary" data-dismiss="modal">Fechar</button>`)
+}
+
+function desativaAlunos(confirma=false) {
+    if (confirma) {
+        loader.style.display = 'block'
+        loaderMsg.innerText = 'Desativando alunos...'
+        let nomes = {}
+        let turma
+        for (const matricula in alunosSelecionadosTurma) {
+            if (Object.hasOwnProperty.call(alunosSelecionadosTurma, matricula)) {
+                const aluno = alunosSelecionadosTurma[matricula];
+                if (matricula == 'codTurma') {
+                    turma = aluno
+                } else if(matricula == undefined || aluno == undefined) {
+
+                } else if(matricula != '') {
+                    nomes[formataNumMatricula(matricula)] = aluno
+                }
+                
+            }
+        }
+        let ativaDesativaAlunos = firebase.functions().httpsCallable('ativaDesativaAlunos')
+        ativaDesativaAlunos({codTurma: alunosSelecionadosTurma.codTurma, modo: 'desativa', alunos: nomes}).then(function(result){
+            loader.style.display = 'none'
+            AstNotif.dialog(result.data.answer)
+        }).catch(function(error){
+            AstNotif.dialog('Erro', error.message)
+            loader.style.display = 'none'
+        })
+    } else {
+        let nomes = ''
+        let turma
+        for (const matricula in alunosSelecionadosTurma) {
+            if (Object.hasOwnProperty.call(alunosSelecionadosTurma, matricula)) {
+                const aluno = alunosSelecionadosTurma[matricula];
+                if (matricula == 'codTurma') {
+                    turma = aluno
+                } else if(matricula == undefined || aluno == undefined) {
+
+                } else {
+                    nomes += formataNumMatricula(matricula) + ': ' + aluno + '<br>'
+                }
+                
+            }
+        }
+
+        abrirModal('modal', 'Confirmação', 
+        `Você está prestes à desativar o(s) aluno(s) que você selecionou da turma ${turma}.
+            <br>
+            ${nomes}
+            <br><br>
+            A desativação de um aluno consiste em desconectar o aluno das turmas e dos professores,
+            mantendo seu cadastro no sistema, porém inativado. Esta ação não apaga nenhum dado, como histórico, notas,
+            e informações cadastrais do aluno. Você poderá consultar alunos desativados na aba de "Alunos Desativados"
+            da secretaria, bem como reativa-los na mesma aba.
+
+            <br><br><b>Você deseja desativar os alunos selecionados?</b>
+        `, 
+        `<button type="button" data-toggle="tooltip" data-placement="top" title="A operação de desativação de alunos ficará gravada no sistema para futuras consultas." class="btn btn-warning" onclick="desativaAlunos(true)">Sim, Desativar</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>`
+        )
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
+    }
 }
