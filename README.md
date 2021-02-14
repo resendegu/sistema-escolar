@@ -17,7 +17,9 @@ O login é baseado no formato email/senha. Todo usuário que se cadastra no site
 
 ##### Vídeo - Como se cadastrar e logar no site. (1min40seg)
 [![Como se cadastrar e logar no site](http://img.youtube.com/vi/QGrImToH5-s/0.jpg)](http://www.youtube.com/watch?v=QGrImToH5-s "Como se cadastrar e logar no site")
+Quando qualquer usuário que não seja um usuário master, se cadastra no sistema, esse usuário não terá nenhum tipo de acesso ao sistema.
 
 
 ##### Vídeo - Como usar o painel de administrador na pagina de login (1min46seg)
 [![Como usar o painel de administrador na pagina de login](http://img.youtube.com/vi/T0z-knrXUrI/0.jpg)](http://www.youtube.com/watch?v=T0z-knrXUrI "Como usar o painel de administrador na pagina de login")
+No painel do administrador você também pode definir usuários masters sem precisar de cadastrá-lo manualmente no Firebase.
