@@ -444,8 +444,60 @@ exports.ativaDesativaAlunos = functions.https.onCall((data, context) => {
     if (context.auth.token.master == true || context.auth.token.secretaria == true) {
         let alunos = data.alunos
         let turma = data.codTurma
+        var timestamp = admin.firestore.Timestamp.now()
         if (data.modo == 'ativa') {
-            
+            async function ativaAlunos() {
+                let dadosAluno
+                let dadosTurma
+                for (const matriculaNum in alunos) {
+                    if (Object.hasOwnProperty.call(alunos, matriculaNum)) {
+                        const nome = alunos[matriculaNum];
+                        let matricula = formataNumMatricula(matriculaNum)
+                        await admin.database().ref(`sistemaEscolar/alunosDesativados/${matricula}/dadosAluno`).once('value').then(snapshot => {
+                            dadosAluno = snapshot.val()
+                            console.log(dadosAluno)
+
+                            admin.database().ref(`sistemaEscolar/alunosDesativados/${matricula}/dadosTurma`).once('value').then(snapshotTurma => {
+                                dadosTurma = snapshotTurma.val()
+
+                                admin.database().ref(`sistemaEscolar/alunos/${matricula}/`).set(dadosAluno).then(() => {
+                                    admin.database().ref(`sistemaEscolar/alunosDesativados/${matricula}`).remove().then(() => {
+                                        admin.database().ref(`sistemaEscolar/turmas/${turma}/alunos/${matricula}/`).set(dadosTurma).then(() => {
+                                            admin.database().ref(`sistemaEscolar/alunos/${matricula}/historico`).push({dados:{dadosTurma: dadosTurma, turmaAtivacao: turma}, timestamp: timestamp, operacao: 'Reativação de aluno'}).then(() => {
+                                                admin.database().ref(`sistemaEscolar/alunos/${matricula}/turmaAluno`).set(turma).then(() => {
+
+                                                }).catch(error => {
+                                                    throw new functions.https.HttpsError('unknown', error.message, error)
+                                                })
+
+                                            }).catch((error) => {
+                                                throw new functions.https.HttpsError('unknown', error.message, error)
+                                            })
+                                        
+                                        }).catch(error => {
+                                            throw new functions.https.HttpsError('unknown', error.message, error)
+                                        })
+                                    }).catch(error => {
+                                        throw new functions.https.HttpsError('unknown', error.message, error)
+                                    })
+                                }).catch(error => {
+                                    throw new functions.https.HttpsError('unknown', error.message, error)
+                                })
+                            }).catch(error => {
+                                throw new functions.https.HttpsError('unknown', error.message, error)
+                            })
+                        }).catch(error => {
+                            throw new functions.https.HttpsError('unknown', error.message, error)
+                        })
+                    }
+                }
+            }
+
+            return ativaAlunos().then(() => {
+                return {answer: 'Os alunos selecionados foram reativados com sucesso.'}
+            }).catch(error => {
+                throw new functions.https.HttpsError('unknown', error.message, error)
+            })
         } else if (data.modo == 'desativa') {
             async function desativaAlunos() {
                 let dadosAluno
@@ -461,9 +513,14 @@ exports.ativaDesativaAlunos = functions.https.onCall((data, context) => {
                             admin.database().ref(`sistemaEscolar/turmas/${turma}/alunos/${matricula}/`).once('value').then(snapshotTurma => {
                                 dadosTurma = snapshotTurma.val()
 
-                                admin.database().ref(`sistemaEscolar/alunosDesativados/${matricula}/`).set({dadosAluno: dadosAluno, dadosTurma: dadosTurmaturmas}).then(() => {
+                                admin.database().ref(`sistemaEscolar/alunosDesativados/${matricula}/`).set({dadosAluno: dadosAluno, dadosTurma: dadosTurma}).then(() => {
                                     admin.database().ref(`sistemaEscolar/alunos/${matricula}`).remove().then(() => {
                                         admin.database().ref(`sistemaEscolar/turmas/${turma}/alunos/${matricula}/`).remove().then(() => {
+                                            admin.database().ref(`sistemaEscolar/alunosDesativados/${matricula}/dadosAluno/historico`).push({dados:{dadosTurma: dadosTurma, turma: turma}, timestamp: timestamp, operacao: 'Desativação de aluno'}).then(() => {
+
+                                            }).catch((error) => {
+                                                throw new functions.https.HttpsError('unknown', error.message, error)
+                                            })
                                         
                                         }).catch(error => {
                                             throw new functions.https.HttpsError('unknown', error.message, error)
@@ -485,7 +542,7 @@ exports.ativaDesativaAlunos = functions.https.onCall((data, context) => {
             }
 
 
-            return desativaAlunos().then((error) => {
+            return desativaAlunos().then(() => {
                 return {answer: 'Os alunos selecionados foram desativados com sucesso.'}
             }).catch(error => {
                 throw new functions.https.HttpsError('unknown', error.message, error)
