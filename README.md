@@ -12,10 +12,12 @@ Um sistema de gestão escolar, indicado para **escolas de idiomas e cursos livre
 ### Área de Login/Cadastro (Autenticação)
 O login é baseado no formato email/senha. Todo usuário que se cadastra no site não tem permissões para realizar nada com banco de dados, funções... Ou seja, não têm acesso à nada. Exceto os usuários "master" ou "administradores do sistema". Por uma questão de segurança, é necessário definir pelo menos um email de um usuário master manualmente no Realtime Database do Firebase. (Veja o vídeo abaixo mostrando como definir um usuário master manualmente).
 
-##### Vídeo - Como definir usuários master no Realtime Database.
+##### Vídeo - Como definir usuários master no Realtime Database. (1min30seg)
 [![Definir usuários masters no Firebase - Vídeo](http://img.youtube.com/vi/eRPceWNkV3s/0.jpg)](http://www.youtube.com/watch?v=eRPceWNkV3s "Definir usuários masters no Firebase")
 
-Vídeo - Como se cadastrar e logar no site.
+##### Vídeo - Como se cadastrar e logar no site. (1min40seg)
+[![Como se cadastrar e logar no site](http://img.youtube.com/vi/QGrImToH5-s/0.jpg)](http://www.youtube.com/watch?v=QGrImToH5-s "Como se cadastrar e logar no site")
 
 
-Vídeo - Como usar o painel de administrador na pagina de login
+##### Vídeo - Como usar o painel de administrador na pagina de login (1min46seg)
+[![Como usar o painel de administrador na pagina de login](http://img.youtube.com/vi/T0z-knrXUrI/0.jpg)](http://www.youtube.com/watch?v=T0z-knrXUrI "Como usar o painel de administrador na pagina de login")
