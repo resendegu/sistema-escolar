@@ -10,4 +10,12 @@ Um sistema de gestão escolar, indicado para **escolas de idiomas e cursos livre
  ## Funcionalidades do sistema
  De forma simples e com vídeos curtos, apresento as funções de cada área do site/sistema.
 ### Área de Login/Cadastro (Autenticação)
-O login é baseado no formato email/senha. Todo usuário que se cadastra no site não tem permissões para realizar nada com banco de dados, funções... Ou seja, não têm acesso à nada. Exceto os usuários "master" ou "administradores do sistema". Por uma questão de segurança, é necessário definir um email de um usuário master manualmente no Realtime Database .do Firebase. (Veja o vídeo abaixo mostrando como definir um usuário master manualmente)
+O login é baseado no formato email/senha. Todo usuário que se cadastra no site não tem permissões para realizar nada com banco de dados, funções... Ou seja, não têm acesso à nada. Exceto os usuários "master" ou "administradores do sistema". Por uma questão de segurança, é necessário definir pelo menos um email de um usuário master manualmente no Realtime Database do Firebase. (Veja o vídeo abaixo mostrando como definir um usuário master manualmente).
+
+Vídeo - Como definir usuários master no Realtime Database.
+
+
+Vídeo - Como se cadastrar e logar no site.
+
+
+Vídeo - Como usar o painel de administrador na pagina de login
