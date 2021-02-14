@@ -23,3 +23,6 @@ Quando qualquer usuário que não seja um usuário master, se cadastra no sistem
 ##### Vídeo - Como usar o painel de administrador na pagina de login (1min46seg)
 [![Como usar o painel de administrador na pagina de login](http://img.youtube.com/vi/T0z-knrXUrI/0.jpg)](http://www.youtube.com/watch?v=T0z-knrXUrI "Como usar o painel de administrador na pagina de login")
 No painel do administrador você também pode definir usuários masters sem precisar de cadastrá-lo manualmente no Firebase.
+
+
+Projeto em construção :-) 
