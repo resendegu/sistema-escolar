@@ -369,13 +369,13 @@ exports.transfereAlunos = functions.https.onCall((data, context) => {
                     for (const matricula in alunos) {
                         if (Object.hasOwnProperty.call(alunos, matricula)) {
                             const dadosAluno = alunos[matricula];
-                            await admin.database().ref(`sistemaEscolar/turmas/${turmaAtual}/historico`).push({dados: {matricula: matricula, dadosAluno: dadosAluno}, timestamp: timestamp, operacao: 'Transferência de alunos'}).then(() => {
+                            await admin.database().ref(`sistemaEscolar/turmas/${turmaAtual}/historico`).push({dados: {matricula: matricula, dadosAluno: dadosAluno, turmaAtual: turmaAtual, turmaParaQualFoiTransferido: turmaParaTransferir}, timestamp: timestamp, operacao: 'Transferência de alunos'}).then(() => {
                                 admin.database().ref(`sistemaEscolar/turmas/${turmaAtual}/alunos/${matricula}`).remove().then(() => {
                                     admin.database().ref(`sistemaEscolar/turmas/${turmaParaTransferir}/professor/0`).once('value').then(novoProfessor => {
                                         admin.database().ref(`sistemaEscolar/turmas/${turmaParaTransferir}/alunos/${matricula}/prof/`).set(novoProfessor.val()).then(() =>{
                                             admin.database().ref(`sistemaEscolar/alunos/${matricula}/profAluno/`).set(novoProfessor.val()).then(() =>{
                                                 admin.database().ref(`sistemaEscolar/alunos/${matricula}/turmaAluno/`).set(turmaParaTransferir).then(() =>{
-                                                    admin.database().ref(`sistemaEscolar/alunos/${matricula}/historico/`).push({dados: {matricula: matricula, dadosAluno: dadosAluno}, timestamp: timestamp, operacao: 'Transferência de alunos'}).then(() =>{
+                                                    admin.database().ref(`sistemaEscolar/alunos/${matricula}/historico/`).push({dados: {matricula: matricula, dadosAluno: dadosAluno, turmaAtual: turmaAtual, turmaParaQualFoiTransferido: turmaParaTransferir}, timestamp: timestamp, operacao: 'Transferência de alunos'}).then(() =>{
 
                                                     }).catch(error => {
                                                         throw new functions.https.HttpsError('unknown', error.message, error)
@@ -429,6 +429,130 @@ exports.excluiTurma = functions.https.onCall((data, context) => {
         }).catch(error => {
             throw new functions.https.HttpsError('unknown', error.message, error)
         })
+    } else {
+        throw new functions.https.HttpsError('permission-denied', 'Você não possui permissão para fazer alterações nesta área.')
+    }
+})
+
+exports.ativaDesativaAlunos = functions.https.onCall((data, context) => {
+    function formataNumMatricula(num) {
+        let numero = num
+        numero = "00000" + numero.replace(/\D/g, '');
+        numero = numero.slice(-5,-1) + numero.slice(-1);
+        return numero
+    }
+    if (context.auth.token.master == true || context.auth.token.secretaria == true) {
+        let alunos = data.alunos
+        let turma = data.codTurma
+        var timestamp = admin.firestore.Timestamp.now()
+        if (data.modo == 'ativa') {
+            async function ativaAlunos() {
+                let dadosAluno
+                let dadosTurma
+                for (const matriculaNum in alunos) {
+                    if (Object.hasOwnProperty.call(alunos, matriculaNum)) {
+                        const nome = alunos[matriculaNum];
+                        let matricula = formataNumMatricula(matriculaNum)
+                        await admin.database().ref(`sistemaEscolar/alunosDesativados/${matricula}/dadosAluno`).once('value').then(snapshot => {
+                            dadosAluno = snapshot.val()
+                            console.log(dadosAluno)
+
+                            admin.database().ref(`sistemaEscolar/alunosDesativados/${matricula}/dadosTurma`).once('value').then(snapshotTurma => {
+                                dadosTurma = snapshotTurma.val()
+
+                                admin.database().ref(`sistemaEscolar/alunos/${matricula}/`).set(dadosAluno).then(() => {
+                                    admin.database().ref(`sistemaEscolar/alunosDesativados/${matricula}`).remove().then(() => {
+                                        admin.database().ref(`sistemaEscolar/turmas/${turma}/alunos/${matricula}/`).set(dadosTurma).then(() => {
+                                            admin.database().ref(`sistemaEscolar/alunos/${matricula}/historico`).push({dados:{dadosTurma: dadosTurma, turmaAtivacao: turma}, timestamp: timestamp, operacao: 'Reativação de aluno'}).then(() => {
+                                                admin.database().ref(`sistemaEscolar/alunos/${matricula}/turmaAluno`).set(turma).then(() => {
+
+                                                }).catch(error => {
+                                                    throw new functions.https.HttpsError('unknown', error.message, error)
+                                                })
+
+                                            }).catch((error) => {
+                                                throw new functions.https.HttpsError('unknown', error.message, error)
+                                            })
+                                        
+                                        }).catch(error => {
+                                            throw new functions.https.HttpsError('unknown', error.message, error)
+                                        })
+                                    }).catch(error => {
+                                        throw new functions.https.HttpsError('unknown', error.message, error)
+                                    })
+                                }).catch(error => {
+                                    throw new functions.https.HttpsError('unknown', error.message, error)
+                                })
+                            }).catch(error => {
+                                throw new functions.https.HttpsError('unknown', error.message, error)
+                            })
+                        }).catch(error => {
+                            throw new functions.https.HttpsError('unknown', error.message, error)
+                        })
+                    }
+                }
+            }
+
+            return ativaAlunos().then(() => {
+                return {answer: 'Os alunos selecionados foram reativados com sucesso.'}
+            }).catch(error => {
+                throw new functions.https.HttpsError('unknown', error.message, error)
+            })
+        } else if (data.modo == 'desativa') {
+            async function desativaAlunos() {
+                let dadosAluno
+                let dadosTurma
+                for (const matriculaNum in alunos) {
+                    if (Object.hasOwnProperty.call(alunos, matriculaNum)) {
+                        const nome = alunos[matriculaNum];
+                        let matricula = formataNumMatricula(matriculaNum)
+                        await admin.database().ref(`sistemaEscolar/alunos/${matricula}`).once('value').then(snapshot => {
+                            dadosAluno = snapshot.val()
+                            console.log(dadosAluno)
+
+                            admin.database().ref(`sistemaEscolar/turmas/${turma}/alunos/${matricula}/`).once('value').then(snapshotTurma => {
+                                dadosTurma = snapshotTurma.val()
+
+                                admin.database().ref(`sistemaEscolar/alunosDesativados/${matricula}/`).set({dadosAluno: dadosAluno, dadosTurma: dadosTurma}).then(() => {
+                                    admin.database().ref(`sistemaEscolar/alunos/${matricula}`).remove().then(() => {
+                                        admin.database().ref(`sistemaEscolar/turmas/${turma}/alunos/${matricula}/`).remove().then(() => {
+                                            admin.database().ref(`sistemaEscolar/alunosDesativados/${matricula}/dadosAluno/historico`).push({dados:{dadosTurma: dadosTurma, turma: turma}, timestamp: timestamp, operacao: 'Desativação de aluno'}).then(() => {
+
+                                            }).catch((error) => {
+                                                throw new functions.https.HttpsError('unknown', error.message, error)
+                                            })
+                                        
+                                        }).catch(error => {
+                                            throw new functions.https.HttpsError('unknown', error.message, error)
+                                        })
+                                    }).catch(error => {
+                                        throw new functions.https.HttpsError('unknown', error.message, error)
+                                    })
+                                }).catch(error => {
+                                    throw new functions.https.HttpsError('unknown', error.message, error)
+                                })
+                            }).catch(error => {
+                                throw new functions.https.HttpsError('unknown', error.message, error)
+                            })
+                        }).catch(error => {
+                            throw new functions.https.HttpsError('unknown', error.message, error)
+                        })
+                    }
+                }
+            }
+
+
+            return desativaAlunos().then(() => {
+                return {answer: 'Os alunos selecionados foram desativados com sucesso.'}
+            }).catch(error => {
+                throw new functions.https.HttpsError('unknown', error.message, error)
+            })
+            
+            
+        } else {
+            throw new functions.https.HttpsError('aborted', 'A operação foi abortada pois não foi passado o modo da operação')
+        }
+
     } else {
         throw new functions.https.HttpsError('permission-denied', 'Você não possui permissão para fazer alterações nesta área.')
     }
