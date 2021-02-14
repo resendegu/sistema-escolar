@@ -7,4 +7,6 @@ Um sistema de gestão escolar, indicado para **escolas de idiomas e cursos livre
  ### Proposta do projeto 
  Ser simples, responsivo (dentro do possível), e atender à necessidades básicas de cursos livres, por exemplo, apresentando seções para professores, secretaria, e administrativo, guardando todos os dados escolares (como históricos, notas...) na nuvem, também gerenciando esses dados automaticamente na plataforma, permitindo um acesso mais facilitado, e também remoto das informações necessárias.
 
- Projeto em construção...
+ ## Funcionalidades do sistema
+ De forma simples e com vídeos curtos, apresento as funções de cada área do site/sistema.
+### Área de Login/Cadastro
