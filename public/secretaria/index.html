@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="../css/loader.css">
     <link href="../css/list-items.css" rel="stylesheet">
     <link rel="stylesheet" href="../css/secretaria.css">
+    <link rel="stylesheet" href="../css/chat.css">
 
       <!-- Carregando arquivos da biblioteca AST-Notif. Créditos: https://github.com/anandastoon/AST-Notif -->
     <link rel="stylesheet" href="../resources/AST-Notif/css/ast-notif.min.css">
@@ -43,6 +44,9 @@
         </div>
       </div>
     </div>
+
+    
+
           <!-- Inicialização do Firebase -->
         <!-- update the version number as needed -->
         <script defer src="/__/firebase/8.2.3/firebase-app.js"></script>
@@ -142,6 +146,72 @@
 </div>
 
     <div class="container-fluid">
+      <div id="chat">                          
+        <div class="container">
+          <div class="row pt-3">
+            <div class="chat-main">
+                  <div class="col-md-12 chat-header rounded-top bg-primary text-white">
+                      <div class="row">
+                          <div class="col-md-6 username pl-2">
+                              <i aria-hidden="true" data-feather="message-square"></i>
+                              <h6 class="m-0" id="nomeChat">Geral</h6>
+                          </div>
+                          <div class="col-md-6 options text-right pr-2">
+                              <i data-feather="video" aria-hidden="true"></i>
+                              <i data-feather="phone" aria-hidden="true"></i>
+                              <i class="fa fa-cog mr-2" data-feather="settings" aria-hidden="true"></i>
+                              <i class="fa fa-times hide-chat-box" data-feather="chevrons-down" id="fechaChat" aria-hidden="true"></i>
+                              <i class="fa fa-times hide-chat-box" data-feather="chevrons-up" id="abreChat" aria-hidden="true" style="visibility: hidden;"></i>
+                            </div>
+                        </div>
+                  </div>
+                  <div class="chat-content">
+                      <div class="col-md-12 chats border">
+                        <ul class="p-0" id="mensagensChat">
+                          <!-- Exemplos de mesagens: 
+                            <li class="pl-2 pr-2 bg-primary rounded text-white text-center send-msg mb-1">
+                                hiii
+                            </li>
+                            <li class="p-1 rounded mb-1">
+                                <div class="receive-msg">
+                                    <img src="http://nicesnippets.com/demo/image1.jpg">
+                                    <div class="receive-msg-desc  text-center mt-1 ml-1 pl-2 pr-2">
+                                        <p class="pl-2 pr-2 rounded">hello</p>
+                                    </div>
+                                </div>
+                            </li>
+                          -->  
+                        </ul>
+                      </div>
+                      <div class="col-md-12 message-box border pl-2 pr-2 border-top-0">
+                          <form id="enviaMsgChat">
+                            <div class="row">
+                              <div class="col-md-10">
+                                <input type="text" name="txtMsg" autocomplete="off" id="txtMsg" class="pl-0 pr-0 w-100" placeholder="Digite aqui..." />
+                                
+                              </div>
+                              <div class="col-auto">
+                                <button type="submit" class="float-right" id="btnEnviaMsg" style="padding: 0; border: none; background: none;"><i class="fa fa-telegram" data-feather="send" aria-hidden="true"></i></button>
+                              </div>
+                            </div>
+                          </form>
+                        
+                          
+                          
+                        
+                          
+                          <div class="tools">
+                            <button type="button" onclick="enviarImagem()" id="btnEnviaImagem" style="padding: 0; border: none; background: none;"><i class="fa fa-picture-o" data-feather="image" aria-hidden="true"></i></button>
+                            <button type="button" onclick="enviarAnexo()" id="btnEnviaAnexo" style="padding: 0; border: none; background: none;"><i class="fa fa-paperclip" data-feather="paperclip" aria-hidden="true"></i></button>
+                            
+                            <button type="button" onclick="mensagemRapida('like')" id="btnEnviaLike" class="float-right" style="padding: 0; border: none; background: none;"><i class="fa fa-thumbs-o-up m-0" data-feather="thumbs-up" aria-hidden="true"></i></button>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+        </div>
+      </div>
       <div class="row">
         <nav class="col-md-2 d-none d-md-block bg-light sidebar">
           <div class="sidebar-sticky">
@@ -185,39 +255,44 @@
             </ul>
 
             <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
-              <span>Saved reports</span>
+              <span>Chats</span>
               <a class="d-flex align-items-center text-muted" href="#">
-                <span data-feather="plus-circle"></span>
+                <span data-feather="plus-circle" data-toggle="tooltip" data-placement="top" title="Procurar e adicionar usuários no chat"></span>
               </a>
             </h6>
-            <ul class="nav flex-column mb-2">
-              <li class="nav-item">
-                <a class="nav-link" href="#">
-                  <span data-feather="file-text"></span>
-                  Current month
-                </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#">
-                  <span data-feather="file-text"></span>
-                  Last quarter
-                </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#">
-                  <span data-feather="file-text"></span>
-                  Social engagement
-                </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#">
-                  <span data-feather="file-text"></span>
-                  Year-end sale
-                </a>
-              </li>
-            </ul>
+            <div id="listaChats">
+              <ul class="nav flex-column mb-2">
+                <li class="nav-item">
+                  <a class="nav-link" href="#" data-toggle="tooltip" data-placement="top" title="Apenas funcionários cadastrados corretamente no sistema têm acesso à este chat">
+                    <span data-feather="message-square"></span>
+                    Geral
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#">
+                    <span data-feather="file-text"></span>
+                    Last quarter
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#">
+                    <span data-feather="file-text"></span>
+                    Social engagement
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#">
+                    <span data-feather="file-text"></span>
+                    Year-end sale
+                  </a>
+                </li>
+              </ul>
+            </div>
+            
+            
           </div>
         </nav>
+       
 
         <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
           <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
@@ -1131,6 +1206,7 @@
     </script>
     <script defer src="../js/secretaria.js"></script>
     <script defer src="../js/app.js"></script>
+    <script defer src="../js/chat.js"></script>
     <!-- Carregando outros arquivos da biblioteca AST-Notif. Créditos: https://github.com/anandastoon/AST-Notif -->
     <script defer src="../resources/AST-Notif/js/ast-notif.min.js"></script>
 
