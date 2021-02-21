@@ -13,7 +13,7 @@
 	position: fixed;
 	width: 270px;
 	bottom: 0;
-	left: 10px;
+	right: 10px;
     background: white;
     z-index: 99999;
 }

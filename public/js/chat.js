@@ -13,10 +13,45 @@ $('.hide-chat-box').click(function(){
 $('#fechaChat').click()
 
 var chatsRef = firebase.database().ref('sistemaEscolar/chats')
+function carregaListaChats() {
+    let listaChats = document.getElementById('listaChats')
+    listaChats.innerHTML = `
+        <li class="nav-item">
+            <a class="nav-link" href="#" onclick="carregaChat('geral')" data-toggle="tooltip" data-placement="top" title="Apenas funcionários cadastrados corretamente no sistema têm acesso à este chat">
+            <span data-feather="message-square"></span>
+            geral
+            </a>
+        </li>`
+    chatsRef.on('child_added', (snapshot) => {
+        if (snapshot.key != 'geral') {
+            listaChats.innerHTML += `
+        <li class="nav-item">
+            <a class="nav-link" href="#" id="chat${snapshot.key}" onclick="carregaChat('${snapshot.key}')">
+            <span data-feather="message-square"></span>
+            ${snapshot.key}
+            </a>
+        </li>
+        `
+        feather.replace()
+        }
+    })
+}
+
 
 var chat = 'geral'
 function carregaChat(chatConectado='geral', primeiravez=false) {
+    let nomeChat = document.getElementById('nomeChat')
+    let mensagensChat = document.getElementById('mensagensChat')
+
+    if (primeiravez == false) {
+        $('#abreChat').click()
+    }
+
+    nomeChat.innerText = chatConectado
+    chatsRef.child(chat).off('child_added')
     chat = chatConectado
+
+    mensagensChat.innerHTML = ''
     chatsRef.child(chatConectado).on('child_added', (snapshot) => {
         console.log(snapshot.val())
         let mensagem = snapshot.val()
@@ -25,7 +60,7 @@ function carregaChat(chatConectado='geral', primeiravez=false) {
             mensagem.foto = '../images/profile_placeholder.png'
         }
         let user = usuarioAtual()
-        let mensagensChat = document.getElementById('mensagensChat')
+        
         if (tipo == 'imagem') {
             
         } else if (tipo == 'anexo') {
@@ -57,6 +92,7 @@ function carregaChat(chatConectado='geral', primeiravez=false) {
     })
     
 }
+carregaListaChats()
 
 carregaChat('geral', true)
 
@@ -144,5 +180,80 @@ function enviarAnexo(confirma=false) {
          `,
          `<button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>`
         )
+    }
+}
+
+function criarChat(confirma=false) {
+    if (confirma) {
+        loader.style.display = 'block'
+        loaderMsg.innerHTML = 'Criando canal de chat...'
+        let nome = document.getElementById('nomeNovoChat').value
+        let user = usuarioAtual()
+        chatsRef.child(nome).once('value').then(snapshot => {
+            if(snapshot.exists()) {
+                AstNotif.dialog('Opa...', 'Um chat com o mesmo nome já existe. Tente usar outro nome.')
+                loader.style.display = 'none'
+            } else {
+                chatsRef.child(nome).push({
+                    nome: 'Chat criado!', 
+                    email: user.email,
+                    mensagem: 'O chat foi criado. Envie mensagens!'
+                }).then(() => {
+                    loader.style.display = 'none'
+                    AstNotif.notify('Sucesso', `O chat ${nome}, foi criado. Envie Mensagens!`)
+                    $('#modal').modal('hide')
+                    carregaChat(nome)
+                }).catch(error => {
+                    AstNotif.dialog('Erro', error.message)
+                    loader.style.display = 'none'
+                })
+            }
+        }).catch(error => {
+            AstNotif.dialog('Erro', error.message)
+        })
+    } else {
+        abrirModal('modal', 'Criar um novo canal de chat', 
+            `
+                Dê um nome que já não esteja cadastrado para o chat:
+                <div class="form-group">
+                    <label for="exampleFormControlInput1">Nome do chat:</label>
+                    <input type="url" class="form-control" id="nomeNovoChat" placeholder="Crie um nome para o chat...">
+                </div>
+
+            `,
+            `<button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button> <button type="button" class="btn btn-primary" onclick="criarChat(true)">Criar chat</button>`
+        )
+    }
+}
+
+function configChat() {
+    let mensagensChat = document.getElementById('mensagensChat')
+    mensagensChat.innerHTML = `
+        <li class="pl-2 pr-2 bg-primary rounded text-white text-center float-left send-msg mb-1">
+            Opções do chat
+        </li>
+        <br><br>
+        <button type="button" class="btn btn-sm btn-danger" onclick="excluirChat()">Excluir chat</button>
+    `
+}
+
+function excluirChat(confirma=false) {
+    if (confirma) {
+        loader.style.display = 'block'
+        loaderMsg.innerText = 'Excluido chat...'
+        chatsRef.child(chat).remove().then(() => {
+            loader.style.display = 'none'
+            AstNotif.notify('Sucesso', 'O chat foi excluído')
+            carregaListaChats()
+            carregaChat('geral')
+            document.getElementById('ast-dialog-bg').remove()
+        }).catch(error => {
+            document.getElementById('ast-dialog-bg').remove()
+            AstNotif.dialog('Erro', error.message)
+            loader.style.display = 'none'
+            
+        })
+    } else {
+        AstNotif.dialog('Atenção', 'Você está prestes a excluir o chat ' + chat + '. Todas as mensagens serão perdidas. Você confirma esta ação? <br><br><button type="button" class="btn btn-sm btn-danger" onclick="excluirChat(true)">Sim, excluir o chat</button>', {positive: 'Cancelar', negative: ''})
     }
 }
