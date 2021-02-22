@@ -148,7 +148,7 @@ function enviarImagem(confirma=false) {
         $('#fechaChat').click()
         abrirModal('modal', 'Enviar uma imagem', 
          `Cuidado para não extrapolar e enviar imagens muito grandes ao servidor, pois você pode exceder a cota de armazenamento e banda, e poderá pagar por isso. Use com moderação :-)
-         <br><br>
+         <br>
         
         <div class="form-group">
             <label for="exampleFormControlInput1">Enviar uma imagem de um link da internet:</label>
@@ -157,7 +157,18 @@ function enviarImagem(confirma=false) {
         <br> Ou<br><br>
         <div class="form-group">
             <label for="exampleFormControlFile1">Envie uma imagem do seu dispositivo para os servidores:</label>
-            <input type="file" class="form-control-file" id="exampleFormControlFile1">
+            <!-- Drag and Drop -->
+              <div id="drop-area">
+                <form class="my-form">
+                  <p>Arraste e solte os arquivos para enviar (upload)</p> ou
+                  <input type="file" id="fileElem" multiple onchange="handleFiles(this.files)">
+                  
+                  <label class="button" for="fileElem">Escolher arquivos</label>
+                </form>
+                <div class="progress" style="position: relative;">
+                  <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" id="progress">0%</div>
+                </div>
+              </div>
         </div>
          `,
          `<button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>`
@@ -175,7 +186,18 @@ function enviarAnexo(confirma=false) {
          <br><br>
          <div class="form-group">
             <label for="exampleFormControlFile1">Envie um arquivo do seu dispositivo para os servidores:</label>
-            <input type="file" class="form-control-file" id="exampleFormControlFile1">
+            <!-- Drag and Drop -->
+              <div id="drop-area">
+                <form class="my-form">
+                  <p>Arraste e solte os arquivos para enviar (upload)</p> ou
+                  <input type="file" id="fileElem" multiple onchange="handleFiles(this.files)">
+                  
+                  <label class="button" for="fileElem">Escolher arquivos</label>
+                </form>
+                <div class="progress" style="position: relative;">
+                  <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" id="progress">0%</div>
+                </div>
+              </div>
         </div>
          `,
          `<button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>`
@@ -226,15 +248,27 @@ function criarChat(confirma=false) {
     }
 }
 
+var configChatEstado = 'fechado'
 function configChat() {
     let mensagensChat = document.getElementById('mensagensChat')
-    mensagensChat.innerHTML = `
+    if (configChatEstado == 'fechado') {
+        configChatEstado = 'aberto'
+        let botaoAbre = document.getElementById('abreChat')
+        if (botaoAbre.style.visibility == 'visible') {
+            $('#abreChat').click()
+        }
+        mensagensChat.innerHTML = `
         <li class="pl-2 pr-2 bg-primary rounded text-white text-center float-left send-msg mb-1">
             Opções do chat
         </li>
         <br><br>
         <button type="button" class="btn btn-sm btn-danger" onclick="excluirChat()">Excluir chat</button>
-    `
+        `
+    } else {
+        configChatEstado = 'fechado'
+        carregaChat(chat)
+    }
+    
 }
 
 function excluirChat(confirma=false) {

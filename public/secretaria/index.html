@@ -17,6 +17,7 @@
     <link href="../css/list-items.css" rel="stylesheet">
     <link rel="stylesheet" href="../css/secretaria.css">
     <link rel="stylesheet" href="../css/chat.css">
+    <link rel="stylesheet" href="../css/filedrop.css">
 
       <!-- Carregando arquivos da biblioteca AST-Notif. Créditos: https://github.com/anandastoon/AST-Notif -->
     <link rel="stylesheet" href="../resources/AST-Notif/css/ast-notif.min.css">
@@ -150,7 +151,7 @@
         <div class="container">
           <div class="row pt-3">
             <div class="chat-main">
-              <div class="col-md-12 chat-header rounded-top bg-primary text-white">
+              <div class="col-md-12 chat-header rounded-top text-white">
                 <div class="row">
                   <div class="col-md-6 username pl-2">
                     <i aria-hidden="true" data-feather="message-square"></i>
@@ -1121,28 +1122,7 @@
             <div class="container tab-pane fade" id="abaAlunosDesativados" role="tabpanel" aria-labelledby="Alunos Desativados">
               <label class="h3">Alunos Desativados</label>
               <br>
-              <div class="col">
-                <div class="container">
-                  <div class="row">
-                    <!--<div class="form-group col-auto">
-                      <label for="inputAddress">Campo de busca</label>
-                      <input class="form-control" type="search" placeholder="Digite a busca..." aria-label="Search" onchange="carregaAlunosDesativados(maiusculo(this))">
-                    </div>
-                    <div class="form-group col-auto">
-                      <label for="inputAddress">Buscar por:</label>
-                      <select class="form-control" name="tipoDeBusca" id="tipoDeBusca" onchange="alteraTipoDeBuscaDesativados(this.value)">
-                        <option selected value="nomeAluno">Nome do aluno</option>
-                        <option value="matriculaAluno">Número de matrícula</option>
-                        <option value="cpfAluno">CPF do aluno</option>
-                        <option value="rgAluno">RG do aluno</option>
-                        <option value="emailAluno">E-mail do aluno</option>
-                        <option value="celularAluno">Celular do aluno</option>
-                        <option value="telefoneAluno">Telefone do aluno</option>
-                      </select>
-                      
-                    </div>-->
-                  </div> 
-                </div>
+              
                 <div class="overflow-auto" style="height: fit-content; max-height: 280px;">
                   <div class="list-group" id="listaAlunosDesativados">
                     
@@ -1150,7 +1130,6 @@
                 </div>
 
                 
-              </div>
               
             </div>
 

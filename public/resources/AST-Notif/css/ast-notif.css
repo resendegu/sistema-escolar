@@ -187,14 +187,17 @@ body.ast-dialog {
 	width: 360px;
 	position: fixed;
 	bottom: 10px;
+	z-index: 999999;
 }
 
 .ast-notify-wrapper {
 	position: relative;
 	margin-bottom: 10px;
+	z-index: 999999;
 }
 
 .ast-notify-el {
+	z-index: 999999;
 	box-sizing: border-box;
 	display: block;
 	position: absolute;
@@ -271,6 +274,7 @@ body.ast-dialog {
 
 .ast-notify-el p.notify-body {
 	margin: 0;
+	z-index: 999999;
 }
 
 .ast-notify-el p.notify-footer {

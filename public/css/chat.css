@@ -13,12 +13,12 @@
 	position: fixed;
 	width: 270px;
 	bottom: 0;
-	right: 10px;
-    background: white;
+	left: 10px;
+    background: rgba(255, 255, 255, 0.582);
     z-index: 99999;
 }
 .chat-header{
-	background: #4267B2;
+	background: #4267b2ab;
 	padding-top: 1px;
 	padding-bottom: 1px;
 }
