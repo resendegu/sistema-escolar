@@ -10,6 +10,16 @@ var storageUserRef = firebase.storage().ref('/users');
             document.getElementById('loginContainer').style.display = 'none'
             document.getElementById('logado').style.visibility = 'visible'
             document.getElementById('nome').innerText = user.displayName
+            if (user.emailVerified) {
+                document.getElementById('statusVerificacao').innerText = 'E-mail verificado'
+                document.getElementById('statusVerificacao').style.color = 'lightgreen'
+                document.getElementById('verificaEmail').style.display = 'none'
+            } else {
+                document.getElementById('statusVerificacao').innerText = 'E-mail não verificado'
+                document.getElementById('statusVerificacao').style.color = 'red'
+                document.getElementById('verificaEmail').style.display = 'block'
+            }
+            
             if (user.photoURL) {
                 document.getElementById('foto').src = user.photoURL
             }
@@ -166,6 +176,35 @@ function sair() {
         document.getElementById('logado').style.visibility = 'hidden'
     }).catch(function(error) {
         AstNotif.dialog("Erro ao sair", error.message);
+    })
+}
+
+function verificaEmail() {
+    loader.style.display = 'block'
+    let user = usuarioAtual()
+
+    user.sendEmailVerification().then(function() {
+        abrirModal('modal', 'E-mail enviado', 'Vá na sua caixa de entrada e procure pelo e-mail de Verificação do seu e-mail', '<button type="button" data-dismiss="modal" class="btn btn-primary">Fechar</button>')
+        loader.style.display = 'none'
+    }).catch(function(error) {
+        AstNotif.dialog('Erro', error.message)
+        console.log(error)
+        loader.style.display = 'none'
+    })
+}
+
+function redefinirSenha() {
+    loader.style.display = 'block'
+    let user = usuarioAtual()
+    let auth = firebase.auth()
+
+    auth.sendPasswordResetEmail(user.email).then(function() {
+        loader.style.display = 'none'
+        abrirModal('modal', 'E-mail enviado', 'Vá na sua caixa de entrada e procure pelo e-mail de redefinição de senha da sua conta', '<button type="button" data-dismiss="modal" class="btn btn-primary">Fechar</button>')
+    }).catch(function(error) {
+        AstNotif.dialog('Erro', error.message)
+        console.log(error)
+        loader.style.display = 'none'
     })
 }
 

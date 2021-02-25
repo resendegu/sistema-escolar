@@ -154,11 +154,14 @@
               <h5 class="card-title" id="nome">Nome</h5>
               <a href="#" onclick="alteraFoto()"><img src="./images/profile_placeholder.png" id="foto" class="rounded float-left" width="80px" style="margin-right: 10px;"></a>
               <label class="card-text" id="email" style="font-size: small;">Email</label>
+              <br><label class="card-text" id="statusVerificacao" style="font-size: small;"></label>
               <br>
                 <br><br><br>
                 <button onclick="alteraFoto()" class="btn btn-primary btn-sm">Alterar foto</button>
                 <input type="file" accept="image/*" name="foto" id="alteraFoto" style="visibility: hidden" onchange="uploadFoto(this.files)">
                 <br><br>
+                <button type="button" id="verificaEmail" onclick="verificaEmail()" class="btn btn-primary btn-block">Verificar meu email</button>
+                <button type="button" id="alteraSenha" onclick="redefinirSenha()" class="btn btn-info btn-block">Alterar minha senha</button>
                 <button type="button" id="sair" onclick="sair()" class="btn btn-warning btn-block">Sair</button>
               </div>
           </div>
