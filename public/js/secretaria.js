@@ -808,6 +808,7 @@ function criaPDFAluno() {
 
 // Esperando o submit para o cadastro efetivo
 var idadeAluno
+var matriculaPDF = ''
 document.querySelector('#formCadastroAluno').addEventListener('submit', (e) => {
     e.preventDefault()
     loader.style.display = 'block'
@@ -864,7 +865,9 @@ document.querySelector('#formCadastroAluno').addEventListener('submit', (e) => {
     dadosAluno.rgPedagogicoAluno = dados.get('rgPedagogicoAluno')
     dadosAluno.cpfPedagogicoAluno = dados.get('cpfPedagogicoAluno')
     // Gera ou não o PDF do aluno
-    dadosAluno.geraPDFAluno = dados.get('geraPDFAluno')
+    dadosAluno.geraPDFAluno = document.getElementById('geraPDFAluno')
+    
+
     console.log(dadosAluno)
     if (dadosAluno.dataNascimentoAluno == '' || dadosAluno.nomeAluno == '') {
         AstNotif.dialog('Confira os campos', 'A data de nascimento do aluno e o nome do aluno são obrigatórios.')
@@ -887,6 +890,11 @@ document.querySelector('#formCadastroAluno').addEventListener('submit', (e) => {
         cadastraAluno({dados: dadosAluno}).then(function(result) {
             loader.style.display = 'none'
             AstNotif.dialog('Sucesso', result.data.answer)
+            if (dadosAluno.geraPDFAluno.checked) {
+                document.getElementById('corpoMatricula').innerHTML = `<iframe src="../resources/pdfsProntos/matriculaPdf.html#${dadosAluno.matriculaAluno}" frameborder="0" width="100%" height="max-content" id="fichaPdf" name="fichaPdf"></iframe>`
+                $('#matriculaModal').modal({backdrop: 'static'})
+            }
+            
             document.getElementById('resetForm').click()
             carregaProfsETurmas()
         }).catch(function(error) {

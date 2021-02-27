@@ -56,10 +56,10 @@
             </button> -->
           </div>
           <div class="modal-body" id="corpoMatricula">
-            <iframe src="../resources/pdfsProntos/matriculaPdf.html" frameborder="0"></iframe>
+            
           </div>
           <div class="modal-footer" id="botoesMatricula">
-            <button type="button" class="btn btn-primary">Imprimir</button>
+            <button type="button" class="btn btn-primary" onclick="window.frames['fichaPdf'].focus(), window.frames['fichaPdf'].print()">Imprimir</button>
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
           </div>
         </div>
@@ -329,9 +329,6 @@
           <!-- <canvas class="my-4" id="myChart" width="900" height="380"></canvas> -->
           <div class="tab-content" id="nav-tabContent">
             <div class="container tab-pane fade show active" id="abaDashboard" role="tabpanel" aria-labelledby="Dashboard">
-              <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#matriculaModal">
-                Launch demo modal
-              </button>
               <div class="row">
                 <div class="col-sm-auto">
                   <h2>Tabela semanal de alunos</h2>
@@ -1133,7 +1130,7 @@
                   <div class="form-check">
                     <input class="form-check-input" type="checkbox" id="geraPDFAluno" name="geraPDFAluno">
                     <label class="form-check-label" for="geraPDFAluno">
-                      Gerar PDF com os dados digitados
+                      Gerar ficha de matrícula
                     </label>
                   </div>
                 </div>
