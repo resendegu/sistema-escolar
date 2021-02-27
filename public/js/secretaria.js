@@ -984,6 +984,7 @@ function abreDadosDoAluno(matricula, desativado=false, notasDesativado=false) {
     carregaHistoricoAluno(matricula)
     document.getElementById('infoDoAluno').style.display = 'block'
     document.getElementById('rolaTelaAbaixoAlunos').style.display = 'block'
+    document.getElementById('secGeraFicha').innerHTML = `<button class="btn btn-outline-primary" id="btnGeraFicha" onclick="gerarFichaAluno('${matricula}')">Gerar ficha de matrícula em PDF</button>`
     let dados
     if (desativado != false) {
         dados = desativado
@@ -1496,6 +1497,11 @@ function desativaAlunos(confirma=false) {
             $('[data-toggle="tooltip"]').tooltip()
         })
     }
+}
+
+function gerarFichaAluno(matricula) {
+    document.getElementById('corpoMatricula').innerHTML = `<iframe src="../resources/pdfsProntos/matriculaPdf.html#${matricula}" frameborder="0" width="100%" height="400px" id="fichaPdf" name="fichaPdf"></iframe>`
+    $('#matriculaModal').modal({backdrop: 'static'})
 }
 
 // Funções da aba Alunos Desativados
