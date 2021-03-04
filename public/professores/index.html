@@ -6,7 +6,7 @@
     <meta name="description" content="">
     <meta name="author" content="Gustavo Resende">
 
-    <title>Secretaria</title>
+    <title>Professores</title>
 
     <!-- Bootstrap core CSS -->
     <link href="../resources/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -15,7 +15,7 @@
     <link href="../css/dashboard.css" rel="stylesheet">
     <link rel="stylesheet" href="../css/loader.css">
     <link href="../css/list-items.css" rel="stylesheet">
-    <link rel="stylesheet" href="../css/secretaria.css">
+    <link rel="stylesheet" href="../css/professores.css">
     <link rel="stylesheet" href="../css/chat.css">
     <link rel="stylesheet" href="../css/filedrop.css">
 
@@ -92,7 +92,7 @@
         <ul class="navbar-nav">
           <li class="nav-item dropdown active navbar-toggler" class="" type="button" data-toggle="collapse">
             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              &nbsp;&nbsp;Secretaria
+              &nbsp;&nbsp;Professores
             </a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
               <ul class="nav flex-column">
@@ -103,33 +103,15 @@
                   </a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" data-toggle="list" href="#abaAlunos" role="tab" aria-controls="alunos" id="btnAbaAlunosResponsivo" onclick="carregaListaDeAlunos()">
+                  <a class="nav-link" data-toggle="list" href="#abaAlunos" role="tab" aria-controls="alunos" id="btnAbaAlunosResponsivo" >
                     <span data-feather="users" ></span>
                     Alunos
                   </a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" data-toggle="list" href="#abaTurmas" role="tab" aria-controls="turmas" onclick="carregaTurmas()">
+                  <a class="nav-link" data-toggle="list" href="#abaTurmas" role="tab" aria-controls="turmas" onclick="carregaTurmas()" id="btnAbaTurmasMobile">
                     <span data-feather="database"></span>
                     Turmas
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" data-toggle="list" href="#abaCadastrarTurmas" role="tab" aria-controls="CadastrarTurmas" onclick="carregaProfessores()">
-                    <span data-feather="plus-square"></span>
-                    Cadastrar turmas
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" data-toggle="list" href="#abaCadastrarAlunos" role="tab" aria-controls="CadastrarAlunos" onclick="carregaProfsETurmas()">
-                    <span data-feather="user-plus"></span>
-                    Cadastrar alunos
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" data-toggle="list" href="#abaAlunosDesativados" role="tab" aria-controls="alunosDesativados" onclick="carregaAlunosDesativados()">
-                    <span data-feather="user-x"></span>
-                    Alunos desativados
                   </a>
                 </li>
               </ul>
@@ -148,10 +130,10 @@
               <a class="nav-link" href="../login.html">&nbsp;&nbsp;Login</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="../adm">&nbsp;&nbsp;Administração</a>
+              <a class="nav-link" href="adm.html">&nbsp;&nbsp;Administração</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="../professores/">&nbsp;&nbsp;Professores</a>
+              <a class="nav-link" href="../secretaria/">&nbsp;&nbsp;Secretaria</a>
             </li>
           </ul>
         </div>
@@ -236,7 +218,7 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" data-toggle="list" href="#abaAlunos" role="tab" aria-controls="alunos" id="btnAbaAlunos" onclick="carregaListaDeAlunos()">
+                <a class="nav-link" data-toggle="list" href="#abaAlunos" role="tab" aria-controls="alunos" id="btnAbaAlunos">
                   <span data-feather="users" ></span>
                   Alunos
                 </a>
@@ -245,24 +227,6 @@
                 <a class="nav-link" data-toggle="list" href="#abaTurmas" role="tab" aria-controls="turmas" id="btnAbaTurmas" onclick="carregaTurmas()">
                   <span data-feather="database"></span>
                   Turmas
-                </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" data-toggle="list" href="#abaCadastrarTurmas" role="tab" aria-controls="CadastrarTurmas" onclick="carregaProfessores()">
-                  <span data-feather="plus-square"></span>
-                  Cadastrar turmas
-                </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" data-toggle="list" href="#abaCadastrarAlunos" role="tab" aria-controls="CadastrarAlunos" onclick="carregaProfsETurmas()">
-                  <span data-feather="user-plus"></span>
-                  Cadastrar alunos
-                </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" data-toggle="list" href="#abaAlunosDesativados" role="tab" id="btnAbaAlunosDesativados" aria-controls="alunosDesativados" onclick="carregaAlunosDesativados()">
-                  <span data-feather="user-x"></span>
-                  Alunos desativados
                 </a>
               </li>
             </ul>
@@ -291,7 +255,7 @@
 
         <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
           <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
-            <h1 class="h2">Secretaria</h1>
+            <h1 class="h2">Professores</h1>
             <div class="btn-toolbar mb-2 mb-md-0">
               <!--<div class="btn-group mr-2">
                 <button class="btn btn-sm btn-outline-secondary">Share</button>
@@ -328,76 +292,11 @@
             <div class="container tab-pane fade show active" id="abaDashboard" role="tabpanel" aria-labelledby="Dashboard">
               <div class="row">
                 <div class="col-sm-auto">
-                  <h2>Tabela semanal de alunos</h2>
-                  <div class="table-responsive">
-                    <table class="table table-striped table-sm">
-                      <thead>
-                        <tr>
-                          <th>Dia da semana</th>
-                          <th>Manhã</th>
-                          <th>Tarde</th>
-                          <th>Noite</th>
-                          <th>Total</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td>Segunda - feira</td>
-                          <td id="MONManha">0</td>
-                          <td id="MONTarde">0</td>
-                          <td id="MONNoite">0</td>
-                          <td id="totalMON">0</td>
-                        </tr>
-                        <tr>
-                          <td>Terça - feira</td>
-                          <td id="TUEManha">0</td>
-                          <td id="TUETarde">0</td>
-                          <td id="TUENoite">0</td>
-                          <td id="totalTUE">0</td>
-                        </tr>
-                        <tr>
-                          <td>Quarta - feira</td>
-                          <td id="WEDManha">0</td>
-                          <td id="WEDTarde">0</td>
-                          <td id="WEDNoite">0</td>
-                          <td id="totalWED">0</td>
-                        </tr>
-                        <tr>
-                          <td>Quinta - feira</td>
-                          <td id="THUManha">0</td>
-                          <td id="THUTarde">0</td>
-                          <td id="THUNoite">0</td>
-                          <td id="totalTHU">0</td>
-                        </tr>
-                        <tr>
-                          <td>Sexta - feira</td>
-                          <td id="FRIManha">0</td>
-                          <td id="FRITarde">0</td>
-                          <td id="FRINoite">0</td>
-                          <td id="totalFRI">0</td>
-                        </tr>
-                        <tr>
-                          <td>Sábado</td>
-                          <td id="SATManha">0</td>
-                          <td id="SATTarde">0</td>
-                          <td id="SATNoite">0</td>
-                          <td id="totalSAT">0</td>
-                        </tr>
-                        <tr>
-                          <td>Domingo</td>
-                          <td id="SUNManha">0</td>
-                          <td id="SUNTarde">0</td>
-                          <td id="SUNNoite">0</td>
-                          <td id="totalSUN">0</td>
-                        </tr>
-                        <tr>
-                          <td><b>Total</b></td>
-                          <td id="totalManha">0</td>
-                          <td id="totalTarde">0</td>
-                          <td id="totalNoite">0</td>
-                        </tr>
-                      </tbody>
-                    </table>
+                  <h2>Turmas</h2>
+                  <div class="overflow-auto" style="height: fit-content; max-height: 300px;">
+                    <div class="list-group" id="listaTurmasProf">
+                      
+                    </div>
                   </div>
                 </div>
                 <div class="col">
@@ -444,6 +343,7 @@
 
                 
               </div>
+              
               <div class="container" id="infoDoAluno" style="display: none;">
                 <div class="main-body">
                       <div class="row gutters-sm">
@@ -463,7 +363,6 @@
                                   <button class="btn btn-primary" onclick="followUpAluno(`${document.getElementById('mostraMatriculaAluno').innerText}`)">Follow Up</button>
                                   <button class="btn btn-outline-primary" onclick="mostraDadosResponsaveis()">Responsáveis</button>
                                   <br><br>
-                                  <section id="secGeraFicha"></section>
                                   
                                   
                                 </div>
@@ -643,7 +542,7 @@
             <div class="container tab-pane fade" id="abaTurmas" role="tabpanel" aria-labelledby="Turmas">
               <div class="input-group mb-3">
                 <div class="input-group-prepend">
-                  <label class="input-group-text" for="inputGroupSelect01">Turmas Cadastradas</label>
+                  <label class="input-group-text" for="inputGroupSelect01">Turmas</label>
                 </div>
                 <select class="custom-select" id="selectTurmas" onchange="abreTurma(this.value)" style="visibility: hidden;">
                   <option selected hidden>Escolha uma turma...</option>
@@ -699,462 +598,15 @@
                   </div>
                 </div>
                 <br><br>
-                <button type="button" class="btn btn-info" id="btnTransfereAlunosTurma" disabled>Transferir alunos</button>
-                <button type="button" class="btn btn-danger" id="btnExcluirTurma" onclick="excluirTurma()">Excluir turma</button>
-                <button type="button" class="btn btn-warning" id="btnDesativaAlunos" onclick="desativaAlunos()" disabled>Desativar Alunos</button>
+                <button type="button" class="btn btn-primary" id="btnLancaFrequencia">Lançar frequência</button>
+                <button type="button" class="btn btn-info" id="btnLancaNotas" onclick="">Lançar Notas Manuais</button>
+                <button type="button" class="btn btn-secondary" id="btnDesativaAlunos" onclick="desativaAlunos()">Distribuir notas</button>
+                <button type="button" class="btn btn-warning" id="btnDesativaAlunos" onclick="desativaAlunos()">Fechar período</button>
                 <hr>
                 <p class="text-muted float-md-right" id="timestampTurmaCadastrada"></p>
                 
               </div>
             </div>
-
-            <div class="container tab-pane fade" id="abaCadastrarTurmas" role="tabpanel" aria-labelledby="Cadastrar Turmas">
-              <label class="h3">Cadastrar turmas</label>
-              <label class="text-muted float-right h5" id="codigoNivel"></label><label class="text-muted float-right h5" id="codigoFaixa"></label><label class="text-muted float-right h5" id="codigoLivros"></label><label class="text-muted float-right h5" id="codigoDia"></label><label class="text-muted float-right h5" id="codigoHorario"></label>
-              <hr>
-              <div class="row">
-                <div class="col-md-auto">
-                  <h6>Faixa etária</h6>
-                  <div class="list-group" id="myList" role="tablist">
-                    <a class="list-group-item list-group-item-action" data-toggle="list" id="KIDS" href="#kids" role="tab" onclick="faixa('KIDS')">KIDS</a>
-                    <a class="list-group-item list-group-item-action" data-toggle="list" id="T" href="#teens" role="tab" onclick="faixa('T')">TEENS</a>
-                    <a class="list-group-item list-group-item-action" data-toggle="list" id="A" href="#adults" role="tab" onclick="faixa('A')">ADULTS</a>
-                  </div>
-                </div>
-                <div class="col">
-                  <br>
-                  <div class="tab-content" id="nav-tabContent">
-                    <div class="tab-pane fade" id="teens" role="tabpanel" aria-labelledby="Teens">
-                      <h6>Livros da turma</h6>
-                      <div class="input-group-text">
-                        <input type="checkbox" id="livro1" value="1" onclick="livro(1, this.checked)">
-                        &nbsp;Book 1&nbsp;&nbsp;&nbsp;
-                        <input type="checkbox" value="" id="livro2" value="2" onclick="livro(2, this.checked)">
-                        &nbsp;Book 2&nbsp;&nbsp;&nbsp;
-                        <input type="checkbox" id="livro3" value="3" onclick="livro(3, this.checked)">
-                        &nbsp;Book 3&nbsp;&nbsp;&nbsp;
-                        <input type="checkbox" id="livro4" value="4" onclick="livro(4, this.checked)">
-                        &nbsp;Book 4&nbsp;&nbsp;&nbsp;
-                      </div>
-                    </div>
-
-                    <div class="tab-pane fade" id="adults" role="tabpanel" aria-labelledby="list-profile-list">
-                      <div class="input-group prepend">
-                        <div class="input-group-prepend">
-                          <label class="input-group-text" for="inputGroupSelect01">Nivelamento</label>
-                        </div>
-                        <select class="custom-select" id="inputGroupSelect01" onchange="nivel(this.value)">
-                          <option selected hidden>Nível da turma...</option>
-                          <option value="B">B - Basic</option>
-                          <option value="I">I - Intermediate</option>
-                          <option value="A">A - Advanced</option>
-                        </select>
-                      </div>
-                      <br>
-                      <h6>Livros da turma</h6>
-                      <div class="input-group-text">
-                        <input type="checkbox" id="livroA1" value="1" onclick="livro(this.value, this.checked)">
-                        &nbsp;Book 1&nbsp;&nbsp;&nbsp;
-                        <input type="checkbox" id="livroA2" value="2" onclick="livro(this.value, this.checked)">
-                        &nbsp;Book 2&nbsp;&nbsp;&nbsp;
-                        <input type="checkbox" id="livroA3" value="3" onclick="livro(this.value, this.checked)">
-                        &nbsp;Book 3&nbsp;&nbsp;&nbsp;
-                        <input type="checkbox" id="livroA4" value="4" onclick="livro(this.value, this.checked)">
-                        &nbsp;Book 4&nbsp;&nbsp;&nbsp;
-                        <input type="checkbox" id="livroA5" disabled value="5" onclick="livro(this.value, this.checked)">
-                        &nbsp;Book 5&nbsp;&nbsp;&nbsp;
-                        <input type="checkbox" id="livroA6" disabled value="6" onclick="livro(this.value, this.checked)">
-                        &nbsp;Book 6&nbsp;&nbsp;&nbsp;
-                        <input type="checkbox" id="livroA7" disabled value="7" onclick="livro(this.value, this.checked)">
-                        &nbsp;Book 7&nbsp;&nbsp;&nbsp;
-                        <input type="checkbox" id="livroA8" disabled value="8" onclick="livro(this.value, this.checked)">
-                        &nbsp;Book 8&nbsp;&nbsp;&nbsp;
-                      </div>
-                    </div>
-        
-                    <div class="tab-pane fade" id="avancado" role="tabpanel" aria-labelledby="list-profile-list">
-                      Obsoleto
-                    </div>
-        
-                    <div class="tab-pane fade" id="kids" role="tabpanel" aria-labelledby="list-profile-list">
-                      <input class="form-control" type="text" placeholder="Readonly input here…" value="KIDS" readonly>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-sm">
-                    <fieldset>
-                      
-                      <div class="row">
-                        <div class="col-5">
-                          <label for="inputGroupSelect01">Dias da semana: &nbsp;</label>
-                          <br><input type="checkbox" value="0" onchange="diaSemana(this.value, this.checked)">Domingo &nbsp; 
-                          <br><input type="checkbox" value="1" onchange="diaSemana(this.value, this.checked)">Segunda &nbsp; 
-                          <br><input type="checkbox" value="2" onchange="diaSemana(this.value, this.checked)">Terça &nbsp; 
-                          <br><input type="checkbox" value="3" onchange="diaSemana(this.value, this.checked)">Quarta &nbsp;
-                        </div>
-                        <div class="col-5">
-                          <br>
-                          <br><input type="checkbox" value="4" onchange="diaSemana(this.value, this.checked)">Quinta &nbsp; 
-                          <br><input type="checkbox" value="5" onchange="diaSemana(this.value, this.checked)">Sexta &nbsp; 
-                          <br><input type="checkbox" value="6" onchange="diaSemana(this.value, this.checked)">Sábado &nbsp;
-                        </div>
-                      </div>
-                    </fieldset>
-                </div>
-                <div class="col-sm">
-                  <div class="col-sm">
-                    <div class="input-group prepend">
-                      <div class="input-group-prepend">
-                        <label class="input-group-text" for="inputGroupSelect01">Prof. referência</label>
-                      </div>
-                      <select class="custom-select" id="professorTurma" onchange="professorReferencia(this.value)">
-                        <option selected hidden>Escolha o(a) professor(a)...</option>
-                        
-                      </select>
-                    </div>
-                    <div class="input-group prepend">
-                      <div class="input-group-prepend">
-                        <label class="input-group-text" for="inputGroupSelect01">Horário</label>
-                      </div>
-                      <input type="number" name="horario" id="horario" onchange="horario(this.value)">
-                    </div>
-                  </div>
-                </div>
-                <br>
-                <button type="button" onclick="cadastrarTurma()" class="btn btn-primary btn-block" id="btnCadastrarTurma" disabled>Cadastrar turma</button>
-              </div>
-            
-              
-            </div>
-            
-
-            <div class="container tab-pane fade" id="abaCadastrarAlunos" role="tabpanel" aria-labelledby="Cadastrar Alunos">
-              <label class="h3">Cadastro de alunos</label>
-              <hr>
-              <form id="formCadastroAluno" onkeydown="return event.key != 'Enter';">
-                <input type='reset' class="btn btn-warning btn-sm" id="resetForm" value='Limpar todos os campos'/>
-                <a class="btn btn-info btn-sm" onclick="carregaProfsETurmas()"><span data-feather="refresh-cw"></span> Atualizar número de matrícula e turmas</a>
-                <br> <br>
-                <label class="h6">Dados pessoais</label>
-                <div class="form-row">
-                  <div class="form-group col-sm-2">
-                    <label for="inputEmail4">Matrícula</label>
-                    <input type="number" class="form-control" id="matriculaAluno" name="matriculaAluno" placeholder="Número de matrícula">
-                  </div>
-                  <div class="form-group col-md-4">
-                    <label for="inputPassword4">Nome</label>
-                    <input type="name" class="form-control" id="nomeAluno" name="nomeAluno" placeholder="Nome" onblur="maiusculo(this)">
-                  </div>
-                  <div class="form-group col-auto">
-                    <label for="inputPassword4">Data de nascimento</label>
-                    <input type="date" class="form-control" id="dataNascimentoAluno" name="dataNascimentoAluno" placeholder="Data" onblur="calculaIdade(this.value)">
-                    
-                  </div>
-                  <div class="form-group col-auto">
-                    <br><br>
-                    <label for="dataNascimentoAluno" class="text-muted" id="idadeCalculada">Idade:</label>
-                  </div>
-                </div>
-                <div class="form-row">
-                  <div class="form-group col-auto">
-                    <label for="inputEmail4">Telefone (fixo)</label>
-                    <input type="phone" class="form-control" id="telefoneAluno" name="telefoneAluno" placeholder="Número">
-                  </div>
-                  <div class="form-group col-auto">
-                    <label for="inputPassword4">Celular</label>
-                    <input type="phone" class="form-control" id="celularAluno" name="celularAluno" placeholder="Número">
-                  </div>
-                  <div class="form-group col-md-5">
-                    <label for="inputPassword4">Email</label>
-                    <input type="email" class="form-control" id="emailAluno" name="emailAluno" placeholder="Email">
-                  </div>
-                </div>
-                <div class="form-row">
-                  <div class="form-group col-auto">
-                    <label for="inputEmail4">RG</label>
-                    <input type="text" class="form-control" id="rgAluno" name="rgAluno" placeholder="RG">
-                  </div>
-                  <div class="form-group col-auto">
-                    <label for="inputPassword4">CPF</label>
-                    <input type="text" class="form-control" id="cpfAluno" name="cpfAluno" placeholder="CPF" onchange="verificaCPF(this.value)">
-                    <small id="cpfHelp" class="form-text text-muted">Digite um CPF válido, existe um algoritmo de validação neste campo.</small>
-                  </div>
-                </div>
-                <hr>
-                <label class="h6">Dados para o curso</label>
-                <div class="form-row">
-                  <div class="form-group col-auto">
-                    <label for="inputAddress">Turma</label>
-                    <select class="form-control" name="turmaAluno" id="turmaAluno" onclick="mostraProfsAlunoESetaTurma(this.value)">
-                      <option hidden selected>Escolha a turma...</option>
-                      
-                    </select>
-                  </div>
-                  
-                  
-                  <div class="form-group col-auto">
-                    <label for="inputAddress">Horário e dias da semana</label>
-                    <input type="text" class="form-control" id="horaEDiasAluno" name="horaEDiasAluno" placeholder="Ex.: 20h,MON,THU">
-                  </div>
-                  <div class="form-group col-auto">
-                    <legend class="col-form-label col-auto pt-0">Curso de inglês para:</legend>
-                    <div class="col-auto">
-                      <div class="form-check">
-                        <input class="form-check-input" type="radio" name="faixaEtaria" id="faixaKIDS" value="KIDS" checked>
-                        <label class="form-check-label" for="gridRadios1">
-                          KIDS
-                        </label>
-                      </div>
-                      <div class="form-check">
-                        <input class="form-check-input" type="radio" name="faixaEtaria" id="faixaT" value="T">
-                        <label class="form-check-label" for="gridRadios2">
-                          TEENS
-                        </label>
-                      </div>
-                      <div class="form-check">
-                        <input class="form-check-input" type="radio" name="faixaEtaria" id="faixaA" value="A">
-                        <label class="form-check-label" for="gridRadios3">
-                          ADULTS
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <hr>
-                <label class="h6">Dados de endereço</label>
-                <div class="form-row col-md-4">
-                  <label for="inputZip">CEP (somente números)</label>
-                  <input type="number" class="form-control" id="cepAluno" name="cepAluno" placeholder="CEP" onchange="preencheEndereco(this.value)">
-                  <small id="emailHelp" class="form-text text-muted">O CEP é opcional, mas quando inserido preenche o endereço automaticamente.</small>
-                </div>
-                <div class="form-row">
-                  <div class="form-group col-md-5">
-                    <label for="inputAddress2">Rua</label>
-                    <input type="text" class="form-control" id="enderecoAluno" name="enderecoAluno" placeholder="Endereço">
-                  </div>
-                  <div class="form-group col-md-1">
-                    <label for="inputAddress2">Número</label>
-                    <input type="number" class="form-control" id="numeroAluno" name="numeroAluno" placeholder="Núm.">
-                  </div>
-                  <div class="form-group col-md-2">
-                    <label for="inputCity">Bairro</label>
-                    <input type="text" class="form-control" id="bairroAluno"name="bairroAluno" placeholder="Bairro">
-                  </div>
-                  <div class="form-group col-md-2">
-                    <label for="inputState">Cidade</label>
-                    <input type="text" class="form-control" id="cidadeAluno" name="cidadeAluno" placeholder="Cidade">
-                  </div>
-                  <div class="form-group col-md-1">
-                    <label for="inputState">Estado</label>
-                    <input type="text" class="form-control" id="estadoAluno" name="estadoAluno" placeholder="Estado">
-                  </div>
-                </div>
-                <hr>
-                <label class="h6">Dados de filiação</label>
-                <div class="form-row border border-secondary rounded">
-                  <div class="form-group col-md-4">
-                    <label for="inputAddress">Filiação ou Responsável legal 1</label>
-                    <input type="text" class="form-control" id="nomeResponsavelAluno1" name="nomeResponsavelAluno1" placeholder="Nome" onblur="maiusculo(this)">
-                  </div>
-                  <div class="form-group col-md-2">
-                    <label for="inputAddress">Relação</label>
-                    <br>
-                    <select class="form-control form-control-md" name="relacaoAluno1" id="relacaoAluno1">
-                      <option hidden selected>Escolha...</option>
-                      <option value="Mãe">Mãe</option>
-                      <option value="Pai">Pai</option>
-                      <option value="Tio/Tia">Tio/Tia</option>
-                      <option value="Avô/Avó">Avô/Avó</option>
-                      <option value="Outros">Outros</option>
-                    </select>
-                  </div>
-                  <div class="form-group col-md-2">
-                    <label for="inputAddress">Número comercial</label>
-                    <input type="text" class="form-control" id="numeroComercialResponsavel1" name="numeroComercialResponsavel1" placeholder="Comercial">
-                  </div>
-                  <div class="form-group col-md-2">
-                    <label for="inputAddress">Número Celular</label>
-                    <input type="text" class="form-control" id="numeroCelularResponsavel1" name="numeroCelularResponsavel1" placeholder="Celular">
-                  </div>
-                  <div class="form-group col-auto">
-                    <label for="inputEmail4">RG</label>
-                    <input type="text" class="form-control" id="rgResponsavel1" name="rgResponsavel1" placeholder="RG">
-                  </div>
-                  <div class="form-group col-auto">
-                    <label for="inputPassword4">CPF</label>
-                    <input type="text" class="form-control" id="cpfResponsavel1" name="cpfResponsavel1" placeholder="CPF" onchange="verificaCPF(this.value)">
-                    <small id="cpfHelp" class="form-text text-muted">Digite um CPF válido, existe um algoritmo de validação neste campo.</small>
-                  </div>
-                  
-                  <div class="form-group col-md-auto">
-                    <br>
-                    <div class="form-group col-md-auto">
-                      <a class="btn btn-outline-primary btn-sm" name="responsavelFinanceiro" id="responsavelFinanceiro1" onclick="setaRespFinan('1')">Copiar dados p/ Resp. Financeiro</a>
-                      <br>
-                      <a class="btn btn-outline-success btn-sm" name="responsavelPedagogico" id="responsavelPedagogico1" onclick="setaRespPedag('1')">Copiar dados p/ Resp. Pedagógico</a>
-                      
-                    </div>
-                  </div>
-                </div>
-                <br>
-                
-                <div class="form-row border border-secondary rounded">
-                  <div class="form-group col-md-4">
-                    <label for="inputAddress">Filiação ou Responsável legal 2</label>
-                    <input type="text" class="form-control" id="nomeResponsavelAluno2" name="nomeResponsavelAluno2" placeholder="Nome" onblur="maiusculo(this)">
-                  </div>
-                  <div class="form-group col-md-2">
-                    <label for="inputAddress">Relação</label>
-                    <br>
-                    <select class="form-control form-control-md" name="relacaoAluno2" id="relacaoAluno2">
-                      <option hidden selected>Escolha...</option>
-                      <option value="Mãe">Mãe</option>
-                      <option value="Pai">Pai</option>
-                      <option value="Tio/Tia">Tio/Tia</option>
-                      <option value="Avô/Avó">Avô/Avó</option>
-                      <option value="Outros">Outros</option>
-                    </select>
-                  </div>
-                  <div class="form-group col-md-2">
-                    <label for="inputAddress">Número comercial</label>
-                    <input type="text" class="form-control" id="numeroComercialResponsavel2" name="numeroComercialResponsavel2" placeholder="Comercial">
-                  </div>
-                  <div class="form-group col-md-2">
-                    <label for="inputAddress">Número Celular</label>
-                    <input type="text" class="form-control" id="numeroCelularResponsavel2" name="numeroCelularResponsavel2" placeholder="Celular">
-                  </div>
-                  <div class="form-group col-auto">
-                    <label for="inputEmail4">RG</label>
-                    <input type="text" class="form-control" id="rgResponsavel2" name="rgResponsavel2" placeholder="RG">
-                  </div>
-                  <div class="form-group col-auto">
-                    <label for="inputPassword4">CPF</label>
-                    <input type="text" class="form-control" id="cpfResponsavel2" name="cpfResponsavel2" placeholder="CPF" onchange="verificaCPF(this.value)">
-                    <small id="cpfHelp" class="form-text text-muted">Digite um CPF válido, existe um algoritmo de validação neste campo.</small>
-                  </div>
-                  &nbsp;&nbsp;&nbsp;
-                  <div class="form-group col-md-auto">
-                    <br>
-                    <a class="btn btn-outline-primary btn-sm" name="responsavelFinanceiro" id="responsavelFinanceiro2" onclick="setaRespFinan('2')">Copiar dados p/ Resp. Financeiro</a>
-                    <br>
-                    <a class="btn btn-outline-success btn-sm" name="responsavelPedagogico" id="responsavelPedagogico2" onclick="setaRespPedag('2')">Copiar dados p/ Resp. Pedagogico</a>
-                    
-                  </div>
-                </div>
-                <br>
-                <hr>
-                <label class="h6">Dados do responsável Financeiro</label>
-                <div class="form-row border border-primary rounded">
-                  <div class="form-group col-md-4">
-                    <label for="inputAddress">Responsável financeiro</label>
-                    <input type="text" class="form-control" id="nomeResponsavelFinanceiroAluno" name="nomeResponsavelFinanceiroAluno" placeholder="Nome" onblur="maiusculo(this)">
-                  </div>
-                  <div class="form-group col-md-2">
-                    <label for="inputAddress">Relação</label>
-                    <br>
-                    <select class="form-control form-control-md" name="relacaoFinanceiroAluno" id="relacaoFinanceiroAluno">
-                      <option hidden selected>Escolha...</option>
-                      <option value="Mãe">Mãe</option>
-                      <option value="Pai">Pai</option>
-                      <option value="Tio/Tia">Tio/Tia</option>
-                      <option value="Avô/Avó">Avô/Avó</option>
-                      <option value="Outros">Outros</option>
-                    </select>
-                  </div>
-                  <div class="form-group col-md-2">
-                    <label for="inputAddress">Número comercial</label>
-                    <input type="text" class="form-control" id="numeroComercialFinanceiroAluno" name="numeroComercialFinanceiroAluno" placeholder="Comercial">
-                  </div>
-                  <div class="form-group col-md-2">
-                    <label for="inputAddress">Número Celular</label>
-                    <input type="text" class="form-control" id="numeroCelularFinanceiroAluno" name="numeroCelularFinanceiroAluno" placeholder="Celular">
-                  </div>
-                  <div class="form-group col-md-5">
-                    <label for="inputPassword4">Email</label>
-                    <input type="email" class="form-control" id="emailResponsavelFinanceiro" name="emailresponsavelFinanceiro" placeholder="Email">
-                  </div>
-                  <div class="form-group col-auto">
-                    <label for="inputEmail4">RG</label>
-                    <input type="text" class="form-control" id="rgFinanceiroAluno" name="rgFinanceiroAluno" placeholder="RG">
-                  </div>
-                  <div class="form-group col-auto">
-                    <label for="inputPassword4">CPF</label>
-                    <input type="text" class="form-control" id="cpfFinanceiroAluno" name="cpfFinanceiroAluno"  placeholder="CPF" onchange="verificaCPF(this.value)">
-                    <small id="cpfHelp4" class="form-text text-muted">Digite um CPF válido, existe um algoritmo de validação neste campo.</small>
-                  </div>
-                </div>
-                <br>
-                <label class="h6">Dados do responsável Financeiro</label>
-                <div class="form-row border border-success rounded">
-                  
-                  <div class="form-group col-md-4">
-                    <label for="inputAddress">Responsável pedagógico/didático</label>
-                    <input type="text" class="form-control" id="nomeResponsavelPedagogicoAluno" name="nomeResponsavelPedagogicoAluno" placeholder="Nome" onblur="maiusculo(this)">
-                  </div>
-                  <div class="form-group col-md-2">
-                    <label for="inputAddress">Relação</label>
-                    <br>
-                    <select class="form-control form-control-md" name="relacaoPedagogicoAluno" id="relacaoPedagogicoAluno">
-                      <option hidden selected>Escolha...</option>
-                      <option value="Mãe">Mãe</option>
-                      <option value="Pai">Pai</option>
-                      <option value="Tio/Tia">Tio/Tia</option>
-                      <option value="Avô/Avó">Avô/Avó</option>
-                      <option value="Outros">Outros</option>
-                    </select>
-                  </div>
-                  <div class="form-group col-md-2">
-                    <label for="inputAddress">Número comercial</label>
-                    <input type="text" class="form-control" id="numeroComercialPedagogicoAluno" name="numeroComercialPedagogicoAluno" placeholder="Comercial">
-                  </div>
-                  <div class="form-group col-md-2">
-                    <label for="inputAddress">Número Celular</label>
-                    <input type="text" class="form-control" id="numeroCelularPedagogicoAluno" name="numeroCelularPedagogicoAluno" placeholder="Celular">
-                  </div>
-                  <div class="form-group col-md-5">
-                    <label for="inputPassword4">Email</label>
-                    <input type="email" class="form-control" id="emailResponsavelPedagogico" name="emailResponsavelPedagogico" placeholder="Email">
-                  </div>
-                  <div class="form-group col-auto">
-                    <label for="inputEmail4">RG</label>
-                    <input type="text" class="form-control" id="rgPedagogicoAluno" name="rgPedagogicoAluno" placeholder="RG">
-                  </div>
-                  <div class="form-group col-auto">
-                    <label for="inputPassword4">CPF</label>
-                    <input type="text" class="form-control" id="cpfPedagogicoAluno" name="cpfPedgogicoAluno" placeholder="CPF" onchange="verificaCPF(this.value)">
-                    <small id="cpfHelp3" class="form-text text-muted">Digite um CPF válido, existe um algoritmo de validação neste campo.</small>
-                  </div>
-                </div>
-
-                <div class="form-group">
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="geraPDFAluno" name="geraPDFAluno">
-                    <label class="form-check-label" for="geraPDFAluno">
-                      Gerar ficha de matrícula
-                    </label>
-                  </div>
-                </div>
-                <button type="submit" class="btn btn-primary" id="cadastrarAluno">Cadastrar Aluno</button>
-                <br><br>
-              </form>
-            </div>
-
-            <div class="container tab-pane fade" id="abaAlunosDesativados" role="tabpanel" aria-labelledby="Alunos Desativados">
-              <label class="h3">Alunos Desativados</label>
-              <br>
-              
-                <div class="overflow-auto" style="height: fit-content; max-height: 280px;">
-                  <div class="list-group" id="listaAlunosDesativados">
-                    
-                  </div>
-                </div>
-
-                
-              
-            </div>
-
 
           </div>
 
@@ -1182,7 +634,7 @@
     <script>
       feather.replace()
     </script>
-    <script defer src="../js/secretaria.js"></script>
+    <script defer src="../js/professores.js"></script>
     <script defer src="../js/app.js"></script>
     <script defer src="../js/chat.js"></script>
     <!-- Carregando outros arquivos da biblioteca AST-Notif. Créditos: https://github.com/anandastoon/AST-Notif -->
