@@ -21,7 +21,7 @@ $(function () {
     $('[data-toggle="popover"]').popover()
   })
 var turmasProf
-var alunos
+var alunos = {}
 firebase.auth().onAuthStateChanged((user) => {
     update()
     if (user == null) {
@@ -30,6 +30,7 @@ firebase.auth().onAuthStateChanged((user) => {
     } else {
         usuarioRef.child(user.uid).once('value').then(snapshot => {
             let dadosUser = snapshot.val()
+            let listaAlunosMat = []
             if (dadosUser.professor != undefined) {
                 turmasProf = dadosUser.professor.turmas
                 for (const turma in turmasProf) {
@@ -37,9 +38,33 @@ firebase.auth().onAuthStateChanged((user) => {
                         const bool = turmasProf[turma];
                         if (bool) {
                             document.getElementById('listaTurmasProf').innerHTML = `<button class="list-group-item list-group-item-action" onclick="document.getElementById('btnAbaTurmas').click(),abreTurma('${turma}')">Turma ${turma}</button>`
+                            turmasRef.child(turma + '/alunos').once('value').then(matAlunos => {
+                                for (const matricula in matAlunos.val()) {
+                                    if (Object.hasOwnProperty.call(matAlunos.val(), matricula)) {
+                                        listaAlunosMat.push(matricula)
+                                        console.log(matricula)
+                                    }
+                                }
+                                for (const i in listaAlunosMat) {
+                                    if (Object.hasOwnProperty.call(listaAlunosMat, i)) {
+                                        const aluno = listaAlunosMat[i];
+                                        alunosRef.child(aluno).once('value').then(dadosAluno => {
+                                            alunos[aluno] = dadosAluno.val()
+                                            
+                                        }).catch(error => {
+                                            AstNotif.dialog("Erro", error.message)
+                                        })
+                                        
+                                    }
+                                }
+                            }).catch(error => {
+                                AstNotif.dialog('Erro', error.message)
+                                console.log(error)
+                            })
                         }
                     }
                 }
+                
             }
         }).catch(error => {
             AstNotif.dialog('Erro', error.message)
@@ -81,31 +106,15 @@ function carregaListaDeAlunos(filtro='') {
     let listaAlunos = document.getElementById('listaAlunos')
     if (filtro == '') {
         document.getElementById('listaAlunos').innerHTML = ''
-        alunosRef.on('value', (snapshot) => {
-            alunos = snapshot.val()
-            for (const matricula in alunos) {
-                if (Object.hasOwnProperty.call(alunos, matricula)) {
-                    const aluno = alunos[matricula];
-                    document.getElementById('listaAlunos').innerHTML += `<button class="list-group-item list-group-item-action" onclick="abreDadosDoAluno('${matricula}')">${matricula}: ${aluno.nomeAluno} (${aluno.turmaAluno})</button>`
-                }
+        for (const matricula in alunos) {
+            if (Object.hasOwnProperty.call(alunos, matricula)) {
+                const aluno = alunos[matricula];
+                document.getElementById('listaAlunos').innerHTML += `<button class="list-group-item list-group-item-action" onclick="abreDadosDoAluno('${matricula}')">${matricula}: ${aluno.nomeAluno} (${aluno.turmaAluno})</button>`
             }
-            loader.style.display = 'none'
-        })
+        }
+        loader.style.display = 'none'
     } else {
-        document.getElementById('listaAlunos').innerHTML = ''
-        alunosRef.orderByChild(tipoDeBusca).equalTo(filtro).once('value').then(snapshot => {
-            alunos = snapshot.val()
-            for (const matricula in alunos) {
-                if (Object.hasOwnProperty.call(alunos, matricula)) {
-                    const aluno = alunos[matricula];
-                    document.getElementById('listaAlunos').innerHTML += `<button class="list-group-item list-group-item-action" onclick="abreDadosDoAluno('${matricula}')">${matricula}: ${aluno.nomeAluno} (${aluno.turmaAluno})</button>`
-                }
-            }
-            loader.style.display = 'none'
-        }).catch(error => {
-            console.log(error)
-            AstNotif.dialog('Erro', error.message)
-        })
+        
     }
     
 }
@@ -158,10 +167,10 @@ function carregaListaDeAlunosDaTurma(turma, filtro='') {
     if (filtro == '') {
         document.getElementById('listaAlunosDaTurma').innerHTML = ''
         turmasRef.child(turma + '/alunos').once('value').then(snapshot => {
-            alunos = snapshot.val()
-            for (const matricula in alunos) {
-                if (Object.hasOwnProperty.call(alunos, matricula)) {
-                    const aluno = alunos[matricula];
+            let alunosTurma = snapshot.val()
+            for (const matricula in alunosTurma) {
+                if (Object.hasOwnProperty.call(alunosTurma, matricula)) {
+                    const aluno = alunosTurma[matricula];
                     document.getElementById('listaAlunosDaTurma').innerHTML += `<div class="row"><div class="col-1" ><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" name="${matricula}" onclick="this.checked ? alunosSelecionadosTurma[${matricula}] = '${aluno.nome}' : alunosSelecionadosTurma[${matricula}] = '', verificaAlunosSelecionados()"></div><div class="col-md"><button class="list-group-item list-group-item-action" onclick="document.getElementById('btnAbaAlunos').click(), document.getElementById('btnAbaAlunosResponsivo').click(), abreDadosDoAluno('${matricula}'), setTimeout( function() {document.getElementById('rolaTelaAbaixoAlunos').style.display = 'block', document.getElementById('rolaTelaAbaixoAlunos').focus(), document.getElementById('rolaTelaAbaixoAlunos').style.display = 'none'}, 300 ); "> ${matricula}: ${aluno.nome}</button></div></div>`
                 }
                 
@@ -174,10 +183,10 @@ function carregaListaDeAlunosDaTurma(turma, filtro='') {
     } else {
         document.getElementById('listaAlunosDaTurma').innerHTML = ''
         turmasRef.child(turma + '/alunos').orderByChild('nome').equalTo(filtro).once('value').then(snapshot => {
-            alunos = snapshot.val()
-            for (const matricula in alunos) {
-                if (Object.hasOwnProperty.call(alunos, matricula)) {
-                    const aluno = alunos[matricula];
+            let alunosTurma = snapshot.val()
+            for (const matricula in alunosTurma) {
+                if (Object.hasOwnProperty.call(alunosTurma, matricula)) {
+                    const aluno = alunosTurma[matricula];
                     document.getElementById('listaAlunosDaTurma').innerHTML += `<div class="row"><div class="col-sm-1"><input type="checkbox" name="${matricula}" onclick="this.checked ? alunosSelecionadosTurma[${matricula}] = '${aluno.nome}' : alunosSelecionadosTurma[${matricula}] = '', verificaAlunosSelecionados()"></div><div class="col-md"><button class="list-group-item list-group-item-action" onclick="document.getElementById('btnAbaAlunos').click(), document.getElementById('btnAbaAlunosResponsivo').click(), abreDadosDoAluno('${matricula}') "> ${matricula}: ${aluno.nome}</button></div></div>`
                 }
             }
@@ -304,6 +313,7 @@ var tipoDeBusca = 'nomeAluno'
 function alteraTipoDeBusca(tipo) {
     tipoDeBusca = tipo
 }
+
 
 var dadosResponsaveis = {}
 function abreDadosDoAluno(matricula, desativado=false, notasDesativado=false) {
