@@ -692,7 +692,9 @@
                     </div>
                   </div> 
                 </div>
-                <label>Alunos cadastrados na turma:</label>
+                <label>Alunos cadastrados na turma:</label><br>
+                <input type="checkbox" id="selecTodos" onclick="selecionaTodos(this)">
+                <label for="selecTodos">Selecionar todos</label>
                 <div class="overflow-auto" style="height: fit-content; max-height: 280px;">
                   <div class="list-group" id="listaAlunosDaTurma" style="width: 90%;">
                     
@@ -841,15 +843,15 @@
                 <div class="form-row">
                   <div class="form-group col-sm-2">
                     <label for="inputEmail4">Matrícula</label>
-                    <input type="number" class="form-control" id="matriculaAluno" name="matriculaAluno" placeholder="Número de matrícula">
+                    <input type="number" class="form-control" id="matriculaAluno" name="matriculaAluno" placeholder="Número de matrícula" required>
                   </div>
                   <div class="form-group col-md-4">
                     <label for="inputPassword4">Nome</label>
-                    <input type="name" class="form-control" id="nomeAluno" name="nomeAluno" placeholder="Nome" onblur="maiusculo(this)">
+                    <input type="name" class="form-control" id="nomeAluno" name="nomeAluno" placeholder="Nome" onblur="maiusculo(this)" required>
                   </div>
                   <div class="form-group col-auto">
                     <label for="inputPassword4">Data de nascimento</label>
-                    <input type="date" class="form-control" id="dataNascimentoAluno" name="dataNascimentoAluno" placeholder="Data" onblur="calculaIdade(this.value)">
+                    <input type="date" class="form-control" id="dataNascimentoAluno" name="dataNascimentoAluno" placeholder="Data" onblur="calculaIdade(this.value)" required>
                     
                   </div>
                   <div class="form-group col-auto">
@@ -868,17 +870,17 @@
                   </div>
                   <div class="form-group col-md-5">
                     <label for="inputPassword4">Email</label>
-                    <input type="email" class="form-control" id="emailAluno" name="emailAluno" placeholder="Email">
+                    <input type="email" class="form-control" id="emailAluno" name="emailAluno" placeholder="Email" required>
                   </div>
                 </div>
                 <div class="form-row">
                   <div class="form-group col-auto">
                     <label for="inputEmail4">RG</label>
-                    <input type="text" class="form-control" id="rgAluno" name="rgAluno" placeholder="RG">
+                    <input type="text" class="form-control" id="rgAluno" name="rgAluno" placeholder="RG" required>
                   </div>
                   <div class="form-group col-auto">
                     <label for="inputPassword4">CPF</label>
-                    <input type="text" class="form-control" id="cpfAluno" name="cpfAluno" placeholder="CPF" onchange="verificaCPF(this.value)">
+                    <input type="text" class="form-control" id="cpfAluno" name="cpfAluno" placeholder="CPF" onchange="verificaCPF(this.value)" required>
                     <small id="cpfHelp" class="form-text text-muted">Digite um CPF válido, existe um algoritmo de validação neste campo.</small>
                   </div>
                 </div>

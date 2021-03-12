@@ -37,7 +37,7 @@ firebase.auth().onAuthStateChanged((user) => {
                     if (Object.hasOwnProperty.call(turmasProf, turma)) {
                         const bool = turmasProf[turma];
                         if (bool) {
-                            document.getElementById('listaTurmasProf').innerHTML = `<button class="list-group-item list-group-item-action" onclick="document.getElementById('btnAbaTurmas').click(),abreTurma('${turma}')">Turma ${turma}</button>`
+                            document.getElementById('listaTurmasProf').innerHTML += `<button class="list-group-item list-group-item-action" onclick="document.getElementById('btnAbaTurmas').click(),abreTurma('${turma}')">Turma ${turma}</button>`
                             turmasRef.child(turma + '/alunos').once('value').then(matAlunos => {
                                 for (const matricula in matAlunos.val()) {
                                     if (Object.hasOwnProperty.call(matAlunos.val(), matricula)) {
@@ -120,7 +120,7 @@ function carregaListaDeAlunos(filtro='') {
 }
 
 var turmas
-// Funções da aba de turmas da secretaria
+// Funções da aba de turmas dos professores
 function carregaTurmas() {
     alunosSelecionadosTurma = {}
     document.getElementById("areaInfoTurma").style.visibility = 'hidden'
@@ -132,7 +132,7 @@ function carregaTurmas() {
             const bool = turmasProf[turma];
             if (bool) {
                 turmasRef.child(turma).once('value').then(snapshot => {
-                    selectTurmas.innerHTML = '<option selected hidden>Escolha uma turma...</option>'
+                    selectTurmas.innerHTML += '<option selected hidden>Escolha uma turma...</option>'
                     let infoDaTurma = snapshot.val()
                     if (infoDaTurma.professor == undefined) {
                         var profReferencia = 'Não cadastrado'
@@ -159,6 +159,7 @@ var alunosSelecionadosTurma = {}
 function carregaListaDeAlunosDaTurma(turma, filtro='') {
     
     tipoDeBusca = 'nome'
+    alunosSelecionadosTurma = {}
     alunosSelecionadosTurma.codTurma = turma
     console.log(filtro)
     loader.style.display = 'block'
@@ -171,7 +172,7 @@ function carregaListaDeAlunosDaTurma(turma, filtro='') {
             for (const matricula in alunosTurma) {
                 if (Object.hasOwnProperty.call(alunosTurma, matricula)) {
                     const aluno = alunosTurma[matricula];
-                    document.getElementById('listaAlunosDaTurma').innerHTML += `<div class="row"><div class="col-1" ><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" name="${matricula}" onclick="this.checked ? alunosSelecionadosTurma[${matricula}] = '${aluno.nome}' : alunosSelecionadosTurma[${matricula}] = '', verificaAlunosSelecionados()"></div><div class="col-md"><button class="list-group-item list-group-item-action" onclick="document.getElementById('btnAbaAlunos').click(), document.getElementById('btnAbaAlunosResponsivo').click(), abreDadosDoAluno('${matricula}'), setTimeout( function() {document.getElementById('rolaTelaAbaixoAlunos').style.display = 'block', document.getElementById('rolaTelaAbaixoAlunos').focus(), document.getElementById('rolaTelaAbaixoAlunos').style.display = 'none'}, 300 ); "> ${matricula}: ${aluno.nome}</button></div></div>`
+                    document.getElementById('listaAlunosDaTurma').innerHTML += `<div class="row"><div class="col-1" ><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" name="alunosTurma" onclick="this.checked ? alunosSelecionadosTurma[${matricula}] = '${aluno.nome}' : delete alunosSelecionadosTurma[${matricula}], verificaAlunosSelecionados()"></div><div class="col-md"><button class="list-group-item list-group-item-action" onclick="document.getElementById('btnAbaAlunos').click(), document.getElementById('btnAbaAlunosResponsivo').click(), abreDadosDoAluno('${matricula}'), setTimeout( function() {document.getElementById('rolaTelaAbaixoAlunos').style.display = 'block', document.getElementById('rolaTelaAbaixoAlunos').focus(), document.getElementById('rolaTelaAbaixoAlunos').style.display = 'none'}, 300 ); "> ${matricula}: ${aluno.nome}</button></div></div>`
                 }
                 
             }
@@ -187,7 +188,7 @@ function carregaListaDeAlunosDaTurma(turma, filtro='') {
             for (const matricula in alunosTurma) {
                 if (Object.hasOwnProperty.call(alunosTurma, matricula)) {
                     const aluno = alunosTurma[matricula];
-                    document.getElementById('listaAlunosDaTurma').innerHTML += `<div class="row"><div class="col-sm-1"><input type="checkbox" name="${matricula}" onclick="this.checked ? alunosSelecionadosTurma[${matricula}] = '${aluno.nome}' : alunosSelecionadosTurma[${matricula}] = '', verificaAlunosSelecionados()"></div><div class="col-md"><button class="list-group-item list-group-item-action" onclick="document.getElementById('btnAbaAlunos').click(), document.getElementById('btnAbaAlunosResponsivo').click(), abreDadosDoAluno('${matricula}') "> ${matricula}: ${aluno.nome}</button></div></div>`
+                    document.getElementById('listaAlunosDaTurma').innerHTML += `<div class="row"><div class="col-sm-1"><input type="checkbox" name="alunosTurma" onclick="this.checked ? alunosSelecionadosTurma[${matricula}] = '${aluno.nome}' : delete alunosSelecionadosTurma[${matricula}], verificaAlunosSelecionados()"></div><div class="col-md"><button class="list-group-item list-group-item-action" onclick="document.getElementById('btnAbaAlunos').click(), document.getElementById('btnAbaAlunosResponsivo').click(), abreDadosDoAluno('${matricula}') "> ${matricula}: ${aluno.nome}</button></div></div>`
                 }
             }
             loader.style.display = 'none'
@@ -212,11 +213,244 @@ function verificaAlunosSelecionados() {
             }
             console.log(c)
             if (c == 0) {
-                document.getElementById('btnTransfereAlunosTurma').disabled = true
-                document.getElementById('btnDesativaAlunos').disabled = true
+                document.getElementById('btnLancaFrequencia').disabled = true
+                document.getElementById('btnLancaNotas').disabled = true
+                document.getElementById('selecTodos').checked = false
             } else {
-                document.getElementById('btnTransfereAlunosTurma').disabled = false
-                document.getElementById('btnDesativaAlunos').disabled = false
+                document.getElementById('btnLancaFrequencia').disabled = false
+                document.getElementById('btnLancaNotas').disabled = false
+            }
+        }
+    }
+    
+}
+
+function distribuiNotas() {
+    loader.style.display = 'block'
+    loaderMsg.innerText = 'Buscando notas...'
+    abrirModal('modal', 'Distribuição de notas da turma ' + alunosSelecionadosTurma.codTurma, 
+            `Distribua os tipos de notas que você aplicará em sala de aula<br>
+            
+            <button type="button" data-toggle="tooltip" data-placement="top" title="Adicionar nota" class="btn btn-light btn-sm" onclick="addCampoNota()"><span data-feather="plus-square"></span></button><br>
+            <div class="row"><div class="col-2"><label>Nota</label></div><div class="col-2"><label>Valor</label></div></div>
+            <section id="camposNotas"></section>
+            <br>
+            Total: <label id="somaNotasDistribuidas"></label>/100.0
+            `
+            , `<button type="button" data-toggle="tooltip" data-placement="top" title="Essas serão as notas que você deverá distribuir durante o período. Você pode alterar as distribuição de notas depois." class="btn btn-primary" onclick="defineNotas()">Definir notas</button><button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>`
+        )
+        feather.replace()
+        contadorNotas = 0
+        contadorNotasExtras = 0
+        notasDistribuidas = {}
+        somatorioDistribuidas = 0
+        turmasRef.child(alunosSelecionadosTurma.codTurma + '/notas').once('value').then(snapshot => {
+            
+            let notas = snapshot.val()
+            if (notas != null) {
+                notasDistribuidas = notas
+            }
+            
+            console.log(notas)
+            let c = 0
+            for (const nomeNota in notas) {
+                if (Object.hasOwnProperty.call(notas, nomeNota)) {
+                    const valor = notas[nomeNota];
+                    document.getElementById('camposNotas').innerHTML += `
+                    <div class="row" id="linha${c}">
+                        <div class="col-2" >
+                            <input type="text" class="form-control" id="nomeNota${c}" placeholder="EX ${c + 1}" value="${nomeNota}">
+                        </div>
+                        <div class="col-2">
+                            <input type="number" id="valorNota${c}" class="form-control" value="${valor}" onkeyup="somaNotasDistribuidas('${c}')" placeholder="15.5">
+                        </div>
+                        <button type="button" class="btn btn-light btn-sm" onclick="somaNotasDistribuidas('${c}', true), document.getElementById('linha${c}').remove(), contadorNotas--"><span data-feather="x-square"></span></button><br>
+                    </div>
+                    `
+                    somaNotasDistribuidas(c)
+                    c++
+                }
+            }
+            contadorNotas = c
+            feather.replace()
+           
+
+            loader.style.display = 'none'
+        }).catch(error => {
+            loader.style.display = 'none'
+            AstNotif.dialog('Erro', error.message)
+            console.log(error)
+        })
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
+        
+}
+
+
+
+var contadorNotas = 0
+var contadorNotasExtras = 0
+function addCampoNota(extra=false) {
+    let camposNotas = document.getElementById('camposNotas')
+    document.getElementById('somaNotasDistribuidas').innerText = 0
+    
+    if (extra) {
+        
+    } else {
+        camposNotas.innerHTML += 
+        `
+        <div class="row" id="linha${contadorNotas}">
+            <div class="col-2" >
+                <input type="text" class="form-control" id="nomeNota${contadorNotas}" placeholder="EX ${contadorNotas + 1}">
+            </div>
+            <div class="col-2">
+                <input type="number" id="valorNota${contadorNotas}" class="form-control" onkeyup="somaNotasDistribuidas('${contadorNotas}')" placeholder="15.5">
+            </div>
+            <button type="button" class="btn btn-light btn-sm" onclick="somaNotasDistribuidas('${contadorNotas}', true), document.getElementById('linha${contadorNotas}').remove(), contadorNotas--"><span data-feather="x-square"></span></button><br>
+        </div>
+        `
+        feather.replace()
+        contadorNotas++
+    }
+}
+var notasDistribuidas = {}
+var somatorioDistribuidas = 0
+
+function defineNotas() {
+    loader.style.display = 'block'
+    loaderMsg.innerText = 'Distribuindo notas...'
+    turmasRef.child(alunosSelecionadosTurma.codTurma + '/notas').set(notasDistribuidas).then(() => {
+        loader.style.display = 'none'
+        $('#modal').modal('hide')
+        AstNotif.notify('Sucesso', 'Notas distribuídas!')
+    }).catch(error => {
+        loader.style.display = 'none'
+        AstNotif.dialog('Erro', error.message)
+        console.log(error)
+    })
+}
+
+function somaNotasDistribuidas(id, subtrai=false) {
+    let somaNotasDist = document.getElementById('somaNotasDistribuidas')
+    if (subtrai) {
+        try {
+            notasDistribuidas[document.getElementById('nomeNota' + id).value] = null
+        } catch (error) {
+            console.log(error)
+        }
+        
+    } else {
+        notasDistribuidas[document.getElementById('nomeNota' + id).value] = Number(document.getElementById('valorNota' + id).value)
+    }
+    somaNotasDist.innerText = 0
+    somatorioDistribuidas = 0
+    for (const idValor in notasDistribuidas) {
+        if (Object.hasOwnProperty.call(notasDistribuidas, idValor)) {
+            const valor = notasDistribuidas[idValor];
+            somatorioDistribuidas += Number(valor)
+            if (somatorioDistribuidas > 100) {
+                somaNotasDist.style.color = 'red'
+            } else {
+                somaNotasDist.style.color = 'black'
+            }
+        }
+    }
+    somaNotasDist.innerText = somatorioDistribuidas
+}
+
+function selecionaTodos(source) {
+    let checkboxes = document.getElementsByName('alunosTurma');
+    for(var i=0, n=checkboxes.length;i<n;i++) {
+        if (source.checked) {
+            checkboxes[i].checked = false;
+            checkboxes[i].click()
+        } else {
+            checkboxes[i].checked = true;
+            checkboxes[i].click()
+        }
+        
+    }
+    
+}
+
+function lancaFrequencia(alunos={}, turma="", data='', confirma=false) {
+    if (confirma) {
+        loader.style.display = 'block'
+        loaderMsg.innerText = 'Lançando frequências...'
+        console.log(data)
+        if (alunos.codTurma != '') {
+            delete alunos.codTurma
+        }
+
+        turmasRef.child(turma + '/frequencia/' + data).set(alunos).then(() => {
+            async function frequenciaAluno() {
+                for (const matricula in alunos) {
+                    if (Object.hasOwnProperty.call(alunos, matricula)) {
+                        const aluno = alunos[matricula];
+                        turmasRef.child(turma + '/alunos/' + formataNumMatricula(matricula) + '/frequencia/' + data).set({turma: turma}).then(() => {
+                            
+    
+                            
+                        }).catch(error => {
+                            AstNotif.dialog('Erro', error.message)
+                            loader.style.display = 'none'
+                            console.log(error)
+                        })
+                    }
+                }
+            }
+
+            frequenciaAluno().then(() => {
+                AstNotif.notify('Sucesso', 'As frequências foram lançadas com sucesso!')
+                loader.style.display = 'none'
+            }).catch(error => {
+                AstNotif.dialog('Erro', error.message)
+                console.log(error)
+            })
+            
+            
+            loader.style.display = 'none'
+        }).catch(error => {
+            AstNotif.dialog('Erro', error.message)
+            console.log(error)
+            loader.style.display = 'none'
+        })
+    } else {
+        let nomes = ''
+        let turma
+        for (const matricula in alunosSelecionadosTurma) {
+            if (Object.hasOwnProperty.call(alunosSelecionadosTurma, matricula)) {
+                const aluno = alunosSelecionadosTurma[matricula];
+                if (matricula == 'codTurma') {
+                    turma = aluno
+                } else if(matricula == undefined || aluno == undefined) {
+
+                } else {
+                    nomes += formataNumMatricula(matricula) + ': ' + aluno + '<br>'
+                }
+                
+            }
+        }
+        abrirModal('modal', 'Lançamento de freqêuncia', 
+            `Você selecionou os alunos listados abaixo da turma ${turma}. <br> ${nomes} <br><b>Você deseja lançar frequências para esses alunos para que dia?</b><br>
+            <input type="date" class="form-control" name="dataFrequencia" id="dataFrequencia">
+            `
+            , `<button type="button" data-toggle="tooltip" data-placement="top" title="Lançar frequência para os alunos selecionados" class="btn btn-primary" onclick="lancaFrequencia(alunosSelecionadosTurma,'${turma}', document.getElementById('dataFrequencia').value, true)">Lançar</button><button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>`
+        )
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
+        let selectTurmasTransfere = document.getElementById('selectTurmasTransfere')
+        for (const cod in turmas) {
+            if (Object.hasOwnProperty.call(turmas, cod)) {
+                const infoDaTurma = turmas[cod];
+                if (infoDaTurma.professor == undefined) {
+                    var profReferencia = 'Não cadastrado'
+                } else {
+                    var profReferencia = infoDaTurma.professor[0].nome
+                }
+                selectTurmasTransfere.innerHTML += `<option value="${cod}">Turma ${cod} (Prof. ${profReferencia})</option>`
             }
         }
     }

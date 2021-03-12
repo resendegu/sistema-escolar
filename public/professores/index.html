@@ -129,10 +129,10 @@
             <li class="nav-item">
               <a class="nav-link" href="../login.html">&nbsp;&nbsp;Login</a>
             </li>
-            <li class="nav-item">
+            <li class="nav-item" id="navAdm" >
               <a class="nav-link" href="adm.html">&nbsp;&nbsp;Administração</a>
             </li>
-            <li class="nav-item">
+            <li class="nav-item" id="navSecretaria">
               <a class="nav-link" href="../secretaria/">&nbsp;&nbsp;Secretaria</a>
             </li>
           </ul>
@@ -591,17 +591,20 @@
                     </div>
                   </div> 
                 </div>
-                <label>Alunos cadastrados na turma:</label>
+                <label>Alunos cadastrados na turma: (Selecione alunos para fazer lançamentos ou clique em um aluno para ver sua ficha)</label><br>
+                <input type="checkbox" id="selecTodos" onclick="selecionaTodos(this)">
+                <label for="selecTodos">Selecionar todos</label>
                 <div class="overflow-auto" style="height: fit-content; max-height: 280px;">
                   <div class="list-group" id="listaAlunosDaTurma" style="width: 90%;">
                     
                   </div>
                 </div>
                 <br><br>
-                <button type="button" class="btn btn-primary" id="btnLancaFrequencia">Lançar frequência</button>
-                <button type="button" class="btn btn-info" id="btnLancaNotas" onclick="">Lançar Notas Manuais</button>
-                <button type="button" class="btn btn-secondary" id="btnDesativaAlunos" onclick="desativaAlunos()">Distribuir notas</button>
-                <button type="button" class="btn btn-warning" id="btnDesativaAlunos" onclick="desativaAlunos()">Fechar período</button>
+                <button type="button" class="btn btn-primary" id="btnLancaFrequencia" onclick="lancaFrequencia()" disabled>Lançar frequência</button>
+                <button type="button" class="btn btn-info" id="btnLancaNotas" disabled onclick="lancaNotas()">Lançar Notas</button>
+                <button type="button" class="btn btn-secondary" id="btnDistribuiNotas" onclick="distribuiNotas()">Distribuir notas</button>
+                <button type="button" class="btn btn-success" id="btnFechaPeriodo" onclick="iniciaPeriodo()">Iniciar período</button>
+                <button type="button" class="btn btn-warning" id="btnFechaPeriodo" onclick="fechaPeriodo()">Fechar período</button>
                 <hr>
                 <p class="text-muted float-md-right" id="timestampTurmaCadastrada"></p>
                 

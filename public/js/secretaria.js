@@ -397,6 +397,21 @@ function transfereAlunosConfirma() {
     }
 }
 
+function selecionaTodos(source) {
+    let checkboxes = document.getElementsByName('alunosTurma');
+    for(var i=0, n=checkboxes.length;i<n;i++) {
+        if (source.checked) {
+            checkboxes[i].checked = false;
+            checkboxes[i].click()
+        } else {
+            checkboxes[i].checked = true;
+            checkboxes[i].click()
+        }
+        
+    }
+    
+}
+
 
 
 function excluirTurma(confirma=false) {
@@ -450,6 +465,7 @@ var alunos
 function carregaListaDeAlunosDaTurma(turma, filtro='') {
     
     tipoDeBusca = 'nome'
+    alunosSelecionadosTurma = {}
     alunosSelecionadosTurma.codTurma = turma
     console.log(filtro)
     loader.style.display = 'block'
@@ -462,7 +478,7 @@ function carregaListaDeAlunosDaTurma(turma, filtro='') {
             for (const matricula in alunos) {
                 if (Object.hasOwnProperty.call(alunos, matricula)) {
                     const aluno = alunos[matricula];
-                    document.getElementById('listaAlunosDaTurma').innerHTML += `<div class="row"><div class="col-1" ><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" name="${matricula}" onclick="this.checked ? alunosSelecionadosTurma[${matricula}] = '${aluno.nome}' : alunosSelecionadosTurma[${matricula}] = '', verificaAlunosSelecionados()"></div><div class="col-md"><button class="list-group-item list-group-item-action" onclick="document.getElementById('btnAbaAlunos').click(), document.getElementById('btnAbaAlunosResponsivo').click(), abreDadosDoAluno('${matricula}'), setTimeout( function() {document.getElementById('rolaTelaAbaixoAlunos').style.display = 'block', document.getElementById('rolaTelaAbaixoAlunos').focus(), document.getElementById('rolaTelaAbaixoAlunos').style.display = 'none'}, 300 ); "> ${matricula}: ${aluno.nome}</button></div></div>`
+                    document.getElementById('listaAlunosDaTurma').innerHTML += `<div class="row"><div class="col-1" ><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" name="alunosTurma" onclick="this.checked ? alunosSelecionadosTurma[${matricula}] = '${aluno.nome}' : delete alunosSelecionadosTurma[${matricula}], verificaAlunosSelecionados()"></div><div class="col-md"><button class="list-group-item list-group-item-action" onclick="document.getElementById('btnAbaAlunos').click(), document.getElementById('btnAbaAlunosResponsivo').click(), abreDadosDoAluno('${matricula}'), setTimeout( function() {document.getElementById('rolaTelaAbaixoAlunos').style.display = 'block', document.getElementById('rolaTelaAbaixoAlunos').focus(), document.getElementById('rolaTelaAbaixoAlunos').style.display = 'none'}, 300 ); "> ${matricula}: ${aluno.nome}</button></div></div>`
                 }
                 
             }
@@ -478,7 +494,7 @@ function carregaListaDeAlunosDaTurma(turma, filtro='') {
             for (const matricula in alunos) {
                 if (Object.hasOwnProperty.call(alunos, matricula)) {
                     const aluno = alunos[matricula];
-                    document.getElementById('listaAlunosDaTurma').innerHTML += `<div class="row"><div class="col-sm-1"><input type="checkbox" name="${matricula}" onclick="this.checked ? alunosSelecionadosTurma[${matricula}] = '${aluno.nome}' : alunosSelecionadosTurma[${matricula}] = '', verificaAlunosSelecionados()"></div><div class="col-md"><button class="list-group-item list-group-item-action" onclick="document.getElementById('btnAbaAlunos').click(), document.getElementById('btnAbaAlunosResponsivo').click(), abreDadosDoAluno('${matricula}') "> ${matricula}: ${aluno.nome}</button></div></div>`
+                    document.getElementById('listaAlunosDaTurma').innerHTML += `<div class="row"><div class="col-sm-1"><input type="checkbox" name="alunosTurma" onclick="this.checked ? alunosSelecionadosTurma[${matricula}] = '${aluno.nome}' : delete alunosSelecionadosTurma[${matricula}], verificaAlunosSelecionados()"></div><div class="col-md"><button class="list-group-item list-group-item-action" onclick="document.getElementById('btnAbaAlunos').click(), document.getElementById('btnAbaAlunosResponsivo').click(), abreDadosDoAluno('${matricula}') "> ${matricula}: ${aluno.nome}</button></div></div>`
                 }
             }
             loader.style.display = 'none'
@@ -505,6 +521,7 @@ function verificaAlunosSelecionados() {
             if (c == 0) {
                 document.getElementById('btnTransfereAlunosTurma').disabled = true
                 document.getElementById('btnDesativaAlunos').disabled = true
+                document.getElementById('selecTodos').checked = false
             } else {
                 document.getElementById('btnTransfereAlunosTurma').disabled = false
                 document.getElementById('btnDesativaAlunos').disabled = false
@@ -866,7 +883,10 @@ document.querySelector('#formCadastroAluno').addEventListener('submit', (e) => {
     dadosAluno.cpfPedagogicoAluno = dados.get('cpfPedagogicoAluno')
     // Gera ou não o PDF do aluno
     dadosAluno.geraPDFAluno = document.getElementById('geraPDFAluno')
-    
+    function emailRegularExpression(email) {
+        var re = /\S+@\S+\.\S+/
+        return re.test(email)
+    }
 
     console.log(dadosAluno)
     if (dadosAluno.dataNascimentoAluno == '' || dadosAluno.nomeAluno == '') {
@@ -874,6 +894,9 @@ document.querySelector('#formCadastroAluno').addEventListener('submit', (e) => {
         loader.style.display = 'none'
     } else if((dadosAluno.cpfResponsavel1 == '' || dadosAluno.rgResponsavel1 == '' || dadosAluno.numeroCelularResponsavel1 == '' || dadosAluno.nomeResponsavelAluno1 == '')&& idadeAluno != undefined && idadeAluno.years < 18) {
         AstNotif.dialog('Confira os campos', 'O aluno é menor de idade. É obrigatório o preenchimento dos dados do responsável número 1 do aluno.')
+        loader.style.display = 'none'
+    } else if (dadosAluno.emailAluno == '' || emailRegularExpression(dadosAluno.emailAluno) == false) {
+        AstNotif.dialog('Confira o email do aluno', 'O email do aluno é obrigatório. Confira se foi escrito corretamente.')
         loader.style.display = 'none'
     } else if (((dadosAluno.cpfFinanceiroAluno == '' || dadosAluno.numeroCelularFinanceiroAluno == '' || dadosAluno.nomeResponsavelFinanceiroAluno == '') || (dadosAluno.cpfPedgogicoAluno == '' || dadosAluno.numeroCelularPedagogicoAluno == '' || dadosAluno.nomeResponsavelPedagogicoAluno == '')) && idadeAluno.years < 18) {
         AstNotif.dialog('Confira os campos', 'O aluno é menor de idade. Cofira os campos de responsáveis financeiro e pedagógico do aluno, eles são obrigatórios quando o aluno é menor de idade.')

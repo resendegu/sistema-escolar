@@ -6,7 +6,7 @@ var loader = document.getElementById('loader')
 var loaderMsg = document.getElementById('loaderMsg')
 
 function update() {
-	let versao = 0.83
+	let versao = 0.84
 	updatesRef.on('value', (snapshot) => {
 		let dados = snapshot.val()
 		if (versao < dados.versao) {
@@ -14,6 +14,7 @@ function update() {
 		}
 	})
 }
+
 
 function usuarioAtual() {
     let user = firebase.auth().currentUser;
