@@ -1,3 +1,4 @@
+
 var secretariaRef = firebase.database().ref('sistemaEscolar/secretaria')
 var numerosRef = firebase.database().ref('sistemaEscolar/numeros')
 var aniversariosRef = firebase.database().ref('sistemaEscolar/aniversarios')
@@ -199,7 +200,73 @@ function carregaListaDeAlunosDaTurma(turma, filtro='') {
             AstNotif.dialog('Erro', error.message)
         })
     }
+
+    turmasRef.child(turma + '/status').once('value').then(snapshot => {
+        let status = snapshot.val()
+        if (snapshot.exists()) {
+            if (status.turma == 'aberta') {
+                document.getElementById('infoTurma').style.color = 'green'
+                document.getElementById('infoTurma').innerText = 'Turma Aberta'
+                document.getElementById('btnIniciaPeriodo').style.visibility = 'visible'
+                document.getElementById('btnFechaPeriodo').style.visibility = 'visible'
+                document.getElementById('btnIniciaPeriodo').disabled = true
+                document.getElementById('btnFechaPeriodo').disabled = false
+                document.getElementById('btnLancaFrequencia').style.visibility = 'visible'
+                document.getElementById('btnLancaNotas').style.visibility = 'visible'
+            } else {
+                document.getElementById('btnLancaFrequencia').style.visibility = 'hidden'
+                document.getElementById('btnLancaNotas').style.visibility = 'hidden'
+                document.getElementById('btnIniciaPeriodo').style.visibility = 'hidden'
+                document.getElementById('infoTurma').style.color = 'yellow'
+                document.getElementById('infoTurma').innerText = 'Turma Fechada'
+                document.getElementById('btnIniciaPeriodo').style.visibility = 'visible'
+                document.getElementById('btnFechaPeriodo').style.visibility = 'visible'
+                document.getElementById('btnIniciaPeriodo').disabled = false
+                document.getElementById('btnFechaPeriodo').disabled = true
+            }
+        } else {
+            document.getElementById('btnLancaFrequencia').style.visibility = 'hidden'
+            document.getElementById('btnLancaNotas').style.visibility = 'hidden'
+            document.getElementById('btnFechaPeriodo').style.visibility = 'hidden'
+            document.getElementById('btnIniciaPeriodo').disabled = false
+            document.getElementById('infoTurma').innerText = 'Turma'
+            document.getElementById('infoTurma').style.color = 'black'
+        }
+        
+    }).catch(error => {
+        console.log(error)
+        AstNotif.dialog('Erro', error.message)
+    })
     
+}
+
+function iniciaPeriodo(confirma=false, inicio='', fim='') {
+    if (confirma) {
+        loader.style.display = 'block'
+        loaderMsg.innerText = 'Iniciando turma...'
+        turmasRef.child(alunosSelecionadosTurma.codTurma + '/status').set({turma: 'aberta', inicio: inicio, fim: fim}).then(()=>{
+            $('#modal').modal('hide')
+            AstNotif.notify('Sucesso', 'Turma aberta')
+            carregaListaDeAlunosDaTurma(alunosSelecionadosTurma.codTurma)
+            loader.style.display = 'none'
+        }).catch(error => {
+            loader.style.display = 'none'
+            console.log(error)
+            AstNotif.dialog('Erro', error.message)
+        })
+    } else {
+        abrirModal('modal', 'Confirmação de abertura da turma ' + alunosSelecionadosTurma.codTurma, `
+            Atenção. Você está prestes a iniciar as ativiadades da turma ${alunosSelecionadosTurma.codTurma}. Ao iniciar a turma, você poderá lançar notas e frequências para os alunos que estão cadastrados na turma.<br>
+            <br>
+            <b>Escolha uma data de início e um data com o fim previsto deste semestre, bimestre, ano...</b> (Essas datas não farão com que o sistema abra ou feche as turmas automaticamente. Um professor cadastrado na turma é quem deve iniciar e fechar a turma manualmente)<br>
+            Início previsto:
+            <input type="date" class="form-control" name="dataInicioPeriodo" id="dataInicioPeriodo">
+            <br> Fim previsto:
+            <input type="date" class="form-control" name="dataFimPeriodo" id="dataFimPeriodo">
+
+        `, 
+        `<button type="button" data-toggle="tooltip" data-placement="top" title="Iniciar atividades da turma no sistema" class="btn btn-primary" onclick="iniciaPeriodo(true, document.getElementById('dataInicioPeriodo').value, document.getElementById('dataFimPeriodo').value)">Iniciar turma</button><button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>`)
+    }
 }
 
 function verificaAlunosSelecionados() {
@@ -226,6 +293,8 @@ function verificaAlunosSelecionados() {
     }
     
 }
+
+
 
 var contadorDeNotas
 function lancaNotas(confirma=false) {

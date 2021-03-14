@@ -549,7 +549,7 @@
                 </select>
               </div>
               <div class="container" id="areaInfoTurma" style="visibility: hidden;">
-                <label class="h3">Turma</label>
+                <label class="h3" id="infoTurma">Turma</label>
                 <label class="text-muted float-right h5" id="codigoDaTurma"></label>
                 <div class="row">
                   <div class="col-md-auto">
@@ -603,8 +603,8 @@
                 <button type="button" class="btn btn-primary" id="btnLancaFrequencia" onclick="lancaFrequencia()" disabled>Lançar frequência</button>
                 <button type="button" class="btn btn-info" id="btnLancaNotas" disabled onclick="lancaNotas()">Lançar Notas</button>
                 <button type="button" class="btn btn-secondary" id="btnDistribuiNotas" onclick="distribuiNotas()">Distribuir notas</button>
-                <button type="button" class="btn btn-success" id="btnFechaPeriodo" onclick="iniciaPeriodo()">Iniciar período</button>
-                <button type="button" class="btn btn-warning" id="btnFechaPeriodo" onclick="fechaPeriodo()">Fechar período</button>
+                <button type="button" class="btn btn-success" id="btnIniciaPeriodo" onclick="iniciaPeriodo()">Iniciar turma</button>
+                <button type="button" class="btn btn-warning" id="btnFechaPeriodo" onclick="fechaPeriodo()">Fechar turma</button>
                 <hr>
                 <p class="text-muted float-md-right" id="timestampTurmaCadastrada"></p>
                 
