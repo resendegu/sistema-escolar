@@ -1,6 +1,7 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const { auth } = require('firebase-admin');
+const { HttpsError } = require('firebase-functions/lib/providers/https');
 admin.initializeApp()
 
 exports.verificadorDeAcesso = functions.https.onCall((data, context) => {
@@ -556,4 +557,43 @@ exports.ativaDesativaAlunos = functions.https.onCall((data, context) => {
     } else {
         throw new functions.https.HttpsError('permission-denied', 'Você não possui permissão para fazer alterações nesta área.')
     }
+})
+
+exports.lancarNotas = functions.https.onCall((data, context) => {
+    // data: {alunos: {matricula: nomeAluno}, turma: codTurma, notas: {ativ1: 50, ativ2: 50}}
+    if (context.auth.token.master == true || context.auth.token.professores == true) {
+        function formataNumMatricula(num) {
+            let numero = num
+            numero = "00000" + numero.replace(/\D/g, '');
+            numero = numero.slice(-5,-1) + numero.slice(-1);
+            return numero
+        }
+        var dados = data
+        var alunos = dados.alunos
+        var turma = dados.turma
+        var notas = dados.notas
+    
+        var alunosTurmaRef = admin.database().ref('sistemaEscolar/turmas/' + turma + '/alunos')
+        async function lancar() {
+            for (const matricula in alunos) {
+                if (Object.hasOwnProperty.call(alunos, matricula)) {
+                    const nomeAluno = alunos[matricula];
+                    alunosTurmaRef.child(formataNumMatricula(matricula) + '/notas').set(notas).then(() => {
+        
+                    }).catch(error => {
+                        throw new HttpsError('unknown', error.message, error)
+                    })
+                }
+            }
+        }
+        return lancar().then(() => {
+            return {answer: 'As notas foram substituídas e lançadas com sucesso'}
+        }).catch(error => {
+            throw new HttpsError('unknown', error.message, error)
+        })
+        
+    } else {
+        throw new functions.https.HttpsError('permission-denied', 'Você não possui permissão para fazer alterações nesta área.')
+    }
+
 })

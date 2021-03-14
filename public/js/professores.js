@@ -31,6 +31,7 @@ firebase.auth().onAuthStateChanged((user) => {
         usuarioRef.child(user.uid).once('value').then(snapshot => {
             let dadosUser = snapshot.val()
             let listaAlunosMat = []
+            
             if (dadosUser.professor != undefined) {
                 turmasProf = dadosUser.professor.turmas
                 for (const turma in turmasProf) {
@@ -127,6 +128,7 @@ function carregaTurmas() {
     loader.style.display = 'block'
     loaderMsg.innerText = 'Carregando informações das turmas...'
     var selectTurmas = document.getElementById('selectTurmas')
+    selectTurmas.innerHTML = ''
     for (const turma in turmasProf) {
         if (Object.hasOwnProperty.call(turmasProf, turma)) {
             const bool = turmasProf[turma];
@@ -225,6 +227,144 @@ function verificaAlunosSelecionados() {
     
 }
 
+var contadorDeNotas
+function lancaNotas(confirma=false) {
+    if (confirma) {
+        loader.style.display = 'block'
+        loaderMsg.innerText = 'Lançando notas dos alunos no sistema...'
+        var notasParaLancar = {}
+        let c2 = 0
+        while (c2 < contadorDeNotas) {
+            let index = document.getElementById('nomeNota' + c2).value
+            let valor = Number(document.getElementById('valorNota' + c2).value)
+            notasParaLancar[index] = valor
+            c2++
+        }
+        var alunosSelec = Object.assign({}, alunosSelecionadosTurma)
+        delete alunosSelec.codTurma
+        var lancarNotas = firebase.functions().httpsCallable('lancarNotas')
+        console.log(alunosSelecionadosTurma)
+        console.log(alunosSelec)
+        console.log({alunos: alunosSelec, turma: alunosSelecionadosTurma.codTurma, notas: notasParaLancar})
+        lancarNotas({alunos: alunosSelec, turma: alunosSelecionadosTurma.codTurma, notas: notasParaLancar}).then(function(result){
+            AstNotif.notify('Sucesso', result.data.answer)
+            $('#modal').modal('hide')
+            loader.style.display = 'none'
+        }).catch(function(error){
+            loader.style.display = 'none'
+            AstNotif.dialog('Erro', error.message)
+            console.log(error)
+        })
+    } else {
+        let nomes = ''
+        let turma
+        for (const matricula in alunosSelecionadosTurma) {
+            if (Object.hasOwnProperty.call(alunosSelecionadosTurma, matricula)) {
+                const aluno = alunosSelecionadosTurma[matricula];
+                if (matricula == 'codTurma') {
+                    turma = aluno
+                } else if(matricula == undefined || aluno == undefined) {
+
+                } else {
+                    nomes += formataNumMatricula(matricula) + ': ' + aluno + '<br>'
+                }
+                
+            }
+        }
+        abrirModal('modal', 'Lançamento de notas', 
+            `Você selecionou os alunos listados abaixo da turma ${turma}. <br> ${nomes} <br><b>Digite os valores nas notas que deseja lançar:</b><br>
+            <section id="camposLancaNotas"></section>
+            `
+            , `<button type="button" data-toggle="tooltip" data-placement="top" title="Lançar notas para os alunos selecionados" class="btn btn-primary" onclick="lancaNotas(true)">Lançar</button><button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>`
+        )
+        turmasRef.child(alunosSelecionadosTurma.codTurma + '/notas').once('value').then(snapshot => {
+            let notas = snapshot.val()
+            if (notas != null) {
+                notasDistribuidas = notas
+            } else {
+                AstNotif.dialog('Espera aí', 'Você não distribuiu notas nesta turma. Volte na turma e clique em "Distribuir notas".')
+            }
+            
+            console.log(notas)
+            let c = 0
+            for (const nomeNota in notas) {
+                if (Object.hasOwnProperty.call(notas, nomeNota)) {
+                    const valor = notas[nomeNota];
+                    document.getElementById('camposLancaNotas').innerHTML += `
+                    <div class="row" id="linha${c}">
+                        <div class="col-2" >
+                            <input type="text" class="form-control" id="nomeNota${c}" placeholder="EX ${c + 1}" value="${nomeNota}" readonly>
+                        </div>
+                        Total: ${valor}
+                        <div class="col-2">
+                            
+                            <input type="number" min="0" max="${valor}" id="valorNota${c}" value="0" class="form-control"  placeholder="Total: ${valor}" onkeyup='this.value > ${valor} || this.value == "" ? this.value = 0: console.log("ok")'>
+                        </div>
+                        <button type="button" class="btn btn-light btn-sm" onclick="document.getElementById('valorNota${c}').value = ${valor}">Dar Total</button><br>
+                    </div>
+                    `
+                    c++
+                }
+            }
+            contadorDeNotas = c
+            let aluno = Object.assign({}, alunosSelecionadosTurma)
+            delete aluno.codTurma
+            console.log(aluno)
+            let c3 = 0
+            for (const matricula in aluno) {
+                if (Object.hasOwnProperty.call(aluno, matricula)) {
+                    aluno = matricula
+                    
+                }
+                c3++
+                console.log(c3)
+            }
+            console.log(c3)
+            if (c3 == 1) {
+                var c4 = 0
+                turmasRef.child(alunosSelecionadosTurma.codTurma + '/alunos/' + formataNumMatricula(aluno) + '/notas').once('value').then(snapshot => {
+                    let notasDoAluno = snapshot.val()
+                    console.log(snapshot)
+                    for (const nomeNota in notasDoAluno) {
+                        if (Object.hasOwnProperty.call(notasDoAluno, nomeNota)) {
+                            const valor = notasDoAluno[nomeNota];
+                            console.log(valor)
+                            document.getElementById('valorNota' + c4).value = valor
+                            c4++
+                        }
+                    }
+                    
+                }).catch(error => {
+                    loader.style.display = 'none'
+                    AstNotif.dialog('Erro', error.message)
+                    console.log(error)
+                })
+            }
+            feather.replace()
+        }).catch(error => {
+            loader.style.display = 'none'
+            AstNotif.dialog('Erro', error.message)
+            console.log(error)
+        })
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
+        let selectTurmasTransfere = document.getElementById('selectTurmasTransfere')
+        for (const cod in turmas) {
+            if (Object.hasOwnProperty.call(turmas, cod)) {
+                const infoDaTurma = turmas[cod];
+                if (infoDaTurma.professor == undefined) {
+                    var profReferencia = 'Não cadastrado'
+                } else {
+                    var profReferencia = infoDaTurma.professor[0].nome
+                }
+                selectTurmasTransfere.innerHTML += `<option value="${cod}">Turma ${cod} (Prof. ${profReferencia})</option>`
+            }
+        }
+    }
+        
+}
+
 function distribuiNotas() {
     loader.style.display = 'block'
     loaderMsg.innerText = 'Buscando notas...'
@@ -302,7 +442,7 @@ function addCampoNota(extra=false) {
         `
         <div class="row" id="linha${contadorNotas}">
             <div class="col-2" >
-                <input type="text" class="form-control" id="nomeNota${contadorNotas}" placeholder="EX ${contadorNotas + 1}">
+                <input type="text" class="form-control" id="nomeNota${contadorNotas}" placeholder="EX ${contadorNotas + 1}" value="EX ${contadorNotas + 1}">
             </div>
             <div class="col-2">
                 <input type="number" id="valorNota${contadorNotas}" class="form-control" onkeyup="somaNotasDistribuidas('${contadorNotas}')" placeholder="15.5">
@@ -318,7 +458,10 @@ var notasDistribuidas = {}
 var somatorioDistribuidas = 0
 
 function defineNotas() {
-    loader.style.display = 'block'
+    if (somatorioDistribuidas >  100) {
+        AstNotif.dialog('Atenção', 'O somatório das notas ultrapassou 100 pontos. Por favor, faça ajustes na distribuição para que não passe de 100 pontos.')
+    } else {
+        loader.style.display = 'block'
     loaderMsg.innerText = 'Distribuindo notas...'
     turmasRef.child(alunosSelecionadosTurma.codTurma + '/notas').set(notasDistribuidas).then(() => {
         loader.style.display = 'none'
@@ -329,6 +472,8 @@ function defineNotas() {
         AstNotif.dialog('Erro', error.message)
         console.log(error)
     })
+    }
+    
 }
 
 function somaNotasDistribuidas(id, subtrai=false) {
