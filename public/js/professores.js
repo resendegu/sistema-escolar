@@ -364,7 +364,9 @@ function lancaNotas(confirma=false) {
                         <div class="col-2" >
                             <input type="text" class="form-control" id="nomeNota${c}" placeholder="EX ${c + 1}" value="${nomeNota}" readonly>
                         </div>
-                        Total: ${valor}
+                        <div class="col-2">
+                            Total: ${valor}
+                        </div>
                         <div class="col-2">
                             
                             <input type="number" min="0" max="${valor}" id="valorNota${c}" value="0" class="form-control"  placeholder="Total: ${valor}" onkeyup='this.value > ${valor} || this.value == "" ? this.value = 0: console.log("ok")'>
@@ -393,11 +395,12 @@ function lancaNotas(confirma=false) {
                 var c4 = 0
                 turmasRef.child(alunosSelecionadosTurma.codTurma + '/alunos/' + formataNumMatricula(aluno) + '/notas').once('value').then(snapshot => {
                     let notasDoAluno = snapshot.val()
-                    console.log(snapshot)
+                    console.log(snapshot.val())
                     for (const nomeNota in notasDoAluno) {
                         if (Object.hasOwnProperty.call(notasDoAluno, nomeNota)) {
                             const valor = notasDoAluno[nomeNota];
                             console.log(valor)
+                            console.log(c4)
                             document.getElementById('valorNota' + c4).value = valor
                             c4++
                         }
@@ -840,14 +843,31 @@ function abreDadosDoAluno(matricula, desativado=false, notasDesativado=false) {
             notas = notasDesativado
         }
         console.log(notas)
-        document.getElementById('pontosAudicao').innerText = notas.audicao
+        let notasDoAlunoDiv = document.getElementById('notasDoAluno')
+        notasDoAlunoDiv.innerHTML = ''
+        if (notas == null) {
+            notasDoAlunoDiv.innerHTML = 'Nenhuma nota foi lançada para este aluno'
+        }
+        for (const nomeNota in notas) {
+            if (Object.hasOwnProperty.call(notas, nomeNota)) {
+                const valorNota = notas[nomeNota];
+                notasDoAlunoDiv.innerHTML += `
+                <small id="nomeNota${nomeNota}"><b>${nomeNota}</b>: ${valorNota}</small> 
+                <div class="progress mb-3" style="height: 10px">
+                  <div class="progress-bar bg-primary" role="progressbar" style="width: ${valorNota}%" aria-valuenow="${valorNota}" aria-valuemin="0" aria-valuemax="100">${valorNota}</div>
+                </div>
+                `
+            }
+        }
+
+        /*document.getElementById('pontosAudicao').innerText = notas.audicao
         document.getElementById('pontosFala').innerText = notas.fala
         document.getElementById('pontosEscrita').innerText = notas.escrita
         document.getElementById('pontosLeitura').innerText = notas.leitura
         document.getElementById('barraPontosAudicao').style.width = notas.audicao * 20 + '%'
         document.getElementById('barraPontosFala').style.width = notas.fala * 20 + '%'
         document.getElementById('barraPontosEscrita').style.width = notas.escrita * 20 + '%'
-        document.getElementById('barraPontosLeitura').style.width = notas.leitura * 20 + '%'
+        document.getElementById('barraPontosLeitura').style.width = notas.leitura * 20 + '%'*/
     }).catch(error => {
         AstNotif.dialog('Erro', error.message)
         console.log(error)

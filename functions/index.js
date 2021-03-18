@@ -2,6 +2,7 @@ const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const { auth } = require('firebase-admin');
 const { HttpsError } = require('firebase-functions/lib/providers/https');
+const { firebaseConfig } = require('firebase-functions');
 admin.initializeApp()
 
 exports.verificadorDeAcesso = functions.https.onCall((data, context) => {
@@ -253,6 +254,25 @@ exports.addNovoProfTurma = functions.https.onCall((data, context) => {
 
 })
 
+exports.desconectaProf = functions.database.ref('sistemaEscolar/turmas/{codTurma}/professor/{iProf}').onDelete((snapshot, context) => {
+    // context.params = { codTurma: 'KIDS-SAT08', iProf: '1' }
+    // context.timestamp = context.timestamp
+    
+    var turma = context.params.codTurma
+    var professor = snapshot.val().email
+    return admin.auth().getUserByEmail(professor).then(user => {
+        return admin.database().ref(`sistemaEscolar/usuarios/${user.uid}/professor/turmas/${turma}`).remove().then(() => {
+            return {answer: 'Professor desconectado!'}
+        }).catch(error => {
+            throw new HttpsError('unknown', error)
+        })
+    }).catch(error => {
+        throw new HttpsError('not-found', error.message, error)
+    })
+
+    
+}) 
+
 exports.cadastraAluno = functions.https.onCall((data, context) => {
     if (context.auth.token.master == true || context.auth.token.secretaria == true) {
         let dadosAluno = data.dados
@@ -262,7 +282,7 @@ exports.cadastraAluno = functions.https.onCall((data, context) => {
                     throw new functions.https.HttpsError('already-exists', 'Este número de matrícula já consta no sistema. Por favor, clique no botão azul no início deste formulário para atualizar o número de matrícula, para gerar um novo número de matrícula.')
                 }
                 return admin.database().ref('sistemaEscolar/alunos/' + dadosAluno.matriculaAluno).set(dadosAluno).then(() => {
-                    return admin.database().ref('sistemaEscolar/turmas').child(dadosAluno.turmaAluno + '/alunos').child(dadosAluno.matriculaAluno).set({nome: dadosAluno.nomeAluno, prof: dadosAluno.profAluno, notas: {prova1: 0, prova2: 0, fala: 0, audicao: 0, leitura: 0, escrita: 0, atividadesExtras: 0}}).then(() => {
+                    return admin.database().ref('sistemaEscolar/turmas').child(dadosAluno.turmaAluno + '/alunos').child(dadosAluno.matriculaAluno).set({nome: dadosAluno.nomeAluno, prof: dadosAluno.profAluno}).then(() => {
                         return admin.database().ref('sistemaEscolar/ultimaMatricula').set(dadosAluno.matriculaAluno).then(() => {
                             admin.database().ref('sistemaEscolar/numeros/alunosMatriculados').transaction(function (current_value) {
                                 let numAtual = Number(current_value)
@@ -425,11 +445,21 @@ exports.transfereAlunos = functions.https.onCall((data, context) => {
 exports.excluiTurma = functions.https.onCall((data, context) => {
     if (context.auth.token.master == true || context.auth.token.secretaria == true) {
         let turma = data.codTurma
-        return admin.database().ref(`sistemaEscolar/turmas/${turma}`).remove().then(() => {
-            return {answer: 'A turma e todos os seus registros foram excluídos com sucesso.'}
+        return admin.database().ref(`sistemaEscolar/turmas/${turma}/professor/0`).once('value').then(snapshot => {
+            if (snapshot.val() != null) {
+                throw new HttpsError('cancelled', 'Operação cancelada! Desconecte todos os professores desta turma antes de excluir a turma', )
+            }
+            return admin.database().ref(`sistemaEscolar/turmas/${turma}`).remove().then(() => {
+
+                return {answer: 'A turma e todos os seus registros foram excluídos com sucesso.'}
+            }).catch(error => {
+                throw new functions.https.HttpsError('unknown', error.message, error)
+            })
+            
         }).catch(error => {
             throw new functions.https.HttpsError('unknown', error.message, error)
         })
+        
     } else {
         throw new functions.https.HttpsError('permission-denied', 'Você não possui permissão para fazer alterações nesta área.')
     }
