@@ -837,7 +837,7 @@ function abreDadosDoAluno(matricula, desativado=false, notasDesativado=false) {
     document.getElementById('mostraEnderecoAluno').innerText = `${dados.enderecoAluno}, ${dados.numeroAluno}, ${dados.bairroAluno}, ${dados.cidadeAluno}, ${dados.estadoAluno}. CEP ${dados.cepAluno}.`
     document.getElementById('rolaTelaAbaixoAlunos').focus()
     document.getElementById('rolaTelaAbaixoAlunos').style.display = 'none'
-    turmasRef.child(`${dados.turmaAluno}/alunos/${matricula}/notas`).once('value').then(snapshot => {
+    turmasRef.child(`${dados.turmaAluno}/alunos/${matricula}/notas`).on('value', (snapshot) => {
         turmasRef.child(`${dados.turmaAluno}/notas`).once('value').then(notasReferencia => {
             let notas = snapshot.val()
             let referenciaDeNotas = notasReferencia.val()
@@ -867,7 +867,15 @@ function abreDadosDoAluno(matricula, desativado=false, notasDesativado=false) {
                     
                 }
             }
-            notasDoAlunoDiv.innerHTML += `<div id="somatorioNotas">Somatório: <b>${somatorioNotas}</b>/100</div>`
+            let cor
+            if (somatorioNotas >= 80) {
+                cor = 'green'
+            } else if (somatorioNotas <= 79 && somatorioNotas >= 60) {
+                cor = 'gold'
+            } else {
+                cor = 'red'
+            }
+            notasDoAlunoDiv.innerHTML += `<div id="somatorioNotas">Somatório: <b style="color: ${cor}">${somatorioNotas}</b>/100</div>`
 
             /*document.getElementById('pontosAudicao').innerText = notas.audicao
             document.getElementById('pontosFala').innerText = notas.fala
@@ -882,9 +890,6 @@ function abreDadosDoAluno(matricula, desativado=false, notasDesativado=false) {
             console.log(error)
         })
         
-    }).catch(error => {
-        AstNotif.dialog('Erro', error.message)
-        console.log(error)
     })
 }
 
@@ -978,6 +983,29 @@ function editaNotasAluno(matricula, turma) {
             loader.style.display = 'none'
             console.log(error)
         })
+    }).catch(error => {
+        AstNotif.dialog('Erro', error.message)
+        loader.style.display = 'none'
+        console.log(error)
+    })
+}
+
+function historicoAluno(matricula, turma) {
+    loader.style.display = 'block'
+    loaderMsg.innerText = 'Recuperando informações do histórico escolar...'
+    alunosRef.child(matricula).once('value').then(snapshot => {
+        let dadosAluno = snapshot.val()
+        abrirModal('modal', 'Histórico escolar de ' + dadosAluno.nomeAluno, 
+            `
+                Esta área ainda está em construção...
+                <br> Aguarde :-)
+                <br> <br> Gustavo Resende
+            `, `<button type="button" data-toggle="tooltip" data-placement="top" title="Ja falei que ta em construção, sai daqui ;-)" class="btn btn-primary">Acessar</button><button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>`
+        )
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+          })
+        loader.style.display = 'none'
     }).catch(error => {
         AstNotif.dialog('Erro', error.message)
         loader.style.display = 'none'
