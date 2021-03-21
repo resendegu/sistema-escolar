@@ -838,56 +838,61 @@ function abreDadosDoAluno(matricula, desativado=false, notasDesativado=false) {
     document.getElementById('rolaTelaAbaixoAlunos').focus()
     document.getElementById('rolaTelaAbaixoAlunos').style.display = 'none'
     turmasRef.child(`${dados.turmaAluno}/alunos/${matricula}/notas`).on('value', (snapshot) => {
-        turmasRef.child(`${dados.turmaAluno}/notas`).once('value').then(notasReferencia => {
-            let notas = snapshot.val()
-            let referenciaDeNotas = notasReferencia.val()
-            if (desativado != false) {
-                notas = notasDesativado
-            }
-            console.log(notas)
-            let notasDoAlunoDiv = document.getElementById('notasDoAluno')
-            notasDoAlunoDiv.innerHTML = ''
-            //let somatorioNotasDiv = document.getElementById('somatorioNotas')
-            if (notas == null) {
-                notasDoAlunoDiv.innerHTML = 'Nenhuma nota foi lançada para este aluno'
-            }
-            let somatorioNotas = 0
-            for (const nomeNota in notas) {
-                if (Object.hasOwnProperty.call(notas, nomeNota)) {
-                    const valorNota = notas[nomeNota];
-                    const barra = (100*valorNota)/referenciaDeNotas[nomeNota]
-                    somatorioNotas += valorNota
-                    notasDoAlunoDiv.innerHTML += `
-                    
-                    <small id="nomeNota${nomeNota}"><b>${nomeNota}</b>: ${valorNota}</small><small id="notaReferencia">/${referenciaDeNotas[nomeNota]}</small>
-                    <div class="progress mb-3" style="height: 10px">
-                    <div class="progress-bar bg-primary" role="progressbar" style="width: ${barra}%" aria-valuenow="${valorNota}" aria-valuemin="0" aria-valuemax="${referenciaDeNotas[nomeNota]}">${valorNota}</div>
-                    </div>
-                    `
-                    
+        turmasRef.child(`${dados.turmaAluno}/alunos/${matricula}/desempenho`).on('value', (desempenho) => {
+            turmasRef.child(`${dados.turmaAluno}/notas`).once('value').then(notasReferencia => {
+                let notas = snapshot.val()
+                let referenciaDeNotas = notasReferencia.val()
+                if (desativado != false) {
+                    notas = notasDesativado
                 }
-            }
-            let cor
-            if (somatorioNotas >= 80) {
-                cor = 'green'
-            } else if (somatorioNotas <= 79 && somatorioNotas >= 60) {
-                cor = 'gold'
-            } else {
-                cor = 'red'
-            }
-            notasDoAlunoDiv.innerHTML += `<div id="somatorioNotas">Somatório: <b style="color: ${cor}">${somatorioNotas}</b>/100</div>`
+                console.log(notas)
+                let notasDoAlunoDiv = document.getElementById('notasDoAluno')
+                notasDoAlunoDiv.innerHTML = ''
+                //let somatorioNotasDiv = document.getElementById('somatorioNotas')
+                if (notas == null) {
+                    notasDoAlunoDiv.innerHTML = 'Nenhuma nota foi lançada para este aluno'
+                }
+                let somatorioNotas = 0
+                for (const nomeNota in notas) {
+                    if (Object.hasOwnProperty.call(notas, nomeNota)) {
+                        const valorNota = notas[nomeNota];
+                        const barra = (100*valorNota)/referenciaDeNotas[nomeNota]
+                        somatorioNotas += valorNota
+                        notasDoAlunoDiv.innerHTML += `
+                        
+                        <small id="nomeNota${nomeNota}"><b>${nomeNota}</b>: ${valorNota}</small><small id="notaReferencia">/${referenciaDeNotas[nomeNota]}</small>
+                        <div class="progress mb-3" style="height: 10px">
+                        <div class="progress-bar bg-primary" role="progressbar" style="width: ${barra}%" aria-valuenow="${valorNota}" aria-valuemin="0" aria-valuemax="${referenciaDeNotas[nomeNota]}">${valorNota}</div>
+                        </div>
+                        `
+                        
+                    }
+                }
+                let cor
+                if (somatorioNotas >= 80) {
+                    cor = 'green'
+                } else if (somatorioNotas <= 79 && somatorioNotas >= 60) {
+                    cor = 'gold'
+                } else {
+                    cor = 'red'
+                }
+                notasDoAlunoDiv.innerHTML += `<div id="somatorioNotas">Somatório: <b style="color: ${cor}">${somatorioNotas}</b>/100</div>`
 
-            /*document.getElementById('pontosAudicao').innerText = notas.audicao
-            document.getElementById('pontosFala').innerText = notas.fala
-            document.getElementById('pontosEscrita').innerText = notas.escrita
-            document.getElementById('pontosLeitura').innerText = notas.leitura
-            document.getElementById('barraPontosAudicao').style.width = notas.audicao * 20 + '%'
-            document.getElementById('barraPontosFala').style.width = notas.fala * 20 + '%'
-            document.getElementById('barraPontosEscrita').style.width = notas.escrita * 20 + '%'
-            document.getElementById('barraPontosLeitura').style.width = notas.leitura * 20 + '%'*/
-        }).catch(error => {
-            AstNotif.dialog('Erro', error.message)
-            console.log(error)
+                let desempenhoAlunoDiv = document.getElementById('desempenhoAluno')
+                desempenhoAlunoDiv.innerHTML = ''
+                let valoresDesempenhoAluno = desempenho.val()
+                document.getElementById('pontosAudicao').innerText = valoresDesempenhoAluno.A
+                document.getElementById('pontosFala').innerText = valoresDesempenhoAluno.F
+                document.getElementById('pontosEscrita').innerText = valoresDesempenhoAluno.E
+                document.getElementById('pontosLeitura').innerText = valoresDesempenhoAluno.L
+                document.getElementById('barraPontosAudicao').style.width = valoresDesempenhoAluno.A * 20 + '%'
+                document.getElementById('barraPontosFala').style.width = valoresDesempenhoAluno.F * 20 + '%'
+                document.getElementById('barraPontosEscrita').style.width = valoresDesempenhoAluno.E * 20 + '%'
+                document.getElementById('barraPontosLeitura').style.width = valoresDesempenhoAluno.L * 20 + '%'
+            }).catch(error => {
+                AstNotif.dialog('Erro', error.message)
+                console.log(error)
+            })
         })
         
     })
@@ -910,7 +915,7 @@ function lancaNotasDoAluno(turma, matricula) {
     var lancarNotas = firebase.functions().httpsCallable('lancarNotas')
     
     lancarNotas({alunos: alunosSelec, turma: turma, notas: notasParaLancar}).then(function(result){
-        AstNotif.notify('Sucesso', result.data.answer)
+        AstNotif.dialog('Aguarde...', result.data.answer)
         $('#modal').modal('hide')
         loader.style.display = 'none'
     }).catch(function(error){
@@ -934,7 +939,7 @@ function editaNotasAluno(matricula, turma) {
                 `
                 <section id="camposLancaNotas"></section>
                 `
-                , `<button type="button" data-toggle="tooltip" data-placement="top" title="Lançar notas para os alunos selecionados" class="btn btn-primary" onclick="lancaNotasDoAluno('${turma}', '${matricula}')">Lançar</button><button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>`
+                , `<button type="button" data-toggle="tooltip" data-placement="top" title="Lançar notas para o aluno" class="btn btn-primary" onclick="lancaNotasDoAluno('${turma}', '${matricula}')">Lançar</button><button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>`
             )
             if (notasDeReferencia != null) {
                 notasDistribuidas = notasDeReferencia
@@ -988,6 +993,84 @@ function editaNotasAluno(matricula, turma) {
         loader.style.display = 'none'
         console.log(error)
     })
+}
+
+function lancaDesempenho(matricula='', turma='', confirma=false, FALE={}) {
+    if (confirma) {
+        loader.style.display = 'block'
+        loaderMsg.innerText = 'Lançando notas dos alunos no sistema...'
+        var notasParaLancar = {}
+        let c2 = 0
+        while (c2 < contadorDeNotas) {
+            let index = document.getElementById('nomeNota' + c2).value
+            let valor = Number(document.getElementById('valorNota' + c2).value)
+            notasParaLancar[index] = valor
+            c2++
+        }
+
+        turmasRef.child(`${turma}/alunos/${matricula}/desempenho`).set(notasParaLancar).then(() => {
+            $('#modal').modal('hide')
+            loader.style.display = 'none'
+            AstNotif.notify('Sucesso', 'Desempenho do aluno alterado com sucesso.')
+
+        }).catch(error => {
+            AstNotif.dialog('Erro', error.message)
+            loader.style.display = 'none'
+            console.log(error)
+        })
+    } else {
+        loader.style.display = 'block'
+        loaderMsg.innerText = 'Buscando notas...'
+        turmasRef.child(`${turma}/alunos/${matricula}/desempenho`).once('value').then(notasAluno => {
+            loader.style.display = 'none'
+            let notasDoAluno = notasAluno.val()
+            let notasDeReferencia = {F: 5, A: 5, L: 5, E: 5}
+
+            abrirModal('modal', 'Lançar desempenho', `
+            <section id="camposLancaNotas"></section> 
+            `, `<button type="button" data-toggle="tooltip" data-placement="top" title="Lançar notas para os alunos selecionados" class="btn btn-primary" onclick="lancaDesempenho('${matricula}', '${turma}', true)">Lançar</button><button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>`)
+            
+            
+            let c = 0
+            for (const nomeNota in notasDeReferencia) {
+                if (Object.hasOwnProperty.call(notasDeReferencia, nomeNota)) {
+                    const valor = notasDeReferencia[nomeNota];
+                    document.getElementById('camposLancaNotas').innerHTML += `
+                    <div class="row" id="linha${c}">
+                        <div class="col-2" >
+                            <input type="text" class="form-control" id="nomeNota${c}" placeholder="EX ${c + 1}" value="${nomeNota}" readonly>
+                        </div>
+                        <div class="col-2">
+                            Total: ${valor}
+                        </div>
+                        <div class="col-2">
+                            
+                            <input type="number" min="0" max="${valor}" id="valorNota${c}" value="0" class="form-control"  placeholder="Total: ${valor}" onkeyup='this.value > ${valor} || this.value == "" ? this.value = 0: console.log("ok")'>
+                        </div>
+                        <button type="button" class="btn btn-light btn-sm" onclick="document.getElementById('valorNota${c}').value = ${valor}">Dar Total</button><br>
+                    </div>
+                    `
+                    c++
+                }
+            }
+            contadorDeNotas = c
+            
+            let c4 = 0
+            for (const nomeNota in notasDoAluno) {
+                if (Object.hasOwnProperty.call(notasDoAluno, nomeNota)) {
+                    const valor = notasDoAluno[nomeNota];
+                    console.log(valor)
+                    console.log(c4)
+                    document.getElementById('valorNota' + c4).value = valor
+                    c4++
+                }
+            }
+        }).catch(error => {
+            AstNotif.dialog('Erro', error.message)
+            loader.style.display = 'none'
+            console.log(error)
+        })
+    }
 }
 
 function historicoAluno(matricula, turma) {

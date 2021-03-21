@@ -617,7 +617,7 @@ exports.lancarNotas = functions.https.onCall((data, context) => {
             }
         }
         return lancar().then(() => {
-            return {answer: 'As notas foram substituídas e lançadas com sucesso'}
+            return {answer: 'As notas lançadas com sucesso. Aguarde um momento até que o sistema atualize as notas automaticamente.'}
         }).catch(error => {
             throw new HttpsError('unknown', error.message, error)
         })
