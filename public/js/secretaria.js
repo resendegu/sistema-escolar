@@ -8,6 +8,7 @@ var ultimaMatriculaRef = firebase.database().ref('sistemaEscolar/ultimaMatricula
 var alunosRef = firebase.database().ref('sistemaEscolar/alunos')
 var followUpRef = firebase.database().ref('sistemaEscolar/followUp')
 var transfereAlunos = firebase.functions().httpsCallable('transfereAlunos')
+var desempenhoRef = firebase.database().ref('sistemaEscolar/notasDesempenho/referencia')
 
 var loader = document.getElementById('loader')
 var loaderMsg = document.getElementById('loaderMsg')
@@ -1123,6 +1124,139 @@ function abreDadosDoAluno(matricula, desativado=false, notasDesativado=false) {
         AstNotif.dialog('Erro', error.message)
         console.log(error)
     })
+
+    turmasRef.child(`${dados.turmaAluno}/alunos/${matricula}/desempenho`).on('value', (desempenho) => {
+        desempenhoRef.once('value').then(referenciaDesempenho => {
+            let notas = desempenho.val()
+            let referenciaDeNotas = referenciaDesempenho.val()
+            console.log(notas)
+            let notasDoAlunoDiv = document.getElementById('desempenhoAluno')
+            notasDoAlunoDiv.innerHTML = ''
+            //let somatorioNotasDiv = document.getElementById('somatorioNotas')
+            if (notas == null) {
+                notasDoAlunoDiv.innerHTML = 'Nenhuma nota de desempenho foi lançada para este aluno'
+            }
+            let somatorioNotas = 0
+            for (const nomeNota in notas) {
+                if (Object.hasOwnProperty.call(notas, nomeNota)) {
+                    const valorNota = notas[nomeNota];
+                    const barra = (100*valorNota)/referenciaDeNotas[nomeNota]
+                    somatorioNotas += valorNota
+                    notasDoAlunoDiv.innerHTML += `
+                    
+                    <small id="nomeDesempenho${nomeNota}"><b>${nomeNota}</b>: ${valorNota}</small><small id="notaReferencia">/${referenciaDeNotas[nomeNota]}</small>
+                    <div class="progress mb-3" style="height: 10px">
+                    <div class="progress-bar bg-primary" role="progressbar" style="width: ${barra}%" aria-valuenow="${valorNota}" aria-valuemin="0" aria-valuemax="${referenciaDeNotas[nomeNota]}">${valorNota}</div>
+                    </div>
+                    `
+                    
+                }
+            }
+            
+            notasDoAlunoDiv.innerHTML += `<div id="somatorioNotas">Somatório: <b>${somatorioNotas}</b></div>`
+
+            
+        }).catch(error => {
+            AstNotif.dialog('Erro', error.message)
+            console.log(error)
+        })
+        
+    })
+}
+
+function alteraNotasDesempenho(confirma=false) {
+    if (confirma) {
+        loader.style.display = 'block'
+        loaderMsg.innerText = 'Lançando notas dos alunos no sistema...'
+        var notasParaLancar = {}
+        let c2 = 0
+        while (c2 < contadorNotas) {
+            let index = document.getElementById('nomeNota' + c2).value
+            let valor = Number(document.getElementById('valorNota' + c2).value)
+            notasParaLancar[index] = valor
+            c2++
+        }
+
+        desempenhoRef.set(notasParaLancar).then(() => {
+            $('#modal').modal('hide')
+            loader.style.display = 'none'
+            AstNotif.notify('Sucesso', 'Desempenho do aluno alterado com sucesso.')
+
+        }).catch(error => {
+            AstNotif.dialog('Erro', error.message)
+            loader.style.display = 'none'
+            console.log(error)
+        })
+    } else {
+        loader.style.display = 'block'
+        loaderMsg.innerText = 'Buscando notas...'
+        
+        desempenhoRef.once('value').then(referenciaDesempenho => {
+            let notas = referenciaDesempenho.val()
+
+            abrirModal('modal', 'Distribuir notas de referência de desempenho', `
+            Ao distribuir essas notas, todos os professores terão de lançar pontos para todos os alunos com cada um dos tópicos que estiverem definidos nesta referência.<br><br>
+            <button type="button" data-toggle="tooltip" data-placement="top" title="Adicionar nota" class="btn btn-light btn-sm" onclick="addCampoNota()"><span data-feather="plus-square"></span></button><br>
+            <div class="row"><div class="col-2"><label>Nota</label></div><div class="col-2"><label>Valor</label></div></div>
+            <section id="camposLancaNotas"></section> 
+            `, `<button type="button" data-toggle="tooltip" data-placement="top" title="Distribuir essas notas de referência para que os professores possam fazer lançamentos." class="btn btn-primary" onclick="alteraNotasDesempenho(true)">Distribuir notas</button><button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>`)
+            feather.replace()
+            contadorNotas = 0
+            contadorNotasExtras = 0
+            notasDistribuidas = {}
+            somatorioDistribuidas = 0
+            
+            let c = 0
+            for (const nomeNota in notas) {
+                if (Object.hasOwnProperty.call(notas, nomeNota)) {
+                    const valor = notas[nomeNota];
+                    document.getElementById('camposLancaNotas').innerHTML += `
+                    <div class="row" id="linha${c}">
+                        <div class="col-2" >
+                            <input type="text" class="form-control" id="nomeNota${c}" placeholder="EX ${c + 1}" value="${nomeNota}">
+                        </div>
+                        <div class="col-2">
+                            <input type="number" id="valorNota${c}" class="form-control" value="${valor}" onkeyup="somaNotasDistribuidas('${c}')" placeholder="15.5">
+                        </div>
+                        <button type="button" class="btn btn-light btn-sm" onclick="document.getElementById('linha${c}').remove(), contadorNotas--"><span data-feather="x-square"></span></button><br>
+                    </div>
+                    `
+                    c++
+                }
+            }
+            contadorNotas = c
+            feather.replace()
+           
+
+            loader.style.display = 'none'
+        })
+
+    }
+}
+
+var contadorNotas = 0
+var contadorNotasExtras = 0
+function addCampoNota(extra=false) {
+    let camposNotas = document.getElementById('camposLancaNotas')
+    
+    if (extra) {
+        
+    } else {
+        camposNotas.innerHTML += 
+        `
+        <div class="row" id="linha${contadorNotas}">
+            <div class="col-2" >
+                <input type="text" class="form-control" id="nomeNota${contadorNotas}" placeholder="EX ${contadorNotas + 1}" value="EX ${contadorNotas + 1}">
+            </div>
+            <div class="col-2">
+                <input type="number" id="valorNota${contadorNotas}" value=0 class="form-control"  placeholder="15.5">
+            </div>
+            <button type="button" class="btn btn-light btn-sm" onclick="somaNotasDistribuidas('${contadorNotas}', true), document.getElementById('linha${contadorNotas}').remove(), contadorNotas--"><span data-feather="x-square"></span></button><br>
+        </div>
+        `
+        feather.replace()
+        contadorNotas++
+    }
 }
 
 function followUpAluno(matricula) {

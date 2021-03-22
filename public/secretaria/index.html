@@ -413,6 +413,7 @@
 
             <div class="container tab-pane fade" id="abaAlunos" role="tabpanel" aria-labelledby="Alunos">
               <label class="h3">Alunos</label>
+              <button class="btn btn-light btn-sm float-right" onclick="alteraNotasDesempenho()">Alterar distribuição de desempenho <span data-feather="edit"></span></button>
               <br>
               <div class="col">
                 <div class="container">
@@ -549,26 +550,8 @@
                               <div class="card h-100">
                                 <div class="card-body">
                                   <h6 class="d-flex align-items-center mb-3"><i class="material-icons text-info mr-2">Desempenho</i>do aluno</h6>
-                                  <small>Audição</small>
-                                  <small id="pontosAudicao">1</small>
-                                  <div class="progress mb-3" style="height: 5px">
-                                    <div class="progress-bar bg-primary" id="barraPontosAudicao" role="progressbar" style="width: 80%" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
-                                  </div>
-                                  <small>Fala</small>
-                                  <small id="pontosFala">1</small>
-                                  <div class="progress mb-3" style="height: 5px">
-                                    <div class="progress-bar bg-primary" id="barraPontosFala" role="progressbar" style="width: 72%" aria-valuenow="72" aria-valuemin="0" aria-valuemax="100"></div>
-                                  </div>
-                                  <small>Escrita</small>
-                                  <small id="pontosEscrita">1</small>
-                                  <div class="progress mb-3" style="height: 5px">
-                                    <div class="progress-bar bg-primary" id="barraPontosEscrita" role="progressbar" style="width: 89%" aria-valuenow="89" aria-valuemin="0" aria-valuemax="100"></div>
-                                  </div>
-                                  <small>Leitura</small>
-                                  <small id="pontosLeitura">1</small>
-                                  <div class="progress mb-3" style="height: 5px">
-                                    <div class="progress-bar bg-primary" id="barraPontosLeitura" role="progressbar" style="width: 55%" aria-valuenow="55" aria-valuemin="0" aria-valuemax="100"></div>
-                                  </div>
+                                  <div id="desempenhoAluno"></div>
+                                  
                                 </div>
                               </div>
                             </div>
