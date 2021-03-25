@@ -855,21 +855,37 @@ function abreDadosDoAluno(matricula, desativado=false, notasDesativado=false) {
             notasDoAlunoDiv.innerHTML = ''
             //let somatorioNotasDiv = document.getElementById('somatorioNotas')
             if (notas == null) {
-                notasDoAlunoDiv.innerHTML = 'Nenhuma nota foi lançada para este aluno'
+                notasDoAlunoDiv.innerHTML = 'Nenhuma nota foi lançada para este aluno<br>'
+            }
+            if (referenciaDeNotas == null) {
+                notasDoAlunoDiv.innerHTML = 'Você não distribuiu notas para esta turma. Se aparecerem notas aqui abaixo, elas podem ter sido lançadas por outro professor.<br>'
             }
             let somatorioNotas = 0
             for (const nomeNota in notas) {
                 if (Object.hasOwnProperty.call(notas, nomeNota)) {
                     const valorNota = notas[nomeNota];
-                    const barra = (100*valorNota)/referenciaDeNotas[nomeNota]
-                    somatorioNotas += valorNota
-                    notasDoAlunoDiv.innerHTML += `
-                    
-                    <small id="nomeNota${nomeNota}"><b>${nomeNota}</b>: ${valorNota}</small><small id="notaReferencia">/${referenciaDeNotas[nomeNota]}</small>
-                    <div class="progress mb-3" style="height: 10px">
-                    <div class="progress-bar bg-primary" role="progressbar" style="width: ${barra}%" aria-valuenow="${valorNota}" aria-valuemin="0" aria-valuemax="${referenciaDeNotas[nomeNota]}">${valorNota}</div>
-                    </div>
-                    `
+                    try {
+                        const barra = (100*valorNota)/referenciaDeNotas[nomeNota]
+                        somatorioNotas += valorNota
+                        notasDoAlunoDiv.innerHTML += `
+                        
+                        <small id="nomeNota${nomeNota}"><b>${nomeNota}</b>: ${valorNota}</small><small id="notaReferencia">/${referenciaDeNotas[nomeNota] == undefined ? 'Nota não lançada': referenciaDeNotas[nomeNota]}</small>
+                        <div class="progress mb-3" style="height: 10px">
+                        <div class="progress-bar bg-primary" role="progressbar" style="width: ${barra}%" aria-valuenow="${valorNota}" aria-valuemin="0" aria-valuemax="${referenciaDeNotas[nomeNota]}">${valorNota}</div>
+                        </div>
+                        `
+                    } catch (error) {
+                        console.log(error)
+                        somatorioNotas += valorNota
+                        notasDoAlunoDiv.innerHTML += `
+                        
+                        <small id="nomeNota${nomeNota}"><b>${nomeNota}</b>: ${valorNota}</small><small id="notaReferencia">/?</small>
+                        <div class="progress mb-3" style="height: 10px">
+                        <div class="progress-bar bg-primary" role="progressbar" style="width: 0%" aria-valuenow="${valorNota}" aria-valuemin="0" aria-valuemax="?">${valorNota}</div>
+                        </div>
+                        `
+                    }
+                   
                     
                 }
             }
