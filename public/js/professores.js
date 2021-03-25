@@ -1026,7 +1026,13 @@ function editaNotasAluno(matricula, turma) {
                 if (Object.hasOwnProperty.call(notasDoAluno, nomeNota)) {
                     const valor = notasDoAluno[nomeNota];
                     if (nomeNota != document.getElementById('nomeNota' + c4).value) {
-                        document.getElementById('valorNota' + (c4 + 1)).value = valor
+                        try {
+                            document.getElementById('valorNota' + (c4 + 1)).value = valor
+                        } catch (error) {
+                            console.log(error)
+                            AstNotif.dialog('Aviso', 'Existem notas divergentes para este aluno. Isso pode acontecer quando o aluno é transferido de uma turma para outra e o professor da turma anterior já tiver lançado alguma nota para o aluno. <b>É recomendado corrigir as notas do aluno o quanto antes para evitar problemas de lançamento no sistema.</b>')
+                        }
+                        
                         c4++
                     } else {
                         console.log(valor)
