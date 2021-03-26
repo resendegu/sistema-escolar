@@ -41,7 +41,7 @@ firebase.auth().onAuthStateChanged((user) => {
                         const bool = turmasProf[turma];
                         if (bool) {
                             document.getElementById('listaTurmasProf').innerHTML += `<button class="list-group-item list-group-item-action" onclick="document.getElementById('btnAbaTurmas').click(),abreTurma('${turma}')">Turma ${turma}</button>`
-                            turmasRef.child(turma + '/alunos').once('value').then(matAlunos => {
+                            turmasRef.child(turma + '/alunos').on('value', matAlunos => {
                                 for (const matricula in matAlunos.val()) {
                                     if (Object.hasOwnProperty.call(matAlunos.val(), matricula)) {
                                         listaAlunosMat.push(matricula)
@@ -60,9 +60,6 @@ firebase.auth().onAuthStateChanged((user) => {
                                         
                                     }
                                 }
-                            }).catch(error => {
-                                AstNotif.dialog('Erro', error.message)
-                                console.log(error)
                             })
                         }
                     }
@@ -443,11 +440,52 @@ function lancaNotas(confirma=false) {
         
 }
 
+function incluirNotasDesempenho(turma=undefined, elementoCheckbox) {
+    if (elementoCheckbox.checked) {
+        desempenhoRef.once('value').then(snapshot => {
+            let notasDesemp = snapshot.val()
+            let somatorioDesemp = 0
+            for (const nomeNota in notasDesemp) {
+                if (Object.hasOwnProperty.call(notasDesemp, nomeNota)) {
+                    const valor = notasDesemp[nomeNota];
+                    somatorioDesemp += Number(valor)
+                }
+            }
+            addCampoNota(somatorioDesemp, 'readonly', true) 
+        }).catch(error => {
+            AstNotif.dialog('Erro', error.message)
+            console.log(error)
+        })
+        
+    } else {
+        let c = 0
+        while (c < contadorNotas) {
+            if (document.getElementById('nomeNota' + c).value == 'Desempenho') {
+                somaNotasDistribuidas(c, true) 
+                document.getElementById('linha' + c).remove() 
+                contadorNotas--
+                break
+            }
+            c++
+        }
+    }
+    
+    
+}
+
 function distribuiNotas() {
     loader.style.display = 'block'
     loaderMsg.innerText = 'Buscando notas...'
     abrirModal('modal', 'Distribuição de notas da turma ' + alunosSelecionadosTurma.codTurma, 
             `Distribua os tipos de notas que você aplicará em sala de aula<br>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <div class="input-group-text">
+                    <input type="checkbox" id="checkboxIncluiDesempenho" aria-label="Incluir Pontos do desempenho" onclick="incluirNotasDesempenho('${alunosSelecionadosTurma.codTurma}', this)">
+                     &nbsp;Incluir pontos do desempenho no somatório da distribuição &nbsp;<span data-feather="help-circle" data-toggle="tooltip" data-placement="right" title="Ao marcar esta caixa, o somatório das notas de desempenho (que são definidas pela secretaria) será adicionado automaticamente ao somatório da distribuição de notas desta turma."></span>
+                    </div>
+                </div>
+            </div>
             
             <button type="button" data-toggle="tooltip" data-placement="top" title="Adicionar nota" class="btn btn-light btn-sm" onclick="addCampoNota()"><span data-feather="plus-square"></span></button><br>
             <div class="row"><div class="col-2"><label>Nota</label></div><div class="col-2"><label>Valor</label></div></div>
@@ -477,14 +515,18 @@ function distribuiNotas() {
                     document.getElementById('camposNotas').innerHTML += `
                     <div class="row" id="linha${c}">
                         <div class="col-2" >
-                            <input type="text" class="form-control" id="nomeNota${c}" placeholder="EX ${c + 1}" value="${nomeNota}">
+                            <input type="text" class="form-control" id="nomeNota${c}" placeholder="EX ${c + 1}" value="${nomeNota}" ${nomeNota == 'Desempenho' ? ('readonly') : ''}>
                         </div>
                         <div class="col-2">
-                            <input type="number" id="valorNota${c}" class="form-control" value="${valor}" onkeyup="somaNotasDistribuidas('${c}')" placeholder="15.5">
+                            <input type="number" id="valorNota${c}" class="form-control" value="${valor}" onkeyup="somaNotasDistribuidas('${c}')" placeholder="15.5" ${nomeNota == 'Desempenho' ? ('readonly') : ''}>
                         </div>
-                        <button type="button" class="btn btn-light btn-sm" onclick="somaNotasDistribuidas('${c}', true), document.getElementById('linha${c}').remove(), contadorNotas--"><span data-feather="x-square"></span></button><br>
+                        <button type="button" id="removedor${c}" class="btn btn-light btn-sm" onclick="somaNotasDistribuidas('${c}', true), document.getElementById('linha${c}').remove(), contadorNotas--"><span data-feather="x-square"></span></button><br>
                     </div>
                     `
+                    if (nomeNota == 'Desempenho') {
+                        document.getElementById('removedor' + c).remove()
+                        document.getElementById('checkboxIncluiDesempenho').checked = true
+                    }
                     somaNotasDistribuidas(c)
                     c++
                 }
@@ -509,21 +551,35 @@ function distribuiNotas() {
 
 var contadorNotas = 0
 var contadorNotasExtras = 0
-function addCampoNota(extra=false) {
+function addCampoNota(valorInicial=0, readonly=false, desempenho=false) {
     let camposNotas = document.getElementById('camposNotas')
     document.getElementById('somaNotasDistribuidas').innerText = 0
     
-    if (extra) {
+    if (desempenho) {
+        camposNotas.innerHTML += 
+        `
+        <div class="row" id="linha${contadorNotas}">
+            <div class="col-2" >
+                <input type="text" class="form-control" id="nomeNota${contadorNotas}" placeholder="EX ${contadorNotas + 1}" value="Desempenho" readonly>
+            </div>
+            <div class="col-2">
+                <input type="number" id="valorNota${contadorNotas}" class="form-control" onkeyup="somaNotasDistribuidas('${contadorNotas}')" value="${valorInicial}" placeholder="15.5" readonly>
+            </div>
+        </div>
+        `
+        somaNotasDistribuidas(contadorNotas)
+        feather.replace()
+        contadorNotas++
         
     } else {
         camposNotas.innerHTML += 
         `
         <div class="row" id="linha${contadorNotas}">
             <div class="col-2" >
-                <input type="text" class="form-control" id="nomeNota${contadorNotas}" placeholder="EX ${contadorNotas + 1}" value="EX ${contadorNotas + 1}">
+                <input type="text" class="form-control" id="nomeNota${contadorNotas}" placeholder="EX ${contadorNotas + 1}" value="EX ${contadorNotas + 1}" ${readonly}>
             </div>
             <div class="col-2">
-                <input type="number" id="valorNota${contadorNotas}" class="form-control" onkeyup="somaNotasDistribuidas('${contadorNotas}')" placeholder="15.5">
+                <input type="number" id="valorNota${contadorNotas}" class="form-control" onkeyup="somaNotasDistribuidas('${contadorNotas}')" value="${valorInicial}" placeholder="15.5" ${readonly}>
             </div>
             <button type="button" class="btn btn-light btn-sm" onclick="somaNotasDistribuidas('${contadorNotas}', true), document.getElementById('linha${contadorNotas}').remove(), contadorNotas--"><span data-feather="x-square"></span></button><br>
         </div>

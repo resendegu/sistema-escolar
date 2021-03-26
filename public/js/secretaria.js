@@ -1170,10 +1170,15 @@ function alteraNotasDesempenho(confirma=false) {
         loaderMsg.innerText = 'Lançando notas dos alunos no sistema...'
         var notasParaLancar = {}
         let c2 = 0
-        while (c2 < contadorNotas) {
-            let index = document.getElementById('nomeNota' + c2).value
-            let valor = Number(document.getElementById('valorNota' + c2).value)
-            notasParaLancar[index] = valor
+        while (c2 <= contadorNotas) {
+            try {
+                let index = document.getElementById('nomeNota' + c2).value
+                let valor = Number(document.getElementById('valorNota' + c2).value)
+                notasParaLancar[index] = valor 
+            } catch (error) {
+                console.log(error)
+            }
+            
             c2++
         }
 
