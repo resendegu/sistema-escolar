@@ -267,6 +267,55 @@ function iniciaPeriodo(confirma=false, inicio='', fim='') {
     }
 }
 
+function fechaPeriodo() {
+        loader.style.display = 'block'
+        loaderMsg.innerText = 'Recuperando status da turma...'
+        turmasRef.child(alunosSelecionadosTurma.codTurma + '/status').once('value').then(status => {
+            console.log(status)
+            console.log(status.val())
+            abrirModal('modal', 'Confirmação de fechamento da turma ' + alunosSelecionadosTurma.codTurma, `
+            Atenção. Você está prestes a fechar as ativiadades da turma ${alunosSelecionadosTurma.codTurma}. Ao fechar a turma, você não poderá mais lançar notas e frequência para esta turma, até que você inicie novamente mais um período para esta turma. <b>Automaticamente, ao fechar a turma, o sistema irá iniciar os processos de geração de boletim, notas, somatórios finais, frequência, desempenho, entre outros processos parecidos.</b> (Esses processos são realizados nos servidores remotos do sistema para maior segurança e integridade dos dados.)<br>
+            Confirme os dados de início e fim do semestre que foram definidos no processo de abertura desse semestre da turma nos campos abaixo:<br>
+            <br>
+            <b>Altere as datas de início e fim se necessário:</b><br>
+            Início do período:
+            <input type="date" class="form-control" name="dataInicioPeriodo" id="dataInicioPeriodo" value="${status.val().inicio}">
+            <br> Fim do período:
+            <input type="date" class="form-control" name="dataFimPeriodo" id="dataFimPeriodo" value="${status.val().fim}">
+
+            `, 
+            `<button type="button" id="btnFechaTurma" class='btn btn-warning'>Fechar Turma</button><button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>`)
+            $(function () {
+                $('[data-toggle="popover"]').popover()
+            })
+
+            document.querySelector('#btnFechaTurma').addEventListener('click', (e) => {
+                e.preventDefault()
+                // Aqui começará o fechamento de turmas
+                loader.style.display = 'block'
+                loaderMsg.innerText = 'Aguarde enquanto os dados são processados nos servidores remotos do sistema. Isso pode demorar um pouco...'
+                var fechaTurma = firebase.functions().httpsCallable('fechaTurma')
+                fechaTurma(alunosSelecionadosTurma.codTurma).then(function(result){
+                    AstNotif.dialog('Sucesso', result.data.answer)
+                    loader.style.display = 'none'
+                }).catch(function(error){
+                    AstNotif.dialog('Erro', error.message)
+                    console.log(error)
+                    loader.style.display = 'none'
+                })
+            })
+
+            loader.style.display = 'none'
+        }).catch(error => {
+            AstNotif.dialog('Erro', error.message)
+            console.log(error)
+            loader.style.display = 'none'
+        })
+
+
+        
+}
+
 function verificaAlunosSelecionados() {
     let c = 0
     for (const matricula in alunosSelecionadosTurma) {
@@ -354,9 +403,17 @@ function lancaNotas(confirma=false) {
             
             console.log(notas)
             let c = 0
-            for (const nomeNota in notas) {
+            for (let nomeNota in notas) {
                 if (Object.hasOwnProperty.call(notas, nomeNota)) {
                     const valor = notas[nomeNota];
+                    let readonly = ''
+                    let disabled = ''
+                    let tooltip = ''
+                    if (nomeNota == 'Desempenho') {
+                        readonly = 'readonly'
+                        disabled = 'disabled'
+                        tooltip = 'data-toggle="tooltip" data-placement="top" title="Esta nota deve ser alterada no Desempenho do Aluno."'
+                    }
                     document.getElementById('camposLancaNotas').innerHTML += `
                     <div class="row" id="linha${c}">
                         <div class="col-2" >
@@ -367,14 +424,17 @@ function lancaNotas(confirma=false) {
                         </div>
                         <div class="col-2">
                             
-                            <input type="number" min="0" max="${valor}" id="valorNota${c}" value="0" class="form-control"  placeholder="Total: ${valor}" onkeyup='this.value > ${valor} || this.value == "" ? this.value = 0: console.log("ok")'>
+                            <input type="number" min="0" max="${valor}" id="valorNota${c}" value="0" class="form-control"  placeholder="Total: ${valor}" onkeyup='this.value > ${valor} || this.value == "" ? this.value = 0: console.log("ok")' ${readonly} ${tooltip}>
                         </div>
-                        <button type="button" class="btn btn-light btn-sm" onclick="document.getElementById('valorNota${c}').value = ${valor}">Dar Total</button><br>
+                        <button type="button" class="btn btn-light btn-sm ${disabled}" ${disabled} onclick="document.getElementById('valorNota${c}').value = ${valor}">Dar Total</button><br>
                     </div>
                     `
                     c++
                 }
             }
+            $(function () {
+                $('[data-toggle="tooltip"]').tooltip()
+            })
             contadorDeNotas = c
             let aluno = Object.assign({}, alunosSelecionadosTurma)
             delete aluno.codTurma
@@ -1054,9 +1114,17 @@ function editaNotasAluno(matricula, turma) {
             }
             
             let c = 0
-            for (const nomeNota in notasDeReferencia) {
+            for (let nomeNota in notasDeReferencia) {
                 if (Object.hasOwnProperty.call(notasDeReferencia, nomeNota)) {
                     const valor = notasDeReferencia[nomeNota];
+                    let readonly = ''
+                    let disabled = ''
+                    let tooltip = ''
+                    if (nomeNota == 'Desempenho') {
+                        readonly = 'readonly'
+                        disabled = 'disabled'
+                        tooltip = 'data-toggle="tooltip" data-placement="top" title="Esta nota deve ser alterada no Desempenho do Aluno."'
+                    }
                     document.getElementById('camposLancaNotas').innerHTML += `
                     <div class="row" id="linha${c}">
                         <div class="col-2" >
@@ -1067,14 +1135,17 @@ function editaNotasAluno(matricula, turma) {
                         </div>
                         <div class="col-2">
                             
-                            <input type="number" min="0" max="${valor}" id="valorNota${c}" value="0" class="form-control"  placeholder="Total: ${valor}" onkeyup='this.value > ${valor} || this.value == "" ? this.value = 0: console.log("ok")'>
+                            <input type="number" min="0" max="${valor}" id="valorNota${c}" value="0" class="form-control"  placeholder="Total: ${valor}" onkeyup='this.value > ${valor} || this.value == "" ? this.value = 0: console.log("ok")' ${readonly} ${tooltip}>
                         </div>
-                        <button type="button" class="btn btn-light btn-sm" onclick="document.getElementById('valorNota${c}').value = ${valor}">Dar Total</button><br>
+                        <button type="button" class="btn btn-light btn-sm ${disabled}" ${disabled} onclick="document.getElementById('valorNota${c}').value = ${valor}">Dar Total</button><br>
                     </div>
                     `
                     c++
                 }
             }
+            $(function () {
+                $('[data-toggle="tooltip"]').tooltip()
+            })
             contadorDeNotas = c
             
             let c4 = 0

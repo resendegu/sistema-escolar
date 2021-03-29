@@ -3,6 +3,7 @@ const admin = require('firebase-admin');
 const { auth } = require('firebase-admin');
 const { HttpsError } = require('firebase-functions/lib/providers/https');
 const { firebaseConfig } = require('firebase-functions');
+const { https } = require('firebase-functions');
 admin.initializeApp()
 
 exports.verificadorDeAcesso = functions.https.onCall((data, context) => {
@@ -626,4 +627,43 @@ exports.lancarNotas = functions.https.onCall((data, context) => {
         throw new functions.https.HttpsError('permission-denied', 'Você não possui permissão para fazer alterações nesta área.')
     }
 
+})
+
+exports.lancaDesempenhos = functions.database.ref('sistemaEscolar/turmas/{codTurma}/alunos/{matricula}/desempenho').onWrite((snapshot, context)=> {
+    // context.timestamp = context.timestamp
+    // context.params = { codTurma: 'KIDS-SAT08', matricula: '00001' }
+
+    var notasDesempenho = snapshot.after.val()
+    var referencia = {turma: context.params.codTurma, matriculaAluno: context.params.matricula}
+
+    return admin.database().ref(`sistemaEscolar/turmas/${referencia.turma}/notas/Desempenho`).once('value').then(notasDesempenhoTurma => {
+        if (notasDesempenhoTurma.exists()) {
+            let somatorioDesempenho = 0
+            for (const nomeNota in notasDesempenho) {
+                if (Object.hasOwnProperty.call(notasDesempenho, nomeNota)) {
+                    const valor = notasDesempenho[nomeNota];
+                    somatorioDesempenho += valor
+                }
+            }
+
+            return admin.database().ref(`sistemaEscolar/turmas/${referencia.turma}/alunos/${referencia.matriculaAluno}/notas/Desempenho`).set(somatorioDesempenho).then(() => {
+                return 'Somatório de desempenho da matricula '+ referencia.matriculaAluno + ' foi alterado na turma ' + referencia.turma
+            }).catch(error => {
+                throw new HttpsError('unknown', error.message, error)
+            })
+        } else {
+            return 'A turma ' + referencia.turma + 'não possui nota de desepenho distribuída no somatório final das notas. A nota da matricula ' + referencia.matriculaAluno + ' não foi alterada.'
+        }
+    }).catch(error => {
+        throw new HttpsError('unknown', error.message, error)
+    })
+})
+
+exports.fechaTurma = functions.https.onCall((data, context) => {
+    if (context.auth.token.master == true || context.auth.token.professores == true) {
+        var turma = data
+        return {answer: 'Oiii. Esta é uma mensagem vinda diretamente de um servidor remoto dos Estados Unidos. Legal né kkkkk. Gustavo escreveu isso aqui somente pra avisar você que esta função ainda não está pronta. Nas próximas atualizações ela já deve estar pronta :)'}
+    } else {
+        throw new functions.https.HttpsError('permission-denied', 'Você não possui permissão para fazer alterações nesta área.')
+    }
 })
