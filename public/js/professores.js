@@ -281,14 +281,16 @@ function fechaPeriodo() {
             console.log(status)
             console.log(status.val())
             abrirModal('modal', 'Confirmação de fechamento da turma ' + alunosSelecionadosTurma.codTurma, `
-            Atenção. Você está prestes a fechar as ativiadades da turma ${alunosSelecionadosTurma.codTurma}. Ao fechar a turma, você não poderá mais lançar notas e frequência para esta turma, até que você inicie novamente mais um período para esta turma. <b>Automaticamente, ao fechar a turma, o sistema irá iniciar os processos de geração de boletim, notas, somatórios finais, frequência, desempenho, entre outros processos parecidos.</b> (Esses processos são realizados nos servidores remotos do sistema para maior segurança e integridade dos dados.)<br>
-            Confirme os dados de início e fim do semestre que foram definidos no processo de abertura desse semestre da turma nos campos abaixo:<br>
+            Atenção. Você está prestes a fechar as ativiadades da turma ${alunosSelecionadosTurma.codTurma}. Ao fechar a turma, você não poderá mais lançar notas e frequência para esta turma, até que você inicie novamente mais um período para esta turma. <b>Automaticamente, ao fechar a turma, o sistema irá iniciar uma sequência de processos para a geração de boletins, notas, somatórios finais, frequência, desempenho, entre outros processos parecidos.</b> (Esses processos são realizados nos servidores remotos do sistema para maior segurança e integridade dos dados.)<br>
+            Confirme os dados de início, fim, e quantidade de aulas dadas do semestre que foram definidos no processo de abertura desse semestre da turma nos campos abaixo:<br>
             <br>
-            <b>Altere as datas de início e fim se necessário:</b><br>
+            <b>Altere as datas de início, fim e quantidade de aulas dadas, se necessário:</b><br>
             Início do período:
             <input type="date" class="form-control" name="dataInicioPeriodo" id="dataInicioPeriodo" value="${status.val().inicio}">
             <br> Fim do período:
             <input type="date" class="form-control" name="dataFimPeriodo" id="dataFimPeriodo" value="${status.val().fim}">
+            <br> Quantidade de aulas dadas:
+            <input type="number" class="form-control" name="qtdeAulasConfirma" id="qtdeAulasConfirma" value="${status.val().qtdeAulas}">
 
             `, 
             `<button type="button" id="btnFechaTurma" class='btn btn-warning'>Fechar Turma</button><button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>`)
@@ -301,15 +303,25 @@ function fechaPeriodo() {
                 // Aqui começará o fechamento de turmas
                 loader.style.display = 'block'
                 loaderMsg.innerText = 'Aguarde enquanto os dados são processados nos servidores remotos do sistema. Isso pode demorar um pouco...'
-                var fechaTurma = firebase.functions().httpsCallable('fechaTurma')
-                fechaTurma(alunosSelecionadosTurma.codTurma).then(function(result){
-                    AstNotif.dialog('Sucesso', result.data.answer)
-                    loader.style.display = 'none'
-                }).catch(function(error){
+                let ini = document.getElementById('dataInicioPeriodo').value
+                let fim = document.getElementById('dataFimPeriodo').value
+                let qtdeAulas = document.getElementById('qtdeAulasConfirma').value
+
+                turmasRef.child(alunosSelecionadosTurma.codTurma + '/status').set({inicio: ini, fim: fim, qtdeAulas: qtdeAulas, turma: 'aberta'}).then(() => {
+                    var fechaTurma = firebase.functions().httpsCallable('fechaTurma')
+                    fechaTurma(alunosSelecionadosTurma.codTurma).then(function(result){
+                        AstNotif.dialog('Sucesso', result.data.answer)
+                        loader.style.display = 'none'
+                    }).catch(function(error){
+                        AstNotif.dialog('Erro', error.message)
+                        console.log(error)
+                        loader.style.display = 'none'
+                    })
+                }).catch(error => {
                     AstNotif.dialog('Erro', error.message)
-                    console.log(error)
                     loader.style.display = 'none'
                 })
+                
             })
 
             loader.style.display = 'none'
@@ -748,6 +760,7 @@ function lancaFrequencia(alunos={}, turma="", data='', confirma=false) {
 
             frequenciaAluno().then(() => {
                 AstNotif.dialog('Sucesso', 'As frequências foram lançadas com sucesso!')
+                carregaFrequenciaTurma(turma)
                 loader.style.display = 'none'
             }).catch(error => {
                 AstNotif.dialog('Erro', error.message)

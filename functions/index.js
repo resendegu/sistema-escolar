@@ -4,6 +4,7 @@ const { auth } = require('firebase-admin');
 const { HttpsError } = require('firebase-functions/lib/providers/https');
 const { firebaseConfig } = require('firebase-functions');
 const { https } = require('firebase-functions');
+const { info } = require('firebase-functions/lib/logger');
 admin.initializeApp()
 
 exports.verificadorDeAcesso = functions.https.onCall((data, context) => {
@@ -612,7 +613,7 @@ exports.lancarNotas = functions.https.onCall((data, context) => {
                     alunosTurmaRef.child(formataNumMatricula(matricula) + '/notas').set(notas).then(() => {
         
                     }).catch(error => {
-                        throw new HttpsError('unknown', error.message, error)
+                        throw new functions.https.HttpsError('unknown', error.message, error)
                     })
                 }
             }
@@ -620,7 +621,7 @@ exports.lancarNotas = functions.https.onCall((data, context) => {
         return lancar().then(() => {
             return {answer: 'As notas lançadas com sucesso. Aguarde um momento até que o sistema atualize as notas automaticamente.'}
         }).catch(error => {
-            throw new HttpsError('unknown', error.message, error)
+            throw new functions.https.HttpsError('unknown', error.message, error)
         })
         
     } else {
@@ -649,20 +650,78 @@ exports.lancaDesempenhos = functions.database.ref('sistemaEscolar/turmas/{codTur
             return admin.database().ref(`sistemaEscolar/turmas/${referencia.turma}/alunos/${referencia.matriculaAluno}/notas/Desempenho`).set(somatorioDesempenho).then(() => {
                 return 'Somatório de desempenho da matricula '+ referencia.matriculaAluno + ' foi alterado na turma ' + referencia.turma
             }).catch(error => {
-                throw new HttpsError('unknown', error.message, error)
+                throw new functions.https.HttpsError('unknown', error.message, error)
             })
         } else {
             return 'A turma ' + referencia.turma + 'não possui nota de desepenho distribuída no somatório final das notas. A nota da matricula ' + referencia.matriculaAluno + ' não foi alterada.'
         }
     }).catch(error => {
-        throw new HttpsError('unknown', error.message, error)
+        throw new functions.https.HttpsError('unknown', error.message, error)
     })
 })
 
 exports.fechaTurma = functions.https.onCall((data, context) => {
+    function formataNumMatricula(num) {
+        let numero = num
+        numero = "00000" + numero.replace(/\D/g, '');
+        numero = numero.slice(-5,-1) + numero.slice(-1);
+        return numero
+    }
     if (context.auth.token.master == true || context.auth.token.professores == true) {
         var turma = data
-        return {answer: 'Oiii. Esta é uma mensagem vinda diretamente de um servidor remoto dos Estados Unidos. Legal né kkkkk. Gustavo escreveu isso aqui somente pra avisar você que esta função ainda não está pronta. Nas próximas atualizações ela já deve estar pronta :)'}
+        var turmaRef = admin.database().ref(`sistemaEscolar/turmas/${turma}`)
+        var alunosRef = admin.database().ref(`sistemaEscolar/alunos/`)
+        return turmaRef.once('value').then(dadosTurma => {
+            async function sequenciaDeFechamento(dadosDaTurma) {
+                turmaRef.child('status/turma').set('fechada').then(()=>{
+
+                }).catch(error => {
+                    throw new Error(error.message)
+                })
+
+                turmaRef.child('historicoEscolar').push({dadosDaTurma: dadosDaTurma, timestamp: admin.firestore.Timestamp.now(), codTurma: dadosDaTurma.codigoSala}).then(() => {
+
+                }).catch(error => {
+                    throw new Error(error.message)
+                })
+
+                turmaRef.child('frequencia').remove().then(() => {
+                    turmaRef.child()
+                }).catch(error => {
+                    throw new Error(error.message)
+                })
+
+                for (const matricula in dadosDaTurma.alunos) {
+                    if (Object.hasOwnProperty.call(dadosDaTurma.alunos, matricula)) {
+                        let infoAluno = dadosDaTurma.alunos[matricula];
+                        infoAluno.notasReferencia = dadosDaTurma.notas
+                        infoAluno.timestamp = admin.firestore.Timestamp.now()
+                        infoAluno.codigoSala = dadosDaTurma.codigoSala
+                        infoAluno.inicio = dadosDaTurma.status.inicio
+                        infoAluno.fim = dadosDaTurma.status.fim
+                        infoAluno.qtdeAulas
+                        alunosRef.child(formataNumMatricula(matricula) + '/historicoEscolar').push({infoAluno: infoAluno, timestamp: admin.firestore.Timestamp.now(), turma: dadosDaTurma.codigoSala}).then(() => {
+
+                        }).catch(error => {
+                            throw new Error(error.message)
+                        })
+                        turmaRef.child('alunos/' + formataNumMatricula(matricula)).set({nome: infoAluno.nome}).then(() => {
+
+                        }).catch(error => {
+                            throw new Error(error.message)
+                        })
+                    }
+                }
+            }
+
+            return sequenciaDeFechamento(dadosTurma.val()).then(callback => {
+                return {answer: 'A sequência de fechamento da turma foi concluída com sucesso.', callback: callback}
+            }).catch(error => {
+                throw new functions.https.HttpsError('unknown', error.message, error)
+            })
+        }).catch(error => {
+            throw new functions.https.HttpsError('unknown', error.message, error)
+        })
     } else {
         throw new functions.https.HttpsError('permission-denied', 'Você não possui permissão para fazer alterações nesta área.')
     }
