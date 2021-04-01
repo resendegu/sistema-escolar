@@ -313,6 +313,7 @@ function fechaPeriodo() {
                         AstNotif.dialog('Sucesso', result.data.answer)
                         loader.style.display = 'none'
                         $('#modal').modal('hide')
+                        abreTurma(alunosSelecionadosTurma.codTurma)
                     }).catch(function(error){
                         AstNotif.dialog('Erro', error.message)
                         console.log(error)
