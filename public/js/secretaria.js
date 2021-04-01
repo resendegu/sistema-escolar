@@ -1002,10 +1002,45 @@ function carregaListaDeAlunos(filtro='') {
     }
     
 }
+function carregaFrequenciaAluno(matricula, turma) {
+    let c = 0
+    let divFrequencias = document.getElementById('divFrequencias')
+    let qtdeAulasFrequencia = document.getElementById('qtdeAulasFrequencia')
+    let qtdeAulas
+    turmasRef.child(turma + '/status/qtdeAulas').once('value').then(qtdeDeAulas => {
+        qtdeAulasFrequencia.innerText = qtdeDeAulas.val()
+        qtdeAulas = qtdeDeAulas.val()
+
+        divFrequencias.innerHTML = 'Nenhuma frequência lançada para este aluno, nesta turma'
+        turmasRef.child(turma + '/alunos/' + matricula + '/frequencia').on('child_added', frequencia => {
+            console.log(frequencia.val())
+            if (c==0) {
+                divFrequencias.innerHTML = ''
+            }
+            if (frequencia.val().turma == turma) {
+                divFrequencias.innerHTML += `
+                <div class="row justify-content-center">
+                    <div class="col-3" style="background-color: rgba(86,61,124,.15);border: 1px solid rgba(86,61,124,.2);">${frequencia.key.split('-').reverse().join('/')}</div>
+                    <div class="col-3" style="background-color: rgba(86,61,124,.15);border: 1px solid rgba(86,61,124,.2);">Presente</div>
+            </div>
+                `
+            }
+            c++
+            document.getElementById('totalFrequencias').innerText = c
+            document.getElementById('porcentagemFrequencia').innerText = (100*parseInt(c))/parseInt(qtdeAulas) + '%'
+        })
+    }).catch(error => {
+        AstNotif.dialog('Erro', error.message)
+    })
+
+
+    
+}
 
 var dadosResponsaveis = {}
 function abreDadosDoAluno(matricula, desativado=false, notasDesativado=false) {
     carregaHistoricoAluno(matricula)
+    
     document.getElementById('infoDoAluno').style.display = 'block'
     document.getElementById('rolaTelaAbaixoAlunos').style.display = 'block'
     document.getElementById('secGeraFicha').innerHTML = `<button class="btn btn-outline-primary" id="btnGeraFicha" onclick="gerarFichaAluno('${matricula}')">Gerar ficha de matrícula em PDF</button>`
@@ -1017,6 +1052,7 @@ function abreDadosDoAluno(matricula, desativado=false, notasDesativado=false) {
         dados = alunos[matricula]
         document.getElementById('alunoDesativado').style.display = 'none'
     }
+    carregaFrequenciaAluno(matricula, dados.turmaAluno)
     dadosResponsaveis = {
         nomeResponsavelAluno1: dados.nomeResponsavelAluno1,
         relacaoAluno1: dados.relacaoAluno1,

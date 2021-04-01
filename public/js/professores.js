@@ -238,20 +238,25 @@ function carregaListaDeAlunosDaTurma(turma, filtro='') {
     
 }
 
-function iniciaPeriodo(confirma=false, inicio='', fim='') {
+function iniciaPeriodo(confirma=false, inicio='', fim='', qtdeAulas='') {
     if (confirma) {
         loader.style.display = 'block'
         loaderMsg.innerText = 'Iniciando turma...'
-        turmasRef.child(alunosSelecionadosTurma.codTurma + '/status').set({turma: 'aberta', inicio: inicio, fim: fim}).then(()=>{
-            $('#modal').modal('hide')
-            AstNotif.notify('Sucesso', 'Turma aberta')
-            carregaListaDeAlunosDaTurma(alunosSelecionadosTurma.codTurma)
+        if (inicio == '' || fim == '' || qtdeAulas == '') {
+            AstNotif.dialog('Você esqueceu alguns dados...', 'Por favor preencha todos os dados pedidos para iniciar a turma')
             loader.style.display = 'none'
-        }).catch(error => {
-            loader.style.display = 'none'
-            console.log(error)
-            AstNotif.dialog('Erro', error.message)
-        })
+        } else {
+            turmasRef.child(alunosSelecionadosTurma.codTurma + '/status').set({turma: 'aberta', inicio: inicio, fim: fim, qtdeAulas: qtdeAulas}).then(()=>{
+                $('#modal').modal('hide')
+                AstNotif.notify('Sucesso', 'Turma aberta')
+                carregaListaDeAlunosDaTurma(alunosSelecionadosTurma.codTurma)
+                loader.style.display = 'none'
+            }).catch(error => {
+                loader.style.display = 'none'
+                console.log(error)
+                AstNotif.dialog('Erro', error.message)
+            })
+        }
     } else {
         abrirModal('modal', 'Confirmação de abertura da turma ' + alunosSelecionadosTurma.codTurma, `
             Atenção. Você está prestes a iniciar as ativiadades da turma ${alunosSelecionadosTurma.codTurma}. Ao iniciar a turma, você poderá lançar notas e frequências para os alunos que estão cadastrados na turma.<br>
@@ -261,9 +266,11 @@ function iniciaPeriodo(confirma=false, inicio='', fim='') {
             <input type="date" class="form-control" name="dataInicioPeriodo" id="dataInicioPeriodo">
             <br> Fim previsto:
             <input type="date" class="form-control" name="dataFimPeriodo" id="dataFimPeriodo">
+            <br> Quantidade de dias de aulas:
+            <input type="number" class="form-control" name="qtdeAulas" id="qtdeAulas">
 
         `, 
-        `<button type="button" data-toggle="tooltip" data-placement="top" title="Iniciar atividades da turma no sistema" class="btn btn-primary" onclick="iniciaPeriodo(true, document.getElementById('dataInicioPeriodo').value, document.getElementById('dataFimPeriodo').value)">Iniciar turma</button><button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>`)
+        `<button type="button" data-toggle="tooltip" data-placement="top" title="Iniciar atividades da turma no sistema" class="btn btn-primary" onclick="iniciaPeriodo(true, document.getElementById('dataInicioPeriodo').value, document.getElementById('dataFimPeriodo').value, document.getElementById('qtdeAulas').value)">Iniciar turma</button><button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>`)
     }
 }
 
@@ -713,14 +720,13 @@ function selecionaTodos(source) {
     
 }
 
+var matriculas = {}
 function lancaFrequencia(alunos={}, turma="", data='', confirma=false) {
     if (confirma) {
         loader.style.display = 'block'
         loaderMsg.innerText = 'Lançando frequências...'
         console.log(data)
-        if (alunos.codTurma != '') {
-            delete alunos.codTurma
-        }
+        
 
         turmasRef.child(turma + '/frequencia/' + data).set(alunos).then(() => {
             async function frequenciaAluno() {
@@ -741,7 +747,7 @@ function lancaFrequencia(alunos={}, turma="", data='', confirma=false) {
             }
 
             frequenciaAluno().then(() => {
-                AstNotif.notify('Sucesso', 'As frequências foram lançadas com sucesso!')
+                AstNotif.dialog('Sucesso', 'As frequências foram lançadas com sucesso!')
                 loader.style.display = 'none'
             }).catch(error => {
                 AstNotif.dialog('Erro', error.message)
@@ -757,6 +763,7 @@ function lancaFrequencia(alunos={}, turma="", data='', confirma=false) {
         })
     } else {
         let nomes = ''
+        
         let turma
         for (const matricula in alunosSelecionadosTurma) {
             if (Object.hasOwnProperty.call(alunosSelecionadosTurma, matricula)) {
@@ -767,6 +774,7 @@ function lancaFrequencia(alunos={}, turma="", data='', confirma=false) {
 
                 } else {
                     nomes += formataNumMatricula(matricula) + ': ' + aluno + '<br>'
+                    matriculas[matricula] = aluno
                 }
                 
             }
@@ -775,7 +783,7 @@ function lancaFrequencia(alunos={}, turma="", data='', confirma=false) {
             `Você selecionou os alunos listados abaixo da turma ${turma}. <br> ${nomes} <br><b>Você deseja lançar frequências para esses alunos para que dia?</b><br>
             <input type="date" class="form-control" name="dataFrequencia" id="dataFrequencia">
             `
-            , `<button type="button" data-toggle="tooltip" data-placement="top" title="Lançar frequência para os alunos selecionados" class="btn btn-primary" onclick="lancaFrequencia(alunosSelecionadosTurma,'${turma}', document.getElementById('dataFrequencia').value, true)">Lançar</button><button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>`
+            , `<button type="button" data-toggle="tooltip" data-placement="top" title="Lançar frequência para os alunos selecionados" class="btn btn-primary" onclick="lancaFrequencia(matriculas,'${turma}', document.getElementById('dataFrequencia').value, true)">Lançar</button><button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>`
         )
         $(function () {
             $('[data-toggle="tooltip"]').tooltip()
@@ -796,10 +804,48 @@ function lancaFrequencia(alunos={}, turma="", data='', confirma=false) {
     
 }
 
+function carregaFrequenciaTurma(turma) {
+    let divMapaFrequenciasTurma = document.getElementById('divMapaFrequenciasTurma')
+    divMapaFrequenciasTurma.innerHTML = 'Nenhuma frequência foi lançada nesta turma'
+    let c = 0
+    let qtdeAulas
+    turmasRef.child(turma + '/status/qtdeAulas').once('value').then(qtdeDeAulas => {
+        qtdeAulasFrequencia.innerText = qtdeDeAulas.val()
+        qtdeAulas = qtdeDeAulas.val()
+        document.getElementById('qtdeAulasFrequenciaTurma').innerText = qtdeAulas
+        turmasRef.child(turma + '/frequencia').on('child_added', frequencia => {
+            if (c == 0) {
+                divMapaFrequenciasTurma.innerHTML = ''
+            }
+            let alunosPresentes = ''
+            for (const matricula in frequencia.val()) {
+                if (Object.hasOwnProperty.call(frequencia.val(), matricula)) {
+                    const nome = frequencia.val()[matricula];
+                    alunosPresentes += formataNumMatricula(matricula) + ': ' + nome.split(' ')[0] + " | "
+                }
+            }
+    
+            divMapaFrequenciasTurma.innerHTML += `
+            <div class="row justify-content-start">
+                <div class="col-auto" style="background-color: rgba(86,61,124,.15);border: 1px solid rgba(86,61,124,.2);">${frequencia.key.split('-').reverse().join('/')}</div>
+                <div class="col" style="background-color: rgba(86,61,124,.15);border: 1px solid rgba(86,61,124,.2);">${alunosPresentes}</div>
+            </div>
+            `
+            c++
+            document.getElementById('totalFrequenciasTurma').innerText = c
+            document.getElementById('porcentagemFrequenciaTurma').innerText = (100*parseInt(c))/parseInt(qtdeAulas) + '%'
+        })
+    }).catch(error => {
+        AstNotif.dialog('Erro', error.message)
+    })
+    
+}
+
 function abreTurma(cod) {
     loader.style.display = 'block'
     loaderMsg.innerText = 'Abrindo turma...'
     carregaListaDeAlunosDaTurma(cod)
+    carregaFrequenciaTurma(cod)
     var codigoDaTurmaLabel = document.getElementById('codigoDaTurma')
     var areaInfoTurma = document.getElementById('areaInfoTurma')
     turmasRef.child(cod).on('value', (snapshot) => {
@@ -887,6 +933,42 @@ function alteraTipoDeBusca(tipo) {
     tipoDeBusca = tipo
 }
 
+function carregaFrequenciaAluno(matricula, turma) {
+    let c = 0
+    let divFrequencias = document.getElementById('divFrequencias')
+    let qtdeAulasFrequencia = document.getElementById('qtdeAulasFrequencia')
+    let qtdeAulas
+    turmasRef.child(turma + '/status/qtdeAulas').once('value').then(qtdeDeAulas => {
+        qtdeAulasFrequencia.innerText = qtdeDeAulas.val()
+        qtdeAulas = qtdeDeAulas.val()
+
+        divFrequencias.innerHTML = 'Nenhuma frequência lançada para este aluno, nesta turma'
+        turmasRef.child(turma + '/alunos/' + matricula + '/frequencia').on('child_added', frequencia => {
+            console.log(frequencia.val())
+            if (c==0) {
+                divFrequencias.innerHTML = ''
+            }
+            if (frequencia.val().turma == turma) {
+                divFrequencias.innerHTML += `
+                <div class="row justify-content-center">
+                    <div class="col-3" style="background-color: rgba(86,61,124,.15);border: 1px solid rgba(86,61,124,.2);">${frequencia.key.split('-').reverse().join('/')}</div>
+                    <div class="col-3" style="background-color: rgba(86,61,124,.15);border: 1px solid rgba(86,61,124,.2);">Presente</div>
+            </div>
+                `
+            }
+            c++
+            document.getElementById('totalFrequencias').innerText = c
+            console.log(qtdeAulas)
+            document.getElementById('porcentagemFrequencia').innerText = (100*parseInt(c))/parseInt(qtdeAulas) + '%'
+        })
+    }).catch(error => {
+        AstNotif.dialog('Erro', error.message)
+    })
+
+
+    
+}
+
 
 var dadosResponsaveis = {}
 function abreDadosDoAluno(matricula, desativado=false, notasDesativado=false) {
@@ -901,6 +983,7 @@ function abreDadosDoAluno(matricula, desativado=false, notasDesativado=false) {
         dados = alunos[matricula]
         document.getElementById('alunoDesativado').style.display = 'none'
     }
+    carregaFrequenciaAluno(matricula, dados.turmaAluno)
     dadosResponsaveis = {
         nomeResponsavelAluno1: dados.nomeResponsavelAluno1,
         relacaoAluno1: dados.relacaoAluno1,
@@ -939,7 +1022,7 @@ function abreDadosDoAluno(matricula, desativado=false, notasDesativado=false) {
     document.getElementById('mostraCelularAluno').innerText = dados.celularAluno
     document.getElementById('mostraTelefoneAluno').innerText = dados.telefoneAluno
     document.getElementById('timestampDoAluno').innerText = 'Aluno cadastrado em: ' + new Date(dados.timestamp._seconds * 1000)
-    document.getElementById('mostraDataNascimentoAluno').innerText = dados.dataNascimentoAluno
+    document.getElementById('mostraDataNascimentoAluno').innerText = dados.dataNascimentoAluno.split('-').reverse().join('/');
 
     let nascimento = dados.dataNascimentoAluno.split('-')
     let nascimentoObj = new Date()

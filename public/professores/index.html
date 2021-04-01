@@ -498,6 +498,24 @@
                     <p class="text-muted float-md-right" id="timestampDoAluno"></p>
                     <br>
                     <hr>
+                    <label class="h5">Mapa de frequências da turma atual</label>
+                    <div class="row">
+                      <div class="col">
+                        <div id="divFrequencias">
+                          <div class="row justify-content-start">
+                            <div class="col-3" style="background-color: rgba(86,61,124,.15);border: 1px solid rgba(86,61,124,.2);">Column</div>
+                            <div class="col-3" style="background-color: rgba(86,61,124,.15);border: 1px solid rgba(86,61,124,.2);">Column</div>
+                            
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col">
+                        <div id="divTotalFrequencias">Total de presenças: <label id="totalFrequencias"></label> de <label id="qtdeAulasFrequencia"></label><br> Percentual de frequência atual em <label id="porcentagemFrequencia"></label></div>
+                      </div>
+                    </div>
+                    
+                    
+                    <hr>
                     <label class="h5">Histórico de operações</label>
                     <br>
                     <div class="col">
@@ -598,8 +616,19 @@
                 <button type="button" class="btn btn-success" id="btnIniciaPeriodo" onclick="iniciaPeriodo()">Iniciar turma</button>
                 <button type="button" class="btn btn-warning" id="btnFechaPeriodo" onclick="fechaPeriodo()">Fechar turma</button>
                 <hr>
-                <p class="text-muted float-md-right" id="timestampTurmaCadastrada"></p>
+                <p class="text-muted justify-content-end" id="timestampTurmaCadastrada"></p>
+                <hr>
+                <label class="h5">Mapa de frequências da Turma</label>
+                <div id="divTotalFrequencias">Total de frequências lançadas: <label id="totalFrequenciasTurma"></label> de <label id="qtdeAulasFrequenciaTurma"></label><br> Percentual de frequência lançada em <label id="porcentagemFrequenciaTurma"></label></div>
+                <div id="divMapaFrequenciasTurma">
+                  <div class="row justify-content-start">
+                    <div class="col-3" style="background-color: rgba(86,61,124,.15);border: 1px solid rgba(86,61,124,.2);">Column</div>
+                    <div class="col" style="background-color: rgba(86,61,124,.15);border: 1px solid rgba(86,61,124,.2);">Column</div>
+                    
+                  </div>
+                </div>
                 
+                <hr>
               </div>
             </div>
 
