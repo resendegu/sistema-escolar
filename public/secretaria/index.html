@@ -848,18 +848,33 @@
                 <div class="form-row">
                   <div class="form-group col-auto">
                     <label for="inputEmail4">Telefone (fixo)</label>
-                    <input type="phone" class="form-control" id="telefoneAluno" name="telefoneAluno" placeholder="Número">
+                    <input type="phone" onkeypress="$(this).mask('(00) 0000-00009')" class="form-control" id="telefoneAluno" name="telefoneAluno" placeholder="Número">
                   </div>
+                  
                   <div class="form-group col-auto">
                     <label for="inputPassword4">Celular</label>
-                    <input type="phone" class="form-control" id="celularAluno" name="celularAluno" placeholder="Número">
+                    <input type="phone" class="form-control" id="celularAluno" name="celularAluno" placeholder="Número" onkeypress="$(this).mask('00000000009')" required>
+                    <small id="senhaHelp" class="form-text text-muted">Digite o DDD seguido do número (Ex.: 31999999999)</small>
                   </div>
+                  
                   <div class="form-group col-md-5">
                     <label for="inputPassword4">Email</label>
                     <input type="email" class="form-control" id="emailAluno" name="emailAluno" placeholder="Email" required>
                   </div>
                 </div>
                 <div class="form-row">
+                  <div class="form-group col-md-3">
+                    <label for="inputEmail4">Senha de acesso ao portal</label>
+                    <div class="input-group mb-3">
+                      <div class="input-group-prepend">
+                        <div class="input-group-text">
+                          <input type="checkbox" aria-label="Mostra e esconde a senha" onclick="this.checked ? (document.getElementById('senhaAluno').type = 'text'):(document.getElementById('senhaAluno').type = 'password')">
+                        </div>
+                      </div>
+                      <input type="password" class="form-control" id="senhaAluno" name="senhaAluno" placeholder="Senha" required>
+                    </div>
+                    <small id="senhaHelp" class="form-text text-muted">A senha precisa ter no mínimo 6 caracteres.</small>
+                  </div>
                   <div class="form-group col-auto">
                     <label for="inputEmail4">RG</label>
                     <input type="text" class="form-control" id="rgAluno" name="rgAluno" placeholder="RG" required>
@@ -914,7 +929,7 @@
                 <label class="h6">Dados de endereço</label>
                 <div class="form-row col-md-4">
                   <label for="inputZip">CEP (somente números)</label>
-                  <input type="number" class="form-control" id="cepAluno" name="cepAluno" placeholder="CEP" onchange="preencheEndereco(this.value)">
+                  <input type="text" class="form-control" id="cepAluno" name="cepAluno" placeholder="CEP" onchange="preencheEndereco(this.value)" onkeypress="$(this).mask('00.000-000')">
                   <small id="emailHelp" class="form-text text-muted">O CEP é opcional, mas quando inserido preenche o endereço automaticamente.</small>
                 </div>
                 <div class="form-row">
@@ -960,11 +975,11 @@
                   </div>
                   <div class="form-group col-md-2">
                     <label for="inputAddress">Número comercial</label>
-                    <input type="text" class="form-control" id="numeroComercialResponsavel1" name="numeroComercialResponsavel1" placeholder="Comercial">
+                    <input type="text" class="form-control" id="numeroComercialResponsavel1" name="numeroComercialResponsavel1" placeholder="Comercial" onkeypress="$(this).mask('(00) 0000-00009')">
                   </div>
                   <div class="form-group col-md-2">
                     <label for="inputAddress">Número Celular</label>
-                    <input type="text" class="form-control" id="numeroCelularResponsavel1" name="numeroCelularResponsavel1" placeholder="Celular">
+                    <input type="text" class="form-control" id="numeroCelularResponsavel1" name="numeroCelularResponsavel1" placeholder="Celular" onkeypress="$(this).mask('(00) 0000-00009')">
                   </div>
                   <div class="form-group col-auto">
                     <label for="inputEmail4">RG</label>
@@ -1053,11 +1068,11 @@
                   </div>
                   <div class="form-group col-md-2">
                     <label for="inputAddress">Número comercial</label>
-                    <input type="text" class="form-control" id="numeroComercialFinanceiroAluno" name="numeroComercialFinanceiroAluno" placeholder="Comercial">
+                    <input type="text" class="form-control" id="numeroComercialFinanceiroAluno" name="numeroComercialFinanceiroAluno" placeholder="Comercial" onkeypress="$(this).mask('(00) 0000-00009')">
                   </div>
                   <div class="form-group col-md-2">
                     <label for="inputAddress">Número Celular</label>
-                    <input type="text" class="form-control" id="numeroCelularFinanceiroAluno" name="numeroCelularFinanceiroAluno" placeholder="Celular">
+                    <input type="text" class="form-control" id="numeroCelularFinanceiroAluno" name="numeroCelularFinanceiroAluno" placeholder="Celular" onkeypress="$(this).mask('(00) 0000-00009')">
                   </div>
                   <div class="form-group col-md-5">
                     <label for="inputPassword4">Email</label>
@@ -1157,6 +1172,7 @@
     <!-- Placed at the end of the document so the pages load faster -->
     <!--<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>-->
     <script src="../resources/jQuery/jquery-3.2.1.slim.min.js"></script>
+    <script src="../resources/jQuery/jquery.mask.min.js"></script>
     <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery-slim.min.js"><\/script>')</script>
     <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>-->
     <script src="../resources/popper/popper.min.js"></script>
@@ -1208,5 +1224,7 @@
         }
       });
     </script> -->
+
+   
   </body>
 </html>

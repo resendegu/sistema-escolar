@@ -1,0 +1,594 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="Gustavo Resende">
+
+    <title>Portal do Aluno</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../resources/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="../css/dashboard.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/loader.css">
+    <link href="../css/list-items.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/aluno.css">
+    <link rel="stylesheet" href="../css/chat.css">
+    <link rel="stylesheet" href="../css/filedrop.css">
+
+      <!-- Carregando arquivos da biblioteca AST-Notif. Créditos: https://github.com/anandastoon/AST-Notif -->
+    <link rel="stylesheet" href="../resources/AST-Notif/css/ast-notif.min.css">
+    <link rel="shortcut icon" href="../images/domain.png" type="image/x-icon">
+  </head>
+
+  <body>
+
+    <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" id="modal">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="titulo">Modal title</h5>
+            <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button> -->
+          </div>
+          <div class="modal-body" id="corpo">
+            <p>Modal body text goes here.</p>
+          </div>
+          <div class="modal-footer" id="botoes">
+            <button type="button" class="btn btn-primary">Save changes</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" id="matriculaModal">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="tituloMatricula">Ficha de matrícula - PDF</h5>
+            <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button> -->
+          </div>
+          <div class="modal-body" id="corpoMatricula">
+            
+          </div>
+          <div class="modal-footer" id="botoesMatricula">
+            <button type="button" class="btn btn-primary" onclick="window.frames['fichaPdf'].focus(), window.frames['fichaPdf'].print()">Imprimir</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    
+
+          <!-- Inicialização do Firebase -->
+        <!-- update the version number as needed -->
+        <script defer src="/__/firebase/8.2.3/firebase-app.js"></script>
+        <!-- include only the Firebase features as you need -->
+        <script defer src="/__/firebase/8.2.3/firebase-auth.js"></script>
+        <script defer src="/__/firebase/8.2.3/firebase-database.js"></script>
+        <!-- <script defer src="/__/firebase/8.2.3/firebase-firestore.js"></script> -->
+        <script defer src="/__/firebase/8.2.3/firebase-functions.js"></script>
+        <!-- <script defer src="/__/firebase/8.2.3/firebase-messaging.js"></script> -->
+        <script defer src="/__/firebase/8.2.3/firebase-storage.js"></script>
+        <script defer src="/__/firebase/8.2.3/firebase-analytics.js"></script>
+        <!-- <script defer src="/__/firebase/8.1.1/firebase-remote-config.js"></script> -->
+        <script defer src="/__/firebase/8.2.3/firebase-performance.js"></script>
+        <!-- 
+          initialize the SDK after all desired features are loaded, set useEmulator to false
+          to avoid connecting the SDK to running emulators.
+        -->
+        <script defer src="/__/firebase/init.js"></script>
+        
+        <nav class="navbar navbar-light navbar-expand-lg sticky-top bg-light flex-md-nowrap p-0">
+        <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="../">Portal do Aluno</a>
+        <ul class="navbar-nav">
+          <li class="nav-item dropdown active navbar-toggler" class="" type="button" data-toggle="collapse">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              &nbsp;&nbsp;Aluno
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <ul class="nav flex-column">
+                <li class="nav-item">
+                  <a class="nav-link active" data-toggle="list" href="#abaDashboard" role="tab" aria-controls="home">
+                    <span data-feather="home"></span>
+                    Início <span class="sr-only">(current)</span>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" data-toggle="list" href="#abaAlunos" role="tab" aria-controls="alunos" id="btnAbaAlunosResponsivo" onclick="abreDadosDoAluno()">
+                    <span data-feather="users" ></span>
+                    Meus dados e notas
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" data-toggle="list" href="#abaTurmas" role="tab" aria-controls="turmas" onclick="carregaTurmas()" id="btnAbaTurmasMobile">
+                    <span data-feather="database"></span>
+                    Turmas
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </li>
+        </ul>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+          &nbsp;<ul class="navbar-nav">
+            <li class="nav-item">
+              <a class="nav-link" href="../">&nbsp;&nbsp;Ajuda </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../login.html">&nbsp;&nbsp;Contato da escola</a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+      <!-- Loader -->
+      
+<div id="loader" class="window-loader">
+  <label id="loaderMsg" class="text-white-50 bg-dark">Aguarde...</label>
+    <div class="loader"></div>
+</div>
+
+    <div class="container-fluid">
+      <div class="row">
+        <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+          <div class="sidebar-sticky">
+            <ul class="nav flex-column">
+              <li class="nav-item">
+                <a class="nav-link active" data-toggle="list" href="#abaDashboard" role="tab" aria-controls="home">
+                  <span data-feather="home"></span>
+                  Início <span class="sr-only">(current)</span>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" data-toggle="list" href="#abaAlunos" role="tab" aria-controls="alunos" id="btnAbaAlunos" onclick="abreDadosDoAluno()">
+                  <span data-feather="user" ></span>
+                  Dados e notas
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" data-toggle="list" href="#abaTurmas" role="tab" aria-controls="turmas" id="btnAbaTurmas" onclick="carregaTurmas()">
+                  <span data-feather="database"></span>
+                  Turmas
+                </a>
+              </li>
+            </ul>
+
+            <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+              <span>Follow Ups</span>
+              <a class="d-flex align-items-center text-muted" href="#" onclick="criarChat()">
+                <span data-feather="plus-circle"></span>
+              </a>
+            </h6>
+            
+            
+            
+          </div>
+        </nav>
+       
+
+        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+            <h1 class="h2">Portal do Aluno</h1>
+            <div class="btn-toolbar mb-2 mb-md-0">
+              <!--<div class="btn-group mr-2">
+                <button class="btn btn-sm btn-outline-secondary">Share</button>
+                <button class="btn btn-sm btn-outline-secondary">Export</button>
+              </div>
+              <button class="btn btn-sm btn-outline-secondary dropdown-toggle">
+                <span data-feather="calendar"></span>
+                This week
+              </button>-->
+              <label for="profilePic" class="text-muted float-right" id="username"></label>
+              <a class="btn" href="../login.html"><img src="../images/profile_placeholder.png" class="rounded float-right" width="40px" id="profilePic"></a>
+            </div>
+          </div>
+
+          <div class="container" onload="carregaDadosParaDashboard()">
+            <!--<button type="button" class="btn btn-light btn-sm">
+              Alunos cadastrados <span class="badge badge-primary" id="alunosCadastradosNum">0</span>
+            </button>-->
+            <button type="button" class="btn btn-light btn-sm" onclick="document.getElementById('btnAbaAlunos').click()">
+              Alunos matriculados <span class="badge badge-success" id="alunosMatriculadosNum">0</span>
+            </button>
+            <button type="button" class="btn btn-light btn-sm" onclick="document.getElementById('btnAbaAlunosDesativados').click()">
+              Alunos Desativados <span class="badge badge-danger" id="alunosDesativadosNum">0</span>
+            </button>
+            <button type="button" class="btn btn-light btn-sm" onclick="document.getElementById('btnAbaTurmas').click()">
+              Turmas Cadastradas <span class="badge badge-success" id="turmasCadastradasNum">0</span>
+            </button>
+            
+          </div>
+          <hr>
+          <!-- Gráfico -->
+          <!-- <canvas class="my-4" id="myChart" width="900" height="380"></canvas> -->
+          <div class="tab-content" id="nav-tabContent">
+            <div class="container tab-pane fade show active" id="abaInicio" role="tabpanel" aria-labelledby="Dashboard">
+              <div class="row">
+                <div class="col-sm-auto">
+                  <h2>Minhas turmas</h2>
+                  <div class="overflow-auto" style="height: fit-content; max-height: 300px;">
+                    <div class="list-group" id="listaTurmasProf">
+                      
+                    </div>
+                  </div>
+                </div>
+                <div class="col">
+                  <h2>Notificações da escola</h2>
+                  <div class="overflow-auto" style="height: fit-content; max-height: 300px;">
+                    <div class="list-group" id="listaAniversarios">
+                      
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="container tab-pane fade" id="abaAlunos" role="tabpanel" aria-labelledby="Alunos">
+              <label class="h3">Meus dados e notas</label>
+              <br>
+              
+              <div class="container" id="infoDoAluno">
+                <div class="main-body">
+                      <div class="row gutters-sm">
+                        <div class="col-md-4 mb-3">
+                          <div class="card">
+                            <div class="card-body">
+                              <div class="d-flex flex-column align-items-center text-center">
+                                <img src="../images/profile_placeholder.png" alt="Imagem do aluno" class="rounded-circle" width="150" id="mostraFotoAluno">
+                                
+                                <div class="mt-3">
+                                  <label id="alunoDesativado" style="color: red; display: none">Desativado</label>
+                                  <h4 id="mostraNomeAluno">Nome</h4>
+                                  <p class="text-secondary mb-1" id="mostraIdadeAluno">Idade</p>
+                                  <input type="text" id="rolaTelaAbaixoAlunos" style="display: none;">
+                                  <label class="text-secondary mb-1" id="mostraTurmaAluno">Turma</label>
+                                  <p class="text-muted font-size-sm" id="mostraHoraEDiasAluno">Horário e dia de aula</p>
+                                  <button class="btn btn-primary" onclick="followUpAluno(`${document.getElementById('mostraMatriculaAluno').innerText}`)">Follow Up</button>
+                                  <button class="btn btn-outline-primary" onclick="mostraDadosResponsaveis()">Responsáveis</button>
+                                  <br><br>
+                                  
+                                  
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="card mt-3">
+                            <ul class="list-group list-group-flush">
+                              <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                                <h6 class="mb-0"><span data-feather="file-text"></span> CPF</h6>
+                                <span class="text-secondary" id="mostraCpfAluno">CPF do Aluno</span>
+                              </li>
+                              <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                                <h6 class="mb-0"><span data-feather="clipboard"></span> RG</h6>
+                                <span class="text-secondary" id="mostraRgAluno">RG do Aluno</span>
+                              </li>
+                              <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                                <h6 class="mb-0"><span data-feather="calendar"></span> Data de Nasc.</h6>
+                                <span class="text-secondary" id="mostraDataNascimentoAluno">Data do Aluno</span>
+                              </li>
+                              <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                                <a href="#turmasQueParticipa" id="turmasQueParticipa" onclick="historicoAluno(`${document.getElementById('mostraMatriculaAluno').innerText}`, `${document.getElementById('mostraTurmaAluno').innerText}`)" style="text-decoration: none;"><h6 class="mb-0"><span data-feather="file-text"></span> Histórico do aluno</h6></a>
+                                <span class="text-secondary"></span>
+                              </li>
+                              <!--<li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                                <h6 class="mb-0"><span data-feather="file-text"></span>...</h6>
+                                <span class="text-secondary">...</span>
+                              </li>-->
+                            </ul>
+                          </div>
+                        </div>
+                        <div class="col-md-8">
+                          <div class="card mb-3">
+                            <div class="card-body">
+                              <div class="row">
+                                <div class="col-sm-3">
+                                  <h6 class="mb-0">Matrícula</h6>
+                                </div>
+                                <div class="col-sm-9 text-secondary" id="mostraMatriculaAluno">
+                                  00000
+                                </div>
+                              </div>
+                              <hr>
+                              <div class="row">
+                                <div class="col-sm-3">
+                                  <h6 class="mb-0">E-mail</h6>
+                                </div>
+                                <div class="col-sm-9 text-secondary" id="mostraEmailAluno">
+                                  exemplo@email.com
+                                </div>
+                              </div>
+                              <hr>
+                              <div class="row">
+                                <div class="col-sm-3">
+                                  <h6 class="mb-0">Telefone</h6>
+                                </div>
+                                <div class="col-sm-9 text-secondary" id="mostraTelefoneAluno">
+                                  XXXXXXXXXXX
+                                </div>
+                              </div>
+                              <hr>
+                              <div class="row">
+                                <div class="col-sm-3">
+                                  <h6 class="mb-0">Mobile</h6>
+                                </div>
+                                <div class="col-sm-9 text-secondary" id="mostraCelularAluno">
+                                  XXXXXXXXXXX
+                                </div>
+                              </div>
+                              <hr>
+                              <div class="row">
+                                <div class="col-sm-3">
+                                  <h6 class="mb-0">Endereço</h6>
+                                </div>
+                                <div class="col-sm-9 text-secondary" id="mostraEnderecoAluno">
+                                  Rua, Bairro, Cidade, Estado, Número
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="row gutters-sm">
+                            <div class="col-sm-6 mb-3">
+                              <div class="card h-100">
+                                <div class="card-body">
+                                  <h6 class="d-flex align-items-center mb-3"><i class="material-icons text-info mr-2">Desempenho</i>do aluno &nbsp;<span data-feather="edit" onclick="lancaDesempenho(`${document.getElementById('mostraMatriculaAluno').innerText}`, `${document.getElementById('mostraTurmaAluno').innerText}`)"></span></h6>
+                                  <div id="desempenhoAluno">
+                                    <small>Audição</small>
+                                    <small id="pontosAudicao">1</small>
+                                    <div class="progress mb-3" style="height: 10px">
+                                      <div class="progress-bar bg-primary" id="barraPontosAudicao" role="progressbar" style="width: 80%" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                    <small>Fala</small>
+                                    <small id="pontosFala">1</small>
+                                    <div class="progress mb-3" style="height: 10px">
+                                      <div class="progress-bar bg-primary" id="barraPontosFala" role="progressbar" style="width: 72%" aria-valuenow="72" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                    <small>Escrita</small>
+                                    <small id="pontosEscrita">1</small>
+                                    <div class="progress mb-3" style="height: 10px">
+                                      <div class="progress-bar bg-primary" id="barraPontosEscrita" role="progressbar" style="width: 89%" aria-valuenow="89" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                    <small>Leitura</small>
+                                    <small id="pontosLeitura">1</small>
+                                    <div class="progress mb-3" style="height: 10px">
+                                      <div class="progress-bar bg-primary" id="barraPontosLeitura" role="progressbar" style="width: 55%" aria-valuenow="55" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                  </div>
+                                  
+                                  
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col-sm-6 mb-3">
+                              <div class="card h-100">
+                                <div class="card-body">
+                                  <h6 class="d-flex align-items-center mb-3"><i class="material-icons text-info mr-2">Notas</i>do aluno &nbsp;<span data-feather="edit" onclick="editaNotasAluno(`${document.getElementById('mostraMatriculaAluno').innerText}`, `${document.getElementById('mostraTurmaAluno').innerText}`)"></span></h6>
+                                  <div id="notasDoAluno">
+                                    <small id="nomeNota">...</small>
+                                    <div class="progress mb-3" style="height: 5px">
+                                      <div class="progress-bar bg-primary" role="progressbar" style="width: 80%" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                  </div>
+                                  
+                                  
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <hr>
+                    <p class="text-muted float-md-right" id="timestampDoAluno"></p>
+                    <br>
+                    <hr>
+                    <label class="h5">Frequências lançadas</label>
+                    <div class="row">
+                      <div class="col">
+                        <div id="divFrequencias">
+                          <div class="row justify-content-start">
+                            <div class="col-3" style="background-color: rgba(86,61,124,.15);border: 1px solid rgba(86,61,124,.2);">Column</div>
+                            <div class="col-3" style="background-color: rgba(86,61,124,.15);border: 1px solid rgba(86,61,124,.2);">Column</div>
+                            
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col">
+                        <div id="divTotalFrequencias">Total de presenças: <label id="totalFrequencias"></label> de <label id="qtdeAulasFrequencia"></label><br> Percentual de frequência atual em <label id="porcentagemFrequencia"></label></div>
+                      </div>
+                    </div>
+                    
+                    
+                    <hr>
+                    <label class="h5">Histórico de operações</label>
+                    <br>
+                    <div class="col">
+                      <div class="container">
+                        <div class="row">
+                          <div class="form-group col-auto">
+                            <label for="inputAddress">Campo de busca</label>
+                            <input class="form-control" type="search" placeholder="Digite a busca..." aria-label="Search" onchange="carregaListaDeAlunos(maiusculo(this))">
+                          </div>
+                          <div class="form-group col-auto">
+                            <label for="inputAddress">Buscar por:</label>
+                            <select class="form-control" name="tipoDeBusca" id="tipoDeBuscaHistoricoAluno" onchange="alteraTipoDeBusca(this.value)">
+                              <option selected value="nomeAluno">Nome do aluno</option>
+                              <option value="matriculaAluno">Número de matrícula</option>
+                              <option value="cpfAluno">CPF do aluno</option>
+                              <option value="rgAluno">RG do aluno</option>
+                              <option value="emailAluno">E-mail do aluno</option>
+                              <option value="celularAluno">Celular do aluno</option>
+                              <option value="telefoneAluno">Telefone do aluno</option>
+                            </select>
+                            
+                          </div>
+                        </div> 
+                      </div>
+                      <div class="overflow-auto" style="height: fit-content; max-height: 280px;">
+                        <div class="list-group" id="listaHistoricoAluno">
+                          
+                        </div>
+                      </div>
+                  </div>
+              </div>
+            </div>
+
+            <div class="container tab-pane fade" id="abaTurmas" role="tabpanel" aria-labelledby="Turmas">
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <label class="input-group-text" for="inputGroupSelect01">Turmas</label>
+                </div>
+                <select class="custom-select" id="selectTurmas" onchange="abreTurma(this.value)" style="visibility: hidden;">
+                  <option selected hidden>Escolha uma turma...</option>
+                </select>
+              </div>
+              <div class="container" id="areaInfoTurma" style="visibility: hidden;">
+                <label class="h3" id="infoTurma">Turma</label>
+                <label class="text-muted float-right h5" id="codigoDaTurma"></label>
+                <div class="row">
+                  <div class="col-md-auto">
+                    <h6>Faixa etária</h6>
+                    <div class="row">
+                      &nbsp;&nbsp;&nbsp;<div class="list-group" id="mostraFaixa" role="tablist">
+                        <a class="list-group-item list-group-item-action" data-toggle="list" id="nivelKIDS" href="#kids" role="tab" onclick="faixa('KIDS')">KIDS</a>
+                        <a class="list-group-item list-group-item-action" data-toggle="list" id="nivelT" href="#teens" role="tab" onclick="faixa('T')">TEENS</a>
+                        <a class="list-group-item list-group-item-action" data-toggle="list" id="nivelA" href="#adults" role="tab" onclick="faixa('A')">ADULTS</a>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-auto">
+                    <label id="mostraDiasTurma"></label>
+                    <br>
+                    <label id="mostraHorarioTurma"></label>
+                    <br>
+                    <label id="mostraLivrosTurma"></label>
+                  </div>
+                  <div class="col-lg">
+                    <div>
+                      <label>Professores cadastrados na turma:</label> <br>
+                      <div id="mostraProfessoresCadastrados" class="items-container"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="container">
+                  <div class="row">
+                    <div class="form-group col-auto">
+                      <label for="inputAddress">Campo de busca</label>
+                      <input class="form-control" type="search" placeholder="Digite a busca..." aria-label="Search" onchange="carregaListaDeAlunosDaTurma(`${document.getElementById('selectTurmas').value}`, maiusculo(this))">
+                    </div>
+                    <div class="form-group col-auto">
+                      <label for="inputAddress">Buscar por:</label>
+                      <select class="form-control" name="tipoDeBuscaDaTurma" id="tipoDeBuscaDaTurma" onchange="alteraTipoDeBusca(this.value)">
+                        <option selected value="nome">Nome do aluno</option>
+                      </select>
+                      
+                    </div>
+                  </div> 
+                </div>
+                <label>Alunos cadastrados na turma: (Selecione alunos para fazer lançamentos ou clique em um aluno para ver sua ficha)</label><br>
+                <input type="checkbox" id="selecTodos" onclick="selecionaTodos(this)">
+                <label for="selecTodos">Selecionar todos</label>
+                <div class="overflow-auto" style="height: fit-content; max-height: 280px;">
+                  <div class="list-group" id="listaAlunosDaTurma" style="width: 90%;">
+                    
+                  </div>
+                </div>
+                <br><br>
+                <button type="button" class="btn btn-primary" id="btnLancaFrequencia" onclick="lancaFrequencia()" disabled>Lançar frequência</button>
+                <button type="button" class="btn btn-info" id="btnLancaNotas" disabled onclick="lancaNotas()">Lançar Notas</button>
+                <button type="button" class="btn btn-secondary" id="btnDistribuiNotas" onclick="distribuiNotas()">Distribuir notas</button>
+                <button type="button" class="btn btn-success" id="btnIniciaPeriodo" onclick="iniciaPeriodo()">Iniciar turma</button>
+                <button type="button" class="btn btn-warning" id="btnFechaPeriodo" onclick="fechaPeriodo()">Fechar turma</button>
+                <hr>
+                <p class="text-muted justify-content-end" id="timestampTurmaCadastrada"></p>
+                <hr>
+                <label class="h5" id="tituloMapaFrequencias">Mapa de frequências da Turma</label>
+                <div id="divTotalFrequencias">Total de frequências lançadas: <label id="totalFrequenciasTurma"></label> de <label id="qtdeAulasFrequenciaTurma"></label><br> Percentual de frequência lançada em <label id="porcentagemFrequenciaTurma"></label></div>
+                <div id="divMapaFrequenciasTurma">
+                  <div class="row justify-content-start">
+                    <div class="col-3" style="background-color: rgba(86,61,124,.15);border: 1px solid rgba(86,61,124,.2);">Column</div>
+                    <div class="col" style="background-color: rgba(86,61,124,.15);border: 1px solid rgba(86,61,124,.2);">Column</div>
+                    
+                  </div>
+                </div>
+                
+                <hr>
+              </div>
+            </div>
+
+          </div>
+
+          
+          
+        </main>
+      </div>
+    </div>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <!--<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>-->
+    <script src="../resources/jQuery/jquery-3.2.1.slim.min.js"></script>
+    <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery-slim.min.js"><\/script>')</script>
+    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>-->
+    <script src="../resources/popper/popper.min.js"></script>
+    <script src="../resources/bootstrap/js/bootstrap.min.js"></script>
+
+    <!-- Packages for jsPDF -->
+    <script src="../resources/jsPDF/dist/jspdf.min.js"></script>
+    
+    <!-- Icons -->
+    <script src="../resources/feather-icons/dist/feather.min.js"></script>
+    <script>
+      feather.replace()
+    </script>
+    <script defer src="../js/aluno.js"></script>
+    <script defer src="../js/app.js"></script>
+    <script defer src="../js/chat.js"></script>
+    <!-- Carregando outros arquivos da biblioteca AST-Notif. Créditos: https://github.com/anandastoon/AST-Notif -->
+    <script defer src="../resources/AST-Notif/js/ast-notif.min.js"></script>
+
+
+    <!-- Graphs 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
+    <script>
+      var ctx = document.getElementById("myChart");
+      var myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+          datasets: [{
+            data: [15339, 21345, 18483, 24003, 23489, 24092, 12034],
+            lineTension: 0,
+            backgroundColor: 'transparent',
+            borderColor: '#007bff',
+            borderWidth: 4,
+            pointBackgroundColor: '#007bff'
+          }]
+        },
+        options: {
+          scales: {
+            yAxes: [{
+              ticks: {
+                beginAtZero: false
+              }
+            }]
+          },
+          legend: {
+            display: false,
+          }
+        }
+      });
+    </script> -->
+  </body>
+</html>

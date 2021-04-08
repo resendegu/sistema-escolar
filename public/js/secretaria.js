@@ -842,6 +842,7 @@ document.querySelector('#formCadastroAluno').addEventListener('submit', (e) => {
     dadosAluno.emailAluno = dados.get('emailAluno')
     dadosAluno.rgAluno = dados.get('rgAluno')
     dadosAluno.cpfAluno = dados.get('cpfAluno')
+    dadosAluno.senhaAluno = dados.get('senhaAluno')
     // Dados para o curso
     dadosAluno.turmaAluno = dados.get('turmaAluno')
     dadosAluno.profAluno = dados.get('profAluno')

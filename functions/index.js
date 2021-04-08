@@ -98,6 +98,22 @@ exports.deletaUsersAutomatico = functions.auth.user().onDelete((user) => {
     })
 })
 
+exports.criaContaAluno = functions.database.ref('sistemaEscolar/alunos/{registro}').onWrite((snapshot, context) => {
+    var aluno = snapshot.after.val()
+    admin.auth().createUser({
+        uid: aluno.matriculaAluno,
+        email: aluno.emailAluno,
+        emailVerified: false,
+        password: aluno.senhaAluno,
+        displayName: aluno.nomeAluno,
+        phoneNumber: "+55" + aluno.celularAluno
+    }).then(() => {
+
+    }).catch(error => {
+        throw new functions.https.HttpsError('unknown', error.message, error)
+    })
+})
+
 exports.cadastroUser = functions.auth.user().onCreate((user) => { 
     var dadosNoBanco = admin.database().ref(`sistemaEscolar/usuarios/${user.uid}/`)
     var listaDeUsers = admin.database().ref(`sistemaEscolar/listaDeUsuarios`)
@@ -118,7 +134,8 @@ exports.cadastroUser = functions.auth.user().onCreate((user) => {
             master: false,
             adm: false,
             secretaria: false,
-            professores: false
+            professores: false,
+            aluno: false
         },
         email: user.email
     }).then(() => {
@@ -133,7 +150,8 @@ exports.cadastroUser = functions.auth.user().onCreate((user) => {
                 master: false,
                 adm: false,
                 secretaria: false,
-                professores: false
+                professores: false,
+                aluno: false
             }
         }
         var lista = snapshot.val()
@@ -147,7 +165,21 @@ exports.cadastroUser = functions.auth.user().onCreate((user) => {
                 master: true,
                 adm: false,
                 secretria: false,
-                professores: false
+                professores: false,
+                aluno: false
+            }
+        } else if (user.uid.length == 5){
+            listaDeUsers.child(user.uid + '/acessos/aluno').set(true).then(() => {
+
+            }).catch(error => {
+                throw new functions.https.HttpsError('unknown', error.message)
+            })
+            acessosObj = {
+                master: false,
+                adm: false,
+                secretria: false,
+                professores: false,
+                aluno: true,
             }
         }
         admin.auth().setCustomUserClaims(user.uid, acessosObj).then(() => {
