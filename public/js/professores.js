@@ -737,49 +737,55 @@ function selecionaTodos(source) {
 var matriculas = {}
 function lancaFrequencia(alunos={}, turma="", data='', confirma=false) {
     if (confirma) {
-        loader.style.display = 'block'
-        loaderMsg.innerText = 'Lançando frequências...'
-        console.log(data)
-        
+        if (data != '') {
+            loader.style.display = 'block'
+            loaderMsg.innerText = 'Lançando frequências...'
+            console.log(data)
+            
 
-        turmasRef.child(turma + '/frequencia/' + data).set(alunos).then(() => {
-            async function frequenciaAluno() {
-                for (const matricula in alunos) {
-                    if (Object.hasOwnProperty.call(alunos, matricula)) {
-                        const aluno = alunos[matricula];
-                        turmasRef.child(turma + '/alunos/' + formataNumMatricula(matricula) + '/frequencia/' + data).set({turma: turma}).then(() => {
-                            
-    
-                            
-                        }).catch(error => {
-                            AstNotif.dialog('Erro', error.message)
-                            loader.style.display = 'none'
-                            console.log(error)
-                        })
+            turmasRef.child(turma + '/frequencia/' + data).set(alunos).then(() => {
+                async function frequenciaAluno() {
+                    for (const matricula in alunos) {
+                        if (Object.hasOwnProperty.call(alunos, matricula)) {
+                            const aluno = alunos[matricula];
+                            turmasRef.child(turma + '/alunos/' + formataNumMatricula(matricula) + '/frequencia/' + data).set({turma: turma}).then(() => {
+                                
+        
+                                
+                            }).catch(error => {
+                                AstNotif.dialog('Erro', error.message)
+                                loader.style.display = 'none'
+                                console.log(error)
+                            })
+                        }
                     }
                 }
-            }
 
-            frequenciaAluno().then(() => {
-                AstNotif.dialog('Sucesso', 'As frequências foram lançadas com sucesso!')
-                carregaFrequenciaTurma(turma)
+                frequenciaAluno().then(() => {
+                    AstNotif.dialog('Sucesso', 'As frequências foram lançadas com sucesso!')
+                    carregaFrequenciaTurma(turma)
+                    loader.style.display = 'none'
+                }).catch(error => {
+                    AstNotif.dialog('Erro', error.message)
+                    console.log(error)
+                })
+                
+                
                 loader.style.display = 'none'
             }).catch(error => {
                 AstNotif.dialog('Erro', error.message)
                 console.log(error)
+                loader.style.display = 'none'
             })
-            
-            
-            loader.style.display = 'none'
-        }).catch(error => {
-            AstNotif.dialog('Erro', error.message)
-            console.log(error)
-            loader.style.display = 'none'
-        })
+        } else {
+            AstNotif.dialog('Você não completou o campo data/hora', 'Por favor, defina dia e a hora que a frequência deve ser registrada.')
+        }
+        
     } else {
         let nomes = ''
         
         let turma
+        matriculas = {}
         for (const matricula in alunosSelecionadosTurma) {
             if (Object.hasOwnProperty.call(alunosSelecionadosTurma, matricula)) {
                 const aluno = alunosSelecionadosTurma[matricula];
@@ -794,9 +800,9 @@ function lancaFrequencia(alunos={}, turma="", data='', confirma=false) {
                 
             }
         }
-        abrirModal('modal', 'Lançamento de freqêuncia', 
-            `Você selecionou os alunos listados abaixo da turma ${turma}. <br> ${nomes} <br><b>Você deseja lançar frequências para esses alunos para que dia?</b><br>
-            <input type="date" class="form-control" name="dataFrequencia" id="dataFrequencia">
+        abrirModal('modal', 'Lançamento de frequência', 
+            `Você selecionou os alunos listados abaixo da turma ${turma}. <br> ${nomes} <br><b>Escolha o dia e a hora que deseja lançar frequência.</b> (Por favor, lançe todos os dados corretamente)<br>
+            <input type="datetime-local" class="form-control" name="dataFrequencia" id="dataFrequencia">
             `
             , `<button type="button" data-toggle="tooltip" data-placement="top" title="Lançar frequência para os alunos selecionados" class="btn btn-primary" onclick="lancaFrequencia(matriculas,'${turma}', document.getElementById('dataFrequencia').value, true)">Lançar</button><button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>`
         )
@@ -819,10 +825,46 @@ function lancaFrequencia(alunos={}, turma="", data='', confirma=false) {
     
 }
 
+function deletaFrequencia(chave, turma) {
+    async function deletaIndividual(matricula) {
+        return turmasRef.child(`${turma}/alunos/${formataNumMatricula(matricula)}/frequencia/${chave}`).remove().then(()=> {
+            return true
+        }).catch(error => {
+            throw new Error(error.message)
+        }) 
+    }
+    turmasRef.child(turma + '/frequencia/' + chave).once('value').then(alunosLancados => {
+        for (const matricula in alunosLancados.val()) {
+            if (Object.hasOwnProperty.call(alunosLancados.val(), matricula)) {
+                const nome = alunosLancados.val()[matricula];
+                deletaIndividual(matricula).then(result => {
+                    console.log(result)
+                }).catch(error => {
+                    AstNotif.dialog('Erro', error.message)
+                    console.log(error)
+                })
+            }
+        }
+        turmasRef.child(turma + '/frequencia/' + chave).remove().then(() => {
+            AstNotif.notify('Sucesso', 'Frequência deletada com sucesso')
+            carregaFrequenciaTurma(alunosSelecionadosTurma.codTurma)
+        }).catch(error => {
+            AstNotif.dialog('Erro', error.message)
+        })
+
+        
+    }).catch(error => {
+        AstNotif.dialog('Erro', error.message)
+        console.log(error)
+    })
+}
+
 function carregaFrequenciaTurma(turma) {
     let divMapaFrequenciasTurma = document.getElementById('divMapaFrequenciasTurma')
     divMapaFrequenciasTurma.innerHTML = 'Nenhuma frequência foi lançada nesta turma'
     let c = 0
+    document.getElementById('totalFrequenciasTurma').innerText = c
+    document.getElementById('porcentagemFrequenciaTurma').innerText = 0 + '%'
     let qtdeAulas
     turmasRef.child(turma + '/status/qtdeAulas').once('value').then(qtdeDeAulas => {
         qtdeAulasFrequencia.innerText = qtdeDeAulas.val()
@@ -839,16 +881,18 @@ function carregaFrequenciaTurma(turma) {
                     alunosPresentes += formataNumMatricula(matricula) + ': ' + nome.split(' ')[0] + " | "
                 }
             }
-    
+            let diaFrequencia = frequencia.key.split('T')[0]
+            let horaFrequencia = frequencia.key.split('T')[1]
             divMapaFrequenciasTurma.innerHTML += `
             <div class="row justify-content-start">
-                <div class="col-auto" style="background-color: rgba(86,61,124,.15);border: 1px solid rgba(86,61,124,.2);">${frequencia.key.split('-').reverse().join('/')}</div>
+                <div class="col-auto" style="background-color: rgba(86,61,124,.15);border: 1px solid rgba(86,61,124,.2);"><a href="#tituloMapaFrequencias" onclick="deletaFrequencia('${frequencia.key}', '${alunosSelecionadosTurma.codTurma}')"><span data-feather="trash"></span></a>&nbsp;${diaFrequencia.split('-').reverse().join('/')} ás ${horaFrequencia}</div>
                 <div class="col" style="background-color: rgba(86,61,124,.15);border: 1px solid rgba(86,61,124,.2);">${alunosPresentes}</div>
             </div>
             `
+            feather.replace()
             c++
             document.getElementById('totalFrequenciasTurma').innerText = c
-            document.getElementById('porcentagemFrequenciaTurma').innerText = (100*parseInt(c))/parseInt(qtdeAulas) + '%'
+            document.getElementById('porcentagemFrequenciaTurma').innerText = ((100*parseInt(c))/parseInt(qtdeAulas)).toFixed(2) + '%'
         })
     }).catch(error => {
         AstNotif.dialog('Erro', error.message)
@@ -964,17 +1008,23 @@ function carregaFrequenciaAluno(matricula, turma) {
                 divFrequencias.innerHTML = ''
             }
             if (frequencia.val().turma == turma) {
-                divFrequencias.innerHTML += `
-                <div class="row justify-content-center">
-                    <div class="col-3" style="background-color: rgba(86,61,124,.15);border: 1px solid rgba(86,61,124,.2);">${frequencia.key.split('-').reverse().join('/')}</div>
-                    <div class="col-3" style="background-color: rgba(86,61,124,.15);border: 1px solid rgba(86,61,124,.2);">Presente</div>
-            </div>
+                let diaFrequencia = frequencia.key.split('T')[0]
+                let horaFrequencia = frequencia.key.split('T')[1]
+                divMapaFrequenciasTurma.innerHTML += `
+                <div class="row justify-content-start">
+                    <div class="col-auto" style="background-color: rgba(86,61,124,.15);border: 1px solid rgba(86,61,124,.2);"><span data-feather="trash" data-toggle="tooltip" data-placement="top" title="Deletar frequência"></span>&nbsp;${diaFrequencia.split('-').reverse().join('/')} ás ${horaFrequencia}</div>
+                    <div class="col" style="background-color: rgba(86,61,124,.15);border: 1px solid rgba(86,61,124,.2);">${alunosPresentes}</div>
+                </div>
                 `
+                feather.replace()
+                $(function () {
+                    $('[data-toggle="tooltip"]').tooltip()
+                })
             }
             c++
             document.getElementById('totalFrequencias').innerText = c
             console.log(qtdeAulas)
-            document.getElementById('porcentagemFrequencia').innerText = (100*parseInt(c))/parseInt(qtdeAulas) + '%'
+            document.getElementById('porcentagemFrequencia').innerText = ((100*parseInt(c))/parseInt(qtdeAulas)).toFixed(2) + '%'
         })
     }).catch(error => {
         AstNotif.dialog('Erro', error.message)
