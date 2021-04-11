@@ -27,7 +27,7 @@ var alunos = {}
 firebase.auth().onAuthStateChanged((user) => {
     update()
     if (user == null) {
-        loader.style.display = 'none'
+        loaderRun()
         AstNotif.dialog('Login não identificado', 'Você não está logado, vá para a tela de <a href="../login.html">login</a> para logar ou se cadastrar.')
     } else {
         usuarioRef.child(user.uid).once('value').then(snapshot => {
@@ -93,7 +93,7 @@ firebase.auth().onAuthStateChanged((user) => {
                     document.getElementById('listaAniversarios').innerHTML += `<button class="list-group-item list-group-item-action">${aniversario.nome} no dia ${aniversario.dataNascimento.dia}</button>`
                 }
             }
-            loader.style.display = 'none'
+            loaderRun()
         })
     }
     
@@ -112,7 +112,7 @@ function carregaListaDeAlunos(filtro='') {
                 document.getElementById('listaAlunos').innerHTML += `<button class="list-group-item list-group-item-action" onclick="abreDadosDoAluno('${matricula}')">${matricula}: ${aluno.nomeAluno} (${aluno.turmaAluno})</button>`
             }
         }
-        loader.style.display = 'none'
+        loaderRun()
     } else {
         
     }
@@ -142,9 +142,9 @@ function carregaTurmas() {
                     }
                     selectTurmas.innerHTML += `<option value="${snapshot.key}">Turma ${snapshot.key} (Prof. ${profReferencia})</option>`
                     document.getElementById('selectTurmas').style.visibility = 'visible'
-                    loader.style.display = 'none'
+                    loaderRun()
                 }).catch(error => {
-                    loader.style.display = 'none'
+                    loaderRun()
                     console.error(error)
                     AstNotif.dialog('Erro', error.message)
                 })
@@ -177,7 +177,7 @@ function carregaListaDeAlunosDaTurma(turma, filtro='') {
                 }
                 
             }
-            loader.style.display = 'none'
+            loaderRun()
         }).catch(error => {
             console.log(error)
             AstNotif.dialog('Erro', error.message)
@@ -192,7 +192,7 @@ function carregaListaDeAlunosDaTurma(turma, filtro='') {
                     document.getElementById('listaAlunosDaTurma').innerHTML += `<div class="row"><div class="col-sm-1"><input type="checkbox" name="alunosTurma" onclick="this.checked ? alunosSelecionadosTurma[${matricula}] = '${aluno.nome}' : delete alunosSelecionadosTurma[${matricula}], verificaAlunosSelecionados()"></div><div class="col-md"><button class="list-group-item list-group-item-action" onclick="document.getElementById('btnAbaAlunos').click(), document.getElementById('btnAbaAlunosResponsivo').click(), abreDadosDoAluno('${matricula}') "> ${matricula}: ${aluno.nome}</button></div></div>`
                 }
             }
-            loader.style.display = 'none'
+            loaderRun()
         }).catch(error => {
             console.log(error)
             AstNotif.dialog('Erro', error.message)
@@ -244,15 +244,15 @@ function iniciaPeriodo(confirma=false, inicio='', fim='', qtdeAulas='') {
         loaderMsg.innerText = 'Iniciando turma...'
         if (inicio == '' || fim == '' || qtdeAulas == '') {
             AstNotif.dialog('Você esqueceu alguns dados...', 'Por favor preencha todos os dados pedidos para iniciar a turma')
-            loader.style.display = 'none'
+            loaderRun()
         } else {
             turmasRef.child(alunosSelecionadosTurma.codTurma + '/status').set({turma: 'aberta', inicio: inicio, fim: fim, qtdeAulas: qtdeAulas}).then(()=>{
                 $('#modal').modal('hide')
                 AstNotif.notify('Sucesso', 'Turma aberta')
                 carregaListaDeAlunosDaTurma(alunosSelecionadosTurma.codTurma)
-                loader.style.display = 'none'
+                loaderRun()
             }).catch(error => {
-                loader.style.display = 'none'
+                loaderRun()
                 console.log(error)
                 AstNotif.dialog('Erro', error.message)
             })
@@ -311,26 +311,26 @@ function fechaPeriodo() {
                     var fechaTurma = firebase.functions().httpsCallable('fechaTurma')
                     fechaTurma(alunosSelecionadosTurma.codTurma).then(function(result){
                         AstNotif.dialog('Sucesso', result.data.answer)
-                        loader.style.display = 'none'
+                        loaderRun()
                         $('#modal').modal('hide')
                         abreTurma(alunosSelecionadosTurma.codTurma)
                     }).catch(function(error){
                         AstNotif.dialog('Erro', error.message)
                         console.log(error)
-                        loader.style.display = 'none'
+                        loaderRun()
                     })
                 }).catch(error => {
                     AstNotif.dialog('Erro', error.message)
-                    loader.style.display = 'none'
+                    loaderRun()
                 })
                 
             })
 
-            loader.style.display = 'none'
+            loaderRun()
         }).catch(error => {
             AstNotif.dialog('Erro', error.message)
             console.log(error)
-            loader.style.display = 'none'
+            loaderRun()
         })
 
 
@@ -386,9 +386,9 @@ function lancaNotas(confirma=false) {
         lancarNotas({alunos: alunosSelec, turma: alunosSelecionadosTurma.codTurma, notas: notasParaLancar}).then(function(result){
             AstNotif.notify('Sucesso', result.data.answer)
             $('#modal').modal('hide')
-            loader.style.display = 'none'
+            loaderRun()
         }).catch(function(error){
-            loader.style.display = 'none'
+            loaderRun()
             AstNotif.dialog('Erro', error.message)
             console.log(error)
         })
@@ -491,14 +491,14 @@ function lancaNotas(confirma=false) {
                     }
                     
                 }).catch(error => {
-                    loader.style.display = 'none'
+                    loaderRun()
                     AstNotif.dialog('Erro', error.message)
                     console.log(error)
                 })
             }
             feather.replace()
         }).catch(error => {
-            loader.style.display = 'none'
+            loaderRun()
             AstNotif.dialog('Erro', error.message)
             console.log(error)
         })
@@ -616,9 +616,9 @@ function distribuiNotas() {
             feather.replace()
            
 
-            loader.style.display = 'none'
+            loaderRun()
         }).catch(error => {
-            loader.style.display = 'none'
+            loaderRun()
             AstNotif.dialog('Erro', error.message)
             console.log(error)
         })
@@ -679,11 +679,11 @@ function defineNotas() {
         loader.style.display = 'block'
     loaderMsg.innerText = 'Distribuindo notas...'
     turmasRef.child(alunosSelecionadosTurma.codTurma + '/notas').set(notasDistribuidas).then(() => {
-        loader.style.display = 'none'
+        loaderRun()
         $('#modal').modal('hide')
         AstNotif.notify('Sucesso', 'Notas distribuídas!')
     }).catch(error => {
-        loader.style.display = 'none'
+        loaderRun()
         AstNotif.dialog('Erro', error.message)
         console.log(error)
     })
@@ -754,7 +754,7 @@ function lancaFrequencia(alunos={}, turma="", data='', confirma=false) {
                                 
                             }).catch(error => {
                                 AstNotif.dialog('Erro', error.message)
-                                loader.style.display = 'none'
+                                loaderRun()
                                 console.log(error)
                             })
                         }
@@ -764,18 +764,18 @@ function lancaFrequencia(alunos={}, turma="", data='', confirma=false) {
                 frequenciaAluno().then(() => {
                     AstNotif.dialog('Sucesso', 'As frequências foram lançadas com sucesso!')
                     carregaFrequenciaTurma(turma)
-                    loader.style.display = 'none'
+                    loaderRun()
                 }).catch(error => {
                     AstNotif.dialog('Erro', error.message)
                     console.log(error)
                 })
                 
                 
-                loader.style.display = 'none'
+                loaderRun()
             }).catch(error => {
                 AstNotif.dialog('Erro', error.message)
                 console.log(error)
-                loader.style.display = 'none'
+                loaderRun()
             })
         } else {
             AstNotif.dialog('Você não completou o campo data/hora', 'Por favor, defina dia e a hora que a frequência deve ser registrada.')
@@ -953,7 +953,7 @@ function abreTurma(cod) {
                 `
             }
         }
-        loader.style.display = 'none'
+        loaderRun()
         
     })
 }
@@ -977,12 +977,12 @@ function preencheEndereco(numCep) {
             document.getElementById('numeroAluno').focus()
             AstNotif.toast('Dados de endereço preenchidos com sucesso!')
         }
-        loader.style.display = 'none'
+        loaderRun()
         
     }).catch(function(error){
         AstNotif.dialog('Erro ao buscar CEP', error.message)
         console.log(error)
-        loader.style.display = 'none'
+        loaderRun()
     })
 }
 
@@ -1231,9 +1231,9 @@ function lancaNotasDoAluno(turma, matricula) {
     lancarNotas({alunos: alunosSelec, turma: turma, notas: notasParaLancar}).then(function(result){
         AstNotif.dialog('Aguarde...', result.data.answer)
         $('#modal').modal('hide')
-        loader.style.display = 'none'
+        loaderRun()
     }).catch(function(error){
-        loader.style.display = 'none'
+        loaderRun()
         AstNotif.dialog('Erro', error.message)
         console.log(error)
     })
@@ -1244,7 +1244,7 @@ function editaNotasAluno(matricula, turma) {
     loaderMsg.innerText = 'Buscando notas...'
     turmasRef.child(`${turma}/alunos/${matricula}/notas`).once('value').then(notasAluno => {
         turmasRef.child(`${turma}/notas`).once('value').then(notasReferencia => {
-            loader.style.display = 'none'
+            loaderRun()
             let notasDoAluno = notasAluno.val()
             let notasDeReferencia = notasReferencia.val()
             let notasDistribuidas
@@ -1321,12 +1321,12 @@ function editaNotasAluno(matricula, turma) {
 
         }).catch(error => {
             AstNotif.dialog('Erro', error.message)
-            loader.style.display = 'none'
+            loaderRun()
             console.log(error)
         })
     }).catch(error => {
         AstNotif.dialog('Erro', error.message)
-        loader.style.display = 'none'
+        loaderRun()
         console.log(error)
     })
 }
@@ -1346,12 +1346,12 @@ function lancaDesempenho(matricula='', turma='', confirma=false, FALE={}) {
 
         turmasRef.child(`${turma}/alunos/${matricula}/desempenho`).set(notasParaLancar).then(() => {
             $('#modal').modal('hide')
-            loader.style.display = 'none'
+            loaderRun()
             AstNotif.notify('Sucesso', 'Desempenho do aluno alterado com sucesso.')
 
         }).catch(error => {
             AstNotif.dialog('Erro', error.message)
-            loader.style.display = 'none'
+            loaderRun()
             console.log(error)
         })
     } else {
@@ -1359,7 +1359,7 @@ function lancaDesempenho(matricula='', turma='', confirma=false, FALE={}) {
         loaderMsg.innerText = 'Buscando notas...'
         turmasRef.child(`${turma}/alunos/${matricula}/desempenho`).once('value').then(notasAluno => {
             desempenhoRef.once('value').then(referenciaDesempenho => {
-                loader.style.display = 'none'
+                loaderRun()
                 let notasDoAluno = notasAluno.val()
                 let notasDeReferencia = referenciaDesempenho.val()
 
@@ -1413,7 +1413,7 @@ function lancaDesempenho(matricula='', turma='', confirma=false, FALE={}) {
             
         }).catch(error => {
             AstNotif.dialog('Erro', error.message)
-            loader.style.display = 'none'
+            loaderRun()
             console.log(error)
         })
     }
@@ -1434,10 +1434,10 @@ function historicoAluno(matricula, turma) {
         $(function () {
             $('[data-toggle="tooltip"]').tooltip()
           })
-        loader.style.display = 'none'
+        loaderRun()
     }).catch(error => {
         AstNotif.dialog('Erro', error.message)
-        loader.style.display = 'none'
+        loaderRun()
         console.log(error)
     })
 }
@@ -1446,7 +1446,7 @@ function followUpAluno(matricula) {
     
     if (matricula == '00000' || matricula == '') {
         AstNotif.dialog('Atenção', 'Você deve clicar em um aluno para descrever um follow up.')
-        loader.style.display = 'none'
+        loaderRun()
     } else {
         followUpRef.on('value', (snapshot) => {
             const aluno = alunos[matricula]
@@ -1507,11 +1507,11 @@ function followUpAluno(matricula) {
                 console.log(dadosFollowUp)
                 followUpRef.child(dadosFollowUp.id).set(dadosFollowUp).then(() => {
                     AstNotif.notify('Sucesso', 'O FollowUp foi salvo com sucesso.', 'agora', {length: -1})
-                    loader.style.display = 'none'
+                    loaderRun()
                 }).catch(error =>{
                     AstNotif.dialog('Erro', error.message)
                     console.log(error)
-                    loader.style.display = 'none'
+                    loaderRun()
                 })
             })
         })
@@ -1543,11 +1543,11 @@ function carregaFollowUps(matricula='') {
                 listaFollowUpAluno.innerHTML += `<button class="list-group-item list-group-item-action" onclick="verFollowUp('${id}')"><b>Título:</b> ${followUp.titulo}</button>`
             }
         }
-        loader.style.display = 'none'
+        loaderRun()
     }).catch((error) => {
         console.log(error)
         AstNotif.dialog('Erro', error.message)
-        loader.style.display = 'none'
+        loaderRun()
     })
 }
 
@@ -1557,11 +1557,11 @@ function verFollowUp(id) {
     followUpRef.child(id).once('value').then(snapshot => {
         AstNotif.dialog(snapshot.val().titulo, snapshot.val().descricao + ' <br><br> <b>Autor do FollowUp:</b> ' + snapshot.val().autor, {positive: "OK",negative: ''})
 
-        loader.style.display = 'none'
+        loaderRun()
     }).catch(error => {
         AstNotif.dialog('Erro', error.message)
         console.log(error)
-        loader.style.display = 'none'
+        loaderRun()
     })
     
 }

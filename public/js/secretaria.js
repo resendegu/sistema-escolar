@@ -24,7 +24,7 @@ $(function () {
 firebase.auth().onAuthStateChanged((user) => {
     update()
     if (user == null) {
-        loader.style.display = 'none'
+        loaderRun()
         AstNotif.dialog('Login não identificado', 'Você não está logado, vá para a tela de <a href="../login.html">login</a> para logar ou se cadastrar.')
     } else {
         loader.style.display = 'block'
@@ -118,7 +118,7 @@ firebase.auth().onAuthStateChanged((user) => {
                     idCelulaTabela = ''
                 }
             }
-            loader.style.display = 'none'
+            loaderRun()
         })
 
         aniversariosRef.on('value', snapshot => {
@@ -133,7 +133,7 @@ firebase.auth().onAuthStateChanged((user) => {
                     document.getElementById('listaAniversarios').innerHTML += `<button class="list-group-item list-group-item-action">${aniversario.nome} no dia ${aniversario.dataNascimento.dia}</button>`
                 }
             }
-            loader.style.display = 'none'
+            loaderRun()
         })
     }
     
@@ -294,9 +294,9 @@ function carregaProfessores() {
                 professorTurmaSelect.innerHTML += `<option value="${uid}">${professor.nome} (${professor.email})</option>`
             }
         }
-        loader.style.display = 'none'
+        loaderRun()
     }).catch(error => {
-        loader.style.display = 'none'
+        loaderRun()
         console.error(error)
         AstNotif.dialog('Erro', error.message)
     })
@@ -316,11 +316,11 @@ function cadastrarTurma(confima=false) {
     .then(function(result) {
         console.log(result)
         AstNotif.dialog('Sucesso', result.data.answer)
-        loader.style.display = 'none'
+        loaderRun()
     }).catch(function(error) {
         AstNotif.dialog('Erro', error.message)
         console.log(error)
-        loader.style.display = 'none'
+        loaderRun()
     })
 }
 
@@ -347,9 +347,9 @@ function carregaTurmas() {
             }
         }
         document.getElementById('selectTurmas').style.visibility = 'visible'
-        loader.style.display = 'none'
+        loaderRun()
     }).catch(error => {
-        loader.style.display = 'none'
+        loaderRun()
         console.error(error)
         AstNotif.dialog('Erro', error.message)
     })
@@ -423,11 +423,11 @@ function excluirTurma(confirma=false) {
         excluiTurma({codTurma: alunosSelecionadosTurma.codTurma}).then(function(result) {
             AstNotif.dialog('Sucesso', result.data.answer)
             carregaTurmas()
-            loader.style.display = 'none'
+            loaderRun()
         }).catch(function(error) {
             AstNotif.dialog('Erro', error.message)
             console.log(error)
-            loader.style.display = 'none'
+            loaderRun()
         })
     } else {
         if (alunos == null) {
@@ -444,12 +444,12 @@ function transfereDaTurma() {
     alunosSelecionadosTurma.codTurmaParaTransferir = selectTurmasTransfere.value
     if (alunosSelecionadosTurma.codTurma == alunosSelecionadosTurma.codTurmaParaTransferir) {
         AstNotif.dialog('Erro', 'Você deve escolher uma turma diferente da atual para transferência dos alunos.')
-        loader.style.display = 'none'
+        loaderRun()
     } else {
         console.log(alunosSelecionadosTurma)
         transfereAlunos(alunosSelecionadosTurma).then(function(result){
             AstNotif.dialog('Sucesso', result.data.answer)
-            loader.style.display = 'none'
+            loaderRun()
             alunosSelecionadosTurma = {}
             carregaTurmas()
             $('#modal').modal('hide')
@@ -458,7 +458,7 @@ function transfereDaTurma() {
         }).catch(function(error){
             AstNotif.dialog('Erro', error.message)
             console.error(error)
-            loader.style.display = 'none'
+            loaderRun()
         })
     }
 }
@@ -483,7 +483,7 @@ function carregaListaDeAlunosDaTurma(turma, filtro='') {
                 }
                 
             }
-            loader.style.display = 'none'
+            loaderRun()
         }).catch(error => {
             console.log(error)
             AstNotif.dialog('Erro', error.message)
@@ -498,7 +498,7 @@ function carregaListaDeAlunosDaTurma(turma, filtro='') {
                     document.getElementById('listaAlunosDaTurma').innerHTML += `<div class="row"><div class="col-sm-1"><input type="checkbox" name="alunosTurma" onclick="this.checked ? alunosSelecionadosTurma[${matricula}] = '${aluno.nome}' : delete alunosSelecionadosTurma[${matricula}], verificaAlunosSelecionados()"></div><div class="col-md"><button class="list-group-item list-group-item-action" onclick="document.getElementById('btnAbaAlunos').click(), document.getElementById('btnAbaAlunosResponsivo').click(), abreDadosDoAluno('${matricula}') "> ${matricula}: ${aluno.nome}</button></div></div>`
                 }
             }
-            loader.style.display = 'none'
+            loaderRun()
         }).catch(error => {
             console.log(error)
             AstNotif.dialog('Erro', error.message)
@@ -584,7 +584,7 @@ function abreTurma(cod) {
                 `
             }
         }
-        loader.style.display = 'none'
+        loaderRun()
         
     })
 }
@@ -607,7 +607,7 @@ function retiraProf(email, nome, codSala, confirma=false) {
                 }
             }
             turmasRef.child(codSala).child('professor').set(listaProf).then(() => {
-                loader.style.display = 'none'
+                loaderRun()
                 AstNotif.notify('Sucesso', 'Professor deletado com sucesso')
             })
 
@@ -641,7 +641,7 @@ function modalAddProfTurma(codSala) {
                 document.getElementById('selectAddProfessorTurma').innerHTML += `<option value="${professor.email}">${professor.nome} (${professor.email})</option>`
             }
         }
-        loader.style.display = 'none'
+        loaderRun()
     })
     
 }
@@ -655,11 +655,11 @@ function novoProf(email, codSala) {
     .then(function(result) {
         console.log(result)
         AstNotif.dialog('Sucesso', result.data.answer)
-        loader.style.display = 'none'
+        loaderRun()
     }).catch(function(error) {
         AstNotif.dialog('Erro', error.message)
         console.log(error)
-        loader.style.display = 'none'
+        loaderRun()
     })
 }
 
@@ -682,12 +682,12 @@ function preencheEndereco(numCep) {
             document.getElementById('numeroAluno').focus()
             AstNotif.toast('Dados de endereço preenchidos com sucesso!')
         }
-        loader.style.display = 'none'
+        loaderRun()
         
     }).catch(function(error){
         AstNotif.dialog('Erro ao buscar CEP', error.message)
         console.log(error)
-        loader.style.display = 'none'
+        loaderRun()
     })
 }
 
@@ -711,9 +711,9 @@ function carregaProfsETurmas() {
                 turmaAluno.innerHTML += `<option value="${cod}">${cod}</option>`
             }
         }
-        loader.style.display = 'none'
+        loaderRun()
     }).catch(error => {
-        loader.style.display = 'none'
+        loaderRun()
         console.error(error)
         AstNotif.dialog('Erro', error.message)
     })
@@ -721,7 +721,7 @@ function carregaProfsETurmas() {
         matriculaAluno.value = Number(snapshot.val()) + 1
         arrumaNumMatricula()
     }).catch(error => {
-        loader.style.display = 'none'
+        loaderRun()
         console.log(error)
         AstNotif.dialog('Erro', error.message)
     })
@@ -893,27 +893,27 @@ document.querySelector('#formCadastroAluno').addEventListener('submit', (e) => {
     console.log(dadosAluno)
     if (dadosAluno.dataNascimentoAluno == '' || dadosAluno.nomeAluno == '') {
         AstNotif.dialog('Confira os campos', 'A data de nascimento do aluno e o nome do aluno são obrigatórios.')
-        loader.style.display = 'none'
+        loaderRun()
     } else if((dadosAluno.cpfResponsavel1 == '' || dadosAluno.rgResponsavel1 == '' || dadosAluno.numeroCelularResponsavel1 == '' || dadosAluno.nomeResponsavelAluno1 == '')&& idadeAluno != undefined && idadeAluno.years < 18) {
         AstNotif.dialog('Confira os campos', 'O aluno é menor de idade. É obrigatório o preenchimento dos dados do responsável número 1 do aluno.')
-        loader.style.display = 'none'
+        loaderRun()
     } else if (dadosAluno.emailAluno == '' || emailRegularExpression(dadosAluno.emailAluno) == false) {
         AstNotif.dialog('Confira o email do aluno', 'O email do aluno é obrigatório. Confira se foi escrito corretamente.')
-        loader.style.display = 'none'
+        loaderRun()
     } else if (((dadosAluno.cpfFinanceiroAluno == '' || dadosAluno.numeroCelularFinanceiroAluno == '' || dadosAluno.nomeResponsavelFinanceiroAluno == '') || (dadosAluno.cpfPedgogicoAluno == '' || dadosAluno.numeroCelularPedagogicoAluno == '' || dadosAluno.nomeResponsavelPedagogicoAluno == '')) && idadeAluno.years < 18) {
         AstNotif.dialog('Confira os campos', 'O aluno é menor de idade. Cofira os campos de responsáveis financeiro e pedagógico do aluno, eles são obrigatórios quando o aluno é menor de idade.')
-        loader.style.display = 'none'
+        loaderRun()
     } else if (dadosAluno.cpfAluno == '' || dadosAluno.rgAluno == '') {
         AstNotif.dialog('Confira os campos', 'Os dados de RG e CPF do aluno não podem estar em branco.')
-        loader.style.display = 'none'
+        loaderRun()
     } else if (dadosAluno.turmaAluno == 'Escolha uma turma...') {
         AstNotif.dialog('Confira os campos', 'É obrigatório matricular o aluno em uma turma.')
-        loader.style.display = 'none'
+        loaderRun()
     } else {
         loaderMsg.innerText = 'Enviando dados para o servidor...'
         let cadastraAluno = firebase.functions().httpsCallable('cadastraAluno')
         cadastraAluno({dados: dadosAluno}).then(function(result) {
-            loader.style.display = 'none'
+            loaderRun()
             AstNotif.dialog('Sucesso', result.data.answer)
             if (dadosAluno.geraPDFAluno.checked) {
                 document.getElementById('corpoMatricula').innerHTML = `<iframe src="../resources/pdfsProntos/matriculaPdf.html#${dadosAluno.matriculaAluno}" frameborder="0" width="100%" height="max-content" id="fichaPdf" name="fichaPdf"></iframe>`
@@ -925,7 +925,7 @@ document.querySelector('#formCadastroAluno').addEventListener('submit', (e) => {
         }).catch(function(error) {
             AstNotif.dialog('Erro', error.message)
             console.log(error)
-            loader.style.display = 'none'
+            loaderRun()
         })
     }
     
@@ -954,7 +954,7 @@ function calculaIdade(dataNasc) {
             idadeAluno = idade
             console.log(idadeAluno)
             document.getElementById('idadeCalculada').innerText = `Idade: ${idadeAluno.years} ano(s), ${idadeAluno.months} mes(es), ${idadeAluno.days} dia(s)`
-            loader.style.display = 'none'
+            loaderRun()
         }).catch(function(error){
             console.log(error)
         })
@@ -983,7 +983,7 @@ function carregaListaDeAlunos(filtro='') {
                     document.getElementById('listaAlunos').innerHTML += `<button class="list-group-item list-group-item-action" onclick="abreDadosDoAluno('${matricula}')">${matricula}: ${aluno.nomeAluno} (${aluno.turmaAluno})</button>`
                 }
             }
-            loader.style.display = 'none'
+            loaderRun()
         })
     } else {
         document.getElementById('listaAlunos').innerHTML = ''
@@ -995,7 +995,7 @@ function carregaListaDeAlunos(filtro='') {
                     document.getElementById('listaAlunos').innerHTML += `<button class="list-group-item list-group-item-action" onclick="abreDadosDoAluno('${matricula}')">${matricula}: ${aluno.nomeAluno} (${aluno.turmaAluno})</button>`
                 }
             }
-            loader.style.display = 'none'
+            loaderRun()
         }).catch(error => {
             console.log(error)
             AstNotif.dialog('Erro', error.message)
@@ -1228,12 +1228,12 @@ function alteraNotasDesempenho(confirma=false) {
 
         desempenhoRef.set(notasParaLancar).then(() => {
             $('#modal').modal('hide')
-            loader.style.display = 'none'
+            loaderRun()
             AstNotif.notify('Sucesso', 'Desempenho do aluno alterado com sucesso.')
 
         }).catch(error => {
             AstNotif.dialog('Erro', error.message)
-            loader.style.display = 'none'
+            loaderRun()
             console.log(error)
         })
     } else {
@@ -1277,7 +1277,7 @@ function alteraNotasDesempenho(confirma=false) {
             feather.replace()
            
 
-            loader.style.display = 'none'
+            loaderRun()
         })
 
     }
@@ -1312,7 +1312,7 @@ function followUpAluno(matricula) {
     
     if (matricula == '00000' || matricula == '') {
         AstNotif.dialog('Atenção', 'Você deve clicar em um aluno para descrever um follow up.')
-        loader.style.display = 'none'
+        loaderRun()
     } else {
         followUpRef.on('value', (snapshot) => {
             const aluno = alunos[matricula]
@@ -1373,11 +1373,11 @@ function followUpAluno(matricula) {
                 console.log(dadosFollowUp)
                 followUpRef.child(dadosFollowUp.id).set(dadosFollowUp).then(() => {
                     AstNotif.notify('Sucesso', 'O FollowUp foi salvo com sucesso.', 'agora', {length: -1})
-                    loader.style.display = 'none'
+                    loaderRun()
                 }).catch(error =>{
                     AstNotif.dialog('Erro', error.message)
                     console.log(error)
-                    loader.style.display = 'none'
+                    loaderRun()
                 })
             })
         })
@@ -1409,11 +1409,11 @@ function carregaFollowUps(matricula='') {
                 listaFollowUpAluno.innerHTML += `<button class="list-group-item list-group-item-action" onclick="verFollowUp('${id}')"><b>Título:</b> ${followUp.titulo}</button>`
             }
         }
-        loader.style.display = 'none'
+        loaderRun()
     }).catch((error) => {
         console.log(error)
         AstNotif.dialog('Erro', error.message)
-        loader.style.display = 'none'
+        loaderRun()
     })
 }
 
@@ -1423,11 +1423,11 @@ function verFollowUp(id) {
     followUpRef.child(id).once('value').then(snapshot => {
         AstNotif.dialog(snapshot.val().titulo, snapshot.val().descricao + ' <br><br> <b>Autor do FollowUp:</b> ' + snapshot.val().autor, {positive: "OK",negative: ''})
 
-        loader.style.display = 'none'
+        loaderRun()
     }).catch(error => {
         AstNotif.dialog('Erro', error.message)
         console.log(error)
-        loader.style.display = 'none'
+        loaderRun()
     })
     
 }
@@ -1690,13 +1690,13 @@ function desativaAlunos(confirma=false) {
         }
         let ativaDesativaAlunos = firebase.functions().httpsCallable('ativaDesativaAlunos')
         ativaDesativaAlunos({codTurma: alunosSelecionadosTurma.codTurma, modo: 'desativa', alunos: nomes}).then(function(result){
-            loader.style.display = 'none'
+            loaderRun()
             AstNotif.dialog('Sucesso', result.data.answer)
             $('#modal').modal('hide')
 
         }).catch(function(error){
             AstNotif.dialog('Erro', error.message)
-            loader.style.display = 'none'
+            loaderRun()
         })
     } else {
         let nomes = ''
@@ -1752,7 +1752,7 @@ function carregaAlunosDesativados(filtro='') {
     if (filtro == '') {
         alunosDesativadosRef.once('value').then(snapshot => {
             alunosDesativados = snapshot.val()
-            loader.style.display = 'none'
+            loaderRun()
             let alunos = snapshot.val()
             listaAlunosDesativados.innerHTML = ''
             for (const matricula in alunos) {
@@ -1765,11 +1765,11 @@ function carregaAlunosDesativados(filtro='') {
 
         }).catch(error =>{ 
             AstNotif.dialog('Erro', error.message)
-            loader.style.display = 'none'
+            loaderRun()
         })
     } else {
         alunosDesativadosRef.orderByChild(tipoDeBusca).equalTo(filtro).once('value').then(snapshot => {
-            loader.style.display = 'none'
+            loaderRun()
             let alunos = snapshot.val()
             
             for (const matricula in alunos) {
@@ -1781,7 +1781,7 @@ function carregaAlunosDesativados(filtro='') {
 
         }).catch(error => {
             AstNotif.dialog('Erro', error.message)
-            loader.style.display = 'none'
+            loaderRun()
         })
     }
     
@@ -1815,13 +1815,13 @@ function ativarAluno(matricula, confirma=false) {
         let selectTurmasAtiva = document.getElementById('selectTurmasAtiva')
         aluno[matricula] = dadosAluno.nomeAluno
         ativaDesativaAlunos({alunos: aluno, codTurma: selectTurmasAtiva.value, modo: 'ativa'}).then(function(result) {
-            loader.style.display = 'none'
+            loaderRun()
             AstNotif.dialog('Sucesso', result.data.answer)
             $('#modal').modal('hide')
             carregaAlunosDesativados()
         }).catch(function(error){
             AstNotif.dialog('Erro', error.message)
-            loader.style.display = 'none'
+            loaderRun()
         })
     } else {
         let dadosAluno = alunosDesativados[matricula].dadosAluno

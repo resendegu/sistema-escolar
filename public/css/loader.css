@@ -11,13 +11,16 @@
     margin: auto;
     margin-top: 300px;
   }
+
 #loaderMsg{
   position: absolute;
     z-index: 3001;
     margin: auto;
     margin-top: 450px;
     margin-left: 40%;
-    color: white;
+    color: black;
+    background-color: white;
+    border-radius: 5px;
 }
   
   /* Safari */
@@ -32,7 +35,6 @@
   }
  
 .window-loader {
-    display: none;
     position: fixed;
     left: 0;
     top: 0;

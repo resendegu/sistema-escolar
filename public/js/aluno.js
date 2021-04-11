@@ -28,7 +28,7 @@ var registroAcademico
 firebase.auth().onAuthStateChanged((user) => {
     update()
     if (user == null) {
-        loader.style.display = 'none'
+        loaderRun()
         AstNotif.dialog('Login não identificado', 'Você não está logado, vá para a tela de <a href="../login.html">login</a> para logar ou se cadastrar.')
     } else {
         registroAcademico = user.uid
@@ -38,8 +38,7 @@ firebase.auth().onAuthStateChanged((user) => {
             AstNotif.dialog('Erro', error.message)
             console.log(error)
         })
-        loader.style.display = 'block'
-        loaderMsg.innerText = 'Buscando informações do usuário...'
+        loaderRun(true, 'Buscando informações do usuário...')
         try {
             if (user.photoURL != null) {
                 document.getElementById('profilePic').src = user.photoURL
@@ -61,7 +60,7 @@ firebase.auth().onAuthStateChanged((user) => {
                     document.getElementById('listaAniversarios').innerHTML += `<button class="list-group-item list-group-item-action">${aniversario.nome} no dia ${aniversario.dataNascimento.dia}</button>`
                 }
             }
-            loader.style.display = 'none'
+            loaderRun()
         })
     }
     
@@ -292,8 +291,7 @@ function abreDadosDoAluno(desativado=false) {
 
 
 function historicoAluno(matricula, turma) {
-    loader.style.display = 'block'
-    loaderMsg.innerText = 'Recuperando informações do histórico escolar...'
+    loaderRun(true, 'Recuperando informações do histórico escolar...')
     alunosRef.child(matricula).once('value').then(snapshot => {
         let dadosAluno = snapshot.val()
         abrirModal('modal', 'Histórico escolar de ' + dadosAluno.nomeAluno, 
@@ -306,10 +304,10 @@ function historicoAluno(matricula, turma) {
         $(function () {
             $('[data-toggle="tooltip"]').tooltip()
           })
-        loader.style.display = 'none'
+        loaderRun()
     }).catch(error => {
         AstNotif.dialog('Erro', error.message)
-        loader.style.display = 'none'
+        loaderRun()
         console.log(error)
     })
 }
@@ -318,7 +316,7 @@ function followUpAluno(matricula) {
     
     if (matricula == '00000' || matricula == '') {
         AstNotif.dialog('Atenção', 'Você deve clicar em um aluno para descrever um follow up.')
-        loader.style.display = 'none'
+        loaderRun()
     } else {
         followUpRef.on('value', (snapshot) => {
             const aluno = alunos[matricula]
@@ -366,8 +364,7 @@ function followUpAluno(matricula) {
             )
             document.querySelector('#adicionarFollowUpAluno').addEventListener('submit', (e) => {
                 e.preventDefault()
-                loader.style.display = 'block'
-                loaderMsg.innerText = 'Carregando dados do FollowUp...'
+                loaderRun(true, 'Carregando dados do FollowUp...')
                 const dados = new FormData(e.target);
                 let dadosFollowUp = {}
                 dadosFollowUp.nome = dados.get('nomeFollowUp')
@@ -379,11 +376,11 @@ function followUpAluno(matricula) {
                 console.log(dadosFollowUp)
                 followUpRef.child(dadosFollowUp.id).set(dadosFollowUp).then(() => {
                     AstNotif.notify('Sucesso', 'O FollowUp foi salvo com sucesso.', 'agora', {length: -1})
-                    loader.style.display = 'none'
+                    loaderRun()
                 }).catch(error =>{
                     AstNotif.dialog('Erro', error.message)
                     console.log(error)
-                    loader.style.display = 'none'
+                    loaderRun()
                 })
             })
         })
@@ -392,8 +389,7 @@ function followUpAluno(matricula) {
 }
 
 function carregaFollowUps(matricula='') {
-    loader.style.display = 'block'
-    loaderMsg.innerText = 'Carregando Follow Up...'
+    loaderRun(true, 'Carregando Follow Up...')
     followUpRef.orderByChild('matricula').equalTo(matricula).once('value').then(snapshot => {
         abrirModal('modal', `FollowUp(s) cadastrado(s)`,
             `
@@ -415,11 +411,11 @@ function carregaFollowUps(matricula='') {
                 listaFollowUpAluno.innerHTML += `<button class="list-group-item list-group-item-action" onclick="verFollowUp('${id}')"><b>Título:</b> ${followUp.titulo}</button>`
             }
         }
-        loader.style.display = 'none'
+        loaderRun()
     }).catch((error) => {
         console.log(error)
         AstNotif.dialog('Erro', error.message)
-        loader.style.display = 'none'
+        loaderRun()
     })
 }
 
@@ -429,11 +425,11 @@ function verFollowUp(id) {
     followUpRef.child(id).once('value').then(snapshot => {
         AstNotif.dialog(snapshot.val().titulo, snapshot.val().descricao + ' <br><br> <b>Autor do FollowUp:</b> ' + snapshot.val().autor, {positive: "OK",negative: ''})
 
-        loader.style.display = 'none'
+        loaderRun()
     }).catch(error => {
         AstNotif.dialog('Erro', error.message)
         console.log(error)
-        loader.style.display = 'none'
+        loaderRun()
     })
     
 }

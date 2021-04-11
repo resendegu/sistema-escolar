@@ -5,6 +5,9 @@ var updatesRef = firebase.database().ref('sistemaEscolar/updates')
 var loader = document.getElementById('loader')
 var loaderMsg = document.getElementById('loaderMsg')
 
+var loader = document.getElementById('loader')
+var loaderMsg = document.getElementById('loaderMsg')
+
 function update() {
 	let versao = 0.91
 	updatesRef.on('value', (snapshot) => {
@@ -15,6 +18,17 @@ function update() {
 	})
 }
 
+function loaderRun(show=false, msg='') {
+	let loader = document.getElementById('loader')
+	let loaderMsg = document.getElementById('loaderMsg')
+	if (show) {
+		loader.style.display = 'block'
+		loaderMsg.innerText = msg
+	} else {
+		loader.style.display = 'none'
+		loaderMsg.innerText = 'Aguarde...'
+	}
+}
 
 function usuarioAtual() {
     let user = firebase.auth().currentUser;
@@ -96,7 +110,7 @@ function calcularIdadePrecisa(data) {
 				months: monthAge,
 				days: dateAge
 			};
-		loader.style.display = 'none'
+		loaderRun()
 		return age;
 	}).catch(function(error){
 		throw new Error(error)

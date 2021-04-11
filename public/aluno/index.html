@@ -134,7 +134,7 @@
       <!-- Loader -->
       
 <div id="loader" class="window-loader">
-  <label id="loaderMsg" class="text-white-50 bg-dark">Aguarde...</label>
+  <label id="loaderMsg">Aguarde...</label>
     <div class="loader"></div>
 </div>
 
@@ -144,13 +144,13 @@
           <div class="sidebar-sticky">
             <ul class="nav flex-column">
               <li class="nav-item">
-                <a class="nav-link active" data-toggle="list" href="#abaDashboard" role="tab" aria-controls="home">
+                <a class="nav-link active" data-toggle="list" href="#abaInicio" role="tab" aria-controls="home">
                   <span data-feather="home"></span>
                   Início <span class="sr-only">(current)</span>
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" data-toggle="list" href="#abaAlunos" role="tab" aria-controls="alunos" id="btnAbaAlunos" onclick="abreDadosDoAluno()">
+                <a class="nav-link" data-toggle="list" href="#abaDados" role="tab" aria-controls="alunos" id="btnAbaAlunos" onclick="abreDadosDoAluno()">
                   <span data-feather="user" ></span>
                   Dados e notas
                 </a>
@@ -164,7 +164,7 @@
             </ul>
 
             <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
-              <span>Follow Ups</span>
+              <span>Mensagens da escola</span>
               <a class="d-flex align-items-center text-muted" href="#" onclick="criarChat()">
                 <span data-feather="plus-circle"></span>
               </a>
@@ -233,7 +233,7 @@
               </div>
             </div>
 
-            <div class="container tab-pane fade" id="abaAlunos" role="tabpanel" aria-labelledby="Alunos">
+            <div class="container tab-pane fade" id="abaDados" role="tabpanel" aria-labelledby="Alunos">
               <label class="h3">Meus dados e notas</label>
               <br>
               
@@ -340,7 +340,7 @@
                             <div class="col-sm-6 mb-3">
                               <div class="card h-100">
                                 <div class="card-body">
-                                  <h6 class="d-flex align-items-center mb-3"><i class="material-icons text-info mr-2">Desempenho</i>do aluno &nbsp;<span data-feather="edit" onclick="lancaDesempenho(`${document.getElementById('mostraMatriculaAluno').innerText}`, `${document.getElementById('mostraTurmaAluno').innerText}`)"></span></h6>
+                                  <h6 class="d-flex align-items-center mb-3"><i class="material-icons text-info mr-2">Desempenho</i>do aluno</h6>
                                   <div id="desempenhoAluno">
                                     <small>Audição</small>
                                     <small id="pontosAudicao">1</small>
@@ -371,7 +371,7 @@
                             <div class="col-sm-6 mb-3">
                               <div class="card h-100">
                                 <div class="card-body">
-                                  <h6 class="d-flex align-items-center mb-3"><i class="material-icons text-info mr-2">Notas</i>do aluno &nbsp;<span data-feather="edit" onclick="editaNotasAluno(`${document.getElementById('mostraMatriculaAluno').innerText}`, `${document.getElementById('mostraTurmaAluno').innerText}`)"></span></h6>
+                                  <h6 class="d-flex align-items-center mb-3"><i class="material-icons text-info mr-2">Notas</i>do aluno</h6>
                                   <div id="notasDoAluno">
                                     <small id="nomeNota">...</small>
                                     <div class="progress mb-3" style="height: 5px">
