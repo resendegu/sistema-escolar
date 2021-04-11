@@ -91,10 +91,10 @@ function carregaFrequenciaAluno(registroAcademico, turma) {
             if (frequencia.val().turma == turma) {
                 let diaFrequencia = frequencia.key.split('T')[0]
                 let horaFrequencia = frequencia.key.split('T')[1]
-                divMapaFrequenciasTurma.innerHTML += `
+                divFrequencias.innerHTML += `
                 <div class="row justify-content-start">
-                    <div class="col-auto" style="background-color: rgba(86,61,124,.15);border: 1px solid rgba(86,61,124,.2);"><span data-feather="trash" data-toggle="tooltip" data-placement="top" title="Deletar frequência"></span>&nbsp;${diaFrequencia.split('-').reverse().join('/')} ás ${horaFrequencia}</div>
-                    <div class="col" style="background-color: rgba(86,61,124,.15);border: 1px solid rgba(86,61,124,.2);">${alunosPresentes}</div>
+                    <div class="col-auto" style="background-color: rgba(86,61,124,.15);border: 1px solid rgba(86,61,124,.2);">${diaFrequencia.split('-').reverse().join('/')} ás ${horaFrequencia}</div>
+                    <div class="col" style="background-color: rgba(86,61,124,.15);border: 1px solid rgba(86,61,124,.2);">Presente</div>
                 </div>
                 `
                 feather.replace()

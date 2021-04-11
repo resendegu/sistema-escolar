@@ -1019,16 +1019,23 @@ function carregaFrequenciaAluno(matricula, turma) {
                 divFrequencias.innerHTML = ''
             }
             if (frequencia.val().turma == turma) {
+                let diaFrequencia = frequencia.key.split('T')[0]
+                let horaFrequencia = frequencia.key.split('T')[1]
                 divFrequencias.innerHTML += `
-                <div class="row justify-content-center">
-                    <div class="col-3" style="background-color: rgba(86,61,124,.15);border: 1px solid rgba(86,61,124,.2);">${frequencia.key.split('-').reverse().join('/')}</div>
-                    <div class="col-3" style="background-color: rgba(86,61,124,.15);border: 1px solid rgba(86,61,124,.2);">Presente</div>
-            </div>
+                <div class="row justify-content-start">
+                    <div class="col-auto" style="background-color: rgba(86,61,124,.15);border: 1px solid rgba(86,61,124,.2);">${diaFrequencia.split('-').reverse().join('/')} ás ${horaFrequencia}</div>
+                    <div class="col" style="background-color: rgba(86,61,124,.15);border: 1px solid rgba(86,61,124,.2);">Presente</div>
+                </div>
                 `
+                feather.replace()
+                $(function () {
+                    $('[data-toggle="tooltip"]').tooltip()
+                })
             }
             c++
             document.getElementById('totalFrequencias').innerText = c
-            document.getElementById('porcentagemFrequencia').innerText = (100*parseInt(c))/parseInt(qtdeAulas) + '%'
+            console.log(qtdeAulas)
+            document.getElementById('porcentagemFrequencia').innerText = ((100*parseInt(c))/parseInt(qtdeAulas)).toFixed(2) + '%'
         })
     }).catch(error => {
         AstNotif.dialog('Erro', error.message)
