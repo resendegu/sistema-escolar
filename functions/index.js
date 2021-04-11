@@ -384,7 +384,7 @@ exports.cadastraAluno = functions.https.onCall((data, context) => {
 })
 
 exports.timestamp = functions.https.onCall((data, context) => {
-    if (context.auth.token.master == true || context.auth.token.secretaria == true ||  context.auth.token.professores == true || context.auth.token.adm == true) {
+    if (context.auth.token.master == true || context.auth.token.secretaria == true ||  context.auth.token.professores == true || context.auth.token.adm == true || context.auth.token.aluno == true) {
         return {timestamp: admin.firestore.Timestamp.now()}
     } else {
         throw new functions.https.HttpsError('permission-denied', 'Você não tem permissão.')
