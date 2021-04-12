@@ -12,7 +12,7 @@
     <link href="../resources/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Custom styles for this template -->
-    <link href="../css/dashboard.css" rel="stylesheet">
+    <link href="../css/dashboardaluno.css" rel="stylesheet">
     <link rel="stylesheet" href="../css/loader.css">
     <link href="../css/list-items.css" rel="stylesheet">
     <link rel="stylesheet" href="../css/aluno.css">
@@ -86,7 +86,7 @@
         -->
         <script defer src="/__/firebase/init.js"></script>
         
-        <nav class="navbar navbar-light navbar-expand-lg sticky-top bg-light flex-md-nowrap p-0">
+        <nav class="navbar navbar-light navbar-expand-lg sticky-top bg-primary flex-md-nowrap p-0">
         <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="../">Portal do Aluno</a>
         <ul class="navbar-nav">
           <li class="nav-item dropdown active navbar-toggler" class="" type="button" data-toggle="collapse">
@@ -123,10 +123,10 @@
         <div class="collapse navbar-collapse" id="navbarNavDropdown">
           &nbsp;<ul class="navbar-nav">
             <li class="nav-item">
-              <a class="nav-link" href="../">&nbsp;&nbsp;Ajuda </a>
+              <a class="nav-link text-white" href="../">&nbsp;&nbsp;Ajuda </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="../login.html">&nbsp;&nbsp;Contato da escola</a>
+              <a class="nav-link text-white" href="../login.html">&nbsp;&nbsp;Contato da escola</a>
             </li>
           </ul>
         </div>
@@ -140,7 +140,7 @@
 
     <div class="container-fluid">
       <div class="row">
-        <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+        <nav class="col-md-2 d-none d-md-block sidebar">
           <div class="sidebar-sticky">
             <ul class="nav flex-column">
               <li class="nav-item">
@@ -163,9 +163,9 @@
               </li>
             </ul>
 
-            <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+            <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1">
               <span>Mensagens da escola</span>
-              <a class="d-flex align-items-center text-muted" href="#" onclick="criarChat()">
+              <a class="d-flex align-items-center" href="#" onclick="">
                 <span data-feather="plus-circle"></span>
               </a>
             </h6>
@@ -242,7 +242,7 @@
                       <div class="row gutters-sm">
                         <div class="col-md-4 mb-3">
                           <div class="card">
-                            <div class="card-body">
+                            <div class="card-body shadow-lg">
                               <div class="d-flex flex-column align-items-center text-center">
                                 <img src="../images/profile_placeholder.png" alt="Imagem do aluno" class="rounded-circle" width="150" id="mostraFotoAluno">
                                 
@@ -262,7 +262,7 @@
                               </div>
                             </div>
                           </div>
-                          <div class="card mt-3">
+                          <div class="card mt-3 shadow-lg">
                             <ul class="list-group list-group-flush">
                               <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
                                 <h6 class="mb-0"><span data-feather="file-text"></span> CPF</h6>
@@ -288,7 +288,7 @@
                           </div>
                         </div>
                         <div class="col-md-8">
-                          <div class="card mb-3">
+                          <div class="card mb-3 shadow-lg">
                             <div class="card-body">
                               <div class="row">
                                 <div class="col-sm-3">
@@ -338,7 +338,7 @@
                           </div>
                           <div class="row gutters-sm">
                             <div class="col-sm-6 mb-3">
-                              <div class="card h-100">
+                              <div class="card h-100 shadow-lg">
                                 <div class="card-body">
                                   <h6 class="d-flex align-items-center mb-3"><i class="material-icons text-info mr-2">Desempenho</i>do aluno</h6>
                                   <div id="desempenhoAluno">
@@ -369,7 +369,7 @@
                               </div>
                             </div>
                             <div class="col-sm-6 mb-3">
-                              <div class="card h-100">
+                              <div class="card h-100 shadow-lg">
                                 <div class="card-body">
                                   <h6 class="d-flex align-items-center mb-3"><i class="material-icons text-info mr-2">Notas</i>do aluno</h6>
                                   <div id="notasDoAluno">
