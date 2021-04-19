@@ -970,6 +970,30 @@ function alteraTipoDeBusca(tipo) {
     tipoDeBusca = tipo
 }
 
+function desativarAlunos(confirma=false, codTurma, nomesObj) {
+    if (confirma) {
+        loaderRun(true, 'Desativando alunos...')
+        let ativaDesativaAlunos = firebase.functions().httpsCallable('ativaDesativaAlunos')
+        ativaDesativaAlunos({codTurma: codTurma, modo: 'desativa', alunos: nomesObj}).then(function(result){
+            loaderRun()
+            AstNotif.dialog('Sucesso', result.data.answer)
+            $('#modal').modal('hide')
+
+        }).catch(function(error){
+            AstNotif.dialog('Erro', error.message)
+            loaderRun()
+        })
+    } else {
+        abrirModal('modal', 'Confirmação de desativação do aluno', `
+                Você confirma a ação de desativação do(s) aluno(s) escolhido(s)?
+                <br><br>
+                Esta ação ficará salva no histórico de operações do aluno e da turma para futuras consultas.
+        `, `<button type="button" data-toggle="tooltip" data-placement="top" title="Desativar agora" class="btn btn-warning" onclick="desativarAlunos(true, '${codTurma}', '${nomesObj}')">Desativar</button><button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>`)
+    }
+    
+}
+
+
 
 function carregaListaDeAlunos(filtro='') {
     console.log(filtro)
@@ -980,24 +1004,64 @@ function carregaListaDeAlunos(filtro='') {
         document.getElementById('listaAlunos').innerHTML = ''
         alunosRef.on('value', (snapshot) => {
             alunos = snapshot.val()
+            let c = 0
             for (const matricula in alunos) {
                 if (Object.hasOwnProperty.call(alunos, matricula)) {
                     const aluno = alunos[matricula];
-                    document.getElementById('listaAlunos').innerHTML += `<button class="list-group-item list-group-item-action" onclick="abreDadosDoAluno('${matricula}')">${matricula}: ${aluno.nomeAluno} (${aluno.turmaAluno})</button>`
+                    c++
+                    document.getElementById('listaAlunos').innerHTML += `
+                    <tr>
+                        <td>
+                            <span class="custom-checkbox">
+                            <input type="checkbox" id="checkbox${c}" name="options[]" value="1">
+                            <label for="checkbox${c}"></label>
+                            </span>
+                        </td>
+                        <td><a href="#rolaTelaAbaixoAlunos" onclick="abreDadosDoAluno('${matricula}')">${aluno.nomeAluno}</a></td>
+                        <td>${matricula}</td>
+                        <td>${aluno.turmaAluno}</td>
+                        <td>
+                            <a href="#" class="edit" onclick="ativarAluno('${matricula}')"><i data-feather="git-pull-request" data-toggle="tooltip" title="Transferir Aluno"></i></a>
+                            <a href="#checkbox${c}" class="delete" onclick="desativarAlunos(false, '${aluno.turmaAluno}', {'${matricula}': '${aluno.nomeAluno}'})"><i data-feather="user-x" data-toggle="tooltip" title="Desativar aluno"></i></a>
+                        </td>
+                    </tr>`
                 }
             }
+            feather.replace()
+            $('[data-toggle="tooltip"]').tooltip();
+            ativaCheckboxes()
             loaderRun()
         })
     } else {
         document.getElementById('listaAlunos').innerHTML = ''
         alunosRef.orderByChild(tipoDeBusca).equalTo(filtro).once('value').then(snapshot => {
             alunos = snapshot.val()
+            let c = 0
             for (const matricula in alunos) {
                 if (Object.hasOwnProperty.call(alunos, matricula)) {
                     const aluno = alunos[matricula];
-                    document.getElementById('listaAlunos').innerHTML += `<button class="list-group-item list-group-item-action" onclick="abreDadosDoAluno('${matricula}')">${matricula}: ${aluno.nomeAluno} (${aluno.turmaAluno})</button>`
+                    c++
+                    document.getElementById('listaAlunos').innerHTML += `
+                    <tr>
+                        <td>
+                            <span class="custom-checkbox">
+                            <input type="checkbox" id="checkbox${c}" name="options[]" value="1">
+                            <label for="checkbox${c}"></label>
+                            </span>
+                        </td>
+                        <td><a href="#rolaTelaAbaixoAlunos" onclick="abreDadosDoAluno('${matricula}')">${aluno.nomeAluno}</a></td>
+                        <td>${matricula}</td>
+                        <td>${aluno.turmaAluno}</td>
+                        <td>
+                            <a href="#" class="action" onclick="ativarAluno('${matricula}')"><i data-feather="user-check" data-toggle="tooltip" title="Reativar Aluno"></i></a>
+                            <a href="#deleteEmployeeModal" class="delete" data-toggle="modal"><i data-feather="trash" data-toggle="tooltip" title="Deletar aluno"></i></a>
+                        </td>
+                    </tr>`
                 }
             }
+            feather.replace()
+            $('[data-toggle="tooltip"]').tooltip();
+            ativaCheckboxes()
             loaderRun()
         }).catch(error => {
             console.log(error)
@@ -1745,72 +1809,74 @@ function gerarFichaAluno(matricula) {
 }
 
 // Funções da aba Alunos Desativados
-var tipoDeBuscaDesativados = 'nomeAluno'
+var tipoDeBuscaDesativados = 'dadosAluno/nomeAluno'
 var alunosDesativados
-function carregaAlunosDesativados(filtro='') {
+
+document.querySelector('#ordenaNomeDesativados').addEventListener('click', (e) => {
+    tipoDeBuscaDesativados = 'dadosAluno/nomeAluno'
+    carregaAlunosDesativados()
+})
+document.querySelector('#ordenaMatriculaDesativados').addEventListener('click', (e) => {
+    carregaAlunosDesativados(true)
+})
+document.querySelector('#ordenaUltimaTurmaDesativados').addEventListener('click', (e) => {
+    tipoDeBuscaDesativados = 'dadosAluno/turmaAluno'
+    carregaAlunosDesativados()
+})
+
+function carregaAlunosDesativados(matricula=false,filtro='', numPrimeiros=20, numUltimos=20) {
     loader.style.display = 'block'
     loaderMsg.innerText = 'Carregando alunos desativados...'
     let alunosDesativadosRef = firebase.database().ref('sistemaEscolar/alunosDesativados')
     let listaAlunosDesativados = document.getElementById('listaAlunosDesativados')
-    if (filtro == '') {
-        alunosDesativadosRef.once('value').then(snapshot => {
-            alunosDesativados = snapshot.val()
-            loaderRun()
-            let alunos = snapshot.val()
-            listaAlunosDesativados.innerHTML = ''
-            let c = 0
-            for (const matricula in alunos) {
-                if (Object.hasOwnProperty.call(alunos, matricula)) {
-                    const dados = alunos[matricula];
-                    c++
-                    listaAlunosDesativados.innerHTML += `
-                    
-                    <tr>
-                        <td>
-                            <span class="custom-checkbox">
-                            <input type="checkbox" id="checkbox${c}" name="options[]" value="1">
-                            <label for="checkbox${c}"></label>
-                            </span>
-                        </td>
-                        <td><a href="#" onclick="abreDadosDoAlunoDesativado('${matricula}')">${dados.dadosAluno.nomeAluno}</a></td>
-                        <td>${matricula}</td>
-                        <td>${dados.dadosAluno.turmaAluno}</td>
-                        <td>
-                            <a href="#" class="action" onclick="ativarAluno('${matricula}')"><i data-feather="user-check" data-toggle="tooltip" title="Reativar Aluno"></i></a>
-                            <a href="#deleteEmployeeModal" class="delete" data-toggle="modal"><i data-feather="trash" data-toggle="tooltip" title="Deletar aluno"></i></a>
-                        </td>
-                    </tr>
-                    
-                    
-                    `
-                }
-            }
-            feather.replace()
-            $('[data-toggle="tooltip"]').tooltip();
-            ativaCheckboxes()
-            
-
-        }).catch(error =>{ 
-            AstNotif.dialog('Erro', error.message)
-            loaderRun()
-        })
+    if (matricula) {
+        alunosDesativadosRef = alunosDesativadosRef.orderByValue()
     } else {
-        alunosDesativadosRef.orderByChild(tipoDeBusca).equalTo(filtro).once('value').then(snapshot => {
-            loaderRun()
-            let alunos = snapshot.val()
-            
-            for (const matricula in alunos) {
-                if (Object.hasOwnProperty.call(alunos, matricula)) {
-                    const dados = alunos[matricula];
-                    listaAlunosDesativados.innerHTML = `<button class="list-group-item list-group-item-action" onclick="opcoesAlunoDesativado('${matricula}')">${matricula}: ${dados.dadosAluno.nomeAluno} (Última Turma: ${dados.dadosAluno.turmaAluno})</button>`
-                }
-            }
-
-        }).catch(error => {
-            AstNotif.dialog('Erro', error.message)
-            loaderRun()
-        })
+        alunosDesativadosRef = alunosDesativadosRef.orderByChild(tipoDeBuscaDesativados)
+        console.log(tipoDeBuscaDesativados)
     }
+    
+    alunosDesativadosRef.once('value').then(snapshot => {
+        alunosDesativados = snapshot.val()
+        loaderRun()
+        let alunos = snapshot.val()
+        listaAlunosDesativados.innerHTML = ''
+        let c = 0
+        for (const matricula in alunos) {
+            if (Object.hasOwnProperty.call(alunos, matricula)) {
+                const dados = alunos[matricula];
+                c++
+                listaAlunosDesativados.innerHTML += `
+                
+                <tr>
+                    <td>
+                        <span class="custom-checkbox">
+                        <input type="checkbox" id="checkbox${c}" name="options[]" value="1">
+                        <label for="checkbox${c}"></label>
+                        </span>
+                    </td>
+                    <td><a href="#" onclick="abreDadosDoAlunoDesativado('${matricula}')">${dados.dadosAluno.nomeAluno}</a></td>
+                    <td>${matricula}</td>
+                    <td>${dados.dadosAluno.turmaAluno}</td>
+                    <td>
+                        <a href="#" class="action" onclick="ativarAluno('${matricula}')"><i data-feather="user-check" data-toggle="tooltip" title="Reativar Aluno"></i></a>
+                        <a href="#deleteEmployeeModal" class="delete" data-toggle="modal"><i data-feather="trash" data-toggle="tooltip" title="Deletar aluno"></i></a>
+                    </td>
+                </tr>
+                
+                
+                `
+            }
+        }
+        feather.replace()
+        $('[data-toggle="tooltip"]').tooltip();
+        ativaCheckboxes()
+        
+
+    }).catch(error =>{ 
+        AstNotif.dialog('Erro', error.message)
+        loaderRun()
+    })
     
     
 }
