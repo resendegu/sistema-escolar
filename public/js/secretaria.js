@@ -21,6 +21,8 @@ $(function () {
     $('[data-toggle="popover"]').popover()
   })
 
+
+
 firebase.auth().onAuthStateChanged((user) => {
     update()
     if (user == null) {
@@ -30,9 +32,10 @@ firebase.auth().onAuthStateChanged((user) => {
         loader.style.display = 'block'
         loaderMsg.innerText = 'Buscando informações do usuário...'
         try {
+            document.getElementById('username').innerHTML = "Olá,<br>" + user.displayName.split(' ')[0]
             if (user.photoURL != null) {
                 document.getElementById('profilePic').src = user.photoURL
-                document.getElementById('username').innerHTML = "Olá,<br>" + user.displayName.split(' ')[0]
+                
             } 
         } catch (error) {
             console.log(error)
@@ -1755,12 +1758,36 @@ function carregaAlunosDesativados(filtro='') {
             loaderRun()
             let alunos = snapshot.val()
             listaAlunosDesativados.innerHTML = ''
+            let c = 0
             for (const matricula in alunos) {
                 if (Object.hasOwnProperty.call(alunos, matricula)) {
                     const dados = alunos[matricula];
-                    listaAlunosDesativados.innerHTML += `<button class="list-group-item list-group-item-action" onclick="opcoesAlunoDesativado('${matricula}')">${matricula}: ${dados.dadosAluno.nomeAluno} (Última Turma: ${dados.dadosAluno.turmaAluno})</button>`
+                    c++
+                    listaAlunosDesativados.innerHTML += `
+                    
+                    <tr>
+                        <td>
+                            <span class="custom-checkbox">
+                            <input type="checkbox" id="checkbox${c}" name="options[]" value="1">
+                            <label for="checkbox${c}"></label>
+                            </span>
+                        </td>
+                        <td><a href="#" onclick="abreDadosDoAlunoDesativado('${matricula}')">${dados.dadosAluno.nomeAluno}</a></td>
+                        <td>${matricula}</td>
+                        <td>${dados.dadosAluno.turmaAluno}</td>
+                        <td>
+                            <a href="#" class="action" onclick="ativarAluno('${matricula}')"><i data-feather="user-check" data-toggle="tooltip" title="Reativar Aluno"></i></a>
+                            <a href="#deleteEmployeeModal" class="delete" data-toggle="modal"><i data-feather="trash" data-toggle="tooltip" title="Deletar aluno"></i></a>
+                        </td>
+                    </tr>
+                    
+                    
+                    `
                 }
             }
+            feather.replace()
+            $('[data-toggle="tooltip"]').tooltip();
+            ativaCheckboxes()
             
 
         }).catch(error =>{ 

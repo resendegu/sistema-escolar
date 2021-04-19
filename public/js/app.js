@@ -9,7 +9,7 @@ var loader = document.getElementById('loader')
 var loaderMsg = document.getElementById('loaderMsg')
 
 function update() {
-	let versao = 0.93
+	let versao = 0.94
 	updatesRef.on('value', (snapshot) => {
 		let dados = snapshot.val()
 		if (versao < dados.versao) {
@@ -70,8 +70,6 @@ async function getAddress(numCep) {
 * @return Retorna uma string com a idade da pessoa em anos.
 */
 function calcularIdadePrecisa(data) {
-	loader.style.display = 'block'
-	loaderMsg.innerText = 'Buscando e calculando datas...'
 	let timestampNow = firebase.functions().httpsCallable('timestamp')
 	return timestampNow().then(function(result){
 		var now = new Date(result.data.timestamp._seconds * 1000)
@@ -110,7 +108,7 @@ function calcularIdadePrecisa(data) {
 				months: monthAge,
 				days: dateAge
 			};
-		loaderRun()
+		
 		return age;
 	}).catch(function(error){
 		throw new Error(error)
@@ -129,3 +127,27 @@ function formataNumMatricula(num) {
 	numero = numero.slice(-5,-1) + numero.slice(-1);
 	return numero
 }
+
+function ativaCheckboxes(){
+	// Activate tooltip
+	$('[data-toggle="tooltip"]').tooltip();
+	
+	// Select/Deselect checkboxes
+	var checkbox = $('table tbody input[type="checkbox"]');
+	$("#selectAll").click(function(){
+		if(this.checked){
+			checkbox.each(function(){
+				this.checked = true;                        
+			});
+		} else{
+			checkbox.each(function(){
+				this.checked = false;                        
+			});
+		} 
+	});
+	checkbox.click(function(){
+		if(!this.checked){
+			$("#selectAll").prop("checked", false);
+		}
+	});
+};

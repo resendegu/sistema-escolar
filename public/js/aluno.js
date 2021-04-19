@@ -97,9 +97,9 @@ firebase.auth().onAuthStateChanged((user) => {
         })
         loaderRun(true, 'Buscando informações do usuário...')
         try {
+            document.getElementById('username').innerHTML = "Olá,<br>" + user.displayName.split(' ')[0]
             if (user.photoURL != null) {
                 document.getElementById('profilePic').src = user.photoURL
-                document.getElementById('username').innerHTML = "Olá,<br>" + user.displayName.split(' ')[0]
             } 
         } catch (error) {
             console.log(error)

@@ -46,3 +46,18 @@
     background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
 
 }
+
+.feather-16{
+  width: 16px;
+  height: 16px;
+}
+
+.feather-24{
+  width: 24px;
+  height: 24px;
+}
+
+.feather-32{
+  width: 32px;
+  height: 32px;
+}
