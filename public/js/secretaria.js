@@ -970,8 +970,10 @@ function alteraTipoDeBusca(tipo) {
     tipoDeBusca = tipo
 }
 
-function desativarAlunos(confirma=false, codTurma, nomesObj) {
+function desativarAlunos(confirma=false, codTurma, matricula, nome) {
     if (confirma) {
+        let nomesObj = {}
+        nomesObj[matricula] = nome
         loaderRun(true, 'Desativando alunos...')
         let ativaDesativaAlunos = firebase.functions().httpsCallable('ativaDesativaAlunos')
         ativaDesativaAlunos({codTurma: codTurma, modo: 'desativa', alunos: nomesObj}).then(function(result){
@@ -984,11 +986,12 @@ function desativarAlunos(confirma=false, codTurma, nomesObj) {
             loaderRun()
         })
     } else {
+        console.log(nomesObj)
         abrirModal('modal', 'Confirmação de desativação do aluno', `
                 Você confirma a ação de desativação do(s) aluno(s) escolhido(s)?
                 <br><br>
                 Esta ação ficará salva no histórico de operações do aluno e da turma para futuras consultas.
-        `, `<button type="button" data-toggle="tooltip" data-placement="top" title="Desativar agora" class="btn btn-warning" onclick="desativarAlunos(true, '${codTurma}', '${nomesObj}')">Desativar</button><button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>`)
+        `, `<button type="button" data-toggle="tooltip" data-placement="top" title="Desativar agora" class="btn btn-warning" onclick="desativarAlunos(true, '${codTurma}', '${matricula}', '${nome}')">Desativar</button><button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>`)
     }
     
 }
@@ -1022,7 +1025,7 @@ function carregaListaDeAlunos(filtro='') {
                         <td>${aluno.turmaAluno}</td>
                         <td>
                             <a href="#" class="edit" onclick="ativarAluno('${matricula}')"><i data-feather="git-pull-request" data-toggle="tooltip" title="Transferir Aluno"></i></a>
-                            <a href="#checkbox${c}" class="delete" onclick="desativarAlunos(false, '${aluno.turmaAluno}', {'${matricula}': '${aluno.nomeAluno}'})"><i data-feather="user-x" data-toggle="tooltip" title="Desativar aluno"></i></a>
+                            <a href="#checkbox${c}" class="delete" onclick="desativarAlunos(false, '${aluno.turmaAluno}', '${matricula}', '${aluno.nomeAluno}')"><i data-feather="user-x" data-toggle="tooltip" title="Desativar aluno"></i></a>
                         </td>
                     </tr>`
                 }
