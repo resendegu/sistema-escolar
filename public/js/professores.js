@@ -28,7 +28,63 @@ firebase.auth().onAuthStateChanged((user) => {
     update()
     if (user == null) {
         loaderRun()
-        AstNotif.dialog('Login não identificado', 'Você não está logado, vá para a tela de <a href="../login.html">login</a> para logar ou se cadastrar.')
+        
+        abrirModal('modal', 'Login',
+            `
+                <h3>Seja bem-vindo!</h3>
+                <h6>Para acessar o sistema, digite seu e-mail e sua senha cadastradas.</h6>
+                <form id="areaLogin">
+                    <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="inputEmail4">Email</label>
+                        <input type="email" name="usuario" class="form-control" id="usuario" placeholder="Email">
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="inputPassword4">Senha</label>
+                        <input type="password" name="senha" class="form-control" id="inputPassword4" placeholder="Senha">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block" id="btnEntrar">Entrar no sistema</button>
+                </form>
+                <br><br>
+                <a href="#" id="esqueceuSenha" class="text-center" data-toggle="tooltip" data-placement="right" title="Digite seu e-mail no campo, e clique aqui para que possamos te ajudar.">Esqueci minha senha</a>
+                <p class="text-muted">Caso tenha esquecido sua senha, informe seu e-mail no campo acima e clique em "Esqueci minha senha" para que possamos ajudá-lo.</p>
+            `,
+            `<button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>`
+        )
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
+    
+        document.querySelector('#areaLogin').addEventListener('submit', (e) => {
+            loaderRun(true, 'Conectando ao sistema...')
+            e.preventDefault()
+            const formData = new FormData(e.target);
+            var senha = formData.get('senha')
+            var email = formData.get('usuario')
+            firebase.auth().useDeviceLanguage();
+
+            firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION)
+                .then(() => {
+                    loaderRun(true, 'Autenticando usuário...')
+                    // Existing and future Auth states are now persisted in the current
+                    // session only. Closing the window would clear any existing state even
+                    // if a user forgets to sign out.
+                    // ...
+                    // New sign-in will be persisted with session persistence.
+                    return firebase.auth().signInWithEmailAndPassword(email, senha);
+                }).then((result) => {
+                    loaderRun()
+                    $('#modal').modal('hide')
+                })
+                .catch((error) => {
+                    // Handle Errors here.
+                    var errorCode = error.code;
+                    var errorMessage = error.message;
+                    AstNotif.dialog('Erro', error.message)
+                    loaderRun()
+                });
+
+        })
     } else {
         usuarioRef.child(user.uid).once('value').then(snapshot => {
             let dadosUser = snapshot.val()

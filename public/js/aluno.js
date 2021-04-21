@@ -38,7 +38,7 @@ firebase.auth().onAuthStateChanged((user) => {
                 <form id="areaLogin">
                     <div class="form-row">
                     <div class="form-group col-md-6">
-                        <label for="inputEmail4">Email ou número de celular</label>
+                        <label for="inputEmail4">Email</label>
                         <input type="email" name="usuario" class="form-control" id="usuario" placeholder="Email">
                     </div>
                     <div class="form-group col-md-6">
@@ -83,6 +83,7 @@ firebase.auth().onAuthStateChanged((user) => {
                     var errorCode = error.code;
                     var errorMessage = error.message;
                     AstNotif.dialog('Erro', error.message)
+                    loaderRun()
                 });
 
         })
