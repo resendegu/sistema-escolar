@@ -91,8 +91,13 @@ firebase.auth().onAuthStateChanged((user) => {
     } else {
         registroAcademico = user.uid
         alunosRef.child(user.uid).once('value').then(snapshot => {
-            dadosAluno = snapshot.val()
-            document.getElementById('cursosConcluidos').innerText = Object.keys(dadosAluno.historicoEscolar).length
+            try {
+                dadosAluno = snapshot.val()
+                document.getElementById('cursosConcluidos').innerText = Object.keys(dadosAluno.historicoEscolar).length
+            } catch (error) {
+                console.log(error)
+            }
+            
         }).catch(error => {
             AstNotif.dialog('Erro', error.message)
             console.log(error)
@@ -109,7 +114,8 @@ firebase.auth().onAuthStateChanged((user) => {
 
 
         aniversariosRef.on('value', snapshot => {
-            loader.style.display = 'block'
+            try {
+                loader.style.display = 'block'
             var meses = snapshot.val()
             var dataLocal = new Date()
             var mesAtual = dataLocal.getMonth()
@@ -121,6 +127,11 @@ firebase.auth().onAuthStateChanged((user) => {
                 }
             }
             loaderRun()
+            } catch (error) {
+                loaderRun()
+                console.log(error)
+            }
+            
         })
     }
     
@@ -258,7 +269,7 @@ function abreDadosDoAluno(desativado=false) {
                 notasDoAlunoDiv.innerHTML = 'Nenhuma nota foi lançada para este aluno<br>'
             }
             if (referenciaDeNotas == null) {
-                notasDoAlunoDiv.innerHTML = 'Você não distribuiu notas para esta turma. Se aparecerem notas aqui abaixo, elas podem ter sido lançadas por outro professor.<br>'
+                notasDoAlunoDiv.innerHTML = 'Não foram encontrados lançamentos de notas para você.<br>'
             }
             let somatorioNotas = 0
             for (const nomeNota in notas) {
@@ -318,7 +329,7 @@ function abreDadosDoAluno(desativado=false) {
             notasDoAlunoDiv.innerHTML = ''
             //let somatorioNotasDiv = document.getElementById('somatorioNotas')
             if (notas == null) {
-                notasDoAlunoDiv.innerHTML = 'Nenhuma nota de desempenho foi lançada para este aluno'
+                notasDoAlunoDiv.innerHTML = 'Nenhuma nota de desempenho foi lançada'
             }
             let somatorioNotas = 0
             for (const nomeNota in notas) {
@@ -437,6 +448,7 @@ function historicoAluno(matricula, turma) {
         loaderRun()
         ativaCheckboxes()
     })
+    loaderRun()
 }
 
 function visualizarDadosDoHistorico(info) {
@@ -628,6 +640,7 @@ function verFollowUp(id) {
 function carregaHistoricoAluno() {
     let listaHistoricoAluno = document.getElementById('listaHistoricoAluno')
     listaHistoricoAluno.innerHTML = ''
+    let matricula = registroAcademico
     try {
         const historico = dadosAluno.historico
         for (const key in historico) {
@@ -644,7 +657,7 @@ function carregaHistoricoAluno() {
         }
     } catch (error) {
         console.log(error)
-        const historico = alunosDesativados[matricula].dadosAluno.historico
+        const historico = alunosDesativados[registroAcademico].dadosAluno.historico
         for (const key in historico) {
             if (Object.hasOwnProperty.call(historico, key)) {
                 const infos = historico[key];

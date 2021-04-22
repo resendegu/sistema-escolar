@@ -105,13 +105,11 @@ document.querySelector('#areaLogin').addEventListener('submit', (e) => {
   }).then(() => {
       if (senhaRepetida != '') {
         var user = firebase.auth().currentUser;
-        storageUserRef.child('profilePic.jpg').put(foto).then(function(snapshot) {
-            console.log(snapshot)
-            snapshot.ref.getDownloadURL().then(function (URL) {
-                urlFoto = URL
+        
+                
                 user.updateProfile({
-                    displayName: nome,
-                    photoURL: urlFoto
+                    displayName: nome
+                    
                 }).then(function() {
                     firebase.database().ref('sistemaEscolar/usuarios/' + user.uid + '/nome').set(nome).then(() => {
                       firebase.database().ref('sistemaEscolar/listaDeUsuarios/' + user.uid + '/nome').set(nome).then(() => {
@@ -141,13 +139,7 @@ document.querySelector('#areaLogin').addEventListener('submit', (e) => {
                     AstNotif.dialog('Erro ao atualizar dados do usuário', error.message)
                     console.log(error)
                 })
-            })
-            
-        }).catch(function(error) {
-            loader.style.display = 'none'
-            console.error(error)
-            AstNotif.dialog('Erro', error.message)
-        })
+        
         
       }
     

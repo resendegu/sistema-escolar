@@ -134,7 +134,8 @@ firebase.auth().onAuthStateChanged((user) => {
             alunosDesativadosNum.innerText = c
         })
         numerosRef.on('value', (snapshot) => {
-            loaderMsg.innerText = 'Buscando informações da dashboard'
+            try {
+                loaderMsg.innerText = 'Buscando informações da dashboard'
             var numeros = snapshot.val()
             var tabelaSemanal = numeros.tabelaSemanal
             
@@ -177,6 +178,10 @@ firebase.auth().onAuthStateChanged((user) => {
                     idCelulaTabela = ''
                 }
             }
+            } catch (error) {
+                console.log(error)
+            }
+            
             loaderRun()
         })
 
@@ -186,12 +191,17 @@ firebase.auth().onAuthStateChanged((user) => {
             var dataLocal = new Date()
             var mesAtual = dataLocal.getMonth()
             document.getElementById('listaAniversarios').innerHTML = ''
-            for (const key in meses[mesAtual]) {
-                if (meses[mesAtual].hasOwnProperty(key)) {
-                    const aniversario = meses[mesAtual][key];
-                    document.getElementById('listaAniversarios').innerHTML += `<button class="list-group-item list-group-item-action">${aniversario.nome} no dia ${aniversario.dataNascimento.dia}</button>`
+            try {
+                for (const key in meses[mesAtual]) {
+                    if (meses[mesAtual].hasOwnProperty(key)) {
+                        const aniversario = meses[mesAtual][key];
+                        document.getElementById('listaAniversarios').innerHTML += `<button class="list-group-item list-group-item-action">${aniversario.nome} no dia ${aniversario.dataNascimento.dia}</button>`
+                    }
                 }
+            } catch (error) {
+                console.log(error)
             }
+            
             loaderRun()
         })
     }
@@ -1042,7 +1052,6 @@ function desativarAlunos(confirma=false, codTurma, matricula, nome) {
             loaderRun()
         })
     } else {
-        console.log(nomesObj)
         abrirModal('modal', 'Confirmação de desativação do aluno', `
                 Você confirma a ação de desativação do(s) aluno(s) escolhido(s)?
                 <br><br>
@@ -1916,7 +1925,7 @@ function carregaHistoricoAluno(matricula) {
                 if (infos.operacao == 'Transferência de alunos') {
                     listaHistoricoAluno.innerHTML += `<button class="list-group-item list-group-item-action" onclick="verOperacaoAluno('${matricula}', '${key}')"><b>Operação:</b> ${infos.operacao}: ${infos.dados.turmaAtual} --> ${infos.dados.turmaParaQualFoiTransferido}</button>`
                 } else if(infos.operacao == 'Desativação de aluno') {
-                    listaHistoricoAluno.innerHTML += `<button class="list-group-item list-group-item-action" onclick="verOperacaoAluno('${matricula}', '${key}')"><b>Operação:</b> ${infos.operacao}: ${infos.dados.turmaAtual} --> Desativado</button>`
+                    listaHistoricoAluno.innerHTML += `<button class="list-group-item list-group-item-action" onclick="verOperacaoAluno('${matricula}', '${key}')"><b>Operação:</b> ${infos.operacao}: ${infos.dados.turma} --> Desativado</button>`
                 } else if (infos.operacao == 'Reativação de aluno') {
                     listaHistoricoAluno.innerHTML += `<button class="list-group-item list-group-item-action" onclick="verOperacaoAluno('${matricula}', '${key}')"><b>Operação:</b> ${infos.operacao}: Aluno reativado na turma ${infos.dados.turmaAtivacao}</button>`
                 }

@@ -1,67 +1,81 @@
 // These rules grant access to a node matching the authenticated
 // user's ID from the Firebase auth token
 {
-  	"rules": {
-      // Regra teste para lembrar como libera o acesso aos dados
-      "sistemaEscolar": {
-          ".write": false,
-          ".read": false,
-          //".read": "auth.uid != null && auth.token.master == true || auth.token.secretaria == true"
-          "numeros": {
-            ".write": "auth.uid != null && auth.token.master == true || auth.token.secretaria == true",
-            ".read":"auth.uid != null && auth.token.master == true || auth.token.secretaria == true"
-          },
-            "chats": {
-            ".write": "auth.uid != null && auth.token.secretaria == true || auth.token.master == true || auth.token.adm == true || auth.token.professor == true",
-            ".read":"auth.uid != null && auth.token.secretaria == true || auth.token.master == true || auth.token.adm == true || auth.token.professor == true"
-          },
-            "followUp": {
-            ".write": "auth.uid != null && auth.token.master == true || auth.token.secretaria == true",
-            ".read":"auth.uid != null && auth.token.master == true || auth.token.secretaria == true"
-          },
-            "updates": {
-            ".write": "auth.uid != null",
-            ".read":"auth.uid != null"
-          },
-            "alunos": {
-            ".write": false,
-            ".read":"auth.uid != null && auth.token.master == true || auth.token.secretaria == true"
-          },
-            "alunosDesativados": {
-            ".write": false,
-            ".read":"auth.uid != null && auth.token.master == true || auth.token.secretaria == true"
-          },
-          "ultimaMatricula": {
-            ".write": false,
-            ".read":"auth.token.secretaria == true || auth.token.master == true"
-          },
-          "turmas": {
-            ".write": "auth.token.secretaria == true || auth.token.master == true",
-            ".read":"auth.token.secretaria == true || auth.token.master == true"
-          },
-          "listaDeUsuarios": {
-              ".read": "auth.token.master == true",
-              ".write": "auth.uid != null"
-          },
-          "aniversarios": {
-              ".read": "auth.uid != null",
-              ".write": "auth.uid != null"
-          },
-          "listaDeProfessores": {
-              ".read": "auth.uid != null && auth.token.secretaria == true || auth.token.master == true || auth.token.adm == true",
-              ".write": "auth.uid != null"
-          },
-          "notasDesempenho": {
-            ".write": "auth.uid != null && auth.token.master == true || auth.token.secretaria == true || auth.token.professor == true",
-            ".read":"auth.uid != null && auth.token.master == true || auth.token.secretaria == true || auth.token.professor == true"
-          },
-          "usuarios": {
-            "$user_id":{
-              ".write": "auth.uid == $user_id",
-              ".read": "auth.uid != null"
-            } 
-          }
+  "rules": {
+    // Regra teste para lembrar como libera o acesso aos dados
+    "sistemaEscolar": {
+        ".write": false,
+        ".read": false,
+        //".read": "auth.uid != null && auth.token.master == true || auth.token.secretaria == true"
+        "numeros": {
+          ".write": "auth.uid != null && auth.token.master == true || auth.token.secretaria == true",
+          ".read":"auth.uid != null && auth.token.master == true || auth.token.secretaria == true"
         },
-    }
-      
+          "chats": {
+          ".write": "auth.uid != null && auth.token.secretaria == true || auth.token.master == true || auth.token.adm == true || auth.token.professor == true",
+          ".read":"auth.uid != null && auth.token.secretaria == true || auth.token.master == true || auth.token.adm == true || auth.token.professor == true"
+        },
+          "followUp": {
+          ".write": "auth.uid != null && auth.token.master == true || auth.token.secretaria == true",
+          ".read":"auth.uid != null && auth.token.master == true || auth.token.secretaria == true"
+        },
+          "updates": {
+          ".write": "auth.uid != null",
+          ".read":"auth.uid != null"
+        },
+          "alunos": {
+          ".write": false,
+          ".read":"auth.uid != null && auth.token.master == true || auth.token.secretaria == true",
+            "$registro": {
+              ".write": "auth.token.aluno == true && auth.uid == $registro",
+              ".read": "(auth.token.aluno == true && auth.uid == $registro) || auth.token.master == true || auth.token.secretaria == true"
+            }
+        },
+          "alunosDesativados": {
+          ".write": false,
+          ".read":"auth.uid != null && auth.token.master == true || auth.token.secretaria == true"
+        },
+        "ultimaMatricula": {
+          ".write": false,
+          ".read":"auth.token.secretaria == true || auth.token.master == true"
+        },
+        "turmas": {
+          ".write": "auth.token.secretaria == true || auth.token.master == true",
+          ".read":"auth.token.secretaria == true || auth.token.master == true",
+            "$turma": {
+              ".write": "auth.token.professor == true || auth.token.master == true",
+              ".read": "auth.token.aluno == true || auth.token.master == true || auth.token.secretaria == true",
+                "alunos": {
+                  "$registro": {
+                    ".write": "auth.token.professor == true",
+                    ".read": "auth.token.professor == true || (auth.token.aluno == true && auth.uid == $registro)"
+                  }
+                }
+            }
+        },
+        "listaDeUsuarios": {
+            ".read": "auth.token.master == true",
+            ".write": "auth.uid != null"
+        },
+        "aniversarios": {
+            ".read": "auth.uid != null",
+            ".write": "auth.uid != null"
+        },
+        "listaDeProfessores": {
+            ".read": "auth.uid != null && auth.token.secretaria == true || auth.token.master == true || auth.token.adm == true",
+            ".write": "auth.uid != null"
+        },
+        "notasDesempenho": {
+          ".write": "auth.uid != null && auth.token.master == true || auth.token.secretaria == true || auth.token.professor == true",
+          ".read":"auth.uid != null && auth.token.master == true || auth.token.aluno == true || auth.token.secretaria == true || auth.token.professor == true"
+        },
+        "usuarios": {
+          "$user_id":{
+            ".write": "auth.uid == $user_id",
+            ".read": "auth.uid != null"
+          } 
+        }
+      },
+  }
+    
 }
