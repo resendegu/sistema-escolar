@@ -705,6 +705,7 @@ exports.fechaTurma = functions.https.onCall((data, context) => {
         var alunosRef = admin.database().ref(`sistemaEscolar/alunos/`)
         return turmaRef.once('value').then(dadosTurma => {
             async function sequenciaDeFechamento(dadosDaTurma) {
+                delete dadosDaTurma.historicoEscolar
                 turmaRef.child('status/turma').set('fechada').then(()=>{
 
                 }).catch(error => {

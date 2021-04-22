@@ -17,6 +17,7 @@
     <link href="../css/list-items.css" rel="stylesheet">
     <link rel="stylesheet" href="../css/aluno.css">
     <link rel="stylesheet" href="../css/filedrop.css">
+    <link rel="stylesheet" href="../css/tabela.css">
 
       <!-- Carregando arquivos da biblioteca AST-Notif. Créditos: https://github.com/anandastoon/AST-Notif -->
     <link rel="stylesheet" href="../resources/AST-Notif/css/ast-notif.min.css">
@@ -25,7 +26,7 @@
 
   <body>
 
-    <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" id="modal">
+    <div class="modal fade bd-example-modal-xl" tabindex="-1" role="dialog" id="modal">
       <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
           <div class="modal-header">
@@ -150,7 +151,7 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" data-toggle="list" href="#abaDados" role="tab" aria-controls="alunos" id="btnAbaAlunos" onclick="abreDadosDoAluno()">
+                <a class="nav-link" data-toggle="list" href="#abaDados" role="tab" aria-controls="alunos" id="btnAbaDados" onclick="abreDadosDoAluno()">
                   <span data-feather="user" ></span>
                   Dados e notas
                 </a>
@@ -205,15 +206,15 @@
             <!--<button type="button" class="btn btn-light btn-sm">
               Alunos cadastrados <span class="badge badge-primary" id="alunosCadastradosNum">0</span>
             </button>-->
-            <button type="button" class="btn btn-light btn-sm" onclick="document.getElementById('btnAbaAlunos').click()">
-              Alunos matriculados <span class="badge badge-success" id="alunosMatriculadosNum">0</span>
+            <button type="button" class="btn btn-light btn-sm" onclick="document.getElementById('btnAbaDados').click()">
+              Cursos concluídos <span class="badge badge-success" id="cursosConcluidos">0</span>
             </button>
-            <button type="button" class="btn btn-light btn-sm" onclick="document.getElementById('btnAbaAlunosDesativados').click()">
-              Alunos Desativados <span class="badge badge-danger" id="alunosDesativadosNum">0</span>
+            <!--<button type="button" class="btn btn-light btn-sm" onclick="document.getElementById('btnAbaAlunosDesativados').click()">
+              Nota atual <span class="badge badge-danger" id="notaAtual">0</span>
             </button>
             <button type="button" class="btn btn-light btn-sm" onclick="document.getElementById('btnAbaTurmas').click()">
               Turmas Cadastradas <span class="badge badge-success" id="turmasCadastradasNum">0</span>
-            </button>
+            </button>-->
             
           </div>
           <hr>
@@ -261,7 +262,6 @@
                                   <input type="text" id="rolaTelaAbaixoAlunos" style="display: none;">
                                   <label class="text-secondary mb-1" id="mostraTurmaAluno">Turma</label>
                                   <p class="text-muted font-size-sm" id="mostraHoraEDiasAluno">Horário e dia de aula</p>
-                                  <button class="btn btn-primary" onclick="followUpAluno(`${document.getElementById('mostraMatriculaAluno').innerText}`)">Follow Up</button>
                                   <button class="btn btn-outline-primary" onclick="mostraDadosResponsaveis()">Responsáveis</button>
                                   <br><br>
                                   
@@ -396,6 +396,7 @@
                       </div>
                     </div>
                     <hr>
+                    <button class="btn btn-sm btn-outline-info float-left" onclick="abreDadosDoAluno()"><span data-feather="refresh-ccw"></span>&nbsp;Atualizar para notas atuais</button>
                     <p class="text-muted float-md-right" id="timestampDoAluno"></p>
                     <br>
                     <hr>

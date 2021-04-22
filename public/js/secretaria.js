@@ -1434,6 +1434,159 @@ function addCampoNota(extra=false) {
     }
 }
 
+function historicoAluno(matricula, turma) {
+    loaderRun(true, 'Recuperando informações do histórico escolar...')
+    abrirModal('modal', 'Histórico escolar', 
+            `
+            <div class="container-xl">
+            <div class="table-responsive">
+              <div class="table-wrapper">
+                <div class="table-title">
+                  <div class="row">
+                    <div class="col-sm-6">
+                      <h2>Histórico <b>Escolar</b></h2>
+                    </div>
+                    <div class="col-sm-6">
+                      <!--<a href="#" class="btn btn-success" onclick="carregaListaDeAlunos()">&nbsp; <span class="feather-24" data-feather="refresh-cw"></span><span>Atualizar lista</span></a>
+                      <a href="#deleteEmployeeModal" class="btn btn-danger" data-toggle="modal">&nbsp;<span class="feather-24" data-feather="trash"></span> <span>Delete</span></a>-->						
+                    </div>
+                  </div>
+                </div>
+                <table class="table table-striped table-hover">
+                  <thead>
+                    <tr>
+                      <th>
+                        <span class="custom-checkbox">
+                          <input type="checkbox" id="selectAll">
+                          <label for="selectAll"></label>
+                        </span>
+                      </th>
+                      <th><a href="#" id="ordenaTurma">Turma</a></th>
+                      <th><a href="#" id="ordenaData">Data de fechamento</a></th>
+                      <th><a href="#" id="ordenaNota">Somatório das notas</a></th>
+                      <th>Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody id="listaHistorico">
+                    
+                  </tbody>
+                </table>
+                
+              </div>
+            </div>
+          </div>    
+
+            `, `<button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>`
+        )
+        let listaHistorico = document.getElementById('listaHistorico')
+        let c = 0
+    alunosRef.child(matricula + '/historicoEscolar').on('child_added', (registro) => {
+        
+        c++
+        let dataFechamento = new Date(registro.val().timestamp._seconds * 1000)
+        let notas = registro.val().infoAluno.notas
+        let somatorioNota = 0
+        for (const nomeNota in notas) {
+            if (Object.hasOwnProperty.call(notas, nomeNota)) {
+                const nota = notas[nomeNota];
+                somatorioNota += nota
+            }
+        }
+        listaHistorico.innerHTML += `
+        <tr>
+            <td>
+                <span class="custom-checkbox">
+                    <input type="checkbox" id="checkbox${c}" name="options[]" value="1">
+                    <label for="checkbox${c}"></label>
+                </span>
+            </td>
+            <td>${registro.val().turma}</td>
+            <td>${dataFechamento.getDate()}/${dataFechamento.getMonth() + 1}/${dataFechamento.getFullYear()}</td>
+            <td><b>${somatorioNota}</b>/100</td>
+            <td>
+                <a href="#editEmployeeModal" class="action" data-toggle="modal"><i data-feather="file-text" data-toggle="tooltip" title="Emitir boletim"></i></a>
+                <a href="#" id="verHistorico${c}" class="edit" data-toggle="modal"><i data-feather="eye" data-toggle="tooltip" title="Visualizar dados"></i></a>
+            </td>
+        </tr>
+        `
+        document.querySelector('#verHistorico' + c).addEventListener('click', (e) => {
+            e.preventDefault()
+            visualizarDadosDoHistorico(registro.val())
+        })
+
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
+        feather.replace()
+        loaderRun()
+        ativaCheckboxes()
+    })
+}
+
+function visualizarDadosDoHistorico(info) {
+    console.log(info)
+    $('#modal').modal('hide')
+    let referenciaDeNotas = info.infoAluno.notasReferencia
+    document.getElementById('mostraTurmaAluno').innerText = info.turma
+    document.getElementById('notasDoAluno').innerHTML = ''
+    let somatorioNotas = 0
+    for (const nomeNota in info.infoAluno.notas) {
+        if (Object.hasOwnProperty.call(info.infoAluno.notas, nomeNota)) {
+            const nota = info.infoAluno.notas[nomeNota];
+            const barra = (100*nota)/referenciaDeNotas[nomeNota]
+            somatorioNotas += nota
+            
+            document.getElementById('notasDoAluno').innerHTML += `
+                <small id="nomeNota${nomeNota}"><b>${nomeNota}</b>: ${nota}</small><small id="notaReferencia">/${referenciaDeNotas[nomeNota]}</small>
+                <div class="progress mb-3" style="height: 10px">
+                <div class="progress-bar bg-primary" role="progressbar" style="width: ${barra}%" aria-valuenow="${nota}" aria-valuemin="0" aria-valuemax="${referenciaDeNotas[nomeNota]}">${nota}</div>
+                </div>
+            `
+        }
+    }
+    document.getElementById('notasDoAluno').innerHTML += `<div id="somatorioNotas">Somatório: <b>${somatorioNotas}</b></div>`
+
+    somatorioNotas = 0
+    document.getElementById('desempenhoAluno').innerHTML = ''
+    for (const nomeNota in info.infoAluno.desempenho) {
+        if (Object.hasOwnProperty.call(info.infoAluno.desempenho, nomeNota)) {
+            const valorNota = info.infoAluno.desempenho[nomeNota];
+            
+            somatorioNotas += valorNota
+            document.getElementById('desempenhoAluno').innerHTML += `
+            
+            <small id="nomeDesempenho${nomeNota}"><b>${nomeNota}</b>: ${valorNota}</small>
+            <br><br>
+            `
+            
+        }
+    }
+    
+    document.getElementById('desempenhoAluno').innerHTML += `<div id="somatorioNotas">Somatório: <b>${somatorioNotas}</b></div>`
+
+    document.getElementById('divFrequencias').innerHTML = ''
+    for (const data in info.infoAluno.frequencia) {
+        if (Object.hasOwnProperty.call(info.infoAluno.frequencia, data)) {
+            let diaFrequencia = data.split('T')[0]
+            let horaFrequencia = data.split('T')[1]
+
+            document.getElementById('divFrequencias').innerHTML += `
+            <div class="row justify-content-start">
+                <div class="col-auto" style="background-color: rgba(86,61,124,.15);border: 1px solid rgba(86,61,124,.2);">${diaFrequencia.split('-').reverse().join('/')} ás ${horaFrequencia}</div>
+                <div class="col-auto" style="background-color: rgba(86,61,124,.15);border: 1px solid rgba(86,61,124,.2);">Presente</div>
+            </div>
+            `
+            
+        }
+    }
+
+    document.getElementById('rolaTelaAbaixoAlunos').style.display = 'block'
+    document.getElementById('rolaTelaAbaixoAlunos').focus()
+    document.getElementById('rolaTelaAbaixoAlunos').style.display = 'none'
+
+    AstNotif.notify('Notas carregadas...', 'Agora você está visualizando as notas do período que você escolheu.', 'agora', {length: 15000})
+}
+
 function followUpAluno(matricula) {
     
     if (matricula == '00000' || matricula == '') {

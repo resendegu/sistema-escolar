@@ -323,8 +323,11 @@ function iniciaPeriodo(confirma=false, inicio='', fim='', qtdeAulas='') {
             <input type="date" class="form-control" name="dataInicioPeriodo" id="dataInicioPeriodo">
             <br> Fim previsto:
             <input type="date" class="form-control" name="dataFimPeriodo" id="dataFimPeriodo">
-            <br> Quantidade de dias de aulas:
+            <br> Previsão de quantidade de aulas ministradas:
             <input type="number" class="form-control" name="qtdeAulas" id="qtdeAulas">
+            <small id="cadastrarEntrar" class="form-text text-muted">
+                A quantidade de aulas serve como referência para você e para os alunos para acompanhar o andamento do curso e também poderá ser modificada antes do fechamento desta turma.
+            </small>
 
         `, 
         `<button type="button" data-toggle="tooltip" data-placement="top" title="Iniciar atividades da turma no sistema" class="btn btn-primary" onclick="iniciaPeriodo(true, document.getElementById('dataInicioPeriodo').value, document.getElementById('dataFimPeriodo').value, document.getElementById('qtdeAulas').value)">Iniciar turma</button><button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>`)
@@ -357,9 +360,8 @@ function fechaPeriodo() {
 
             document.querySelector('#btnFechaTurma').addEventListener('click', (e) => {
                 e.preventDefault()
+                loaderRun(true, 'Enviando pedido de fechamento de turma ao servidor...')
                 // Aqui começará o fechamento de turmas
-                loader.style.display = 'block'
-                loaderMsg.innerText = 'Aguarde enquanto os dados são processados nos servidores remotos do sistema. Isso pode demorar um pouco...'
                 let ini = document.getElementById('dataInicioPeriodo').value
                 let fim = document.getElementById('dataFimPeriodo').value
                 let qtdeAulas = document.getElementById('qtdeAulasConfirma').value
@@ -1474,29 +1476,6 @@ function lancaDesempenho(matricula='', turma='', confirma=false, FALE={}) {
             console.log(error)
         })
     }
-}
-
-function historicoAluno(matricula, turma) {
-    loader.style.display = 'block'
-    loaderMsg.innerText = 'Recuperando informações do histórico escolar...'
-    alunosRef.child(matricula).once('value').then(snapshot => {
-        let dadosAluno = snapshot.val()
-        abrirModal('modal', 'Histórico escolar de ' + dadosAluno.nomeAluno, 
-            `
-                Esta área ainda está em construção...
-                <br> Aguarde :-)
-                <br> <br> Gustavo Resende
-            `, `<button type="button" data-toggle="tooltip" data-placement="top" title="Ja falei que ta em construção, sai daqui ;-)" class="btn btn-primary">Acessar</button><button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>`
-        )
-        $(function () {
-            $('[data-toggle="tooltip"]').tooltip()
-          })
-        loaderRun()
-    }).catch(error => {
-        AstNotif.dialog('Erro', error.message)
-        loaderRun()
-        console.log(error)
-    })
 }
 
 function followUpAluno(matricula) {
