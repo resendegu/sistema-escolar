@@ -1,0 +1,1 @@
+firebase emulators:start --import=./localdatabase --export-on-exit
