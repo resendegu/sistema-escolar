@@ -147,11 +147,13 @@ function ativaCheckboxes(){
 	$("#selectAll").click(function(){
 		if(this.checked){
 			checkbox.each(function(){
-				this.checked = true;                        
+				this.checked = false;
+				this.click()                        
 			});
 		} else{
 			checkbox.each(function(){
-				this.checked = false;                        
+				this.checked = true;
+				this.click()                        
 			});
 		} 
 	});

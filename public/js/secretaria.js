@@ -1036,10 +1036,26 @@ function alteraTipoDeBusca(tipo) {
     tipoDeBusca = tipo
 }
 
-function desativarAlunos(confirma=false, codTurma, matricula, nome) {
+document.getElementById('desativaAlunos').addEventListener('click', (e) => {
+    
+})
+
+function desativarAlunos(confirma=false, codTurma, matriculas) {
     if (confirma) {
         let nomesObj = {}
-        nomesObj[matricula] = nome
+        if (typeof(matriculas) == 'string' || typeof(matriculas) == "number") {
+            nomesObj[matriculas] = ''
+        } else {
+            for (const key in matriculas) {
+                if (Object.hasOwnProperty.call(matriculas, key)) {
+                    const matricula = matriculas[key];
+                    nomesObj[matricula] = ''
+                }
+            }
+        }
+        
+        
+        
         loaderRun(true, 'Desativando alunos...')
         let ativaDesativaAlunos = firebase.functions().httpsCallable('ativaDesativaAlunos')
         ativaDesativaAlunos({codTurma: codTurma, modo: 'desativa', alunos: nomesObj}).then(function(result){
@@ -1056,18 +1072,28 @@ function desativarAlunos(confirma=false, codTurma, matricula, nome) {
                 Você confirma a ação de desativação do(s) aluno(s) escolhido(s)?
                 <br><br>
                 Esta ação ficará salva no histórico de operações do aluno e da turma para futuras consultas.
-        `, `<button type="button" data-toggle="tooltip" data-placement="top" title="Desativar agora" class="btn btn-warning" onclick="desativarAlunos(true, '${codTurma}', '${matricula}', '${nome}')">Desativar</button><button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>`)
+        `, `<button type="button" data-toggle="tooltip" data-placement="top" title="Desativar agora" class="btn btn-warning" onclick="desativarAlunos(true, '${codTurma}', ${matriculas})">Desativar</button><button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>`)
     }
     
 }
 
 
+var alunosSelecionados = []
+
+function listenerCheckboxesListaAlunos(checked) {
+    if (alunosSelecionados.length >= 1) {
+        document.getElementById('desativaAlunos').className = 'btn btn-danger'
+    } else {
+        document.getElementById('desativaAlunos').className = 'btn btn-danger disabled'
+    }
+}
 
 function carregaListaDeAlunos(filtro='') {
     console.log(filtro)
     loader.style.display = 'block'
     loaderMsg.innerText = 'Carregando lista de alunos...'
     let listaAlunos = document.getElementById('listaAlunos')
+    alunosSelecionados = []
     if (filtro == '') {
         document.getElementById('listaAlunos').innerHTML = ''
         alunosRef.on('value', (snapshot) => {
@@ -1081,7 +1107,7 @@ function carregaListaDeAlunos(filtro='') {
                     <tr>
                         <td>
                             <span class="custom-checkbox">
-                            <input type="checkbox" id="checkbox${c}" name="options[]" value="1">
+                            <input type="checkbox" id="checkbox${c}" value="${matricula}" onclick="this.checked ? (alunosSelecionados.push(this.value), console.log(alunosSelecionados)) : (alunosSelecionados.splice(alunosSelecionados.indexOf(this.value), 1), console.log(alunosSelecionados)), listenerCheckboxesListaAlunos(this.checked)" name="options[]" value="1">
                             <label for="checkbox${c}"></label>
                             </span>
                         </td>
@@ -1090,9 +1116,10 @@ function carregaListaDeAlunos(filtro='') {
                         <td>${aluno.turmaAluno}</td>
                         <td>
                             <a href="#" class="edit" onclick="ativarAluno('${matricula}')"><i data-feather="git-pull-request" data-toggle="tooltip" title="Transferir Aluno"></i></a>
-                            <a href="#checkbox${c}" class="delete" onclick="desativarAlunos(false, '${aluno.turmaAluno}', '${matricula}', '${aluno.nomeAluno}')"><i data-feather="user-x" data-toggle="tooltip" title="Desativar aluno"></i></a>
+                            <a href="#checkbox${c}" class="delete" onclick="document.getElementById('checkbox${c}').checked = false, document.getElementById('checkbox${c}').click(), desativarAlunos(false, '${aluno.turmaAluno}', alunosSelecionados)"><i data-feather="user-x" data-toggle="tooltip" title="Desativar aluno"></i></a>
                         </td>
                     </tr>`
+                
                 }
             }
             feather.replace()
