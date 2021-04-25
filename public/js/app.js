@@ -137,13 +137,11 @@ function ativaCheckboxes(){
 	$("#selectAll").click(function(){
 		if(this.checked){
 			checkbox.each(function(){
-				this.checked = false;
-				this.click()                        
+				this.checked = true;                        
 			});
 		} else{
 			checkbox.each(function(){
-				this.checked = true;
-				this.click()                        
+				this.checked = false;                        
 			});
 		} 
 	});
