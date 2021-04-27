@@ -8,8 +8,15 @@ var loaderMsg = document.getElementById('loaderMsg')
 var loader = document.getElementById('loader')
 var loaderMsg = document.getElementById('loaderMsg')
 
+let user
+firebase.auth().onAuthStateChanged((usuario) => {
+	user = usuario
+	monitoraConexao()
+	update()
+})
+
 function update() {
-	let versao = 0.95
+	let versao = 0.96
 	updatesRef.on('value', (snapshot) => {
 		let dados = snapshot.val()
 		if (versao < dados.versao) {
@@ -151,3 +158,54 @@ function ativaCheckboxes(){
 		}
 	});
 };
+
+// Monitora última vez online
+function monitoraConexao() {
+	// Since I can connect from multiple devices or browser tabs, we store each connection instance separately
+	// any time that connectionsRef's value is null (i.e. has no children) I am offline
+	var userConnectionsRef = firebase.database().ref('sistemaEscolar/usuarios/' + user.uid + '/connections');
+
+	// stores the timestamp of my last disconnect (the last time I was seen online)
+	var lastOnlineRef = firebase.database().ref(`sistemaEscolar/usuarios/${user.uid}/lastOnline`);
+
+	var connectedRef = firebase.database().ref('.info/connected');
+	let c = 0
+	connectedRef.on('value', (snap) => {
+		if (snap.val() === true) {
+			if (c > 1) {
+				try {
+					let snack = document.getElementById("ast-snack-el")
+					snack.remove()
+					console.log('elemento removido')
+				} catch (error) {
+					console.log(error)
+				}
+				AstNotif.snackbar('Você está devolta online!', {length: 5000, color: 'white', bgcolor: 'darkgreen', position: 'top'})
+			}
+			
+			
+
+			// We're connected (or reconnected)! Do anything here that should happen only if online (or on reconnect)
+			var con = userConnectionsRef.push();
+
+			// When I disconnect, remove this device
+			con.onDisconnect().remove();
+
+			// Add this device to my connections list
+			// this value could contain info about the device or a timestamp too
+			con.set(true);
+
+			// When I disconnect, update the last time I was seen online
+			lastOnlineRef.onDisconnect().set(firebase.database.ServerValue.TIMESTAMP);
+			
+		} else {
+			if (c > 1) {
+				AstNotif.snackbar('Verifique sua conexão com a internet. Não estamos conseguindo nos comunicar com os servidores...', {length: 100000, color: 'white', bgcolor: 'red', position: 'top'})
+			console.log('desconectado')
+			}
+			
+		}
+		c++
+		console.log(c)
+	});
+}

@@ -24,7 +24,7 @@ $(function () {
 
 
 firebase.auth().onAuthStateChanged((user) => {
-    update()
+    
     if (user == null) {
         loaderRun()
         
@@ -1435,7 +1435,7 @@ function addCampoNota(extra=false) {
 }
 
 function historicoAluno(matricula, turma) {
-    loaderRun(true, 'Recuperando informações do histórico escolar...')
+    
     abrirModal('modal', 'Histórico escolar', 
             `
             <div class="container-xl">

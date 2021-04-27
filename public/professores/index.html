@@ -18,6 +18,7 @@
     <link rel="stylesheet" href="../css/professores.css">
     <link rel="stylesheet" href="../css/chat.css">
     <link rel="stylesheet" href="../css/filedrop.css">
+    <link rel="stylesheet" href="../css/tabela.css">
 
       <!-- Carregando arquivos da biblioteca AST-Notif. Créditos: https://github.com/anandastoon/AST-Notif -->
     <link rel="stylesheet" href="../resources/AST-Notif/css/ast-notif.min.css">
@@ -601,14 +602,53 @@
                     </div>
                   </div> 
                 </div>
-                <label>Alunos cadastrados na turma: (Selecione alunos para fazer lançamentos ou clique em um aluno para ver sua ficha)</label><br>
+                
+                <div class="container-xl">
+                  <div class="table-responsive">
+                    <div class="table-wrapper">
+                      <div class="table-title">
+                        <div class="row">
+                          <div class="col-sm-6">
+                            <h2>Alunos da <b>Turma</b></h2>
+                          </div>
+                          <div class="col-sm-6">
+                            <!--<a href="#" class="btn btn-success" onclick="carregaListaDeAlunos()">&nbsp; <span class="feather-24" data-feather="refresh-cw"></span><span>Atualizar lista</span></a>
+                            <a href="#deleteEmployeeModal" class="btn btn-danger" data-toggle="modal">&nbsp;<span class="feather-24" data-feather="trash"></span> <span>Delete</span></a>-->						
+                          </div>
+                        </div>
+                      </div>
+                      <table class="table table-striped table-hover">
+                        <thead>
+                          <tr>
+                            <th>
+                              <span class="custom-checkbox">
+                                <input type="checkbox" id="selectAll">
+                                <label for="selectAll"></label>
+                              </span>
+                            </th>
+                            <th><a href="#" id="ordenaNome">Nome</a></th>
+                            <th><a href="#" id="ordenaMatricula">Matrícula</a></th>
+                            <th><a href="#" id="ordenaNota">Somatório de notas</a></th>
+                            <th>Ações</th>
+                          </tr>
+                        </thead>
+                        <tbody id="listaAlunosDaTurma">
+                          
+                        </tbody>
+                      </table>
+                      
+                    </div>
+                  </div>
+                </div> 
+
+                <!--<label>Alunos cadastrados na turma: (Selecione alunos para fazer lançamentos ou clique em um aluno para ver sua ficha)</label><br>
                 <input type="checkbox" id="selecTodos" onclick="selecionaTodos(this)">
                 <label for="selecTodos">Selecionar todos</label>
                 <div class="overflow-auto" style="height: fit-content; max-height: 280px;">
                   <div class="list-group" id="listaAlunosDaTurma" style="width: 90%;">
                     
                   </div>
-                </div>
+                </div>-->
                 <br><br>
                 <button type="button" class="btn btn-primary" id="btnLancaFrequencia" onclick="lancaFrequencia()" disabled>Lançar frequência</button>
                 <button type="button" class="btn btn-info" id="btnLancaNotas" disabled onclick="lancaNotas()">Lançar Notas</button>

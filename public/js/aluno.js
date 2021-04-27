@@ -27,7 +27,6 @@ var dadosAluno
 var registroAcademico
 firebase.auth().onAuthStateChanged((user) => {
     
-    update()
     if (user == null) {
         loaderRun()
         
@@ -351,7 +350,6 @@ function abreDadosDoAluno(desativado=false) {
 
 
 function historicoAluno(matricula, turma) {
-    loaderRun(true, 'Recuperando informações do histórico escolar...')
     abrirModal('modal', 'Histórico escolar', 
             `
             <div class="container-xl">

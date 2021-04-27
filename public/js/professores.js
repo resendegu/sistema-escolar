@@ -25,7 +25,7 @@ $(function () {
 var turmasProf
 var alunos = {}
 firebase.auth().onAuthStateChanged((user) => {
-    update()
+    
     if (user == null) {
         loaderRun()
         
@@ -92,11 +92,16 @@ firebase.auth().onAuthStateChanged((user) => {
             
             if (dadosUser.professor != undefined) {
                 turmasProf = dadosUser.professor.turmas
+                let c = 0
                 for (const turma in turmasProf) {
                     if (Object.hasOwnProperty.call(turmasProf, turma)) {
                         const bool = turmasProf[turma];
                         if (bool) {
-                            document.getElementById('listaTurmasProf').innerHTML += `<button class="list-group-item list-group-item-action" onclick="document.getElementById('btnAbaTurmas').click(),abreTurma('${turma}')">Turma ${turma}</button>`
+                            document.getElementById('listaTurmasProf').innerHTML += `<button class="list-group-item list-group-item-action" id="btnTurma${c}">Turma ${turma}</button>`
+                            document.getElementById(`btnTurma${c}`).addEventListener('click', (e) => {
+                                document.getElementById('btnAbaTurmas').click()
+                                carregaTurmas(turma)
+                            })
                             turmasRef.child(turma + '/alunos').on('value', matAlunos => {
                                 for (const matricula in matAlunos.val()) {
                                     if (Object.hasOwnProperty.call(matAlunos.val(), matricula)) {
@@ -119,6 +124,7 @@ firebase.auth().onAuthStateChanged((user) => {
                             })
                         }
                     }
+                    c++
                 }
                 
             }
@@ -178,26 +184,32 @@ function carregaListaDeAlunos(filtro='') {
 
 var turmas
 // Funções da aba de turmas dos professores
-function carregaTurmas() {
+function carregaTurmas(preSelecao='') {
     alunosSelecionadosTurma = {}
     document.getElementById("areaInfoTurma").style.visibility = 'hidden'
     loader.style.display = 'block'
     loaderMsg.innerText = 'Carregando informações das turmas...'
     var selectTurmas = document.getElementById('selectTurmas')
     selectTurmas.innerHTML = ''
+    let selected = false
     for (const turma in turmasProf) {
         if (Object.hasOwnProperty.call(turmasProf, turma)) {
             const bool = turmasProf[turma];
             if (bool) {
                 turmasRef.child(turma).once('value').then(snapshot => {
-                    selectTurmas.innerHTML += '<option selected hidden>Escolha uma turma...</option>'
+                    selectTurmas.innerHTML += '<option hidden>Escolha uma turma...</option>'
                     let infoDaTurma = snapshot.val()
                     if (infoDaTurma.professor == undefined) {
                         var profReferencia = 'Não cadastrado'
                     } else {
                         var profReferencia = infoDaTurma.professor[0].nome
                     }
-                    selectTurmas.innerHTML += `<option value="${snapshot.key}">Turma ${snapshot.key} (Prof. ${profReferencia})</option>`
+                    if (preSelecao == snapshot.key) {
+                        selected = 'selected'
+                    } else {
+                        selected = false
+                    }
+                    selectTurmas.innerHTML += `<option ${selected} value="${snapshot.key}">Turma ${snapshot.key} (Prof. ${profReferencia})</option>`
                     document.getElementById('selectTurmas').style.visibility = 'visible'
                     loaderRun()
                 }).catch(error => {
@@ -207,6 +219,9 @@ function carregaTurmas() {
                 })
             }
         }
+    }
+    if (preSelecao != '') {
+        abreTurma(preSelecao)
     }
     
 }
@@ -227,14 +242,49 @@ function carregaListaDeAlunosDaTurma(turma, filtro='') {
         document.getElementById('listaAlunosDaTurma').innerHTML = ''
         turmasRef.child(turma + '/alunos').once('value').then(snapshot => {
             let alunosTurma = snapshot.val()
+            let c = 0
             for (const matricula in alunosTurma) {
                 if (Object.hasOwnProperty.call(alunosTurma, matricula)) {
                     const aluno = alunosTurma[matricula];
-                    document.getElementById('listaAlunosDaTurma').innerHTML += `<div class="row"><div class="col-1" ><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" name="alunosTurma" onclick="this.checked ? alunosSelecionadosTurma[${matricula}] = '${aluno.nome}' : delete alunosSelecionadosTurma[${matricula}], verificaAlunosSelecionados()"></div><div class="col-md"><button class="list-group-item list-group-item-action" onclick="document.getElementById('btnAbaAlunos').click(), document.getElementById('btnAbaAlunosResponsivo').click(), abreDadosDoAluno('${matricula}'), setTimeout( function() {document.getElementById('rolaTelaAbaixoAlunos').style.display = 'block', document.getElementById('rolaTelaAbaixoAlunos').focus(), document.getElementById('rolaTelaAbaixoAlunos').style.display = 'none'}, 300 ); "> ${matricula}: ${aluno.nome}</button></div></div>`
+                    let notas = aluno.notas
+                    let somatorioNota = 0
+                    c++
+                    for (const nomeNota in notas) {
+                        if (Object.hasOwnProperty.call(notas, nomeNota)) {
+                            const valorNota = notas[nomeNota];
+                            somatorioNota += valorNota
+                        }
+                    }
+                    document.getElementById('listaAlunosDaTurma').innerHTML += `
+                    <tr>
+                        <td>
+                            <span class="custom-checkbox">
+                                <input type="checkbox" id="checkbox${c}" name="options[]" value="1">
+                                <label for="checkbox${c}"></label>
+                            </span>
+                        </td>
+                        <td id>${aluno.nome}</td>
+                        <td>${matricula}</td>
+                        <td><b>${somatorioNota}</b>/100</td>
+                        <td>
+                            <a href="#editEmployeeModal" class="action" data-toggle="modal"><i data-feather="file-text" data-toggle="tooltip" title="Emitir boletim"></i></a>
+                            <a href="#" id="lançaNotas${c}" class="edit" data-toggle="modal"><i data-feather="edit" data-toggle="tooltip" title="Lançar notas"></i></a>
+                        </td>
+                    </tr>
+                    `
                 }
                 
             }
+            document.querySelector('#lançaNotas' + c).addEventListener('click', (e) => {
+                e.preventDefault()
+                visualizarDadosDoHistorico(registro.val())
+            })
             loaderRun()
+            $(function () {
+                $('[data-toggle="tooltip"]').tooltip()
+            })
+            feather.replace()
+            ativaCheckboxes()
         }).catch(error => {
             console.log(error)
             AstNotif.dialog('Erro', error.message)
@@ -243,13 +293,50 @@ function carregaListaDeAlunosDaTurma(turma, filtro='') {
         document.getElementById('listaAlunosDaTurma').innerHTML = ''
         turmasRef.child(turma + '/alunos').orderByChild('nome').equalTo(filtro).once('value').then(snapshot => {
             let alunosTurma = snapshot.val()
+            let c = 0
             for (const matricula in alunosTurma) {
                 if (Object.hasOwnProperty.call(alunosTurma, matricula)) {
                     const aluno = alunosTurma[matricula];
-                    document.getElementById('listaAlunosDaTurma').innerHTML += `<div class="row"><div class="col-sm-1"><input type="checkbox" name="alunosTurma" onclick="this.checked ? alunosSelecionadosTurma[${matricula}] = '${aluno.nome}' : delete alunosSelecionadosTurma[${matricula}], verificaAlunosSelecionados()"></div><div class="col-md"><button class="list-group-item list-group-item-action" onclick="document.getElementById('btnAbaAlunos').click(), document.getElementById('btnAbaAlunosResponsivo').click(), abreDadosDoAluno('${matricula}') "> ${matricula}: ${aluno.nome}</button></div></div>`
+                    let notas = aluno.notas
+                    let somatorioNota = 0
+                    c++
+                    for (const nomeNota in notas) {
+                        if (Object.hasOwnProperty.call(notas, nomeNota)) {
+                            const valorNota = notas[nomeNota];
+                            somatorioNota += valorNota
+                        }
+                    }
+                    document.getElementById('listaAlunosDaTurma').innerHTML += `
+                    <tr>
+                        <td>
+                            <span class="custom-checkbox">
+                                <input type="checkbox" id="checkbox${c}" name="options[]" value="1">
+                                <label for="checkbox${c}"></label>
+                            </span>
+                        </td>
+                        <td id>${aluno.nome}</td>
+                        <td>${matricula}</td>
+                        <td><b>${somatorioNota}</b>/100</td>
+                        <td>
+                            <a href="#editEmployeeModal" class="action" data-toggle="modal"><i data-feather="file-text" data-toggle="tooltip" title="Emitir boletim"></i></a>
+                            <a href="#" id="lançaNotas${c}" class="edit" data-toggle="modal"><i data-feather="edit" data-toggle="tooltip" title="Lançar notas"></i></a>
+                        </td>
+                    </tr>
+                    `
+                    document.querySelector('#lançaNotas' + c).addEventListener('click', (e) => {
+                        e.preventDefault()
+                        visualizarDadosDoHistorico(registro.val())
+                    })
                 }
+                
             }
+            
             loaderRun()
+            $(function () {
+                $('[data-toggle="tooltip"]').tooltip()
+            })
+            feather.replace()
+            ativaCheckboxes()
         }).catch(error => {
             console.log(error)
             AstNotif.dialog('Erro', error.message)
