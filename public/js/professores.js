@@ -235,6 +235,7 @@ function carregaListaDeAlunosDaTurma(turma, filtro='') {
     alunosSelecionadosTurma = {}
     alunosSelecionadosTurma.codTurma = turma
     console.log(filtro)
+    document.getElementById('codTurmaAlunos').value = turma
     loader.style.display = 'block'
     loaderMsg.innerText = 'Carregando lista de alunos...'
     let listaAlunos = document.getElementById('listaAlunos')
@@ -259,7 +260,7 @@ function carregaListaDeAlunosDaTurma(turma, filtro='') {
                     <tr>
                         <td>
                             <span class="custom-checkbox">
-                                <input type="checkbox" id="checkbox${c}" name="options[]" value="1">
+                                <input type="checkbox" id="checkbox${c}" name="options[]" value="${matricula}|${aluno.nome}">
                                 <label for="checkbox${c}"></label>
                             </span>
                         </td>
@@ -267,19 +268,16 @@ function carregaListaDeAlunosDaTurma(turma, filtro='') {
                         <td>${matricula}</td>
                         <td><b>${somatorioNota}</b>/100</td>
                         <td>
-                            <a href="#" class="action" id="lancaFrequencia${c}"><i data-feather="calendar" data-toggle="tooltip" title="Lançar frequência"></i></a>
-                            <a href="#" id="lançaNotas${c}" class="edit"><i data-feather="edit" data-toggle="tooltip" title="Lançar notas"></i></a>
+                            <a href="#" class="action" id="lancaFrequencia${c}" onclick="lancaFrequencia({'${matricula}': '${aluno.nome}'}, '${turma}')"><i data-feather="edit-2" data-toggle="tooltip" title="Lançar Desempenho"></i></a>
+                            <a href="#" id="lançaNotas${c}" onclick="editaNotasAluno('${matricula}', '${turma}')" class="edit"><i data-feather="edit" data-toggle="tooltip" title="Lançar notas"></i></a>
                         </td>
                     </tr>
                     `
+                    document.getElementById('mostraQtdeAlunosTurma').innerText = c
+                    document.getElementById('qtdeAlunosTurma').value = c
                 }
-                document.querySelector('#lançaNotas' + c).addEventListener('click', (e) => {
-                    e.preventDefault()
-                    editaNotasAluno(matricula, turma)
-                })
-                document.querySelector('#lancaFrequencia' + c).addEventListener('click', (e) => {
-                    
-                })
+                
+                
                 
             }
             
@@ -385,6 +383,34 @@ function carregaListaDeAlunosDaTurma(turma, filtro='') {
     })
     
 }
+document.getElementById('listaAlunosTurmaForm').addEventListener('submit', (e) => {
+    e.preventDefault()
+    console.log(e)
+    const dados = new FormData(e.target);
+    let codTurma = dados.get('codTurmaAlunos')
+    let qtdeAlunosTotal = dados.get('qtdeAlunosTurma')
+    let arrayAlunos = dados.getAll('options[]')
+    if (arrayAlunos.length == 0) {
+        AstNotif.dialog('Opa...', 'Você esqueceu de selecionar os alunos. Volte, e marque as caixas dos alunos que deseja fazer lançamentos.')
+    } else {
+        let objAlunos = {}
+        for (const i in arrayAlunos) {
+            if (Object.hasOwnProperty.call(arrayAlunos, i)) {
+                const infoAluno = arrayAlunos[i];
+                objAlunos[infoAluno.split('|')[0]] = infoAluno.split('|')[1]
+            }
+        }
+        console.log(objAlunos)
+        if (e.submitter.id == 'btnLancaFrequencia') {
+            console.log(e.submitter.id)
+            lancaFrequencia(objAlunos, codTurma)
+        } else if(e.submitter.id == 'btnLancaNotas') {
+            console.log(e.submitter.id)
+            // Fazer outra função melhor pra lançar notas em massa
+        }
+    }
+    
+})
 
 function iniciaPeriodo(confirma=false, inicio='', fim='', qtdeAulas='') {
     if (confirma) {
@@ -933,21 +959,14 @@ function lancaFrequencia(alunos={}, turma="", data='', confirma=false) {
         
     } else {
         let nomes = ''
-        
-        let turma
         matriculas = {}
-        for (const matricula in alunosSelecionadosTurma) {
-            if (Object.hasOwnProperty.call(alunosSelecionadosTurma, matricula)) {
-                const aluno = alunosSelecionadosTurma[matricula];
-                if (matricula == 'codTurma') {
-                    turma = aluno
-                } else if(matricula == undefined || aluno == undefined) {
-
-                } else {
-                    nomes += formataNumMatricula(matricula) + ': ' + aluno + '<br>'
-                    matriculas[matricula] = aluno
-                }
-                
+        console.log(alunos)
+        console.log(turma)
+        for (const matricula in alunos) {
+            if (Object.hasOwnProperty.call(alunos, matricula)) {
+                const aluno = alunos[matricula];
+                nomes += formataNumMatricula(matricula) + ': ' + aluno + '<br>'
+                matriculas[matricula] = aluno
             }
         }
         abrirModal('modal', 'Lançamento de frequência', 
@@ -1399,8 +1418,19 @@ function editaNotasAluno(matricula, turma) {
             let notasDeReferencia = notasReferencia.val()
             let notasDistribuidas
 
-            abrirModal('modal', 'Lançamento de notas', 
+            abrirModal('modal', 'Lançando notas para matrícula ' + matricula, 
                 `
+                <div class="row" id="linha">
+                    <div class="col-2" >
+                        <b>Identificação da nota</b>
+                    </div>
+                    <div class="col-2">
+                        <b>Valor Total</b>
+                    </div>
+                    <div class="col-2">
+                        <b>Nota do aluno</b>
+                    </div>
+                </div>
                 <section id="camposLancaNotas"></section>
                 `
                 , `<button type="button" data-toggle="tooltip" data-placement="top" title="Lançar notas para o aluno" class="btn btn-primary" onclick="lancaNotasDoAluno('${turma}', '${matricula}')">Lançar</button><button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>`
