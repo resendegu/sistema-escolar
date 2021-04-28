@@ -267,18 +267,22 @@ function carregaListaDeAlunosDaTurma(turma, filtro='') {
                         <td>${matricula}</td>
                         <td><b>${somatorioNota}</b>/100</td>
                         <td>
-                            <a href="#editEmployeeModal" class="action" data-toggle="modal"><i data-feather="file-text" data-toggle="tooltip" title="Emitir boletim"></i></a>
-                            <a href="#" id="lançaNotas${c}" class="edit" data-toggle="modal"><i data-feather="edit" data-toggle="tooltip" title="Lançar notas"></i></a>
+                            <a href="#" class="action" id="lancaFrequencia${c}"><i data-feather="calendar" data-toggle="tooltip" title="Lançar frequência"></i></a>
+                            <a href="#" id="lançaNotas${c}" class="edit"><i data-feather="edit" data-toggle="tooltip" title="Lançar notas"></i></a>
                         </td>
                     </tr>
                     `
                 }
+                document.querySelector('#lançaNotas' + c).addEventListener('click', (e) => {
+                    e.preventDefault()
+                    editaNotasAluno(matricula, turma)
+                })
+                document.querySelector('#lancaFrequencia' + c).addEventListener('click', (e) => {
+                    
+                })
                 
             }
-            document.querySelector('#lançaNotas' + c).addEventListener('click', (e) => {
-                e.preventDefault()
-                visualizarDadosDoHistorico(registro.val())
-            })
+            
             loaderRun()
             $(function () {
                 $('[data-toggle="tooltip"]').tooltip()

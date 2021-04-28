@@ -1042,7 +1042,6 @@ function desativarAlunos(confirma=false, codTurma, matricula, nome) {
             loaderRun()
         })
     } else {
-        console.log(nomesObj)
         abrirModal('modal', 'Confirmação de desativação do aluno', `
                 Você confirma a ação de desativação do(s) aluno(s) escolhido(s)?
                 <br><br>
