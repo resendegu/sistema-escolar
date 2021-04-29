@@ -386,14 +386,13 @@ function cadastrarTurma(confima=false) {
 var turmas
 // Funções da aba de turmas da secretaria
 function carregaTurmas() {
-    alunosSelecionadosTurma = {}
-    document.getElementById("areaInfoTurma").style.visibility = 'hidden'
     loader.style.display = 'block'
     loaderMsg.innerText = 'Carregando informações das turmas...'
     var selectTurmas = document.getElementById('selectTurmas')
     turmasRef.once('value').then(snapshot => {
         selectTurmas.innerHTML = '<option selected hidden>Escolha uma turma...</option>'
         turmas = snapshot.val()
+        let selected = false
         for (const cod in turmas) {
             if (Object.hasOwnProperty.call(turmas, cod)) {
                 const infoDaTurma = turmas[cod];
@@ -402,7 +401,12 @@ function carregaTurmas() {
                 } else {
                     var profReferencia = infoDaTurma.professor[0].nome
                 }
-                selectTurmas.innerHTML += `<option value="${cod}">Turma ${cod} (Prof. ${profReferencia})</option>`
+                if (alunosSelecionadosTurma.codTurma != undefined) {
+                    selected = 'selected'
+                } else {
+                    selected = false
+                }
+                selectTurmas.innerHTML += `<option ${selected} value="${cod}">Turma ${cod} (Prof. ${profReferencia})</option>`
             }
         }
         document.getElementById('selectTurmas').style.visibility = 'visible'

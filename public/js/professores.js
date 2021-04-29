@@ -185,8 +185,6 @@ function carregaListaDeAlunos(filtro='') {
 var turmas
 // Funções da aba de turmas dos professores
 function carregaTurmas(preSelecao='') {
-    alunosSelecionadosTurma = {}
-    document.getElementById("areaInfoTurma").style.visibility = 'hidden'
     loader.style.display = 'block'
     loaderMsg.innerText = 'Carregando informações das turmas...'
     var selectTurmas = document.getElementById('selectTurmas')
@@ -204,7 +202,7 @@ function carregaTurmas(preSelecao='') {
                     } else {
                         var profReferencia = infoDaTurma.professor[0].nome
                     }
-                    if (preSelecao == snapshot.key) {
+                    if (preSelecao == snapshot.key || alunosSelecionadosTurma.codTurma != undefined) {
                         selected = 'selected'
                     } else {
                         selected = false
@@ -240,8 +238,8 @@ function carregaListaDeAlunosDaTurma(turma, filtro='') {
     loaderMsg.innerText = 'Carregando lista de alunos...'
     let listaAlunos = document.getElementById('listaAlunos')
     if (filtro == '') {
-        document.getElementById('listaAlunosDaTurma').innerHTML = ''
-        turmasRef.child(turma + '/alunos').once('value').then(snapshot => {
+        turmasRef.child(turma + '/alunos').on('value', (snapshot) => {
+            document.getElementById('listaAlunosDaTurma').innerHTML = ''
             let alunosTurma = snapshot.val()
             let c = 0
             for (const matricula in alunosTurma) {
@@ -264,11 +262,11 @@ function carregaListaDeAlunosDaTurma(turma, filtro='') {
                                 <label for="checkbox${c}"></label>
                             </span>
                         </td>
-                        <td id>${aluno.nome}</td>
+                        <td><a href="#" onclick="document.getElementById('btnAbaAlunos').click(), document.getElementById('btnAbaAlunosResponsivo').click(), abreDadosDoAluno('${matricula}'), setTimeout( function() {document.getElementById('rolaTelaAbaixoAlunos').style.display = 'block', document.getElementById('rolaTelaAbaixoAlunos').focus(), document.getElementById('rolaTelaAbaixoAlunos').style.display = 'none'}, 300 ); ">${aluno.nome}</a></td>
                         <td>${matricula}</td>
                         <td><b>${somatorioNota}</b>/100</td>
                         <td>
-                            <a href="#" class="action" id="lancaFrequencia${c}" onclick="lancaFrequencia({'${matricula}': '${aluno.nome}'}, '${turma}')"><i data-feather="edit-2" data-toggle="tooltip" title="Lançar Desempenho"></i></a>
+                            <a href="#" class="action" id="lancaFrequencia${c}" onclick="lancaDesempenho('${matricula}', '${turma}')"><i data-feather="edit-2" data-toggle="tooltip" title="Lançar Desempenho"></i></a>
                             <a href="#" id="lançaNotas${c}" onclick="editaNotasAluno('${matricula}', '${turma}')" class="edit"><i data-feather="edit" data-toggle="tooltip" title="Lançar notas"></i></a>
                         </td>
                     </tr>
@@ -280,20 +278,16 @@ function carregaListaDeAlunosDaTurma(turma, filtro='') {
                 
                 
             }
-            
             loaderRun()
             $(function () {
                 $('[data-toggle="tooltip"]').tooltip()
             })
             feather.replace()
             ativaCheckboxes()
-        }).catch(error => {
-            console.log(error)
-            AstNotif.dialog('Erro', error.message)
         })
     } else {
-        document.getElementById('listaAlunosDaTurma').innerHTML = ''
-        turmasRef.child(turma + '/alunos').orderByChild('nome').equalTo(filtro).once('value').then(snapshot => {
+        turmasRef.child(turma + '/alunos').orderByChild('nome').equalTo(filtro).on('value', (snapshot) => {
+            document.getElementById('listaAlunosDaTurma').innerHTML = ''
             let alunosTurma = snapshot.val()
             let c = 0
             for (const matricula in alunosTurma) {
@@ -312,36 +306,32 @@ function carregaListaDeAlunosDaTurma(turma, filtro='') {
                     <tr>
                         <td>
                             <span class="custom-checkbox">
-                                <input type="checkbox" id="checkbox${c}" name="options[]" value="1">
+                                <input type="checkbox" id="checkbox${c}" name="options[]" value="${matricula}|${aluno.nome}">
                                 <label for="checkbox${c}"></label>
                             </span>
                         </td>
-                        <td id>${aluno.nome}</td>
+                        <td><a href="#" onclick="document.getElementById('btnAbaAlunos').click(), document.getElementById('btnAbaAlunosResponsivo').click(), abreDadosDoAluno('${matricula}'), setTimeout( function() {document.getElementById('rolaTelaAbaixoAlunos').style.display = 'block', document.getElementById('rolaTelaAbaixoAlunos').focus(), document.getElementById('rolaTelaAbaixoAlunos').style.display = 'none'}, 300 ); ">${aluno.nome}</a></td>
                         <td>${matricula}</td>
                         <td><b>${somatorioNota}</b>/100</td>
                         <td>
-                            <a href="#editEmployeeModal" class="action" data-toggle="modal"><i data-feather="file-text" data-toggle="tooltip" title="Emitir boletim"></i></a>
-                            <a href="#" id="lançaNotas${c}" class="edit" data-toggle="modal"><i data-feather="edit" data-toggle="tooltip" title="Lançar notas"></i></a>
+                            <a href="#" class="action" id="lancaFrequencia${c}" onclick="lancaDesempenho('${matricula}', '${turma}')"><i data-feather="edit-2" data-toggle="tooltip" title="Lançar Desempenho"></i></a>
+                            <a href="#" id="lançaNotas${c}" onclick="editaNotasAluno('${matricula}', '${turma}')" class="edit"><i data-feather="edit" data-toggle="tooltip" title="Lançar notas"></i></a>
                         </td>
                     </tr>
                     `
-                    document.querySelector('#lançaNotas' + c).addEventListener('click', (e) => {
-                        e.preventDefault()
-                        visualizarDadosDoHistorico(registro.val())
-                    })
+                    document.getElementById('mostraQtdeAlunosTurma').innerText = c
+                    document.getElementById('qtdeAlunosTurma').value = c
                 }
                 
+                
+                
             }
-            
             loaderRun()
             $(function () {
                 $('[data-toggle="tooltip"]').tooltip()
             })
             feather.replace()
             ativaCheckboxes()
-        }).catch(error => {
-            console.log(error)
-            AstNotif.dialog('Erro', error.message)
         })
     }
 
@@ -406,7 +396,7 @@ document.getElementById('listaAlunosTurmaForm').addEventListener('submit', (e) =
             lancaFrequencia(objAlunos, codTurma)
         } else if(e.submitter.id == 'btnLancaNotas') {
             console.log(e.submitter.id)
-            // Fazer outra função melhor pra lançar notas em massa
+            lancaNotas(objAlunos, codTurma)
         }
     }
     
@@ -433,7 +423,7 @@ function iniciaPeriodo(confirma=false, inicio='', fim='', qtdeAulas='') {
         }
     } else {
         abrirModal('modal', 'Confirmação de abertura da turma ' + alunosSelecionadosTurma.codTurma, `
-            Atenção. Você está prestes a iniciar as ativiadades da turma ${alunosSelecionadosTurma.codTurma}. Ao iniciar a turma, você poderá lançar notas e frequências para os alunos que estão cadastrados na turma.<br>
+            Atenção. Você está prestes a iniciar as atividades da turma ${alunosSelecionadosTurma.codTurma}. Ao iniciar a turma, você poderá lançar notas e frequências para os alunos que estão cadastrados na turma.<br>
             <br>
             <b>Escolha uma data de início e um data com o fim previsto deste semestre, bimestre, ano...</b> (Essas datas não farão com que o sistema abra ou feche as turmas automaticamente. Um professor cadastrado na turma é quem deve iniciar e fechar a turma manualmente)<br>
             Início previsto:
@@ -458,7 +448,7 @@ function fechaPeriodo() {
             console.log(status)
             console.log(status.val())
             abrirModal('modal', 'Confirmação de fechamento da turma ' + alunosSelecionadosTurma.codTurma, `
-            Atenção. Você está prestes a fechar as ativiadades da turma ${alunosSelecionadosTurma.codTurma}. Ao fechar a turma, você não poderá mais lançar notas e frequência para esta turma, até que você inicie novamente mais um período para esta turma. <b>Automaticamente, ao fechar a turma, o sistema irá iniciar uma sequência de processos para a geração de boletins, notas, somatórios finais, frequência, desempenho, entre outros processos parecidos.</b> (Esses processos são realizados nos servidores remotos do sistema para maior segurança e integridade dos dados.)<br>
+            Atenção. Você está prestes a fechar as atividades da turma ${alunosSelecionadosTurma.codTurma}. Ao fechar a turma, você não poderá mais lançar notas e frequência para esta turma, até que você inicie novamente mais um período para esta turma. <b>Automaticamente, ao fechar a turma, o sistema irá iniciar uma sequência de processos para a geração de boletins, notas, somatórios finais, frequência, desempenho, entre outros processos parecidos.</b> (Esses processos são realizados nos servidores remotos do sistema para maior segurança e integridade dos dados.)<br>
             Confirme os dados de início, fim, e quantidade de aulas dadas do semestre que foram definidos no processo de abertura desse semestre da turma nos campos abaixo:<br>
             <br>
             <b>Altere as datas de início, fim e quantidade de aulas dadas, se necessário:</b><br>
@@ -541,7 +531,7 @@ function verificaAlunosSelecionados() {
 
 
 var contadorDeNotas
-function lancaNotas(confirma=false) {
+function lancaNotas(alunos={}, turma, confirma=false) {
     if (confirma) {
         loader.style.display = 'block'
         loaderMsg.innerText = 'Lançando notas dos alunos no sistema...'
@@ -553,13 +543,8 @@ function lancaNotas(confirma=false) {
             notasParaLancar[index] = valor
             c2++
         }
-        var alunosSelec = Object.assign({}, alunosSelecionadosTurma)
-        delete alunosSelec.codTurma
         var lancarNotas = firebase.functions().httpsCallable('lancarNotas')
-        console.log(alunosSelecionadosTurma)
-        console.log(alunosSelec)
-        console.log({alunos: alunosSelec, turma: alunosSelecionadosTurma.codTurma, notas: notasParaLancar})
-        lancarNotas({alunos: alunosSelec, turma: alunosSelecionadosTurma.codTurma, notas: notasParaLancar}).then(function(result){
+        lancarNotas({alunos: alunos, turma: turma, notas: notasParaLancar}).then(function(result){
             AstNotif.notify('Sucesso', result.data.answer)
             $('#modal').modal('hide')
             loaderRun()
@@ -570,17 +555,11 @@ function lancaNotas(confirma=false) {
         })
     } else {
         let nomes = ''
-        let turma
-        for (const matricula in alunosSelecionadosTurma) {
-            if (Object.hasOwnProperty.call(alunosSelecionadosTurma, matricula)) {
-                const aluno = alunosSelecionadosTurma[matricula];
-                if (matricula == 'codTurma') {
-                    turma = aluno
-                } else if(matricula == undefined || aluno == undefined) {
-
-                } else {
-                    nomes += formataNumMatricula(matricula) + ': ' + aluno + '<br>'
-                }
+        
+        for (const matricula in alunos) {
+            if (Object.hasOwnProperty.call(alunos, matricula)) {
+                const aluno = alunos[matricula];
+                nomes += formataNumMatricula(matricula) + ': ' + aluno + '<br>'
                 
             }
         }
@@ -588,8 +567,11 @@ function lancaNotas(confirma=false) {
             `Você selecionou os alunos listados abaixo da turma ${turma}. <br> ${nomes} <br><b>Digite os valores nas notas que deseja lançar:</b><br>
             <section id="camposLancaNotas"></section>
             `
-            , `<button type="button" data-toggle="tooltip" data-placement="top" title="Lançar notas para os alunos selecionados" class="btn btn-primary" onclick="lancaNotas(true)">Lançar</button><button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>`
+            , `<button type="button" id="btnLancaNotasNoModal" data-toggle="tooltip" data-placement="top" title="Lançar notas para os alunos selecionados" class="btn btn-primary">Lançar</button><button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>`
         )
+        document.getElementById('btnLancaNotasNoModal').addEventListener('click', (e) => {
+            lancaNotas(alunos, turma, true)
+        })
         turmasRef.child(alunosSelecionadosTurma.codTurma + '/notas').once('value').then(snapshot => {
             let notas = snapshot.val()
             if (notas != null) {
