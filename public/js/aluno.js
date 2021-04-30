@@ -91,7 +91,11 @@ firebase.auth().onAuthStateChanged((user) => {
         registroAcademico = user.uid
         alunosRef.child(user.uid).once('value').then(snapshot => {
             dadosAluno = snapshot.val()
-            document.getElementById('cursosConcluidos').innerText = Object.keys(dadosAluno.historicoEscolar).length
+            try {
+                document.getElementById('cursosConcluidos').innerText = Object.keys(dadosAluno.historicoEscolar).length
+            } catch (error) {
+                console.log(error)
+            } 
         }).catch(error => {
             AstNotif.dialog('Erro', error.message)
             console.log(error)
@@ -418,7 +422,7 @@ function historicoAluno(matricula, turma) {
             <td>${dataFechamento.getDate()}/${dataFechamento.getMonth() + 1}/${dataFechamento.getFullYear()}</td>
             <td><b>${somatorioNota}</b>/100</td>
             <td>
-                <a href="#editEmployeeModal" class="action" data-toggle="modal"><i data-feather="file-text" data-toggle="tooltip" title="Emitir boletim"></i></a>
+                <a href="#editEmployeeModal" id="emiteBoletim${c}" onclick="emiteBoletim('${matricula}', '${registro.key}')" class="action" data-toggle="modal"><i data-feather="file-text" data-toggle="tooltip" title="Emitir boletim"></i></a>
                 <a href="#" id="verHistorico${c}" class="edit" data-toggle="modal"><i data-feather="eye" data-toggle="tooltip" title="Visualizar dados"></i></a>
             </td>
         </tr>
@@ -435,6 +439,11 @@ function historicoAluno(matricula, turma) {
         loaderRun()
         ativaCheckboxes()
     })
+}
+
+function emiteBoletim(matricula, chave) {
+    document.getElementById('corpoBoletim').innerHTML = `<iframe src="../resources/pdfsProntos/modeloBoletim.html#${matricula}?${chave}" frameborder="0" width="100%" height="300px" id="boletimPdf" name="boletimPdf"></iframe>`
+    $('#boletimModal').modal({backdrop: 'static'})
 }
 
 function visualizarDadosDoHistorico(info) {

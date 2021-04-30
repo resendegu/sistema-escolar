@@ -177,7 +177,7 @@ function carregaListaDeAlunos(filtro='') {
         }
         loaderRun()
     } else {
-        
+        loaderRun()
     }
     
 }
@@ -286,7 +286,7 @@ function carregaListaDeAlunosDaTurma(turma, filtro='') {
             ativaCheckboxes()
         })
     } else {
-        turmasRef.child(turma + '/alunos').orderByChild('nome').equalTo(filtro).on('value', (snapshot) => {
+        turmasRef.child(turma + '/alunos').orderByChild('nome').startAt(filtro).endAt(filtro+"\uf8ff").on('value', (snapshot) => {
             document.getElementById('listaAlunosDaTurma').innerHTML = ''
             let alunosTurma = snapshot.val()
             let c = 0

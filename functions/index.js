@@ -703,6 +703,7 @@ exports.fechaTurma = functions.https.onCall((data, context) => {
         var turma = data
         var turmaRef = admin.database().ref(`sistemaEscolar/turmas/${turma}`)
         var alunosRef = admin.database().ref(`sistemaEscolar/alunos/`)
+        var chave = alunosRef.push().key
         return turmaRef.once('value').then(dadosTurma => {
             async function sequenciaDeFechamento(dadosDaTurma) {
                 delete dadosDaTurma.historicoEscolar
@@ -712,7 +713,7 @@ exports.fechaTurma = functions.https.onCall((data, context) => {
                     throw new Error(error.message)
                 })
 
-                turmaRef.child('historicoEscolar').push({dadosDaTurma: dadosDaTurma, timestamp: admin.firestore.Timestamp.now(), codTurma: dadosDaTurma.codigoSala}).then(() => {
+                turmaRef.child('historicoEscolar/' + chave).set({dadosDaTurma: dadosDaTurma, timestamp: admin.firestore.Timestamp.now(), codTurma: dadosDaTurma.codigoSala}).then(() => {
 
                 }).catch(error => {
                     throw new Error(error.message)
@@ -732,8 +733,11 @@ exports.fechaTurma = functions.https.onCall((data, context) => {
                         infoAluno.codigoSala = dadosDaTurma.codigoSala
                         infoAluno.inicio = dadosDaTurma.status.inicio
                         infoAluno.fim = dadosDaTurma.status.fim
-                        infoAluno.qtdeAulas
-                        alunosRef.child(formataNumMatricula(matricula) + '/historicoEscolar').push({infoAluno: infoAluno, timestamp: admin.firestore.Timestamp.now(), turma: dadosDaTurma.codigoSala}).then(() => {
+                        infoAluno.qtdeAulas = dadosDaTurma.status.qtdeAulas
+                        infoAluno.livros = dadosDaTurma.livros
+                        infoAluno.faixaTurma = dadosDaTurma.faixaTurma
+                        infoAluno.professor = dadosDaTurma.professor
+                        alunosRef.child(formataNumMatricula(matricula) + '/historicoEscolar/' + chave).set({infoAluno: infoAluno, timestamp: admin.firestore.Timestamp.now(), turma: dadosDaTurma.codigoSala}).then(() => {
 
                         }).catch(error => {
                             throw new Error(error.message)
