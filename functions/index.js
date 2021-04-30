@@ -736,7 +736,11 @@ exports.fechaTurma = functions.https.onCall((data, context) => {
                         infoAluno.qtdeAulas = dadosDaTurma.status.qtdeAulas
                         infoAluno.livros = dadosDaTurma.livros
                         infoAluno.faixaTurma = dadosDaTurma.faixaTurma
+                        infoAluno.nivelTurma = dadosDaTurma.nivelTurma
                         infoAluno.professor = dadosDaTurma.professor
+                        infoAluno.hora = dadosDaTurma.hora
+                        infoAluno.diasDaSemana = dadosDaTurma.diasDaSemana
+                        infoAluno.nomePeriodo = dadosDaTurma.status.nomePeriodo
                         alunosRef.child(formataNumMatricula(matricula) + '/historicoEscolar/' + chave).set({infoAluno: infoAluno, timestamp: admin.firestore.Timestamp.now(), turma: dadosDaTurma.codigoSala}).then(() => {
 
                         }).catch(error => {
