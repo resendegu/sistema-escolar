@@ -8,6 +8,8 @@
   <link rel="stylesheet" href="resources/bootstrap/css/bootstrap.min.css">
   <!-- Carregando arquivos da biblioteca AST-Notif. Créditos: https://github.com/anandastoon/AST-Notif -->
   <link rel="stylesheet" href="resources/AST-Notif/css/ast-notif.min.css">
+  <!-- Carregando arquivos da biblioteca driver.js. Créditos: https://github.com/kamranahmedse/driver.js -->
+  <link rel="stylesheet" href="resources/driver/driver.min.css">
 </head>
 <body>
   <!-- Outros Arquivos necessários para o Bootstrap -->
@@ -34,6 +36,52 @@
   -->
   <script defer src="/__/firebase/init.js?useEmulator=true"></script>
   
+  <div class="modal fade bd-example-modal-xl" tabindex="-1" role="dialog" id="primeiroAcesso">
+    <div class="modal-dialog modal-xl" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="tituloPrimeiroAcesso">Primeiro Acesso</h5>
+          <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button> -->
+        </div>
+        <div class="modal-body" id="corpoPrimeiroAcesso">
+          Ok! Iremos te guiar para o seu primeiro acesso<br> 
+          Mas agora diz aí, qual acesso você irá fazer?<br><br>
+          <a class="btn btn-primary btn-md btn-block" href="login.html#master" role="button">Master (Administrador do sistema)</a>
+         
+          <a class="btn btn-primary btn-md btn-block" role="button">Aluno</a>
+          
+          <a class="btn btn-primary btn-md btn-block" role="button">Secretaria</a>
+          
+          <a class="btn btn-primary btn-md btn-block" role="button">Professores</a>
+        </div>
+        <div class="modal-footer" id="botoesPrimeiroAcesso">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade bd-example-modal-xl" tabindex="-1" role="dialog" id="entraSistema">
+    <div class="modal-dialog modal-xl" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="tituloEntraSistema">Entrar</h5>
+          <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button> -->
+        </div>
+        <div class="modal-body" id="corpoEntraSistema">
+          
+        </div>
+        <div class="modal-footer" id="botoesEntraSistema">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Conteúdo do site - Website content -->
   <header>
     <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #2fa2f3;">
@@ -68,16 +116,20 @@
     <br>
     <div class="jumbotron">
       <h1 class="display-4">Bem vindo!</h1>
-      <p class="lead">Esta é uma prévia do sistema de gestão escolar.</p>
+      <p class="lead">Você está na tela inicial do Sistema Escolar.</p>
       <hr class="my-4">
-      <p>Primeiro, para usar qualquer recurso deste app deve-se definir um ou mais administradores gerais (masters). Esses administradores delegarão às contas para os diferentes setores da escola no sistema. Caso já tenha definido um administrador, apenas faça login. Para definir um administrador é necessário ter acesso direto ao console do banco de dados, por questões de segurança.</p>
+      <p>Primeiro nos conte o que deseja fazer:</p>
       <p class="lead">
-        <a class="btn btn-primary btn-lg" href="login.html" role="button">Login</a>
+        <a class="btn btn-primary btn-lg btn-block" data-toggle="modal" data-target="#primeiroAcesso" role="button">Primeiro Acesso</a>
+        <a class="btn btn-primary btn-lg btn-block" data-toggle="modal" data-target="#entraSistema" role="button">Entrar no sistema</a>
       </p>
     </div>
   </div>
 
   <!-- Carregando outros arquivos da biblioteca AST-Notif. Créditos: https://github.com/anandastoon/AST-Notif -->
   <script src="resources/AST-Notif/js/ast-notif.min.js"></script>
+  <!-- Carregando arquivos da biblioteca driver.js. Créditos: https://github.com/kamranahmedse/driver.js -->
+  <script src="resources/driver/driver.min.js"></script>
+  <script src="js/tour.js"></script>
 </body>
 </html>
