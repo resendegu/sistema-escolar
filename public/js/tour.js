@@ -55,6 +55,7 @@ function iniciaTour(user) {
                 }, 500);
                 document.getElementById('toggleCadastrarEntrar').addEventListener('click', (e) => {
                     driver.moveNext()
+                    document.location.hash = 'mastercadastrado'
                 })   
             } else if (acesso == 'mastercadastrado') {
                 setTimeout(function(){
@@ -163,5 +164,74 @@ function tourLogin() {
       driver.start();
 }
 
+function tourSecretaria() {
+    document.getElementById('btnAbaDashboard').click()
+    driver.defineSteps([
+        // Parte inicial
+        {
+          element: '#telaPrincipalSecretaria',
+          popover: {
+            className: 'scoped-class2',
+            title: 'Esta é a Secretaria.',
+            description: 'No dashboard você consegue ter acesso à dados rápidos sobre sua escola, como aniversariantes do mês, números de alunos matriculados, desativados, entre outros dados.<br> <button class="btn btn-primary" onclick="driver.moveNext()">Continuar</button>',
+            position: 'left'
+          }
+        },
+        {
+            element: '#sidebar',
+            popover: {
+              className: 'scoped-class2',
+              title: 'Telas da Secretaria',
+              description: 'Estes botões são as diferentes telas da área da Secretaria. Você pode alternar entre elas rapidamente, e ainda sem perder o que escreveu na outra tela. <b>Uma experiência de navegação diferenciada!</b><br> Os últimos botões abaixo de "CHATS", são diferentes web chats criados para que você possa conversar internamente com sua equipe. Você pode criar novos chats no botão com símbolo de adição (+).<br><button class="btn btn-primary" onclick="driver.moveNext()">Continuar</button>',
+              position: 'left'
+            }
+        },
+        // Parte de cadastro de turmas
+        {
+            element: '#btnCadastrarTurmas',
+            popover: {
+              className: 'scoped-class2',
+              title: 'Tela de Alunos',
+              description: 'Vamos ver a tela de cadastro de Turmas<br><br> Clique em "Cadastrar turmas"',
+              position: 'top'
+            }
+        },
+        // Parte da aba de alunos
+        {
+            element: '#btnAbaAlunos',
+            popover: {
+              className: 'scoped-class2',
+              title: 'Tela de Alunos',
+              description: 'Vamos ver o que há de interessante na tela de Alunos<br><br> Clique em "Alunos"',
+              position: 'top'
+            }
+        },
+        {
+            element: '#abaAlunos',
+            popover: {
+              className: 'scoped-class2',
+              title: 'Tela de Alunos!',
+              description: 'Na aba Alunos é mostrado uma tabela mostrando todos os alunos matriculados e ativos na escola. A lista é ordenada pelos números de matrícula dos alunos. Acima da tabela há um campo de busca para filtrar a lista de alunos na tabela, caso seja necessário.<br><button class="btn btn-primary" onclick="driver.moveNext()">Continuar</button>',
+              position: 'top'
+            }
+        },
+        {
+            element: '#tabelaAlunos',
+            popover: {
+              className: 'scoped-class2',
+              title: 'Tabela dos Alunos',
+              description: 'Nesta lista de alunos, para cada aluno é mostrado sua turma e seu número de matrícula, e além disso existem uma área chamada "Ações" onde você pode fazer alguma operação com o aluno, passe o mouse sobre os ícones para ver sua função. <br> Para que você visualize a ficha completa de um aluno basta clicar em cima do nome dele. <br><br> Clique no nome de algum aluno para ver sua ficha. (Caso não tenha nenhum aluno na lista, no botão abaixo para tutorial de criação de alunos) <a class="btn btn-primary">Ver Tutorial</a>',
+              position: 'top'
+            }
+        },
+      ]);
+      driver.start();
 
+        document.getElementById('btnAbaAlunos').addEventListener('click', (e) => {
+            driver.moveNext()
+        })
+        document.getElementById('btnCadastrarTurmas').addEventListener('click', (e) => {
+            driver.moveNext()
+        })    
+}
 
