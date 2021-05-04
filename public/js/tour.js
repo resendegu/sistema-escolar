@@ -1,28 +1,29 @@
-const driver = new Driver({
-    className: 'scoped-class',        // className to wrap driver.js popover
-    animate: true,                    // Whether to animate or not
-    opacity: 0.75,                    // Background opacity (0 means only popovers and without overlay)
-    padding: 10,                      // Distance of element from around the edges
-    allowClose: true,                 // Whether the click on overlay should close or not
-    overlayClickNext: false,          // Whether the click on overlay should move next
-    doneBtnText: 'Pronto',              // Text on the final button
-    closeBtnText: 'Fechar',            // Text on the close button for this step
-    stageBackground: 'rgb(255,255,255)',       // Background color for the staged behind highlighted element
-    nextBtnText: 'Próximo',              // Next button text for this step
-    prevBtnText: 'Anterior',          // Previous button text for this step
-    showButtons: false,               // Do not show control buttons in footer
-    keyboardControl: false,            // Allow controlling through keyboard (escape to close, arrow keys to move)
-    scrollIntoViewOptions: {},        // We use `scrollIntoView()` when possible, pass here the options for it if you want any
-    onHighlightStarted: (Element) => {}, // Called when element is about to be highlighted
-    onHighlighted: (Element) => {},      // Called when element is fully highlighted
-    onDeselected: (Element) => {},       // Called when element has been deselected
-    onReset: (Element) => {},            // Called when overlay is about to be cleared
-    onNext: (Element) => {},                    // Called when moving to next step on any step
-    onPrevious: (Element) => {},                // Called when moving to previous step on any step
-});
+
 
 
 function iniciaTour(user) {
+    const driver = new Driver({
+        className: 'scoped-class',        // className to wrap driver.js popover
+        animate: true,                    // Whether to animate or not
+        opacity: 0.75,                    // Background opacity (0 means only popovers and without overlay)
+        padding: 10,                      // Distance of element from around the edges
+        allowClose: true,                 // Whether the click on overlay should close or not
+        overlayClickNext: false,          // Whether the click on overlay should move next
+        doneBtnText: 'Pronto',              // Text on the final button
+        closeBtnText: 'Fechar',            // Text on the close button for this step
+        stageBackground: 'rgb(255,255,255)',       // Background color for the staged behind highlighted element
+        nextBtnText: 'Próximo',              // Next button text for this step
+        prevBtnText: 'Anterior',          // Previous button text for this step
+        showButtons: false,               // Do not show control buttons in footer
+        keyboardControl: false,            // Allow controlling through keyboard (escape to close, arrow keys to move)
+        scrollIntoViewOptions: {},        // We use `scrollIntoView()` when possible, pass here the options for it if you want any
+        onHighlightStarted: (Element) => {}, // Called when element is about to be highlighted
+        onHighlighted: (Element) => {},      // Called when element is fully highlighted
+        onDeselected: (Element) => {},       // Called when element has been deselected
+        onReset: (Element) => {},            // Called when overlay is about to be cleared
+        onNext: (Element) => {},                    // Called when moving to next step on any step
+        onPrevious: (Element) => {},                // Called when moving to previous step on any step
+    });
     console.log(user)
     let acesso = document.location.hash.substring(1)
     if (user == null) {
@@ -123,6 +124,28 @@ function iniciaTour(user) {
 }
 
 function tourLogin() {
+    const driver = new Driver({
+        className: 'scoped-class',        // className to wrap driver.js popover
+        animate: true,                    // Whether to animate or not
+        opacity: 0.75,                    // Background opacity (0 means only popovers and without overlay)
+        padding: 10,                      // Distance of element from around the edges
+        allowClose: true,                 // Whether the click on overlay should close or not
+        overlayClickNext: false,          // Whether the click on overlay should move next
+        doneBtnText: 'Pronto',              // Text on the final button
+        closeBtnText: 'Fechar',            // Text on the close button for this step
+        stageBackground: 'rgb(255,255,255)',       // Background color for the staged behind highlighted element
+        nextBtnText: 'Próximo',              // Next button text for this step
+        prevBtnText: 'Anterior',          // Previous button text for this step
+        showButtons: false,               // Do not show control buttons in footer
+        keyboardControl: false,            // Allow controlling through keyboard (escape to close, arrow keys to move)
+        scrollIntoViewOptions: {},        // We use `scrollIntoView()` when possible, pass here the options for it if you want any
+        onHighlightStarted: (Element) => {}, // Called when element is about to be highlighted
+        onHighlighted: (Element) => {},      // Called when element is fully highlighted
+        onDeselected: (Element) => {},       // Called when element has been deselected
+        onReset: (Element) => {},            // Called when overlay is about to be cleared
+        onNext: (Element) => {},                    // Called when moving to next step on any step
+        onPrevious: (Element) => {},                // Called when moving to previous step on any step
+    });
     driver.defineSteps([
         {
           element: '#cardUser',
@@ -166,34 +189,58 @@ function tourLogin() {
 
 function tourSecretaria() {
     document.getElementById('btnAbaDashboard').click()
+    const driver = new Driver({
+        className: 'scoped-class',        // className to wrap driver.js popover
+        animate: true,                    // Whether to animate or not
+        opacity: 0,                    // Background opacity (0 means only popovers and without overlay)
+        padding: 10,                      // Distance of element from around the edges
+        allowClose: true,                 // Whether the click on overlay should close or not
+        overlayClickNext: false,          // Whether the click on overlay should move next
+        doneBtnText: 'Pronto',              // Text on the final button
+        closeBtnText: 'Fechar',            // Text on the close button for this step
+        stageBackground: 'rgba(255,255,255, 0)',       // Background color for the staged behind highlighted element
+        nextBtnText: 'Próximo',              // Next button text for this step
+        prevBtnText: 'Anterior',          // Previous button text for this step
+        showButtons: true,               // Do not show control buttons in footer
+        keyboardControl: true,            // Allow controlling through keyboard (escape to close, arrow keys to move)
+        scrollIntoViewOptions: {},        // We use `scrollIntoView()` when possible, pass here the options for it if you want any
+        onHighlightStarted: (Element) => {}, // Called when element is about to be highlighted
+        onHighlighted: (Element) => {},      // Called when element is fully highlighted
+        onDeselected: (Element) => {},       // Called when element has been deselected
+        onReset: (Element) => {},            // Called when overlay is about to be cleared
+        onNext: (Element) => {
+            console.log(Element)
+        },                    // Called when moving to next step on any step
+        onPrevious: (Element) => {},                // Called when moving to previous step on any step
+    });
     driver.defineSteps([
         // Parte inicial
         {
-          element: '#telaPrincipalSecretaria',
+          element: '#tituloSecretaria',
           popover: {
             className: 'scoped-class2',
             title: 'Esta é a Secretaria.',
-            description: 'No dashboard você consegue ter acesso à dados rápidos sobre sua escola, como aniversariantes do mês, números de alunos matriculados, desativados, entre outros dados.<br> <button class="btn btn-primary" onclick="driver.moveNext()">Continuar</button>',
-            position: 'left'
+            description: 'No dashboard você consegue ter acesso à dados rápidos sobre sua escola, como aniversariantes do mês, números de alunos matriculados, desativados, entre outros dados.<br> ',
+            position: 'bottom'
           }
         },
         {
-            element: '#sidebar',
+            element: '#btnAbaDashboard',
             popover: {
-              className: 'scoped-class2',
+              className: 'sidebar-sticky',
               title: 'Telas da Secretaria',
               description: 'Estes botões são as diferentes telas da área da Secretaria. Você pode alternar entre elas rapidamente, e ainda sem perder o que escreveu na outra tela. <b>Uma experiência de navegação diferenciada!</b><br> Os últimos botões abaixo de "CHATS", são diferentes web chats criados para que você possa conversar internamente com sua equipe. Você pode criar novos chats no botão com símbolo de adição (+).<br><button class="btn btn-primary" onclick="driver.moveNext()">Continuar</button>',
-              position: 'left'
+              position: 'right'
             }
         },
         // Parte de cadastro de turmas
         {
             element: '#btnCadastrarTurmas',
             popover: {
-              className: 'scoped-class2',
-              title: 'Tela de Alunos',
+              className: 'sidebar-sticky',
+              title: 'Tela de Cadastro de Turmas',
               description: 'Vamos ver a tela de cadastro de Turmas<br><br> Clique em "Cadastrar turmas"',
-              position: 'top'
+              position: 'right'
             }
         },
         // Parte da aba de alunos
@@ -225,7 +272,8 @@ function tourSecretaria() {
             }
         },
       ]);
-      driver.start();
+      setTimeout(function(){driver.start();}, 500)
+      
 
         document.getElementById('btnAbaAlunos').addEventListener('click', (e) => {
             driver.moveNext()
