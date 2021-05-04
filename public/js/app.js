@@ -17,11 +17,7 @@ firebase.auth().onAuthStateChanged((usuario) => {
 })
 
 function update() {
-<<<<<<< HEAD
-	let versao = 0.98
-=======
 	let versao = 0.96
->>>>>>> parent of 7ec66c2 (versao 0.97)
 	updatesRef.on('value', (snapshot) => {
 		let dados = snapshot.val()
 		if (versao < dados.versao) {
