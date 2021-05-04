@@ -1,8 +1,6 @@
 <!DOCTYPE html><!--[if IE]>  <html class="ie"> <![endif]-->
 <html>
-	<head>
-		<link rel="stylesheet" href="../css/loader.css"> 
-		<link rel="stylesheet" href="../resources/AST-Notif/css/ast-notif.min.css">
+	<head> 
  <STYLE> 
  sup {
 	top: -0.4em;
@@ -339,9 +337,6 @@ a:visited {text-decoration:none;}
 				</div>
 			</div>
 		</div>
-		<!-- Carregando outros arquivos da biblioteca AST-Notif. Créditos: https://github.com/anandastoon/AST-Notif -->
-		<script defer src="../resources/AST-Notif/js/ast-notif.min.js"></script>
-		<script src="../../js/app.js"></script>
 		<!-- Inicialização do Firebase -->
         <!-- update the version number as needed -->
         <script  src="/__/firebase/8.2.3/firebase-app.js"></script>
@@ -374,7 +369,7 @@ a:visited {text-decoration:none;}
 			var situacaoFinalBoletim = document.getElementById('situacaoFinalBoletim')
 			var faltasBoletim = document.getElementById('faltasBoletim')
 			var semestreLivroBoletim = document.getElementById('semestreLivroBoletim')
-			let timestampNow = firebase.functions().httpsCallable('timestamp')
+
 			firebase.auth().onAuthStateChanged((user) => {
 				console.log(window.location.hash.substring(1).split('?')[1])
 				if(window.location.hash) {
@@ -392,8 +387,8 @@ a:visited {text-decoration:none;}
 					nomeBoletim.innerText = dadosAluno.nomeAluno
 					turmaBoletim.innerText = historicoEscolar.turma
 					matriculaBoletim.innerText = dadosAluno.matriculaAluno
-					dataInicioBoletim.innerText = historicoEscolar.infoAluno.inicio.split('-').reverse().join('/')
-					dataTerminoBoletim.innerText = historicoEscolar.infoAluno.fim.split('-').reverse().join('/')
+					dataInicioBoletim.innerText = historicoEscolar.infoAluno.inicio
+					dataTerminoBoletim.innerText = historicoEscolar.infoAluno.fim
 
 					for (const nomeNota in notas) {
 						if (Object.hasOwnProperty.call(notas, nomeNota)) {
@@ -407,45 +402,6 @@ a:visited {text-decoration:none;}
 					} else {
 						situacaoFinalBoletim.innerText = 'REPROVADO'
 					}
-
-					let diasDaSemana = historicoEscolar.infoAluno.diasDaSemana
-					turnoBoletim.innerText = ''
-					for (const i in diasDaSemana) {
-						if (Object.hasOwnProperty.call(diasDaSemana, i)) {
-							const dia = diasDaSemana[i];
-							turnoBoletim.innerHTML += ' | ' + dia
-						}
-					}
-					turnoBoletim.innerText += ' ' + historicoEscolar.infoAluno.hora + 'h'
-
-					let qtdePresencas = 0
-					let frequencias = historicoEscolar.infoAluno.frequencia
-					for (const data in frequencias) {
-						if (Object.hasOwnProperty.call(frequencias, data)) {
-							const objTurma = frequencias[data];
-							qtdePresencas++
-						}
-					}
-					let qtdeFaltas = Number(historicoEscolar.infoAluno.qtdeAulas) - qtdePresencas
-					faltasBoletim.innerText = qtdeFaltas
-					porcentagemFrequenciaBoletim.innerText = ((100*parseInt(qtdePresencas))/parseInt(historicoEscolar.infoAluno.qtdeAulas)).toFixed(2) + '%'
-
-					let books = ''
-					let livrosEstudados = historicoEscolar.infoAluno.livros
-					let c = 0
-					for (const i in livrosEstudados) {
-						if (Object.hasOwnProperty.call(livrosEstudados, i)) {
-							const livro = livrosEstudados[i];
-							if (c >= 1) {
-								books += ' - ' + livro
-							} else {
-								books += livro
-							}
-							
-							c++
-						}
-					}
-					semestreLivroBoletim.innerText = historicoEscolar.infoAluno.nomePeriodo + ' - BOOK ' + books
 				}).catch(error => {
 					console.log(error)
 				})

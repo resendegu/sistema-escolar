@@ -423,10 +423,14 @@ function historicoAluno(matricula, turma) {
             <td><b>${somatorioNota}</b>/100</td>
             <td>
                 <a href="#editEmployeeModal" id="emiteBoletim${c}" onclick="emiteBoletim('${matricula}', '${registro.key}')" class="action" data-toggle="modal"><i data-feather="file-text" data-toggle="tooltip" title="Emitir boletim"></i></a>
-                <a href="#" id="verHistorico${c}" onclick="preparaVisualizacaoHistorico('${matricula}', '${registro.key}')" class="edit" data-toggle="modal"><i data-feather="eye" data-toggle="tooltip" title="Visualizar dados"></i></a>
+                <a href="#" id="verHistorico${c}" class="edit" data-toggle="modal"><i data-feather="eye" data-toggle="tooltip" title="Visualizar dados"></i></a>
             </td>
         </tr>
         `
+        document.querySelector('#verHistorico' + c).addEventListener('click', (e) => {
+            e.preventDefault()
+            visualizarDadosDoHistorico(registro.val())
+        })
 
         $(function () {
             $('[data-toggle="tooltip"]').tooltip()
@@ -434,15 +438,6 @@ function historicoAluno(matricula, turma) {
         feather.replace()
         loaderRun()
         ativaCheckboxes()
-    })
-}
-
-function preparaVisualizacaoHistorico(matricula, chave) {
-    alunosRef.child(matricula + '/historicoEscolar/' + chave).once('value').then(snapshot => {
-        visualizarDadosDoHistorico(snapshot.val())
-    }).catch(error => {
-        console.log(error)
-        AstNotif.dialog('Erro', error.message)
     })
 }
 
