@@ -9,6 +9,7 @@ var alunosRef = firebase.database().ref('sistemaEscolar/alunos')
 var followUpRef = firebase.database().ref('sistemaEscolar/followUp')
 var transfereAlunos = firebase.functions().httpsCallable('transfereAlunos')
 var desempenhoRef = firebase.database().ref('sistemaEscolar/notasDesempenho/referencia')
+var infoEscolaRef = firebase.database().ref('sistemaEscolar/infoEscola')
 
 var loader = document.getElementById('loader')
 var loaderMsg = document.getElementById('loaderMsg')
@@ -2189,3 +2190,43 @@ function abreDadosDoAlunoDesativado(matricula) {
 function alteraTipoDeBuscaDesativados(tipo) {
     tipoDeBuscaDesativados = tipo
 }
+
+// Aba de Informações da Escola
+
+function dadosInfoEscola() {
+    infoEscolaRef.once('value').then(snapshot => {
+        let dados = snapshot.val()
+        if (dados != null) {
+            document.getElementById('nomeEscola').value = dados.dadosBasicos.nomeEscola
+            document.getElementById('frequenciaAprovacao').value = dados.dadosBasicos.frequenciaAprovacao
+            document.getElementById('pontosAprovacao').value = dados.dadosBasicos.pontosAprovacao
+        }  
+    }).catch(error => {
+        AstNotif.dialog('Erro', error.message)
+        console.log(error)
+    })
+}
+
+document.getElementById('infoEscolaForm').addEventListener('submit', (e) => {
+    e.preventDefault()
+    const dados = new FormData(e.target);
+    let infoEscola = {}
+    infoEscola.nomeEscola = dados.get('nomeEscola')
+    infoEscola.frequenciaAprovacao = dados.get('frequenciaAprovacao')
+    infoEscola.pontosAprovacao = dados.get('pontosAprovacao')
+    infoEscolaRef.child('dadosBasicos').set(infoEscola).then(() => {
+        AstNotif.dialog('Sucesso', 'Os dados básicos foram atualizados e aplicados com sucesso.')
+    }).catch(error => {
+        AstNotif.dialog('Erro', error.message)
+        console.log(error)
+    })
+})
+
+document.getElementById('livrosEscola').addEventListener('submit', (e) => {
+    e.preventDefault()
+})
+
+document.getElementById('cursosEscola').addEventListener('submit', (e) => {
+    e.preventDefault()
+})
+

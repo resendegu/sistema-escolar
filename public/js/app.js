@@ -10,14 +10,13 @@ var loaderMsg = document.getElementById('loaderMsg')
 
 let user
 firebase.auth().onAuthStateChanged((usuario) => {
-	iniciaTour(usuario)
 	user = usuario
 	monitoraConexao()
 	update()
 })
 
 function update() {
-	let versao = 0.96
+	let versao = 0.981
 	updatesRef.on('value', (snapshot) => {
 		let dados = snapshot.val()
 		if (versao < dados.versao) {

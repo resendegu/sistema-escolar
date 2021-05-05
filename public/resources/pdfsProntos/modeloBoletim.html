@@ -376,35 +376,43 @@ a:visited {text-decoration:none;}
 					var matricula = window.location.hash.substring(1).split('?')[0];
 					var key = window.location.hash.substring(1).split('?')[1];
 				}
+				firebase.database().ref('sistemaEscolar/infoEscola').once('value').then(infos => {
+					firebase.database().ref(`sistemaEscolar/alunos/${matricula}`).once('value').then(snapshot => {
+						let dadosEscola = info.val()
+						let dadosAluno = snapshot.val()
+						let historicoEscolar = dadosAluno.historicoEscolar[key]
+						let notas = historicoEscolar.infoAluno.notas
+						let desempenho = historicoEscolar.infoAluno.desempenho
+						let somatorioNotas = 0
 
-				firebase.database().ref(`sistemaEscolar/alunos/${matricula}`).once('value').then(snapshot => {
-					let dadosAluno = snapshot.val()
-					let historicoEscolar = dadosAluno.historicoEscolar[key]
-					let notas = historicoEscolar.infoAluno.notas
-					let desempenho = historicoEscolar.infoAluno.desempenho
-					let somatorioNotas = 0
+						nomeBoletim.innerText = dadosAluno.nomeAluno
+						turmaBoletim.innerText = historicoEscolar.turma
+						matriculaBoletim.innerText = dadosAluno.matriculaAluno
+						dataInicioBoletim.innerText = historicoEscolar.infoAluno.inicio
+						dataTerminoBoletim.innerText = historicoEscolar.infoAluno.fim
 
-					nomeBoletim.innerText = dadosAluno.nomeAluno
-					turmaBoletim.innerText = historicoEscolar.turma
-					matriculaBoletim.innerText = dadosAluno.matriculaAluno
-					dataInicioBoletim.innerText = historicoEscolar.infoAluno.inicio
-					dataTerminoBoletim.innerText = historicoEscolar.infoAluno.fim
-
-					for (const nomeNota in notas) {
-						if (Object.hasOwnProperty.call(notas, nomeNota)) {
-							const valorNota = notas[nomeNota];
-							somatorioNotas += Number(valorNota)
+						for (const nomeNota in notas) {
+							if (Object.hasOwnProperty.call(notas, nomeNota)) {
+								const valorNota = notas[nomeNota];
+								somatorioNotas += Number(valorNota)
+							}
 						}
-					}
-					notaFinalBoletim.innerText = somatorioNotas
-					if (somatorioNotas >= 70) {
-						situacaoFinalBoletim.innerText = 'APROVADO'
-					} else {
-						situacaoFinalBoletim.innerText = 'REPROVADO'
-					}
+						notaFinalBoletim.innerText = somatorioNotas
+						if (somatorioNotas >= dadosEscola.dadosBasicos.pontosAprovacao) {
+							situacaoFinalBoletim.innerText = 'APROVADO'
+						} else {
+							situacaoFinalBoletim.innerText = 'REPROVADO'
+						}
+
+						escolaBoletim.innerText = dadosEscola.dadosBasicos.nomeEscola
+					}).catch(error => {
+						console.log(error)
+					})
 				}).catch(error => {
 					console.log(error)
 				})
+
+				
 			})
 		</script>
 	</body>

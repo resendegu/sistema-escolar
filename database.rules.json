@@ -11,6 +11,10 @@
           ".write": "auth.uid != null && auth.token.master == true || auth.token.secretaria == true",
           ".read":"auth.uid != null && auth.token.master == true || auth.token.secretaria == true"
         },
+        "infoEscola": {
+          ".write": "auth.uid != null && auth.token.master == true || auth.token.secretaria == true",
+          ".read":"auth.uid != null && auth.token.master == true || auth.token.secretaria == true || auth.token.adm == true || auth.token.professor == true || auth.token.aluno == true"
+        },
           "chats": {
           ".write": "auth.uid != null && auth.token.secretaria == true || auth.token.master == true || auth.token.adm == true || auth.token.professor == true",
           ".read":"auth.uid != null && auth.token.secretaria == true || auth.token.master == true || auth.token.adm == true || auth.token.professor == true"
