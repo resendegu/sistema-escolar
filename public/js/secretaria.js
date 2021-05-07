@@ -2194,6 +2194,8 @@ function alteraTipoDeBuscaDesativados(tipo) {
 // Aba de Informações da Escola
 
 function dadosInfoEscola() {
+    let listaLivros = document.getElementById('listaLivros')
+    let listaCursos = document.getElementById('listaCursos')
     infoEscolaRef.once('value').then(snapshot => {
         let dados = snapshot.val()
         if (dados != null) {
@@ -2205,6 +2207,93 @@ function dadosInfoEscola() {
         AstNotif.dialog('Erro', error.message)
         console.log(error)
     })
+    
+    infoEscolaRef.child('livros').on('value', (snapshot) => {
+        listaLivros.innerHTML = ''
+        let livrosCadastrados = snapshot.val()
+        for (const i in livrosCadastrados) {
+            if (Object.hasOwnProperty.call(livrosCadastrados, i)) {
+                const livro = livrosCadastrados[i];
+                listaLivros.innerHTML += `
+                    <tr>
+                        <td>
+                            <span class="custom-checkbox">
+                                <input type="checkbox" id="checkbox${livro.codSistema}" name="options[]" value="${livro.codSistema}">
+                                <label for="checkbox${livro.codSistema}"></label>
+                            </span>
+                        </td>
+                        <td>${livro.idLivro}</td>
+                        <td>${livro.nomeLivro}</td>
+                        <td>${livro.codLivro}</td>
+                        <td>
+                            <a href="#modalAdicionaLivro" onclick="carregaDadosLivro('${livro.codSistema}')" class="edit" data-toggle="modal"><i data-feather="edit" data-toggle="tooltip" title="Editar livro">&#xE254;</i></a>
+                            <a href="#deleteEmployeeModal" class="action" data-toggle="modal"><i data-feather="eye" data-toggle="tooltip" title="Ver Estatísticas"></i></a>
+                        </td>
+                    </tr>
+                `
+            }
+        }
+        
+        feather.replace()
+        ativaCheckboxes()
+    })
+
+    infoEscolaRef.child('cursos').on('value', (snapshot) => {
+        listaCursos.innerHTML = ''
+        let cursosCadastrados = snapshot.val()
+        for (const i in cursosCadastrados) {
+            if (Object.hasOwnProperty.call(cursosCadastrados, i)) {
+                const curso = cursosCadastrados[i];
+                listaCursos.innerHTML += `
+                    <tr>
+                        <td>
+                            <span class="custom-checkbox">
+                                <input type="checkbox" id="checkboxCurso${curso.codSistema}" name="cursos" value="${curso.codSistema}">
+                                <label for="checkboxCurso${curso.codSistema}"></label>
+                            </span>
+                        </td>
+                        <td>${curso.nomeCurso}</td>
+                        <td></td>
+                        <td>${curso.codCurso}</td>
+                        <td>
+                            <a href="#modalAdicionaCurso" onclick="carregaDadosCurso('${curso.codSistema}')" class="edit" data-toggle="modal"><i data-feather="edit" data-toggle="tooltip" title="Editar livro">&#xE254;</i></a>
+                            <a href="#deleteEmployeeModal" class="action" data-toggle="modal"><i data-feather="eye" data-toggle="tooltip" title="Ver Estatísticas"></i></a>
+                        </td>
+                    </tr>
+                `
+            }
+        }
+        
+        feather.replace()
+        ativaCheckboxes()
+    })
+
+    infoEscolaRef.child('codDiasSemana').on('value', (snapshot) => {
+        let i = 0
+        let diasSemana = snapshot.val()
+        document.getElementsByName('abrv').forEach(element => {
+            element.value = diasSemana[i]
+            i++
+        });
+    })
+    
+}
+
+function carregaDadosLivro(codSistema) {
+    infoEscolaRef.child('livros/' + codSistema).once('value').then(snapshot => {
+        document.getElementById('idLivroAdd').value = snapshot.val().idLivro
+        document.getElementById('nomeLivroAdd').value = snapshot.val().nomeLivro
+        document.getElementById('codigoLivroAdd').value = snapshot.val().codLivro
+        document.getElementById('codigoSistemaAdd').value = snapshot.val().codSistema
+    })
+}
+
+function carregaDadosCurso(codSistema) {
+    infoEscolaRef.child('cursos/' + codSistema).once('value').then(snapshot => {
+        document.getElementById('nomeCursoAdd').value = snapshot.val().nomeCurso
+        document.getElementById('codigoCursoAdd').value = snapshot.val().codCurso
+        document.getElementById('codigoCursoSistemaAdd').value = snapshot.val().codSistema
+    })
 }
 
 document.getElementById('infoEscolaForm').addEventListener('submit', (e) => {
@@ -2214,19 +2303,184 @@ document.getElementById('infoEscolaForm').addEventListener('submit', (e) => {
     infoEscola.nomeEscola = dados.get('nomeEscola')
     infoEscola.frequenciaAprovacao = dados.get('frequenciaAprovacao')
     infoEscola.pontosAprovacao = dados.get('pontosAprovacao')
+    loaderRun(true, 'Enviando dados básicos...')
     infoEscolaRef.child('dadosBasicos').set(infoEscola).then(() => {
         AstNotif.dialog('Sucesso', 'Os dados básicos foram atualizados e aplicados com sucesso.')
+        loaderRun()
+    }).catch(error => {
+        AstNotif.dialog('Erro', error.message)
+        console.log(error)
+        loaderRun()
+    })
+})
+
+// Livros
+document.getElementById('addLivroTabela').addEventListener('submit', (e) => {
+    e.preventDefault()
+    const dados = new FormData(e.target);
+    let livro = {}
+    livro.idLivro = dados.get('idLivroAdd')
+    livro.nomeLivro = dados.get('nomeLivroAdd')
+    livro.codLivro = dados.get('codigoLivroAdd')
+    livro.codSistema = dados.get('codigoSistemaAdd')
+    loaderRun(true, 'Enviando dados do livro...')
+    infoEscolaRef.child('livros/' + livro.codSistema).set(livro).then(() => {
+        AstNotif.notify('Livros Adicionados', 'Livros adicionados com sucesso', 'agora', {length: 5000})
+        $('#modalAdicionaLivro').modal('hide')
+        loaderRun()
+    }).catch(error => {
+        AstNotif.dialog('Erro', error.message)
+        console.log(error)
+        loaderRun()
+    })
+})
+
+function buscaProximoIdLivro() {
+    let textBoxCodSistemaAdd = document.getElementById('codigoSistemaAdd')
+    infoEscolaRef.child('livros').once('value').then(snapshot => {
+        if (snapshot.val() != null) {
+            let dados = snapshot.val()
+            let c = 0
+            for (const i in dados) {
+                if (Object.hasOwnProperty.call(dados, i)) {
+                    const livro = dados[i];
+                    c++
+                }
+            }
+            while (dados.hasOwnProperty(c)) {
+                c++
+            }
+            textBoxCodSistemaAdd.value = c
+        } else {
+            textBoxCodSistemaAdd.value = 0
+        }
+        
+    }).catch(error => {
+        AstNotif.dialog('Erro', error.message)
+        console.log(error)
+        loaderRun()
+    })
+}
+
+document.getElementById('formListaLivros').addEventListener('submit', (e) => {
+    e.preventDefault()
+    const dados = new FormData(e.target);
+    let livrosSelecionados = dados.getAll('options[]')
+    if (livrosSelecionados.length == 0) {
+        AstNotif.dialog('Opa...', 'Você esqueceu de selecionar os livros. Volte, e marque as caixas dos livros que deseja deletar.')
+    } else {
+       abrirModal('modal', 'Confirmação', 'Você confirma a exclusão dos livros selecionados?', '<button id="confirmaDeletaLivros" class="btn btn-danger">Sim</button><button class="btn btn-secondary" data-dismiss="modal">Cancelar</button>')
+       document.getElementById('confirmaDeletaLivros').addEventListener('click', (e) => {
+           e.preventDefault()
+           let c = 0
+           for (const i in livrosSelecionados) {
+               if (Object.hasOwnProperty.call(livrosSelecionados, i)) {
+                   const codLivro = livrosSelecionados[i];
+                   infoEscolaRef.child('livros/' + codLivro).remove().then(() => {
+                    c++
+                    if (c == livrosSelecionados.length) {
+                        AstNotif.notify('Sucesso', 'Livros deletados com sucesso.', 'agora')
+                        $('#modal').modal('hide')
+                    }
+                    
+                   }).catch(error => {
+                       AstNotif.dialog('Erro', error.message)
+                       console.log(error)
+                   })
+               }
+           }
+       }) 
+    }
+    
+})
+
+// Cursos
+document.getElementById('addCursoTabela').addEventListener('submit', (e) => {
+    e.preventDefault()
+    const dados = new FormData(e.target);
+    let curso = {}
+    curso.nomeCurso = dados.get('nomeCursoAdd')
+    curso.codCurso = dados.get('codigoCursoAdd')
+    curso.codSistema = dados.get('codigoCursoSistemaAdd')
+    loaderRun(true, 'Enviando dados do Curso...')
+    infoEscolaRef.child('cursos/' + curso.codSistema).set(curso).then(() => {
+        AstNotif.notify('Cursos Adicionados', 'Cursos adicionados com sucesso', 'agora', {length: 5000})
+        $('#modalAdicionaCurso').modal('hide')
+        loaderRun()
+    }).catch(error => {
+        AstNotif.dialog('Erro', error.message)
+        console.log(error)
+        loaderRun()
+    })
+})
+
+function buscaProximoIdCurso() {
+    let textBoxCodSistemaAdd = document.getElementById('codigoCursoSistemaAdd')
+    infoEscolaRef.child('cursos').once('value').then(snapshot => {
+        if (snapshot.val() != null) {
+            let dados = snapshot.val()
+            let c = 0
+            for (const i in dados) {
+                if (Object.hasOwnProperty.call(dados, i)) {
+                    const curso = dados[i];
+                    c++
+                }
+            }
+            while (curso.hasOwnProperty(c)) {
+                c++
+            }
+            textBoxCodSistemaAdd.value = c
+        } else {
+            textBoxCodSistemaAdd.value = 0
+        }
+        
+    }).catch(error => {
+        AstNotif.dialog('Erro', error.message)
+        console.log(error)
+        loaderRun()
+    })
+}
+
+document.getElementById('formListaCursos').addEventListener('submit', (e) => {
+    e.preventDefault()
+    const dados = new FormData(e.target);
+    let cursosSelecionados = dados.getAll('cursos')
+    if (cursosSelecionados.length == 0) {
+        AstNotif.dialog('Opa...', 'Você esqueceu de selecionar os cursos. Volte, e marque as caixas dos cursos que deseja deletar.')
+    } else {
+        abrirModal('modal', 'Confirmação', 'Você confirma a exclusão dos cursos selecionados?', '<button id="confirmaDeletaCursos" class="btn btn-danger">Sim</button><button class="btn btn-secondary" data-dismiss="modal">Cancelar</button>')
+        document.getElementById('confirmaDeletaCursos').addEventListener('click', (e) => {
+            e.preventDefault()
+            let c = 0
+            for (const i in cursosSelecionados) {
+                if (Object.hasOwnProperty.call(cursosSelecionados, i)) {
+                    const codCurso = cursosSelecionados[i];
+                    infoEscolaRef.child('cursos/' + codCurso).remove().then(() => {
+                        c++
+                        if (c == cursosSelecionados.length) {
+                            AstNotif.notify('Sucesso', 'Cursos deletados com sucesso.', 'agora')
+                            $('#modal').modal('hide')
+                        }
+                    }).catch(error => {
+                        AstNotif.dialog('Erro', error.message)
+                        console.log(error)
+                    })
+                }
+           }
+       }) 
+    }
+    
+})
+
+// Cod Dias da Semana
+document.getElementById('formCodDiasSemana').addEventListener('submit', (e) => {
+    e.preventDefault()
+    const dados = new FormData(e.target);
+    let dias = dados.getAll('abrv')
+    infoEscolaRef.child('codDiasSemana').set(dias).then(() => {
+        AstNotif.notify('Sucesso', 'Códigos aplicados com sucesso. As próximas turmas serão criadas com base nestes códigos.', 'agora', {length: 30000})
     }).catch(error => {
         AstNotif.dialog('Erro', error.message)
         console.log(error)
     })
 })
-
-document.getElementById('livrosEscola').addEventListener('submit', (e) => {
-    e.preventDefault()
-})
-
-document.getElementById('cursosEscola').addEventListener('submit', (e) => {
-    e.preventDefault()
-})
-

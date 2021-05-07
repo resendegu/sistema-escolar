@@ -49,6 +49,92 @@
       </div>
     </div>
 
+    <div class="modal fade bd-example-modal-xl" tabindex="-1" role="dialog" id="modalAdicionaLivro">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="titulo">Adicionar Livro</h5>
+            <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button> -->
+          </div>
+          <div class="modal-body" id="corpo">
+            <form id="addLivroTabela">
+              <div class="form-row">
+                <div class="form-group col-md-6">
+                  <label for="inputEmail4">Identificação do livro</label>
+                  <input type="text" class="form-control" id="idLivroAdd" name="idLivroAdd" placeholder="ID do Livro (Ex.: Book 1)">
+                  <small id="idLivroHElp" class="form-text text-muted">Esta identificação aparecerá nos boletins e nos demais documentos emitidos pelo sistema. Ex.: Book 1</small>
+                </div>
+                <div class="form-group col-md-6">
+                  <label for="exampleInputEmail1">Código</label>
+                  <input type="text" required class="form-control" id="codigoLivroAdd" name="codigoLivroAdd" aria-describedby="nomeEscola" placeholder="Código do Livro">
+                  <small id="nomeEscolaHElp" class="form-text text-muted">Este código será utilizado para formar os códigos automáticos de turma. Você pode definir o código que quiser. Recomendamos usar números (1, 2, 3...)</small>  
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group col-md-6">
+                  <label for="inputPassword4">Nome completo do livro</label>
+                    <input type="text" class="form-control" id="nomeLivroAdd" name="nomeLivroAdd" placeholder="Nome do livro (Ex.: Aprendendo Inglês - Edição para Crianças)">
+                </div>
+                <div class="form-group col-md-6">
+                  <label for="inputPassword4">Código do Sistema</label>
+                    <input type="text" readonly class="form-control" id="codigoSistemaAdd" name="codigoSistemaAdd" placeholder="Código do Sistema">
+                </div>
+              </div>
+              
+              <button type="submit" class="btn btn-primary btn-block">Adicionar</button>
+            </form>
+          </div>
+          <div class="modal-footer" id="botoes">
+            
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade bd-example-modal-xl" tabindex="-1" role="dialog" id="modalAdicionaCurso">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="titulo">Adicionar Livro</h5>
+            <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button> -->
+          </div>
+          <div class="modal-body" id="corpo">
+            <form id="addCursoTabela">
+              <div class="form-row">
+                <div class="form-group col-md-6">
+                  <label for="inputEmail4">Nome do curso</label>
+                  <input type="text" class="form-control" id="nomeCursoAdd" name="nomeCursoAdd" placeholder="Nome do curso (Ex.: Inglês Básico para Adultos)">
+                  <small id="idCursoHElp" class="form-text text-muted">Esta identificação aparecerá nos boletins e nos demais documentos emitidos pelo sistema. Ex.: Inglês Básico para Adultos</small>
+                </div>
+                <div class="form-group col-md-6">
+                  <label for="exampleInputEmail1">Código</label>
+                  <input type="text" required class="form-control" id="codigoCursoAdd" name="codigoCursoAdd" aria-describedby="nomeEscola" placeholder="Código do Curso">
+                  <small id="nomeEscolaHElp" class="form-text text-muted">Este código será utilizado para formar os códigos automáticos de turma. Você pode definir o código que quiser. Recomendamos usar letras que remetam ao nome do seu curso (Ex.: BA) onde BA remete à "Básico Adultos"</small>  
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group col-md-6">
+                  <label for="inputPassword4">Código do Sistema</label>
+                    <input type="text" readonly class="form-control" id="codigoCursoSistemaAdd" name="codigoCursoSistemaAdd" placeholder="Código do Sistema">
+                </div>
+              </div>
+              
+              <button type="submit" class="btn btn-primary btn-block">Adicionar</button>
+            </form>
+          </div>
+          <div class="modal-footer" id="botoes">
+            
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" id="matriculaModal">
       <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
@@ -144,7 +230,7 @@
                 <li class="nav-item">
                   <a class="nav-link" data-toggle="list" href="#abaInfoEscola" onclick="dadosInfoEscola()" role="tab" id="btnAbaInfoEscola" aria-controls="informacoesescola">
                     <span data-feather="info"></span>
-                    Informações da Escola
+                    Configurações da Escola
                   </a>
                 </li>
               </ul>
@@ -289,7 +375,7 @@
               <li class="nav-item">
                 <a class="nav-link" data-toggle="list" href="#abaInfoEscola" onclick="dadosInfoEscola()" role="tab" id="btnAbaInfoEscola" aria-controls="informacoesescola">
                   <span data-feather="info"></span>
-                  Informações da Escola
+                  Configurações da Escola
                 </a>
               </li>
             </ul>
@@ -1343,15 +1429,12 @@
                 </div>
                 
                 
-                <div class="form-check">
-                  <input type="checkbox" class="form-check-input" id="exampleCheck1">
-                  <label class="form-check-label" for="exampleCheck1">Check me out</label>
-                </div>
+                
                 <button type="submit" class="btn btn-primary btn-block">Aplicar dados básicos</button>
               </form>
               <hr>
-              <form id="livrosEscola">
-                <div class="container-xl" id="tabelaAlunos">
+              <form id="formListaLivros">
+                <div class="container-xl">
                   <div class="table-responsive">
                     <div class="table-wrapper">
                       <div class="table-title" style="background-color: darkblue;">
@@ -1360,8 +1443,8 @@
                             <h2>Livros <b>Cadastrados</b></h2>
                           </div>
                           <div class="col-sm-6">
-                            <a href="#" class="btn btn-success">&nbsp; <span class="feather-24" data-feather="refresh-cw"></span><span>Atualizar lista</span></a>
-                            <a href="#deleteEmployeeModal" class="btn btn-danger" data-toggle="modal">&nbsp;<span class="feather-24" data-feather="trash"></span> <span>Delete</span></a>						
+                            <a href="#modalAdicionaLivro" onclick="buscaProximoIdLivro()" class="btn btn-primary" data-toggle="modal">&nbsp; <span class="feather-24" data-feather="plus"></span><span>Adicionar</span></a>
+                            <button type="submit" class="btn btn-danger" data-toggle="modal">&nbsp;<span class="feather-24" data-feather="trash"></span> <span>Deletar</span></button>						
                           </div>
                         </div>
                       </div>
@@ -1369,14 +1452,11 @@
                         <thead>
                           <tr>
                             <th>
-                              <span class="custom-checkbox">
-                                <input type="checkbox" id="selectAll">
-                                <label for="selectAll"></label>
-                              </span>
+                              
                             </th>
-                            <th><a href="#" id="ordenaNome">ID do livro</a></th>
-                            <th><a href="#" id="ordenaMatricula">Nome</a></th>
-                            <th><a href="#" id="ordenaUltimaTurma">Faixas</a></th>
+                            <th>Identificação do livro <span data-feather="help-circle" data-toggle="tooltip" data-placement="top" title="Esse será o nome que aparecerá nos boletins"></span> </th>
+                            <th>Nome Completo do Livro <span data-feather="help-circle" data-toggle="tooltip" data-placement="top" title="Esse será o nome para fins de consulta apenas"></span> </th>
+                            <th>Código <span data-feather="help-circle" data-toggle="tooltip" data-placement="top" title="O código do livro será utilizado para formar o código automático da turma"></span> </th>
                             <th>Ações</th>
                           </tr>
                         </thead>
@@ -1390,7 +1470,7 @@
                             </td>
                             <td>Book 1</td>
                             <td>Learning English Better</td>
-                            <td>KIDS, TEENS</td>
+                            <td>1</td>
                             <td>
                               <a href="#editEmployeeModal" class="action" data-toggle="modal"><i data-feather="edit" data-toggle="tooltip" title="Reativar aluno">&#xE254;</i></a>
                               <a href="#deleteEmployeeModal" class="delete" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Deletar">&#xE872;</i></a>
@@ -1403,10 +1483,9 @@
                   </div>
                 </div>
               </form>
-
               <hr>
-              <form id="cursosEscola">
-                <div class="container-xl" id="tabelaAlunos">
+              <form id="formListaCursos">
+                <div class="container-xl">
                   <div class="table-responsive">
                     <div class="table-wrapper">
                       <div class="table-title">
@@ -1415,8 +1494,8 @@
                             <h2>Cursos <b>Cadastrados</b></h2>
                           </div>
                           <div class="col-sm-6">
-                            <a href="#" class="btn btn-success">&nbsp; <span class="feather-24" data-feather="refresh-cw"></span><span>Atualizar lista</span></a>
-                            <a href="#deleteEmployeeModal" class="btn btn-danger" data-toggle="modal">&nbsp;<span class="feather-24" data-feather="trash"></span> <span>Delete</span></a>						
+                            <a href="#modalAdicionaCurso" onclick="buscaProximoIdCurso()" class="btn btn-primary" data-toggle="modal">&nbsp; <span class="feather-24" data-feather="plus"></span><span>Adicionar</span></a>
+                            <button type="submit" class="btn btn-danger" data-toggle="modal">&nbsp;<span class="feather-24" data-feather="trash"></span> <span>Deletar</span></button>						
                           </div>
                         </div>
                       </div>
@@ -1424,14 +1503,11 @@
                         <thead>
                           <tr>
                             <th>
-                              <span class="custom-checkbox">
-                                <input type="checkbox" id="selectAll">
-                                <label for="selectAll"></label>
-                              </span>
+                              
                             </th>
-                            <th><a href="#" id="ordenaNome">Nome</a></th>
-                            <th><a href="#" id="ordenaMatricula">Matrícula</a></th>
-                            <th><a href="#" id="ordenaUltimaTurma">Turma</a></th>
+                            <th>Nome do Curso <span data-feather="help-circle" data-toggle="tooltip" data-placement="top" title="Esse será o nome que aparecerá nos boletins"></span> </th>
+                            <th> </th>
+                            <th>Código <span data-feather="help-circle" data-toggle="tooltip" data-placement="top" title="O código do curso será utilizado para formar o código automático da turma"></span> </th>
                             <th>Ações</th>
                           </tr>
                         </thead>
@@ -1439,13 +1515,13 @@
                           <tr>
                             <td>
                               <span class="custom-checkbox">
-                                <input type="checkbox" id="checkbox1" name="options[]" value="1">
+                                <input type="checkbox" id="checkbox1" name="cursos" value="1">
                                 <label for="checkbox1"></label>
                               </span>
                             </td>
-                            <td>Gustavo Resende</td>
-                            <td>teste@resende.app</td>
-                            <td>KIDS</td>
+                            <td>Book 1</td>
+                            <td></td>
+                            <td>1</td>
                             <td>
                               <a href="#editEmployeeModal" class="action" data-toggle="modal"><i data-feather="edit" data-toggle="tooltip" title="Reativar aluno">&#xE254;</i></a>
                               <a href="#deleteEmployeeModal" class="delete" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Deletar">&#xE872;</i></a>
@@ -1457,6 +1533,73 @@
                     </div>
                   </div>
                 </div>
+              </form>
+              <hr>
+              <h4>Configurações adicionais do gerador de códigos de turma</h4>
+                <hr>
+              <form id="formCodDiasSemana">
+                <h6>Abreviações dos dias da semana</h6>
+                
+                Defina como os dias da semana devem ser representados no gerador de código
+                <div class="form-row">
+                  <div class="col">
+                    <input type="text" readonly class="form-control" value="Domingo" id="d0" name="d0" placeholder="Dia da Semana">
+                  </div>
+                  <div class="col">
+                    <input type="text" class="form-control" id="abrv0" name="abrv" placeholder="Abreviação">
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="col">
+                    <input type="text" readonly class="form-control" value="Segunda" id="dia1" name="dia1" placeholder="Dia da Semana">
+                  </div>
+                  <div class="col">
+                    <input type="text" class="form-control" id="abrv1" name="abrv" placeholder="Abreviação">
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="col">
+                    <input type="text" readonly class="form-control" value="Terça" id="dia2" name="dia2" placeholder="Dia da Semana">
+                  </div>
+                  <div class="col">
+                    <input type="text" class="form-control" id="abrv2" name="abrv" placeholder="Abreviação">
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="col">
+                    <input type="text" readonly class="form-control" value="Quarta" id="dia3" name="dia3" placeholder="Dia da Semana">
+                  </div>
+                  <div class="col">
+                    <input type="text" class="form-control" id="abrv3" name="abrv" placeholder="Abreviação">
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="col">
+                    <input type="text" readonly class="form-control" value="Quinta" id="dia4" name="dia4" placeholder="Dia da Semana">
+                  </div>
+                  <div class="col">
+                    <input type="text" class="form-control" id="abrv4" name="abrv" placeholder="Abreviação">
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="col">
+                    <input type="text" readonly class="form-control" value="Sexta" id="dia5" name="dia5" placeholder="Dia da Semana">
+                  </div>
+                  <div class="col">
+                    <input type="text" class="form-control" id="abrv5" name="abrv" placeholder="Abreviação">
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="col">
+                    <input type="text" readonly class="form-control" value="Sábado" id="dia6" name="dia6" placeholder="Dia da Semana">
+                  </div>
+                  <div class="col">
+                    <input type="text" class="form-control" id="abrv6" name="abrv" placeholder="Abreviação">
+                  </div>
+                </div>
+                <br>
+                <button class="btn btn-primary btn-block" type="submit">Aplicar abreviações</button>
+                <br><br>
               </form>
             </div>
             <!-- FIM área das abas dinâmicas -->
