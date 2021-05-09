@@ -204,7 +204,7 @@
                   </a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" data-toggle="list" href="#abaCadastrarTurmas" role="tab" aria-controls="CadastrarTurmas" onclick="carregaProfessores()">
+                  <a class="nav-link" data-toggle="list" href="#abaCadastrarTurmas" role="tab" aria-controls="CadastrarTurmas" onclick="preparaCadastroTurma()">
                     <span data-feather="plus-square"></span>
                     Cadastrar turmas
                   </a>
@@ -229,7 +229,7 @@
                 </li>
                 <li class="nav-item">
                   <a class="nav-link" data-toggle="list" href="#abaInfoEscola" onclick="dadosInfoEscola()" role="tab" id="btnAbaInfoEscola" aria-controls="informacoesescola">
-                    <span data-feather="info"></span>
+                    <span data-feather="tool"></span>
                     Configurações da Escola
                   </a>
                 </li>
@@ -349,7 +349,7 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" data-toggle="list" href="#abaCadastrarTurmas" role="tab" aria-controls="CadastrarTurmas" onclick="carregaProfessores()" id="btnCadastrarTurmas">
+                <a class="nav-link" data-toggle="list" href="#abaCadastrarTurmas" role="tab" aria-controls="CadastrarTurmas" onclick="preparaCadastroTurma()" id="btnCadastrarTurmas">
                   <span data-feather="plus-square"></span>
                   Cadastrar turmas
                 </a>
@@ -374,7 +374,7 @@
               </li>
               <li class="nav-item">
                 <a class="nav-link" data-toggle="list" href="#abaInfoEscola" onclick="dadosInfoEscola()" role="tab" id="btnAbaInfoEscola" aria-controls="informacoesescola">
-                  <span data-feather="info"></span>
+                  <span data-feather="tool"></span>
                   Configurações da Escola
                 </a>
               </li>
@@ -799,16 +799,6 @@
                 <label class="text-muted float-right h5" id="codigoDaTurma"></label>
                 <div class="row">
                   <div class="col-md-auto">
-                    <h6>Faixa etária</h6>
-                    <div class="row">
-                      &nbsp;&nbsp;&nbsp;<div class="list-group" id="mostraFaixa" role="tablist">
-                        <a class="list-group-item list-group-item-action" data-toggle="list" id="nivelKIDS" href="#kids" role="tab" onclick="faixa('KIDS')">KIDS</a>
-                        <a class="list-group-item list-group-item-action" data-toggle="list" id="nivelT" href="#teens" role="tab" onclick="faixa('T')">TEENS</a>
-                        <a class="list-group-item list-group-item-action" data-toggle="list" id="nivelA" href="#adults" role="tab" onclick="faixa('A')">ADULTS</a>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-md-auto">
                     <label id="mostraDiasTurma"></label>
                     <br>
                     <label id="mostraHorarioTurma"></label>
@@ -857,121 +847,124 @@
 
             <div class="container tab-pane fade" id="abaCadastrarTurmas" role="tabpanel" aria-labelledby="Cadastrar Turmas">
               <label class="h3">Cadastrar turmas</label>
-              <label class="text-muted float-right h5" id="codigoNivel"></label><label class="text-muted float-right h5" id="codigoFaixa"></label><label class="text-muted float-right h5" id="codigoLivros"></label><label class="text-muted float-right h5" id="codigoDia"></label><label class="text-muted float-right h5" id="codigoHorario"></label>
-              <hr>
-              <div class="row">
-                <div class="col-md-auto">
-                  <h6>Faixa etária</h6>
-                  <div class="list-group" id="myList" role="tablist">
-                    <a class="list-group-item list-group-item-action" data-toggle="list" id="KIDS" href="#kids" role="tab" onclick="faixa('KIDS')">KIDS</a>
-                    <a class="list-group-item list-group-item-action" data-toggle="list" id="T" href="#teens" role="tab" onclick="faixa('T')">TEENS</a>
-                    <a class="list-group-item list-group-item-action" data-toggle="list" id="A" href="#adults" role="tab" onclick="faixa('A')">ADULTS</a>
+              <form id="formCadastroTurma">
+                <div class="form-group row">
+                  <label for="codTurmaAdd" class="col-sm-3 col-form-label col-form-label-lg">Código da Turma</label>
+                  <div class="col-sm-auto">
+                    <input type="text" required class="form-control form-control-lg" id="codTurmaAdd" name="codTurmaAdd" placeholder="Código da Turma">
+                    <small id="codHelp" class="form-text text-muted">O código de turma será gerado automaticamente a medida que você inserir os dados. Mas você pode editar o código aqui caso seja necessário.</small>
                   </div>
                 </div>
-                <div class="col">
-                  <br>
-                  <div class="tab-content" id="nav-tabContent">
-                    <div class="tab-pane fade" id="teens" role="tabpanel" aria-labelledby="Teens">
-                      <h6>Livros da turma</h6>
-                      <div class="input-group-text">
-                        <input type="checkbox" id="livro1" value="1" onclick="livro(1, this.checked)">
-                        &nbsp;Book 1&nbsp;&nbsp;&nbsp;
-                        <input type="checkbox" value="" id="livro2" value="2" onclick="livro(2, this.checked)">
-                        &nbsp;Book 2&nbsp;&nbsp;&nbsp;
-                        <input type="checkbox" id="livro3" value="3" onclick="livro(3, this.checked)">
-                        &nbsp;Book 3&nbsp;&nbsp;&nbsp;
-                        <input type="checkbox" id="livro4" value="4" onclick="livro(4, this.checked)">
-                        &nbsp;Book 4&nbsp;&nbsp;&nbsp;
-                      </div>
-                    </div>
-
-                    <div class="tab-pane fade" id="adults" role="tabpanel" aria-labelledby="list-profile-list">
-                      <div class="input-group prepend">
-                        <div class="input-group-prepend">
-                          <label class="input-group-text" for="inputGroupSelect01">Nivelamento</label>
-                        </div>
-                        <select class="custom-select" id="inputGroupSelect01" onchange="nivel(this.value)">
-                          <option selected hidden>Nível da turma...</option>
-                          <option value="B">B - Basic</option>
-                          <option value="I">I - Intermediate</option>
-                          <option value="A">A - Advanced</option>
-                        </select>
-                      </div>
-                      <br>
-                      <h6>Livros da turma</h6>
-                      <div class="input-group-text">
-                        <input type="checkbox" id="livroA1" value="1" onclick="livro(this.value, this.checked)">
-                        &nbsp;Book 1&nbsp;&nbsp;&nbsp;
-                        <input type="checkbox" id="livroA2" value="2" onclick="livro(this.value, this.checked)">
-                        &nbsp;Book 2&nbsp;&nbsp;&nbsp;
-                        <input type="checkbox" id="livroA3" value="3" onclick="livro(this.value, this.checked)">
-                        &nbsp;Book 3&nbsp;&nbsp;&nbsp;
-                        <input type="checkbox" id="livroA4" value="4" onclick="livro(this.value, this.checked)">
-                        &nbsp;Book 4&nbsp;&nbsp;&nbsp;
-                        <input type="checkbox" id="livroA5" disabled value="5" onclick="livro(this.value, this.checked)">
-                        &nbsp;Book 5&nbsp;&nbsp;&nbsp;
-                        <input type="checkbox" id="livroA6" disabled value="6" onclick="livro(this.value, this.checked)">
-                        &nbsp;Book 6&nbsp;&nbsp;&nbsp;
-                        <input type="checkbox" id="livroA7" disabled value="7" onclick="livro(this.value, this.checked)">
-                        &nbsp;Book 7&nbsp;&nbsp;&nbsp;
-                        <input type="checkbox" id="livroA8" disabled value="8" onclick="livro(this.value, this.checked)">
-                        &nbsp;Book 8&nbsp;&nbsp;&nbsp;
-                      </div>
-                    </div>
-        
-                    <div class="tab-pane fade" id="avancado" role="tabpanel" aria-labelledby="list-profile-list">
-                      Obsoleto
-                    </div>
-        
-                    <div class="tab-pane fade" id="kids" role="tabpanel" aria-labelledby="list-profile-list">
-                      <input class="form-control" type="text" placeholder="Readonly input here…" value="KIDS" readonly>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-sm">
-                    <fieldset>
+                <div class="form-group row">
+                  <div class="col-auto my-1">
+                    <label class="mr-sm-2" for="listaCursosTurma">Curso</label>
+                    <select required class="custom-select mr-sm-2" id="listaCursosTurma" name="listaCursosTurma">
+                      <option hidden selected>Escolha um curso...</option>
                       
-                      <div class="row">
-                        <div class="col-5">
-                          <label for="inputGroupSelect01">Dias da semana: &nbsp;</label>
-                          <br><input type="checkbox" value="0" onchange="diaSemana(this.value, this.checked)">Domingo &nbsp; 
-                          <br><input type="checkbox" value="1" onchange="diaSemana(this.value, this.checked)">Segunda &nbsp; 
-                          <br><input type="checkbox" value="2" onchange="diaSemana(this.value, this.checked)">Terça &nbsp; 
-                          <br><input type="checkbox" value="3" onchange="diaSemana(this.value, this.checked)">Quarta &nbsp;
-                        </div>
-                        <div class="col-5">
-                          <br>
-                          <br><input type="checkbox" value="4" onchange="diaSemana(this.value, this.checked)">Quinta &nbsp; 
-                          <br><input type="checkbox" value="5" onchange="diaSemana(this.value, this.checked)">Sexta &nbsp; 
-                          <br><input type="checkbox" value="6" onchange="diaSemana(this.value, this.checked)">Sábado &nbsp;
-                        </div>
-                      </div>
-                    </fieldset>
+                    </select>
+                  </div>
+                  <div class="col-auto my-1">
+                    <label class="mr-sm-2" for="listaProfessoresTurma">Professor(a) Referência</label>
+                    <select required class="custom-select mr-sm-2" id="listaProfessoresTurma" name="listaProfessoresTurma">
+                      <option hidden selected>Escolha um professor...</option>
+                      
+                    </select>
+                  </div>
+                  <div class="col-auto my-1">
+                    <label class="mr-sm-2" for="horarioTurma">Horário</label>
+                    <input class="form-control" required type="time" name="horarioTurma" id="horarioTurma">
+                  </div>
                 </div>
-                <div class="col-sm">
-                  <div class="col-sm">
-                    <div class="input-group prepend">
-                      <div class="input-group-prepend">
-                        <label class="input-group-text" for="inputGroupSelect01">Prof. referência</label>
-                      </div>
-                      <select class="custom-select" id="professorTurma" onchange="professorReferencia(this.value)">
-                        <option selected hidden>Escolha o(a) professor(a)...</option>
-                        
-                      </select>
+                <div class="form-group row">
+                  <label class="mr-sm-2" for="listaProfessoresTurma">Dias de Aula:</label>
+                </div>
+                <div class="form-group row">
+                  <div class="col-auto my-1">
+                    <div class="custom-control custom-checkbox mr-sm-2">
+                      <input type="checkbox" value="0" class="custom-control-input" id="diaDomingo" name="dia">
+                      <label class="custom-control-label" for="diaDomingo">Domingo</label>
                     </div>
-                    <div class="input-group prepend">
-                      <div class="input-group-prepend">
-                        <label class="input-group-text" for="inputGroupSelect01">Horário</label>
-                      </div>
-                      <input type="number" name="horario" id="horario" onchange="horario(this.value)">
+                  </div>
+                  <div class="col-auto my-1">
+                    <div class="custom-control custom-checkbox mr-sm-2">
+                      <input type="checkbox" value="1" class="custom-control-input" id="diaSegunda" name="dia">
+                      <label class="custom-control-label" for="diaSegunda">Segunda</label>
+                    </div>
+                  </div>
+                  <div class="col-auto my-1">
+                    <div class="custom-control custom-checkbox mr-sm-2">
+                      <input type="checkbox" value="2" class="custom-control-input" id="diaTerca" name="dia">
+                      <label class="custom-control-label" for="diaTerca">Terça</label>
+                    </div>
+                  </div>
+                  <div class="col-auto my-1">
+                    <div class="custom-control custom-checkbox mr-sm-2">
+                      <input type="checkbox" value="3" class="custom-control-input" id="diaQuarta" name="dia">
+                      <label class="custom-control-label" for="diaQuarta">Quarta</label>
+                    </div>
+                  </div>
+                  <div class="col-auto my-1">
+                    <div class="custom-control custom-checkbox mr-sm-2">
+                      <input type="checkbox" value="4" class="custom-control-input" id="diaQuinta" name="dia">
+                      <label class="custom-control-label" for="diaQuinta">Quinta</label>
+                    </div>
+                  </div>
+                  <div class="col-auto my-1">
+                    <div class="custom-control custom-checkbox mr-sm-2">
+                      <input type="checkbox" value="5" class="custom-control-input" id="diaSexta" name="dia">
+                      <label class="custom-control-label" for="diaSexta">Sexta</label>
+                    </div>
+                  </div>
+                  <div class="col-auto my-1">
+                    <div class="custom-control custom-checkbox mr-sm-2">
+                      <input type="checkbox" value="6" class="custom-control-input" id="diaSabado" name="dia">
+                      <label class="custom-control-label" for="diaSabado">Sábado</label>
                     </div>
                   </div>
                 </div>
-                <br>
-                <button type="button" onclick="cadastrarTurma()" class="btn btn-primary btn-block" id="btnCadastrarTurma" disabled>Cadastrar turma</button>
-              </div>
+                <div class="container-xl">
+                  <div class="table-responsive">
+                    <div class="table-wrapper">
+                      <div class="table-title">
+                        <div class="row">
+                          <div class="col-sm-6">
+                            <h2>Escolha os <b>livros</b></h2>
+                          </div>
+                          
+                        </div>
+                      </div>
+                      <table class="table table-striped table-hover">
+                        <thead>
+                          <tr>
+                            <th>
+                              
+                            </th>
+                            <th>Nome do Livro</th>
+                            <th>Código</th>
+                            <th>Identificação</th>
+                            
+                          </tr>
+                        </thead>
+                        <tbody id="listaLivrosTurma">
+                          <tr>
+                            <td>
+                              <span class="custom-checkbox">
+                                <input type="checkbox" id="checkbox1" name="livros" value="1">
+                                <label for="checkbox1"></label>
+                              </span>
+                            </td>
+                            <td>Book 1</td>
+                            <td>1</td>
+                            
+                          </tr>
+                        </tbody>
+                      </table>
+                      
+                    </div>
+                  </div>
+                </div>
+                <button class="btn btn-primary btn-block" type="submit">Cadastrar turma</button>
+              </form>
             
               
             </div>
@@ -1057,32 +1050,10 @@
                   
                   
                   <div class="form-group col-auto">
-                    <label for="inputAddress">Horário e dias da semana</label>
-                    <input type="text" class="form-control" id="horaEDiasAluno" name="horaEDiasAluno" placeholder="Ex.: 20h,MON,THU">
+                    <label for="inputAddress">Horário</label>
+                    <input type="text" readonly class="form-control" id="horaAluno" name="horaAluno">
                   </div>
-                  <div class="form-group col-auto">
-                    <legend class="col-form-label col-auto pt-0">Curso de inglês para:</legend>
-                    <div class="col-auto">
-                      <div class="form-check">
-                        <input class="form-check-input" type="radio" name="faixaEtaria" id="faixaKIDS" value="KIDS" checked>
-                        <label class="form-check-label" for="gridRadios1">
-                          KIDS
-                        </label>
-                      </div>
-                      <div class="form-check">
-                        <input class="form-check-input" type="radio" name="faixaEtaria" id="faixaT" value="T">
-                        <label class="form-check-label" for="gridRadios2">
-                          TEENS
-                        </label>
-                      </div>
-                      <div class="form-check">
-                        <input class="form-check-input" type="radio" name="faixaEtaria" id="faixaA" value="A">
-                        <label class="form-check-label" for="gridRadios3">
-                          ADULTS
-                        </label>
-                      </div>
-                    </div>
-                  </div>
+                  
                 </div>
                 <hr>
                 <label class="h6">Dados de endereço</label>

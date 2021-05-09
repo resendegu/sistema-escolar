@@ -191,7 +191,7 @@ exports.cadastroUser = functions.auth.user().onCreate((user) => {
 })
 
 exports.cadastraTurma = functions.https.onCall((data, context) => {
-    /**{codigoSala: codPadrao, professor: professor, diasDaSemana: diasDaSemana, livros: books, nivelTurma: nivelTurma, faixaTurma: faixaEtaria, hora: horarioCurso} */
+    /**{codigoSala: codPadrao, professor: professor, diasDaSemana: diasDaSemana, livros: books, hora: horarioCurso} */
     console.log(data)
     if (context.auth.token.master == true || context.auth.token.secretaria == true) {
         var dados = data
@@ -205,7 +205,7 @@ exports.cadastraTurma = functions.https.onCall((data, context) => {
         } else {
             throw new functions.https.HttpsError('invalid-argument', 'Você deve passar um horário válido')
         }
-        return admin.auth().getUser(data.professor).then(function(user) {
+        return admin.auth().getUserByEmail(data.professor).then(function(user) {
             dados.professor = [{nome: user.displayName, email: user.email}]
             dados.timestamp = admin.firestore.Timestamp.now()
             return admin.database().ref(`sistemaEscolar/usuarios/${user.uid}/professor/turmas/${data.codigoSala}`).set(true).then(() => {

@@ -142,20 +142,20 @@ table.table .avatar {
 	font-size: 13px;
 }    
 /* Custom checkbox */
-.custom-checkbox {
+.table .custom-checkbox {
 	position: relative;
 }
-.custom-checkbox input[type="checkbox"] {    
+.table .custom-checkbox input[type="checkbox"] {    
 	opacity: 0;
 	position: absolute;
 	margin: 5px 0 0 3px;
 	z-index: 9;
 }
-.custom-checkbox label:before{
+.table .custom-checkbox label:before{
 	width: 18px;
 	height: 18px;
 }
-.custom-checkbox label:before {
+.table .custom-checkbox label:before {
 	content: '';
 	margin-right: 10px;
 	display: inline-block;
@@ -166,7 +166,7 @@ table.table .avatar {
 	box-sizing: border-box;
 	z-index: 2;
 }
-.custom-checkbox input[type="checkbox"]:checked + label:after {
+.table .custom-checkbox input[type="checkbox"]:checked + label:after {
 	content: '';
 	position: absolute;
 	left: 6px;
@@ -179,14 +179,14 @@ table.table .avatar {
 	z-index: 3;
 	transform: rotateZ(45deg);
 }
-.custom-checkbox input[type="checkbox"]:checked + label:before {
+.table .custom-checkbox input[type="checkbox"]:checked + label:before {
 	border-color: #03A9F4;
 	background: #03A9F4;
 }
-.custom-checkbox input[type="checkbox"]:checked + label:after {
+.table .custom-checkbox input[type="checkbox"]:checked + label:after {
 	border-color: #fff;
 }
-.custom-checkbox input[type="checkbox"]:disabled + label:before {
+.table .custom-checkbox input[type="checkbox"]:disabled + label:before {
 	color: #b8b8b8;
 	cursor: auto;
 	box-shadow: none;

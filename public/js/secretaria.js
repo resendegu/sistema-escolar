@@ -200,171 +200,177 @@ firebase.auth().onAuthStateChanged((user) => {
 })
 
 // Funções para cadastro de turmas
-var nivelTurma = ''
-var faixaEtaria = ''
-var livros = {1: false, 2: false, 3: false, 4: false, 5: false, 6: false, 7: false, 8: false}
-var diaDaSemana = {SUN: false, MON: false, TUE: false, WED: false, THU: false, FRI: false, SAT: false}
-var horarioCurso = ''
-var codPadrao = ''
-function nivel(niv) {
-    console.log(niv)
-    livros = {1: false, 2: false, 3: false, 4: false, 5: false, 6: false, 7: false, 8: false}
-    nivelTurma = niv
-    if (niv == 'B') {
-        document.getElementById('livroA5').disabled = true
-        document.getElementById('livroA6').disabled = true
-        document.getElementById('livroA7').disabled = true
-        document.getElementById('livroA8').disabled = true
-        document.getElementById('livroA5').checked = false
-        document.getElementById('livroA6').checked = false
-        document.getElementById('livroA7').checked = false
-        document.getElementById('livroA8').checked = false
-    }
-    if (niv == 'I') {
-        document.getElementById('livroA5').disabled = false
-        document.getElementById('livroA6').disabled = false
-        document.getElementById('livroA7').disabled = true
-        document.getElementById('livroA8').disabled = true
-        document.getElementById('livroA7').checked = false
-        document.getElementById('livroA8').checked = false
-    }
-    if (niv == 'A') {
-        document.getElementById('livroA5').disabled = false
-        document.getElementById('livroA6').disabled = false
-        document.getElementById('livroA7').disabled = false
-        document.getElementById('livroA8').disabled = false
-    }
-    junta()
-}
 
-function faixa(faix) {
-    nivelTurma = ''
-    faixaEtaria = ''
-    livros = {1: false, 2: false, 3: false, 4: false, 5: false, 6: false, 7: false, 8: false}
-    codPadrao = ''
 
-    console.log(faix)
-    faixaEtaria = faix
-    /**
-    let botoesFaixas = ['A', 'T', 'KIDS']
-    for (const i in botoesFaixas) {
-        const id = botoesFaixas[i]
-        document.getElementById(id).style.display = 'none'
+
+function preparaCadastroTurma() {
+    let codTurmaAdd = document.getElementById('codTurmaAdd')
+
+    let codDiasSemana
+    let cursosCadastrados
+    let livrosCadastrados
+
+    let codCurso
+    let horario
+    let dias = []
+    let livros = [] 
+
+    function geraCod() {
+        let codTurma = ''
+        if (codCurso != undefined) {
+            codTurma += codCurso
+        }
+        for (const i in livros) {
+            if (Object.hasOwnProperty.call(livros, i)) {
+                const codLivro = livros[i];
+                codTurma += codLivro
+            }
+        }
+        codTurma += '-'
+        for (const i in dias) {
+            if (Object.hasOwnProperty.call(dias, i)) {
+                const dia = dias[i];
+                codTurma += dia
+            }
+        }
+        if (horario != undefined) {
+            codTurma += horario
+        }
+
+        codTurmaAdd.value = codTurma
+        console.log(codTurma)
     }
-    document.getElementById(faix).style.display = 'block'
-     */
+
+    infoEscolaRef.child('codDiasSemana').on('value', (snapshot) => {
+        codDiasSemana = snapshot.val()
+    })
+
+    infoEscolaRef.child('livros').on('value', (snapshot) => {
+        let listaLivros = document.getElementById('listaLivrosTurma')
+        listaLivros.innerHTML = ''
+        livrosCadastrados = snapshot.val()
+        for (const i in livrosCadastrados) {
+            if (Object.hasOwnProperty.call(livrosCadastrados, i)) {
+                const livro = livrosCadastrados[i];
+                listaLivros.innerHTML += `
+                    <tr>
+                        <td>
+                            <span class="custom-checkbox">
+                                <input type="checkbox" id="checkbox${livro.codSistema}" name="livros" value="${livro.codSistema}">
+                                <label for="checkbox${livro.codSistema}"></label>
+                            </span>
+                        </td>
+                        <td>${livro.nomeLivro}</td>
+                        <td>${livro.codLivro}</td>
+                        <td>${livro.idLivro}</td>
+                    </tr>
+                `
+            }
+        }
+        document.getElementsByName('livros').forEach(livro => {
+            livro.addEventListener('input', (e) => {
+                if (e.target.checked) {
+                    livros.push(livrosCadastrados[Number(e.target.value)].codLivro)
+                } else {
+                    livros.splice(livros.indexOf(livrosCadastrados[Number(e.target.value)].codLivro), 1)
+                }
+                geraCod()
+                console.log(livros)
+            })
+        })
+    })
+
+    infoEscolaRef.child('cursos').on('value', (snapshot) => {
+        let listaCursos = document.getElementById('listaCursosTurma')
+        listaCursos.innerHTML = '<option hidden selected>Escolha um curso...</option>'
+        cursosCadastrados = snapshot.val()
+        for (const i in cursosCadastrados) {
+            if (Object.hasOwnProperty.call(cursosCadastrados, i)) {
+                const curso = cursosCadastrados[i];
+                listaCursos.innerHTML += `
+                <option value="${curso.codSistema}">${curso.codCurso} - ${curso.nomeCurso}</option>
+                `
+            }
+        }
+    })
+
+    listaDeProfessores.on('value', (snapshot) => {
+        let listaProfessoresTurma = document.getElementById('listaProfessoresTurma')
+        listaProfessoresTurma.innerHTML = '<option hidden selected>Escolha um professor...</option>'
+        for (const key in snapshot.val()) {
+            if (Object.hasOwnProperty.call(snapshot.val(), key)) {
+                const professor = snapshot.val()[key];
+                listaProfessoresTurma.innerHTML += `
+                <option value="${professor.nome}|${professor.email}">${professor.nome} (${professor.email})</option>
+                `
+            }
+        }
+    })
+
+    document.getElementById('listaCursosTurma').addEventListener('input', (e) => {
+        codCurso = cursosCadastrados[e.target.value].codCurso
+        geraCod()
+        console.log(codCurso)
+    })
+
+    document.getElementsByName('dia').forEach(dia => {
+        dia.addEventListener('click', (e) => {
+            if (e.target.checked) {
+                dias.push(codDiasSemana[Number(e.target.value)])
+            } else {
+                dias.splice(dias.indexOf(codDiasSemana[Number(e.target.value)]), 1)
+            }
+            geraCod()
+            console.log(dias)
+        })
+    });
+
     
-    junta()
-    
-}
 
-function livro(numLivro, checked) {
-    console.log(numLivro, checked)
-    if (checked) {
-        livros[numLivro] = true
-    } else {
-        livros[numLivro] = false
-    }
-    junta()
-}
-
-function diaSemana(dia, checked) {
-    console.log(dia)
-    switch (dia) {
-        case '0':
-            diaDaSemana.SUN = checked
-            break;
-        case '1':
-            diaDaSemana.MON = checked
-            break;
-        case '2':
-            diaDaSemana.TUE = checked
-            break;
-        case '3':
-            diaDaSemana.WED = checked
-            break;
-        case '4':
-            diaDaSemana.THU = checked
-            break;
-        case '5':
-            diaDaSemana.FRI = checked
-            break;
-        case '6':
-            diaDaSemana.SAT = checked
-            break;
-        default:
-            diaDaSemana = '?'
-            break;
-    }
-    junta()
-}
-
-function horario(hora) {
-    console.log(hora)
-    horarioCurso = hora
-    junta()
-}
-var diasDaSemana = []
-var books = []
-function junta() {
-    codPadrao = nivelTurma + faixaEtaria
-    books = []
-    for (const livro in livros) {
-        if (livros.hasOwnProperty(livro)) {
-            const checked = livros[livro];
-            if (checked) {
-                codPadrao = codPadrao + livro
-                books.push(livro)
-            }
+    document.getElementById('horarioTurma').addEventListener('input', (e) => {
+        if (e.target.value.split(':')[1] == '00') {
+            horario = e.target.value.split(':')[0]
+        } else {
+            horario = e.target.value.split(':').join('_')
         }
-    }
-    codPadrao += '-'
-    diasDaSemana = []
-    for (const key in diaDaSemana) {
-        if (Object.hasOwnProperty.call(diaDaSemana, key)) {
-            const check = diaDaSemana[key];
-            if (check) {
-                codPadrao += key
-                diasDaSemana.push(key)
-            }
-        }
-    }
-    codPadrao += horarioCurso
-    document.getElementById('codigoNivel').innerText = codPadrao
-    console.log(codPadrao.length)
-    if (codPadrao.length >= 9) {
-        document.getElementById('btnCadastrarTurma').disabled = false
-    } else {
-        document.getElementById('btnCadastrarTurma').disabled = true
-    }
-}
-var professorReferencia
+        geraCod()
+        console.log(horario)
+    })
 
-function carregaProfessores() {
-    loader.style.display = 'block'
-    loaderMsg.innerText = 'Carregando professores...'
-    console.log('carregando')
-    var professorTurmaSelect = document.getElementById('professorTurma')
-    listaDeProfessores.once('value').then(snapshot => {
-        let professores = snapshot.val()
-        professorTurmaSelect.innerHTML = '<option selected hidden>Escolha o(a) professor(a)...</option>'
-        for (const uid in professores) {
-            if (Object.hasOwnProperty.call(professores, uid)) {
-                const professor = professores[uid];
-                professorTurmaSelect.innerHTML += `<option value="${uid}">${professor.nome} (${professor.email})</option>`
-            }
+    document.getElementById('formCadastroTurma').addEventListener('submit', (e) => {
+        e.preventDefault()
+        loaderRun(true, 'Enviando dados da turma para o servidor...')
+        const dados = new FormData(e.target)
+        let dadosTurma = {}
+        dadosTurma.codigoSala = dados.get('codTurmaAdd')
+        dadosTurma.professor = dados.get('listaProfessoresTurma').split('|')[1]
+        console.log(dadosTurma.professor)
+        dadosTurma.diasDaSemana = dados.getAll('dia')
+        dadosTurma.livros = dados.getAll('livros')
+        dadosTurma.curso = dados.get('listaCursosTurma')
+        if (dados.get('horarioTurma').split(':')[1] == '00') {
+            horario = dados.get('horarioTurma').split(':')[0]
+        } else {
+            horario = dados.get('horarioTurma').split(':').join('_')
         }
-        loaderRun()
-    }).catch(error => {
-        loaderRun()
-        console.error(error)
-        AstNotif.dialog('Erro', error.message)
+        dadosTurma.hora = horario
+        
+        var cadastraTurma = firebase.functions().httpsCallable('cadastraTurma')
+        cadastraTurma(dadosTurma).then(function(result) {
+            console.log(result)
+            AstNotif.dialog('Sucesso', result.data.answer)
+            loaderRun()
+        }).catch(function(error) {
+            AstNotif.dialog('Erro', error.message)
+            console.log(error)
+            loaderRun()
+        })
     })
 }
-function professorReferencia(uid) {
-    console.log(uid)
-    professor = uid
-}
+
+
+
+
 
 // Função de cadastro de turma no banco de dados
 function cadastrarTurma(confima=false) {
@@ -372,7 +378,7 @@ function cadastrarTurma(confima=false) {
     loaderMsg.innerText = 'Enviando informações da turma ao servidor...'
     //AstNotif.dialog('Aguarde', "<img src='../images/carregamento.gif' width=100px>")
     var cadastraTurma = firebase.functions().httpsCallable('cadastraTurma')
-    cadastraTurma({codigoSala: codPadrao, professor: professor, diasDaSemana: diasDaSemana, livros: books, nivelTurma: nivelTurma, faixaTurma: faixaEtaria, hora: horarioCurso})
+    cadastraTurma({codigoSala: codPadrao, professor: professor, diasDaSemana: diasDaSemana, livros: books, hora: horarioCurso})
     .then(function(result) {
         console.log(result)
         AstNotif.dialog('Sucesso', result.data.answer)
@@ -608,34 +614,61 @@ function abreTurma(cod) {
         let dadosDaTurma = snapshot.val()
         codigoDaTurmaLabel.innerText = dadosDaTurma.codigoSala
         areaInfoTurma.style.visibility = 'visible'
-        
-        // Área separação KIDS, TEENS, ADULTS
-        var faixa
-        if (dadosDaTurma.faixaTurma == 'A') {
-            faixa = 'ADULTS'
-        } else if(dadosDaTurma.faixaTurma == 'T') {
-            faixa = 'TEENS'
-        } else {
-            faixa = dadosDaTurma.faixaTurma
-        }
-        document.getElementById('mostraFaixa').innerHTML = `<a class="list-group-item list-group-item-action active" data-toggle="list" role="tab">${faixa}</a>`
-        // Mostra dias de aula da turma
-        document.getElementById('mostraDiasTurma').innerText = 'Dia(s) de Aula:'
-        for (const key in dadosDaTurma.diasDaSemana) {
-            if (Object.hasOwnProperty.call(dadosDaTurma.diasDaSemana, key)) {
-                const dia = dadosDaTurma.diasDaSemana[key];
-                document.getElementById('mostraDiasTurma').innerText += ' ' + dia + ' '
+        infoEscolaRef.once('value').then(infoEscola => {
+            let livros = infoEscola.val().livros
+            let codDiasSemana = infoEscola.val().codDiasSemana
+            document.getElementById('mostraDiasTurma').innerText = 'Dia(s) de Aula:'
+            for (const key in dadosDaTurma.diasDaSemana) {
+                if (Object.hasOwnProperty.call(dadosDaTurma.diasDaSemana, key)) {
+                    const dia = dadosDaTurma.diasDaSemana[key];
+                    let diasemana
+                    switch(Number(dia)) {
+                        case 0:
+                            diasemana = 'Domingo'
+                            break
+                        case 1:
+                            diasemana = 'Segunda'
+                            break
+                        case 2: 
+                            diasemana = 'Terça'
+                            break
+                        case 3:
+                            diasemana = 'Quarta'
+                            break
+                        case 4:
+                            diasemana = 'Quinta'
+                            break
+                        case 5:
+                            diasemana = 'Sexta'
+                            break
+                        case 6:
+                            diasemana = 'Sábado'
+                            break
+                        default:
+                            diasemana = ''
+                            break
+                    }
+                    document.getElementById('mostraDiasTurma').innerText += ' | ' + diasemana + ' '
+                }
+                
             }
-        }
+
+            document.getElementById('mostraLivrosTurma').innerText = 'Livros cadastrados: '
+            for (const key in dadosDaTurma.livros) {
+                if (Object.hasOwnProperty.call(dadosDaTurma.livros, key)) {
+                    const numLivro = dadosDaTurma.livros[key];
+                    document.getElementById('mostraLivrosTurma').innerText += ` | ${livros[numLivro].idLivro} `
+                }
+            }
+        }).catch(error => {
+            AstNotif.dialog('Erro', error.message)
+            console.log(error)
+        })
+        // Mostra dias de aula da turma
+        
         document.getElementById('mostraHorarioTurma').innerText = 'Horário de aula: '+ dadosDaTurma.hora + 'h'
         
-        document.getElementById('mostraLivrosTurma').innerText = 'Livros cadastrados: '
-        for (const key in dadosDaTurma.livros) {
-            if (Object.hasOwnProperty.call(dadosDaTurma.livros, key)) {
-                const numLivro = dadosDaTurma.livros[key];
-                document.getElementById('mostraLivrosTurma').innerText += ` Book ${numLivro} |`
-            }
-        }
+        
 
         document.getElementById('timestampTurmaCadastrada').innerText = 'Turma cadastrada em:  ' + new Date(dadosDaTurma.timestamp._seconds * 1000)
 
@@ -764,23 +797,33 @@ function carregaProfsETurmas() {
     let turmaAluno = document.getElementById('turmaAluno')
     let matriculaAluno = document.getElementById('matriculaAluno')
     
-    turmasRef.once('value').then(snapshot => {
-        turmaAluno.innerHTML = '<option selected hidden>Escolha uma turma...</option>'
-        let turmas = snapshot.val()
-        turmasLocal = snapshot.val()
-        console.log(turmas)
-        for (const cod in turmas) {
-            if (Object.hasOwnProperty.call(turmas, cod)) {
-                const infoDaTurma = turmas[cod];
-                turmaAluno.innerHTML += `<option value="${cod}">${cod}</option>`
+    infoEscolaRef.once('value').then(infoEscola => {
+        turmasRef.once('value').then(snapshot => {
+            let diasDaSemana = infoEscola.val().codDiasSemana
+            let cursos = infoEscola.val().cursos
+
+            turmaAluno.innerHTML = '<option selected hidden>Escolha uma turma...</option>'
+            let turmas = snapshot.val()
+            turmasLocal = snapshot.val()
+            console.log(turmas)
+            for (const cod in turmas) {
+                if (Object.hasOwnProperty.call(turmas, cod)) {
+                    const infoDaTurma = turmas[cod];
+                    turmaAluno.innerHTML += `<option value="${cod}">${cod} \(${cursos[infoDaTurma.curso].nomeCurso})</option>`
+                }
             }
-        }
-        loaderRun()
+            loaderRun()
+        }).catch(error => {
+            loaderRun()
+            console.error(error)
+            AstNotif.dialog('Erro', error.message)
+        })
     }).catch(error => {
         loaderRun()
         console.error(error)
         AstNotif.dialog('Erro', error.message)
     })
+    
     ultimaMatriculaRef.once('value').then(snapshot => {
         matriculaAluno.value = Number(snapshot.val()) + 1
         arrumaNumMatricula()
@@ -794,15 +837,8 @@ function carregaProfsETurmas() {
 
 function mostraProfsAlunoESetaTurma(codTurma) {
     if (codTurma != 'Escolha uma turma...') {
-        let horaEDiasAluno = document.getElementById('horaEDiasAluno')
-        document.getElementById('faixa' + turmasLocal[codTurma].faixaTurma).checked = true
-        horaEDiasAluno.value = turmasLocal[codTurma].hora + 'h'
-        for (const index in turmasLocal[codTurma].diasDaSemana) {
-            if (Object.hasOwnProperty.call(turmasLocal[codTurma].diasDaSemana, index)) {
-                const dia = turmasLocal[codTurma].diasDaSemana[index];
-                horaEDiasAluno.value += ',' + dia
-            }
-        }
+        let horaAluno = document.getElementById('horaAluno')
+        horaAluno.value = turmasLocal[codTurma].hora + 'h'
     }
     
 }
@@ -909,9 +945,7 @@ document.querySelector('#formCadastroAluno').addEventListener('submit', (e) => {
     dadosAluno.senhaAluno = dados.get('senhaAluno')
     // Dados para o curso
     dadosAluno.turmaAluno = dados.get('turmaAluno')
-    dadosAluno.profAluno = dados.get('profAluno')
-    dadosAluno.horaEDiasAluno = dados.get('horaEDiasAluno')
-    dadosAluno.faixaEtaria = dados.get('faixaEtaria')
+    dadosAluno.horaEDiasAluno = dados.get('horaAluno')
     // Dados de endereço
     dadosAluno.cepAluno = dados.get('cepAluno')
     dadosAluno.enderecoAluno = dados.get('enderecoAluno')
