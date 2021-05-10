@@ -838,7 +838,11 @@ function carregaProfsETurmas() {
 function mostraProfsAlunoESetaTurma(codTurma) {
     if (codTurma != 'Escolha uma turma...') {
         let horaAluno = document.getElementById('horaAluno')
+        let nomeProfAluno = document.getElementById('nomeProfAluno')
+        let emailProfAluno = document.getElementById('emailProfAluno')
         horaAluno.value = turmasLocal[codTurma].hora + 'h'
+        nomeProfAluno.value = turmasLocal[codTurma].professor[0].nome
+        emailProfAluno.value = turmasLocal[codTurma].professor[0].email
     }
     
 }
@@ -946,6 +950,7 @@ document.querySelector('#formCadastroAluno').addEventListener('submit', (e) => {
     // Dados para o curso
     dadosAluno.turmaAluno = dados.get('turmaAluno')
     dadosAluno.horaEDiasAluno = dados.get('horaAluno')
+    dadosAluno.profAluno = dados.get('emailProfAluno')
     // Dados de endereço
     dadosAluno.cepAluno = dados.get('cepAluno')
     dadosAluno.enderecoAluno = dados.get('enderecoAluno')
@@ -2290,7 +2295,7 @@ function dadosInfoEscola() {
                         <td></td>
                         <td>${curso.codCurso}</td>
                         <td>
-                            <a href="#modalAdicionaCurso" onclick="carregaDadosCurso('${curso.codSistema}')" class="edit" data-toggle="modal"><i data-feather="edit" data-toggle="tooltip" title="Editar livro">&#xE254;</i></a>
+                            <a href="#modalAdicionaCurso" onclick="carregaDadosCurso('${curso.codSistema}')" class="edit" data-toggle="modal"><i data-feather="edit" data-toggle="tooltip" title="Editar curso">&#xE254;</i></a>
                             <a href="#deleteEmployeeModal" class="action" data-toggle="modal"><i data-feather="eye" data-toggle="tooltip" title="Ver Estatísticas"></i></a>
                         </td>
                     </tr>
@@ -2460,7 +2465,7 @@ function buscaProximoIdCurso() {
                     c++
                 }
             }
-            while (curso.hasOwnProperty(c)) {
+            while (dados.hasOwnProperty(c)) {
                 c++
             }
             textBoxCodSistemaAdd.value = c

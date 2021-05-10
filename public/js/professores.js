@@ -97,11 +97,8 @@ firebase.auth().onAuthStateChanged((user) => {
                     if (Object.hasOwnProperty.call(turmasProf, turma)) {
                         const bool = turmasProf[turma];
                         if (bool) {
-                            document.getElementById('listaTurmasProf').innerHTML += `<button class="list-group-item list-group-item-action" id="btnTurma${c}">Turma ${turma}</button>`
-                            document.getElementById(`btnTurma${c}`).addEventListener('click', (e) => {
-                                document.getElementById('btnAbaTurmas').click()
-                                carregaTurmas(turma)
-                            })
+                            document.getElementById('listaTurmasProf').innerHTML += `<button class="list-group-item list-group-item-action" id="btnTurma${c}" onclick="document.getElementById('btnAbaTurmas').click(), carregaTurmas('${turma}')">Turma ${turma}</button>`
+                            
                             turmasRef.child(turma + '/alunos').on('value', matAlunos => {
                                 for (const matricula in matAlunos.val()) {
                                     if (Object.hasOwnProperty.call(matAlunos.val(), matricula)) {
@@ -402,15 +399,15 @@ document.getElementById('listaAlunosTurmaForm').addEventListener('submit', (e) =
     
 })
 
-function iniciaPeriodo(confirma=false, inicio='', fim='', qtdeAulas='') {
+function iniciaPeriodo(confirma=false, inicio='', fim='', qtdeAulas='', nomePeriodo='') {
     if (confirma) {
         loader.style.display = 'block'
         loaderMsg.innerText = 'Iniciando turma...'
-        if (inicio == '' || fim == '' || qtdeAulas == '') {
+        if (inicio == '' || fim == '' || qtdeAulas == '' || nomePeriodo == '') {
             AstNotif.dialog('Você esqueceu alguns dados...', 'Por favor preencha todos os dados pedidos para iniciar a turma')
             loaderRun()
         } else {
-            turmasRef.child(alunosSelecionadosTurma.codTurma + '/status').set({turma: 'aberta', inicio: inicio, fim: fim, qtdeAulas: qtdeAulas}).then(()=>{
+            turmasRef.child(alunosSelecionadosTurma.codTurma + '/status').set({turma: 'aberta', inicio: inicio, fim: fim, qtdeAulas: qtdeAulas, nomePeriodo: nomePeriodo}).then(()=>{
                 $('#modal').modal('hide')
                 AstNotif.notify('Sucesso', 'Turma aberta')
                 carregaListaDeAlunosDaTurma(alunosSelecionadosTurma.codTurma)
@@ -425,8 +422,13 @@ function iniciaPeriodo(confirma=false, inicio='', fim='', qtdeAulas='') {
         abrirModal('modal', 'Confirmação de abertura da turma ' + alunosSelecionadosTurma.codTurma, `
             Atenção. Você está prestes a iniciar as atividades da turma ${alunosSelecionadosTurma.codTurma}. Ao iniciar a turma, você poderá lançar notas e frequências para os alunos que estão cadastrados na turma.<br>
             <br>
-            <b>Escolha uma data de início e um data com o fim previsto deste semestre, bimestre, ano...</b> (Essas datas não farão com que o sistema abra ou feche as turmas automaticamente. Um professor cadastrado na turma é quem deve iniciar e fechar a turma manualmente)<br>
-            Início previsto:
+            <b>Escolha uma data de início e um data com o fim previsto deste semestre, bimestre, ano...</b> (Essas datas não farão com que o sistema abra ou feche as turmas automaticamente. Um professor cadastrado na turma é quem deve iniciar e fechar a turma manualmente)<br><br>
+            Nome do período:
+            <input type="text" class="form-control" name="nomePeriodo" id="nomePeriodo">
+            <small id="cadastrarEntrar" class="form-text text-muted">
+                O nome do período pode ser por exemplo: 1º Semestre, ou 2º Bimestre ...
+            </small>
+            <br>Início previsto:
             <input type="date" class="form-control" name="dataInicioPeriodo" id="dataInicioPeriodo">
             <br> Fim previsto:
             <input type="date" class="form-control" name="dataFimPeriodo" id="dataFimPeriodo">
@@ -437,7 +439,7 @@ function iniciaPeriodo(confirma=false, inicio='', fim='', qtdeAulas='') {
             </small>
 
         `, 
-        `<button type="button" data-toggle="tooltip" data-placement="top" title="Iniciar atividades da turma no sistema" class="btn btn-primary" onclick="iniciaPeriodo(true, document.getElementById('dataInicioPeriodo').value, document.getElementById('dataFimPeriodo').value, document.getElementById('qtdeAulas').value)">Iniciar turma</button><button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>`)
+        `<button type="button" data-toggle="tooltip" data-placement="top" title="Iniciar atividades da turma no sistema" class="btn btn-primary" onclick="iniciaPeriodo(true, document.getElementById('dataInicioPeriodo').value, document.getElementById('dataFimPeriodo').value, document.getElementById('qtdeAulas').value, document.getElementById('nomePeriodo').value)">Iniciar turma</button><button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>`)
     }
 }
 
