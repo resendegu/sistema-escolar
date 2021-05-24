@@ -114,7 +114,8 @@ exports.criaContaAluno = functions.database.ref('sistemaEscolar/alunos/{registro
     })
 })
 
-exports.cadastroUser = functions.auth.user().onCreate((user) => { 
+exports.cadastroUser = functions.auth.user().onCreate((user) => {
+    console.log(user.displayName) 
     var dadosNoBanco = admin.database().ref(`sistemaEscolar/usuarios/${user.uid}/`)
     var listaDeUsers = admin.database().ref(`sistemaEscolar/listaDeUsuarios`)
     var usuariosMaster = admin.database().ref('sistemaEscolar/usuariosMaster')
@@ -241,7 +242,6 @@ exports.cadastraTurma = functions.https.onCall((data, context) => {
 })
 
 exports.cadastraAniversarios = functions.database.ref('sistemaEscolar/usuarios/{uid}/dataNascimento').onWrite((snapshot, context) => {
-    console.log('aqui', snapshot.after.val())
     var data = snapshot.after.val()
     admin.auth().getUserByEmail(data.email).then((user) => {
         admin.database().ref('sistemaEscolar/aniversarios/' + (data.mes - 1)).push({
@@ -735,7 +735,7 @@ exports.fechaTurma = functions.https.onCall((data, context) => {
                         infoAluno.fim = dadosDaTurma.status.fim
                         infoAluno.qtdeAulas = dadosDaTurma.status.qtdeAulas
                         infoAluno.livros = dadosDaTurma.livros
-                        infoAluno.curso = dadosTurma.curso
+                        infoAluno.curso = dadosDaTurma.curso
                         infoAluno.nomePeriodo = dadosDaTurma.status.nomePeriodo
                         infoAluno.professor = dadosDaTurma.professor
                         alunosRef.child(formataNumMatricula(matricula) + '/historicoEscolar/' + chave).set({infoAluno: infoAluno, timestamp: admin.firestore.Timestamp.now(), turma: dadosDaTurma.codigoSala}).then(() => {

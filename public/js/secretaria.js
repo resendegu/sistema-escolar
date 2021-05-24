@@ -372,23 +372,7 @@ function preparaCadastroTurma() {
 
 
 
-// Função de cadastro de turma no banco de dados
-function cadastrarTurma(confima=false) {
-    loader.style.display = 'block'
-    loaderMsg.innerText = 'Enviando informações da turma ao servidor...'
-    //AstNotif.dialog('Aguarde', "<img src='../images/carregamento.gif' width=100px>")
-    var cadastraTurma = firebase.functions().httpsCallable('cadastraTurma')
-    cadastraTurma({codigoSala: codPadrao, professor: professor, diasDaSemana: diasDaSemana, livros: books, hora: horarioCurso})
-    .then(function(result) {
-        console.log(result)
-        AstNotif.dialog('Sucesso', result.data.answer)
-        loaderRun()
-    }).catch(function(error) {
-        AstNotif.dialog('Erro', error.message)
-        console.log(error)
-        loaderRun()
-    })
-}
+
 
 var turmas
 // Funções da aba de turmas da secretaria
@@ -1064,6 +1048,174 @@ function calculaIdade(dataNasc) {
         
 }
 
+// Drag and Drop
+let dropArea = document.getElementById('drop-area')
+
+;['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    dropArea.addEventListener(eventName, preventDefaults, false)
+  })
+
+function preventDefaults(e) {
+    e.preventDefault()
+    e.stopPropagation()
+}
+
+;['dragenter', 'dragover'].forEach(eventName => {
+    dropArea.addEventListener(eventName, highlight, false)
+  })
+  
+  ;['dragleave', 'drop'].forEach(eventName => {
+    dropArea.addEventListener(eventName, unhighlight, false)
+  })
+  
+  function highlight(e) {
+    dropArea.classList.add('highlight')
+  }
+  
+  function unhighlight(e) {
+    dropArea.classList.remove('highlight')
+  }
+  function handleDrop(e) {
+    console.log(e)
+  let dt = e.dataTransfer
+  let files = dt.files
+
+  arquivosSelecionados(files)
+}
+dropArea.addEventListener('drop', handleDrop, false)
+
+function arquivosSelecionados(files) {
+    let matriculaAluno = document.getElementById('matriculaAluno').value
+    if (matriculaAluno != '') {
+        let metadados = []
+        abrirModal('modal', 'Arquivos da matrícula ' + matriculaAluno, `
+        <label class="h6">Arquivos que você selecionou</label>
+            <div class="block-list block-list-3" id="mostraArquivosSelecionados">
+                
+            </div>
+        `, '<button type="button" id="enviarArquivosCadastro" class="btn btn-primary">Enviar Arquivos</button> <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>')
+        let mostraArquivos = document.getElementById('mostraArquivosSelecionados')
+        let c = 0
+        for (const i in files) {
+            if (Object.hasOwnProperty.call(files, i)) {
+                const file = files[i];
+                console.log(file)
+                let cpf = ''
+                let endereco = ''
+                let outros = ''
+                if (file.name.indexOf('cpf') != -1 || file.name.indexOf('identidade') != -1 || file.name.indexOf('CPF') != -1 || file.name.indexOf('Identidade') != -1 || file.name.indexOf('IDENTIDADE') != -1 || file.name.indexOf('Cpf') != -1) {
+                    cpf = 'checked'
+                    metadados[i] = 'cpf'
+                } else if (file.name.indexOf('endereço') != -1 || file.name.indexOf('endereco') != -1 || file.name.indexOf('residência') != -1 || file.name.indexOf('residencia') != -1 || file.name.indexOf('Endereco') != -1 || file.name.indexOf('Endereço') != -1 || file.name.indexOf('ENDERECO') != -1 || file.name.indexOf('ENDEREÇO') != -1 || file.name.indexOf('RESIDENCIA') != -1 || file.name.indexOf('RESIDÊNCIA') != -1 || file.name.indexOf('Residência') != -1 || file.name.indexOf('Residencia') != -1) {
+                    endereco = 'checked'
+                    metadados[i] = 'endereco'
+                } else {
+                    outros = 'checked'
+                    metadados[i] = 'outros'
+                }
+    
+                mostraArquivos.innerHTML += `
+                <div class="block-list__item">
+                ${Number(i) + 1}<br>
+                <label class="h6">${file.name}</label>
+                <br>
+                <b>Tamanho:</b> ${formatBytes(file.size)}
+                <br>
+                <b>Qual arquivo é este?</b>
+                <br><input type="radio" ${cpf} name="tipo${i}" value="${i}|cpf" id="cpfIdentidade${i}"> Identidade e CPF
+                <br><input type="radio" ${endereco} name="tipo${i}" value="${i}|endereco" id="endereco${i}"> Comprovante de endereço
+                <br><input type="radio" ${outros} name="tipo${i}" value="${i}|outros" id="outros${i}"> Outros
+                </div>
+                `
+                c++
+                
+            }
+        }
+        let c2 = 0
+        while (c2 < c) {
+            document.getElementsByName('tipo' + c2).forEach(element => {
+                element.addEventListener('change', (e) => {
+                    if (e.target.checked == true) {
+                        metadados[e.target.value.split('|')[0]] = e.target.value.split('|')[1]
+                        console.log(metadados)
+                    }
+                })
+            });
+            c2++
+        }
+        
+        document.getElementById('enviarArquivosCadastro').addEventListener('click', (e) => {
+            for (const i in files) {
+                if (Object.hasOwnProperty.call(files, i)) {
+                    const file = files[i];
+                    let metadata = {
+                        customMetadata: {
+                            tipo: metadados[i]
+                        }
+                    }
+                    let path = 'alunos/' + matriculaAluno + '/arquivos/'
+                    uploadFile(file, metadata, path)
+                }
+            }
+        }) 
+    } else {
+        AstNotif.dialog('Calma aí!', 'Você tem que definir o número de matricula do aluno para que o sistema saiba onde guardar os arquivos dele. Caso queira obter um novo número de matrícula, clique no botão no início do formulário de cadastro do aluno.')
+    }
+    
+}
+
+function uploadFile(file, metadata, path) {
+    console.log(file)
+    console.log(metadata)
+    /* Exemplo de como se usa metadados customizados apenas para referência
+    let metadata = {
+        customMetadata: {
+            'email': usuario.email
+        }
+    } */
+    var uploadTask = firebase.storage().ref('sistemaEscolar/' + path).child(file.name.split('.')[0]).put(file, metadata)
+        // Listen for state changes, errors, and completion of the upload.
+    uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED, // or 'state_changed'
+    function(snapshot) {
+    // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+    var progress = ((snapshot.bytesTransferred / snapshot.totalBytes) * 100).toFixed(2);
+    console.log('Upload is ' + progress + '% done');
+    switch (snapshot.state) {
+        case firebase.storage.TaskState.PAUSED: // or 'paused'
+        console.log('Upload is paused');
+        break;
+        case firebase.storage.TaskState.RUNNING: // or 'running'
+        console.log('Upload is running');
+        break;
+    }
+    }, function(error) {
+
+    // A full list of error codes is available at
+    // https://firebase.google.com/docs/storage/web/handle-errors
+    switch (error.code) {
+    case 'storage/unauthorized':
+        // User doesn't have permission to access the object
+        AstNotif.dialog('Erro', 'Você não tem permissões para fazer alterações no caminho que está tentando.')
+        break;
+
+    case 'storage/canceled':
+        // User canceled the upload
+        AstNotif.dialog('Upload Cancelado', 'Upload Cancelado.')
+        break;
+
+
+    case 'storage/unknown':
+        // Unknown error occurred, inspect error.serverResponse
+        AstNotif.dialog('Erro', error.message)
+        break;
+    }
+    }, function() {
+    // Upload completed successfully, now we can get the download URL
+    AstNotif.notify("Sucesso", 'Arquivo ' + file.name +  ' enviado aos servidores com sucesso', "<i>agora</i>", {'length': 90000})
+    $('modal').modal('hide')
+    });
+}
+
 //Funções da aba Alunos
 var tipoDeBusca = 'nomeAluno'
 function alteraTipoDeBusca(tipo) {
@@ -1547,7 +1699,7 @@ function historicoAluno(matricula, turma) {
             <td>${dataFechamento.getDate()}/${dataFechamento.getMonth() + 1}/${dataFechamento.getFullYear()}</td>
             <td><b>${somatorioNota}</b>/100</td>
             <td>
-                <a href="#editEmployeeModal" class="action" data-toggle="modal"><i data-feather="file-text" data-toggle="tooltip" title="Emitir boletim"></i></a>
+                <a id="emiteBoletim${c}" onclick="emiteBoletim('${matricula}', '${registro.key}')" class="action" data-toggle="modal"><i data-feather="file-text" data-toggle="tooltip" title="Emitir boletim"></i></a>
                 <a href="#" id="verHistorico${c}" class="edit" data-toggle="modal"><i data-feather="eye" data-toggle="tooltip" title="Visualizar dados"></i></a>
             </td>
         </tr>
@@ -1564,6 +1716,11 @@ function historicoAluno(matricula, turma) {
         loaderRun()
         ativaCheckboxes()
     })
+}
+
+function emiteBoletim(matricula, chave) {
+    document.getElementById('corpoBoletim').innerHTML = `<iframe src="../resources/pdfsProntos/modeloBoletim.html#${matricula}?${chave}" frameborder="0" width="100%" height="300px" id="boletimPdf" name="boletimPdf"></iframe>`
+    $('#boletimModal').modal({backdrop: 'static'})
 }
 
 function visualizarDadosDoHistorico(info) {

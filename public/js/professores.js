@@ -348,7 +348,7 @@ function carregaListaDeAlunosDaTurma(turma, filtro='') {
                 document.getElementById('btnLancaFrequencia').style.visibility = 'hidden'
                 document.getElementById('btnLancaNotas').style.visibility = 'hidden'
                 document.getElementById('btnIniciaPeriodo').style.visibility = 'hidden'
-                document.getElementById('infoTurma').style.color = 'yellow'
+                document.getElementById('infoTurma').style.color = 'gold'
                 document.getElementById('infoTurma').innerText = 'Turma Fechada'
                 document.getElementById('btnIniciaPeriodo').style.visibility = 'visible'
                 document.getElementById('btnFechaPeriodo').style.visibility = 'visible'
@@ -451,7 +451,12 @@ function fechaPeriodo() {
             console.log(status.val())
             abrirModal('modal', 'Confirmação de fechamento da turma ' + alunosSelecionadosTurma.codTurma, `
             Atenção. Você está prestes a fechar as atividades da turma ${alunosSelecionadosTurma.codTurma}. Ao fechar a turma, você não poderá mais lançar notas e frequência para esta turma, até que você inicie novamente mais um período para esta turma. <b>Automaticamente, ao fechar a turma, o sistema irá iniciar uma sequência de processos para a geração de boletins, notas, somatórios finais, frequência, desempenho, entre outros processos parecidos.</b> (Esses processos são realizados nos servidores remotos do sistema para maior segurança e integridade dos dados.)<br>
-            Confirme os dados de início, fim, e quantidade de aulas dadas do semestre que foram definidos no processo de abertura desse semestre da turma nos campos abaixo:<br>
+            Confirme os dados de início, fim, e quantidade de aulas dadas do semestre que foram definidos no processo de abertura desse semestre da turma nos campos abaixo:<br><br>
+            Nome do período:
+            <input type="text" class="form-control" name="nomePeriodo" id="nomePeriodo" value="${status.val().nomePeriodo}">
+            <small id="cadastrarEntrar" class="form-text text-muted">
+                O nome do período pode ser por exemplo: 1º Semestre, ou 2º Bimestre ...
+            </small>
             <br>
             <b>Altere as datas de início, fim e quantidade de aulas dadas, se necessário:</b><br>
             Início do período:
@@ -471,11 +476,12 @@ function fechaPeriodo() {
                 e.preventDefault()
                 loaderRun(true, 'Enviando pedido de fechamento de turma ao servidor...')
                 // Aqui começará o fechamento de turmas
+                let nomePeriodo = document.getElementById('nomePeriodo').value
                 let ini = document.getElementById('dataInicioPeriodo').value
                 let fim = document.getElementById('dataFimPeriodo').value
                 let qtdeAulas = document.getElementById('qtdeAulasConfirma').value
 
-                turmasRef.child(alunosSelecionadosTurma.codTurma + '/status').set({inicio: ini, fim: fim, qtdeAulas: qtdeAulas, turma: 'aberta'}).then(() => {
+                turmasRef.child(alunosSelecionadosTurma.codTurma + '/status').set({inicio: ini, fim: fim, qtdeAulas: qtdeAulas, turma: 'aberta', nomePeriodo: nomePeriodo}).then(() => {
                     var fechaTurma = firebase.functions().httpsCallable('fechaTurma')
                     fechaTurma(alunosSelecionadosTurma.codTurma).then(function(result){
                         AstNotif.dialog('Sucesso', result.data.answer)
@@ -1067,22 +1073,40 @@ function abreTurma(cod) {
         codigoDaTurmaLabel.innerText = dadosDaTurma.codigoSala
         areaInfoTurma.style.visibility = 'visible'
         
-        // Área separação KIDS, TEENS, ADULTS
-        var faixa
-        if (dadosDaTurma.faixaTurma == 'A') {
-            faixa = 'ADULTS'
-        } else if(dadosDaTurma.faixaTurma == 'T') {
-            faixa = 'TEENS'
-        } else {
-            faixa = dadosDaTurma.faixaTurma
-        }
-        document.getElementById('mostraFaixa').innerHTML = `<a class="list-group-item list-group-item-action active" data-toggle="list" role="tab">${faixa}</a>`
+        
         // Mostra dias de aula da turma
         document.getElementById('mostraDiasTurma').innerText = 'Dia(s) de Aula:'
         for (const key in dadosDaTurma.diasDaSemana) {
             if (Object.hasOwnProperty.call(dadosDaTurma.diasDaSemana, key)) {
                 const dia = dadosDaTurma.diasDaSemana[key];
-                document.getElementById('mostraDiasTurma').innerText += ' ' + dia + ' '
+                let diasemana
+                    switch(Number(dia)) {
+                        case 0:
+                            diasemana = 'Domingo'
+                            break
+                        case 1:
+                            diasemana = 'Segunda'
+                            break
+                        case 2: 
+                            diasemana = 'Terça'
+                            break
+                        case 3:
+                            diasemana = 'Quarta'
+                            break
+                        case 4:
+                            diasemana = 'Quinta'
+                            break
+                        case 5:
+                            diasemana = 'Sexta'
+                            break
+                        case 6:
+                            diasemana = 'Sábado'
+                            break
+                        default:
+                            diasemana = ''
+                            break
+                    }
+                document.getElementById('mostraDiasTurma').innerText += ' | ' + diasemana + ' '
             }
         }
         document.getElementById('mostraHorarioTurma').innerText = 'Horário de aula: '+ dadosDaTurma.hora + 'h'
@@ -1144,6 +1168,8 @@ var tipoDeBusca = 'nomeAluno'
 function alteraTipoDeBusca(tipo) {
     tipoDeBusca = tipo
 }
+
+
 
 function carregaFrequenciaAluno(matricula, turma) {
     let c = 0
@@ -1748,4 +1774,98 @@ function verOperacaoAluno(matricula, key) {
         
     `
     abrirModal('modal', 'Visualização da operação ' + infos.operacao, corpo, `<button class="btn btn-secondary" data-dismiss="modal">Fechar</button>`)
+}
+
+function historicoAluno(matricula, turma) {
+    
+    abrirModal('modal', 'Histórico escolar', 
+            `
+            <div class="container-xl">
+            <div class="table-responsive">
+              <div class="table-wrapper">
+                <div class="table-title">
+                  <div class="row">
+                    <div class="col-sm-6">
+                      <h2>Histórico <b>Escolar</b></h2>
+                    </div>
+                    <div class="col-sm-6">
+                      <!--<a href="#" class="btn btn-success" onclick="carregaListaDeAlunos()">&nbsp; <span class="feather-24" data-feather="refresh-cw"></span><span>Atualizar lista</span></a>
+                      <a href="#deleteEmployeeModal" class="btn btn-danger" data-toggle="modal">&nbsp;<span class="feather-24" data-feather="trash"></span> <span>Delete</span></a>-->						
+                    </div>
+                  </div>
+                </div>
+                <table class="table table-striped table-hover">
+                  <thead>
+                    <tr>
+                      <th>
+                        <span class="custom-checkbox">
+                          <input type="checkbox" id="selectAll">
+                          <label for="selectAll"></label>
+                        </span>
+                      </th>
+                      <th><a href="#" id="ordenaTurma">Turma</a></th>
+                      <th><a href="#" id="ordenaData">Data de fechamento</a></th>
+                      <th><a href="#" id="ordenaNota">Somatório das notas</a></th>
+                      <th>Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody id="listaHistorico">
+                    
+                  </tbody>
+                </table>
+                
+              </div>
+            </div>
+          </div>    
+
+            `, `<button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>`
+        )
+        let listaHistorico = document.getElementById('listaHistorico')
+        let c = 0
+    alunosRef.child(matricula + '/historicoEscolar').on('child_added', (registro) => {
+        
+        c++
+        let dataFechamento = new Date(registro.val().timestamp._seconds * 1000)
+        let notas = registro.val().infoAluno.notas
+        let somatorioNota = 0
+        for (const nomeNota in notas) {
+            if (Object.hasOwnProperty.call(notas, nomeNota)) {
+                const nota = notas[nomeNota];
+                somatorioNota += nota
+            }
+        }
+        listaHistorico.innerHTML += `
+        <tr>
+            <td>
+                <span class="custom-checkbox">
+                    <input type="checkbox" id="checkbox${c}" name="options[]" value="1">
+                    <label for="checkbox${c}"></label>
+                </span>
+            </td>
+            <td>${registro.val().turma}</td>
+            <td>${dataFechamento.getDate()}/${dataFechamento.getMonth() + 1}/${dataFechamento.getFullYear()}</td>
+            <td><b>${somatorioNota}</b>/100</td>
+            <td>
+                <a id="emiteBoletim${c}" onclick="emiteBoletim('${matricula}', '${registro.key}')" class="action" data-toggle="modal"><i data-feather="file-text" data-toggle="tooltip" title="Emitir boletim"></i></a>
+                <a href="#" id="verHistorico${c}" class="edit" data-toggle="modal"><i data-feather="eye" data-toggle="tooltip" title="Visualizar dados"></i></a>
+            </td>
+        </tr>
+        `
+        document.querySelector('#verHistorico' + c).addEventListener('click', (e) => {
+            e.preventDefault()
+            visualizarDadosDoHistorico(registro.val())
+        })
+
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
+        feather.replace()
+        loaderRun()
+        ativaCheckboxes()
+    })
+}
+
+function emiteBoletim(matricula, chave) {
+    document.getElementById('corpoBoletim').innerHTML = `<iframe src="../resources/pdfsProntos/modeloBoletim.html#${matricula}?${chave}" frameborder="0" width="100%" height="300px" id="boletimPdf" name="boletimPdf"></iframe>`
+    $('#boletimModal').modal({backdrop: 'static'})
 }
