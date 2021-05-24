@@ -1211,8 +1211,8 @@ function uploadFile(file, metadata, path) {
     }
     }, function() {
     // Upload completed successfully, now we can get the download URL
-    AstNotif.notify("Sucesso", 'Arquivo ' + file.name +  ' enviado aos servidores com sucesso', "<i>agora</i>", {'length': 90000})
-    $('modal').modal('hide')
+    AstNotif.notify("Sucesso", 'Arquivo "' + file.name +  '" enviado aos servidores com sucesso', "<i>agora</i>", {'length': 90000})
+    $('#modal').modal('hide')
     });
 }
 
