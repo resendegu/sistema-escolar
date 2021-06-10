@@ -10,6 +10,7 @@ var followUpRef = firebase.database().ref('sistemaEscolar/followUp')
 var transfereAlunos = firebase.functions().httpsCallable('transfereAlunos')
 var desempenhoRef = firebase.database().ref('sistemaEscolar/notasDesempenho/referencia')
 var infoEscolaRef = firebase.database().ref('sistemaEscolar/infoEscola')
+var alunosStorageRef = firebase.storage().ref('sistemaEscolar/alunos')
 
 var loader = document.getElementById('loader')
 var loaderMsg = document.getElementById('loaderMsg')
@@ -1366,9 +1367,58 @@ function carregaFrequenciaAluno(matricula, turma) {
     
 }
 
+function carregaArquivosAluno(matricula) {
+    let listaArquivosAluno = document.getElementById('listaArquivosAluno')
+    listaArquivosAluno.innerHTML = ''
+    let storageRef = alunosStorageRef.child(matricula + '/arquivos')
+        // Find all the prefixes and items.
+    storageRef.listAll().then(function(res) {
+        res.prefixes.forEach(function(folderRef) {
+        // All the prefixes under listRef.
+        // You may call listAll() recursively on them.
+        });
+        res.items.forEach(function(itemRef) {
+            // All the items under listRef.
+            itemRef.getMetadata().then(function(metadata) {
+                console.log(metadata)
+                let imagem
+                if (metadata.customMetadata.tipo == 'cpf') imagem = 'cpf-icon.png'
+                else if(metadata.customMetadata.tipo == 'endereco') imagem = 'home.png'
+                listaArquivosAluno.innerHTML += `
+                    <div class="col-lg-3 col-xl-2">
+                        <div class="file-man-box">
+                        <a class="file-close"><i data-feather="x"></i></a>
+                        <div class="file-img-box">
+                            <img src="../images/${imagem}" alt="icon">
+                        </div>
+                        <a class="file-download"><i data-feather="download"></i></a>
+                        <div class="file-man-title">
+                            <h6 class="mb-0 text-overflow">${metadata.name}</h5>
+                            <p class="mb-0"><small>${formatBytes(metadata.size)}</small></p>
+                        </div>
+                        </div>
+                    </div>
+                `
+                feather.replace()
+            }).catch(function(error) {
+                console.log(error)
+                AstNotif.dialog('Erro', error.message)
+            })
+
+            console.log(itemRef)
+            
+        });
+    }).catch(function(error) {
+        // Uh-oh, an error occurred!
+        console.log(error)
+        AstNotif.dialog('Erro', error.message)
+    });
+}
+
 var dadosResponsaveis = {}
 function abreDadosDoAluno(matricula, desativado=false, notasDesativado=false) {
     carregaHistoricoAluno(matricula)
+    carregaArquivosAluno(matricula)
     
     document.getElementById('infoDoAluno').style.display = 'block'
     document.getElementById('rolaTelaAbaixoAlunos').style.display = 'block'

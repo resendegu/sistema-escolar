@@ -20,6 +20,7 @@
     <link rel="stylesheet" href="../css/filedrop.css">
     <link rel="stylesheet" href="../css/tabela.css">
     <link rel="stylesheet" href="../css/grid-list.css">
+    <link rel="stylesheet" href="../css/file-manager.css">
       <!-- Carregando arquivos da biblioteca AST-Notif. Créditos: https://github.com/anandastoon/AST-Notif -->
     <link rel="stylesheet" href="../resources/AST-Notif/css/ast-notif.min.css">
     <!-- Carregando arquivos da biblioteca driver.js. Créditos: https://github.com/kamranahmedse/driver.js -->
@@ -771,6 +772,54 @@
                       </div>
                     </div>
                     <hr>
+                      <!-- Mostra Arquivos -->
+                      <div class="content">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="card-box">
+                                        <div class="row">
+                                            <div class="col-lg-6 col-xl-6">
+                                                <h4 class="header-title m-b-30">Arquivos do Aluno</h4>
+                                            </div>
+                                        </div>
+                    
+                                        <div class="row" id="listaArquivosAluno">
+                                            <div class="col-lg-3 col-xl-2">
+                                              <div class="file-man-box">
+                                                <a class="file-close"><i data-feather="x"></i></a>
+                                                <div class="file-img-box">
+                                                  <img src="../images/cpf-icon.png" alt="icon">
+                                                </div>
+                                                <a class="file-download"><i data-feather="download"></i></a>
+                                                <div class="file-man-title">
+                                                    <h6 class="mb-0 text-overflow">invoice_project.pdf</h5>
+                                                    <p class="mb-0"><small>568.8 kb</small></p>
+                                                </div>
+                                              </div>
+                                            </div>
+                                            
+                                            <div class="col-lg-3 col-xl-2">
+                                              <div class="file-man-box"><a href="" class="file-close"><i class="fa fa-times-circle"></i></a>
+                                                <div class="file-img-box"><img src="https://coderthemes.com/highdmin/layouts/assets/images/file_icons/png.svg" alt="icon">
+                                                
+                                                </div><a href="#" class="file-download"><i class="fa fa-download"></i></a>
+                                                  <div class="file-man-title">
+                                                    <h5 class="mb-0 text-overflow">invoice_project.pdf</h5>
+                                                    <p class="mb-0"><small>568.8 kb</small></p>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                          </div>
+                                    </div>
+                                </div>
+                                <!-- end col -->
+                            </div>
+                            <!-- end row -->
+                        </div>
+                        <!-- container -->
+                    </div>
+                    <hr>
                     <label class="h5">Histórico de operações</label>
                     <br>
                     <div class="col">
@@ -1058,6 +1107,7 @@
                 </div>
                 <hr>
                 <label class="h6">Envio de documentos pessoais</label>
+                <p>Aqui podem ser enviados os documentos como Identidade, CPF, Comprovante de Residência e outros que achar pertinente. Não é obrigatório fazê-lo agora. <br> Você poderá <b>alterar e enviar</b> documentos depois no <b>cadastro do aluno</b>.</p>
                 <div id="drop-area">
                   <section class="my-form">
                     <p><b>Arraste e solte</b> os arquivos para enviar </p> ou
