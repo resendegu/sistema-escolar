@@ -252,3 +252,38 @@ function formatBytes(bytes, decimals = 2) {
 
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 }
+
+
+async function storageDownload(ref, nomeArquivo) {
+    return firebase.storage().ref(ref).getDownloadURL().then(function(urlDownload) {
+		// `url` is the download URL for 'images/stars.jpg'
+	  
+		// This can be downloaded directly:
+		AstNotif.dialog("Aguarde", `<img src="../images/carregamento.gif" width="50px"> <br> Baixando arquivo...<br> O download pode demorar dependendo da sua conexão e do tamanho do arquivo.`, {fa: "exclamation-circle", positive: "", negative: "", iconSize: 48});
+		try {
+			return fetch(urlDownload).then(resp => resp.blob()).then(blob => {
+				const url = window.URL.createObjectURL(blob)
+				const a = document.createElement('a')
+				a.style.display = 'none'
+				a.href = url
+				a.download = nomeArquivo
+				console.log(a)
+				document.body.appendChild(a)
+				a.click()
+				window.URL.revokeObjectURL(url)
+				document.getElementById('ast-dialog-bg').remove()
+				return {answer: 'Download concluído', url: urlDownload}
+			}).catch((error) => {
+				console.log(error)
+				throw new Error(error.message)
+			})
+		} catch (error) {
+			console.log(error)
+			throw new Error(error.message)
+		}
+		
+	}).catch(function(error) {
+		console.log(error)
+		throw new Error(error.message)
+	});
+}

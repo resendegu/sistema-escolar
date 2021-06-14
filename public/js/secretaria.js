@@ -1367,10 +1367,22 @@ function carregaFrequenciaAluno(matricula, turma) {
     
 }
 
+
+function chamaDownload(refDown, nome) {
+    storageDownload(refDown, nome).then(info => {
+        AstNotif.dialog('Sucesso', info.answer + `. Você também pode copiar <a href="${info.url}" target="_blank">este link para download</a>.`)
+    }).catch(error => {
+        AstNotif.dialog('Error', error)
+    })
+}
+
 function carregaArquivosAluno(matricula) {
     let listaArquivosAluno = document.getElementById('listaArquivosAluno')
     listaArquivosAluno.innerHTML = ''
     let storageRef = alunosStorageRef.child(matricula + '/arquivos')
+
+    
+
         // Find all the prefixes and items.
     storageRef.listAll().then(function(res) {
         res.prefixes.forEach(function(folderRef) {
@@ -1391,20 +1403,24 @@ function carregaArquivosAluno(matricula) {
                         <div class="file-img-box">
                             <img src="../images/${imagem}" alt="icon">
                         </div>
-                        <a class="file-download"><i data-feather="download"></i></a>
+                        <a onclick="chamaDownload('${metadata.fullPath}', '${metadata.name}')" class="file-download" name="downBtns"><i data-feather="download"></i></a>
                         <div class="file-man-title">
-                            <h6 class="mb-0 text-overflow">${metadata.name}</h5>
+                            <h6 class="mb-0 text-overflow" data-toggle="tooltip" data-placement="top" title="${metadata.name}">${metadata.name}</h5>
                             <p class="mb-0"><small>${formatBytes(metadata.size)}</small></p>
                         </div>
                         </div>
                     </div>
                 `
                 feather.replace()
+                $(function () {
+                    $('[data-toggle="tooltip"]').tooltip()
+                })
+
             }).catch(function(error) {
                 console.log(error)
                 AstNotif.dialog('Erro', error.message)
             })
-
+            
             console.log(itemRef)
             
         });
