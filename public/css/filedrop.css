@@ -1,4 +1,4 @@
-#drop-area {
+.drop-area {
     border: 2px dashed #ccc;
     border-radius: 20px;
     z-index: 999999;
@@ -6,7 +6,7 @@
     margin: 20px auto;
     padding: 20px;
   }
-  #drop-area.highlight {
+  .drop-area.highlight {
     border-color: purple;
   }
   p {
@@ -35,7 +35,7 @@
   .button:hover {
     background: #ddd;
   }
-  #fileElem {
+  .fileElem {
     display: none;
   }
   

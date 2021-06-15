@@ -1050,7 +1050,8 @@ function calculaIdade(dataNasc) {
 }
 
 // Drag and Drop
-let dropArea = document.getElementById('drop-area')
+function dragDropCadastroAluno() {
+    let dropArea = document.getElementById('drop-area')
 
 ;['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
     dropArea.addEventListener(eventName, preventDefaults, false)
@@ -1078,92 +1079,206 @@ function preventDefaults(e) {
   }
   function handleDrop(e) {
     console.log(e)
-  let dt = e.dataTransfer
-  let files = dt.files
+    let dt = e.target
+    let files = dt.files
 
-  arquivosSelecionados(files)
-}
-dropArea.addEventListener('drop', handleDrop, false)
-
-function arquivosSelecionados(files) {
     let matriculaAluno = document.getElementById('matriculaAluno').value
-    if (matriculaAluno != '') {
-        let metadados = []
-        abrirModal('modal', 'Arquivos da matrícula ' + matriculaAluno, `
-        <label class="h6">Arquivos que você selecionou</label>
-            <div class="block-list block-list-3" id="mostraArquivosSelecionados">
-                
-            </div>
-        `, '<button type="button" id="enviarArquivosCadastro" class="btn btn-primary">Enviar Arquivos</button> <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>')
-        let mostraArquivos = document.getElementById('mostraArquivosSelecionados')
-        let c = 0
-        for (const i in files) {
-            if (Object.hasOwnProperty.call(files, i)) {
-                const file = files[i];
-                console.log(file)
-                let cpf = ''
-                let endereco = ''
-                let outros = ''
-                if (file.name.indexOf('cpf') != -1 || file.name.indexOf('identidade') != -1 || file.name.indexOf('CPF') != -1 || file.name.indexOf('Identidade') != -1 || file.name.indexOf('IDENTIDADE') != -1 || file.name.indexOf('Cpf') != -1) {
-                    cpf = 'checked'
-                    metadados[i] = 'cpf'
-                } else if (file.name.indexOf('endereço') != -1 || file.name.indexOf('endereco') != -1 || file.name.indexOf('residência') != -1 || file.name.indexOf('residencia') != -1 || file.name.indexOf('Endereco') != -1 || file.name.indexOf('Endereço') != -1 || file.name.indexOf('ENDERECO') != -1 || file.name.indexOf('ENDEREÇO') != -1 || file.name.indexOf('RESIDENCIA') != -1 || file.name.indexOf('RESIDÊNCIA') != -1 || file.name.indexOf('Residência') != -1 || file.name.indexOf('Residencia') != -1) {
-                    endereco = 'checked'
-                    metadados[i] = 'endereco'
-                } else {
-                    outros = 'checked'
-                    metadados[i] = 'outros'
-                }
-    
-                mostraArquivos.innerHTML += `
-                <div class="block-list__item">
-                ${Number(i) + 1}<br>
-                <label class="h6">${file.name}</label>
-                <br>
-                <b>Tamanho:</b> ${formatBytes(file.size)}
-                <br>
-                <b>Qual arquivo é este?</b>
-                <br><input type="radio" ${cpf} name="tipo${i}" value="${i}|cpf" id="cpfIdentidade${i}"> Identidade e CPF
-                <br><input type="radio" ${endereco} name="tipo${i}" value="${i}|endereco" id="endereco${i}"> Comprovante de endereço
-                <br><input type="radio" ${outros} name="tipo${i}" value="${i}|outros" id="outros${i}"> Outros
+        if (matriculaAluno != '') {
+            let metadados = []
+            abrirModal('modal', 'Arquivos da matrícula ' + matriculaAluno, `
+            <label class="h6">Arquivos que você selecionou</label>
+                <div class="block-list block-list-3" id="mostraArquivosSelecionados">
+                    
                 </div>
-                `
-                c++
-                
-            }
-        }
-        let c2 = 0
-        while (c2 < c) {
-            document.getElementsByName('tipo' + c2).forEach(element => {
-                element.addEventListener('change', (e) => {
-                    if (e.target.checked == true) {
-                        metadados[e.target.value.split('|')[0]] = e.target.value.split('|')[1]
-                        console.log(metadados)
-                    }
-                })
-            });
-            c2++
-        }
-        
-        document.getElementById('enviarArquivosCadastro').addEventListener('click', (e) => {
+            `, '<button type="button" id="enviarArquivosCadastro" class="btn btn-primary">Enviar Arquivos</button> <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>')
+            let mostraArquivos = document.getElementById('mostraArquivosSelecionados')
+            let c = 0
             for (const i in files) {
                 if (Object.hasOwnProperty.call(files, i)) {
                     const file = files[i];
-                    let metadata = {
-                        customMetadata: {
-                            tipo: metadados[i]
-                        }
+                    console.log(file)
+                    let cpf = ''
+                    let endereco = ''
+                    let outros = ''
+                    if (file.name.indexOf('cpf') != -1 || file.name.indexOf('identidade') != -1 || file.name.indexOf('CPF') != -1 || file.name.indexOf('Identidade') != -1 || file.name.indexOf('IDENTIDADE') != -1 || file.name.indexOf('Cpf') != -1) {
+                        cpf = 'checked'
+                        metadados[i] = 'cpf'
+                    } else if (file.name.indexOf('endereço') != -1 || file.name.indexOf('endereco') != -1 || file.name.indexOf('residência') != -1 || file.name.indexOf('residencia') != -1 || file.name.indexOf('Endereco') != -1 || file.name.indexOf('Endereço') != -1 || file.name.indexOf('ENDERECO') != -1 || file.name.indexOf('ENDEREÇO') != -1 || file.name.indexOf('RESIDENCIA') != -1 || file.name.indexOf('RESIDÊNCIA') != -1 || file.name.indexOf('Residência') != -1 || file.name.indexOf('Residencia') != -1) {
+                        endereco = 'checked'
+                        metadados[i] = 'endereco'
+                    } else {
+                        outros = 'checked'
+                        metadados[i] = 'outros'
                     }
-                    let path = 'alunos/' + matriculaAluno + '/arquivos/'
-                    uploadFile(file, metadata, path)
+        
+                    mostraArquivos.innerHTML += `
+                    <div class="block-list__item">
+                    ${Number(i) + 1}<br>
+                    <label class="h6">${file.name}</label>
+                    <br>
+                    <b>Tamanho:</b> ${formatBytes(file.size)}
+                    <br>
+                    <b>Qual arquivo é este?</b>
+                    <br><input type="radio" ${cpf} name="tipo${i}" value="${i}|cpf" id="cpfIdentidade${i}"> Identidade e CPF
+                    <br><input type="radio" ${endereco} name="tipo${i}" value="${i}|endereco" id="endereco${i}"> Comprovante de endereço
+                    <br><input type="radio" ${outros} name="tipo${i}" value="${i}|outros" id="outros${i}"> Outros
+                    </div>
+                    `
+                    c++
+                    
                 }
             }
-        }) 
-    } else {
-        AstNotif.dialog('Calma aí!', 'Você tem que definir o número de matricula do aluno para que o sistema saiba onde guardar os arquivos dele. Caso queira obter um novo número de matrícula, clique no botão no início do formulário de cadastro do aluno.')
+            let c2 = 0
+            while (c2 < c) {
+                document.getElementsByName('tipo' + c2).forEach(element => {
+                    element.addEventListener('change', (e) => {
+                        if (e.target.checked == true) {
+                            metadados[e.target.value.split('|')[0]] = e.target.value.split('|')[1]
+                            console.log(metadados)
+                        }
+                    })
+                });
+                c2++
+            }
+            
+            document.getElementById('enviarArquivosCadastro').addEventListener('click', (e) => {
+                for (const i in files) {
+                    if (Object.hasOwnProperty.call(files, i)) {
+                        const file = files[i];
+                        let metadata = {
+                            customMetadata: {
+                                tipo: metadados[i]
+                            }
+                        }
+                        let path = 'alunos/' + matriculaAluno + '/arquivos/'
+                        uploadFile(file, metadata, path)
+                    }
+                }
+            }) 
+        } else {
+            AstNotif.dialog('Calma aí!', 'Você tem que definir o número de matricula do aluno para que o sistema saiba onde guardar os arquivos dele. Caso queira obter um novo número de matrícula, clique no botão no início do formulário de cadastro do aluno.')
+        }
     }
-    
+dropArea.addEventListener('drop', handleDrop, false)
+document.getElementById('fileElemCadastroAluno').addEventListener('change', handleDrop)
+console.log('sim')
 }
+
+function dragDropJaCadastrado() {
+    let dropArea = document.getElementById('drop-area-ja-cadastrado')
+
+;['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    dropArea.addEventListener(eventName, preventDefaults, false)
+  })
+
+function preventDefaults(e) {
+    e.preventDefault()
+    e.stopPropagation()
+}
+
+;['dragenter', 'dragover'].forEach(eventName => {
+    dropArea.addEventListener(eventName, highlight, false)
+  })
+  
+  ;['dragleave', 'drop'].forEach(eventName => {
+    dropArea.addEventListener(eventName, unhighlight, false)
+  })
+  
+  function highlight(e) {
+    dropArea.classList.add('highlight')
+  }
+  
+  function unhighlight(e) {
+    dropArea.classList.remove('highlight')
+  }
+  function handleDrop(e) {
+    console.log(e)
+    let dt = e.target
+    let files = dt.files
+
+    let matriculaAluno = document.getElementById('mostraMatriculaAluno').innerText
+        if (matriculaAluno != '') {
+            let metadados = []
+            abrirModal('modal', 'Arquivos da matrícula ' + matriculaAluno, `
+            <label class="h6">Arquivos que você selecionou</label>
+                <div class="block-list block-list-3" id="mostraArquivosSelecionados">
+                    
+                </div>
+            `, '<button type="button" id="enviarArquivosCadastro" class="btn btn-primary">Enviar Arquivos</button> <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>')
+            let mostraArquivos = document.getElementById('mostraArquivosSelecionados')
+            let c = 0
+            for (const i in files) {
+                if (Object.hasOwnProperty.call(files, i)) {
+                    const file = files[i];
+                    console.log(file)
+                    let cpf = ''
+                    let endereco = ''
+                    let outros = ''
+                    if (file.name.indexOf('cpf') != -1 || file.name.indexOf('identidade') != -1 || file.name.indexOf('CPF') != -1 || file.name.indexOf('Identidade') != -1 || file.name.indexOf('IDENTIDADE') != -1 || file.name.indexOf('Cpf') != -1) {
+                        cpf = 'checked'
+                        metadados[i] = 'cpf'
+                    } else if (file.name.indexOf('endereço') != -1 || file.name.indexOf('endereco') != -1 || file.name.indexOf('residência') != -1 || file.name.indexOf('residencia') != -1 || file.name.indexOf('Endereco') != -1 || file.name.indexOf('Endereço') != -1 || file.name.indexOf('ENDERECO') != -1 || file.name.indexOf('ENDEREÇO') != -1 || file.name.indexOf('RESIDENCIA') != -1 || file.name.indexOf('RESIDÊNCIA') != -1 || file.name.indexOf('Residência') != -1 || file.name.indexOf('Residencia') != -1) {
+                        endereco = 'checked'
+                        metadados[i] = 'endereco'
+                    } else {
+                        outros = 'checked'
+                        metadados[i] = 'outros'
+                    }
+        
+                    mostraArquivos.innerHTML += `
+                    <div class="block-list__item">
+                    ${Number(i) + 1}<br>
+                    <label class="h6">${file.name}</label>
+                    <br>
+                    <b>Tamanho:</b> ${formatBytes(file.size)}
+                    <br>
+                    <b>Qual arquivo é este?</b>
+                    <br><input type="radio" ${cpf} name="tipo${i}" value="${i}|cpf" id="cpfIdentidade${i}"> Identidade e CPF
+                    <br><input type="radio" ${endereco} name="tipo${i}" value="${i}|endereco" id="endereco${i}"> Comprovante de endereço
+                    <br><input type="radio" ${outros} name="tipo${i}" value="${i}|outros" id="outros${i}"> Outros
+                    </div>
+                    `
+                    c++
+                    
+                }
+            }
+            let c2 = 0
+            while (c2 < c) {
+                document.getElementsByName('tipo' + c2).forEach(element => {
+                    element.addEventListener('change', (e) => {
+                        if (e.target.checked == true) {
+                            metadados[e.target.value.split('|')[0]] = e.target.value.split('|')[1]
+                            console.log(metadados)
+                        }
+                    })
+                });
+                c2++
+            }
+            
+            document.getElementById('enviarArquivosCadastro').addEventListener('click', (e) => {
+                for (const i in files) {
+                    if (Object.hasOwnProperty.call(files, i)) {
+                        const file = files[i];
+                        let metadata = {
+                            customMetadata: {
+                                tipo: metadados[i]
+                            }
+                        }
+                        let path = 'alunos/' + matriculaAluno + '/arquivos/'
+                        uploadFile(file, metadata, path)
+                    }
+                }
+            }) 
+        } else {
+            AstNotif.dialog('Calma aí!', 'Você não acessou um aluno ainda. Acesse o cadastro de um aluno no sistema para que seja possíve fazer o uplodar de arquivos para um aluno cadastrado no sistema.')
+        }
+    }
+dropArea.addEventListener('drop', handleDrop, false)
+document.getElementById('fileElemJaCadastrado').addEventListener('change', handleDrop)
+console.log('SIM')
+}
+
+
 
 function uploadFile(file, metadata, path) {
     console.log(file)
