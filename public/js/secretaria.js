@@ -1491,6 +1491,23 @@ function chamaDownload(refDown, nome) {
     })
 }
 
+function chamaDelete(ref, nomeArquivo, confirma = false) {
+    if (confirma) {
+        storageDelete(ref).then(info => {
+            AstNotif.notify('Sucesso', info.answer)
+            $('#modal').modal('hide')
+            carregaArquivosAluno(document.getElementById('mostraMatriculaAluno').innerText)
+        }).catch(error => {
+            console.log(error)
+            AstNotif.dialog('Erro', error.message)
+        })
+    } else {
+        abrirModal('modal', 'Confirmação', `
+            Deseja excluir o arquivo "<b>${nomeArquivo}</b>" permanentemente do sistema? (Esta ação não pode ser revertida)
+        `, `<button type="button" id="deletaArquivosConfirma" onclick="chamaDelete('${ref}', '${nomeArquivo}', true)" class="btn btn-danger">Deletar arquivo</button> <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>`)
+    }
+}
+
 function carregaArquivosAluno(matricula) {
     let listaArquivosAluno = document.getElementById('listaArquivosAluno')
     listaArquivosAluno.innerHTML = ''
@@ -1514,7 +1531,7 @@ function carregaArquivosAluno(matricula) {
                 listaArquivosAluno.innerHTML += `
                     <div class="col-lg-3 col-xl-2">
                         <div class="file-man-box">
-                        <a class="file-close"><i data-feather="x"></i></a>
+                        <a class="file-close" onclick="chamaDelete('${metadata.fullPath}', '${metadata.name}')"><i data-feather="x"></i></a>
                         <div class="file-img-box">
                             <img src="../images/${imagem}" alt="icon">
                         </div>

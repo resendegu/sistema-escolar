@@ -1,3 +1,5 @@
+const { storage } = require("firebase-functions");
+
 var perf = firebase.performance()
 firebase.analytics();
 // Código padrão para todas as páginas do site
@@ -16,7 +18,7 @@ firebase.auth().onAuthStateChanged((usuario) => {
 })
 
 function update() {
-	let versao = 0.986
+	let versao = 0.987
 	updatesRef.on('value', (snapshot) => {
 		let dados = snapshot.val()
 		if (versao < dados.versao) {
@@ -286,4 +288,15 @@ async function storageDownload(ref, nomeArquivo) {
 		console.log(error)
 		throw new Error(error.message)
 	});
+}
+
+async function storageDelete(ref) {
+	var deleteRef = firebase.storage().ref(ref)
+
+	return deleteRef.delete().then(function() {
+		return {answer: 'Arquivo deletado com sucesso!'}
+	}).catch(function(error) {
+		console.log(error)
+		throw new Error(error.message)
+	})
 }
