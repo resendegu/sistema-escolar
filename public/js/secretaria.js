@@ -1607,7 +1607,7 @@ function abreDadosDoAluno(matricula, desativado=false, notasDesativado=false) {
         numeroComercialPedagogicoAluno: dados.numeroComercialPedagogicoAluno,
         numeroCelularPedagogicoAluno: dados.numeroCelularPedagogicoAluno,
         rgPedagogicoAluno: dados.rgPedagogicoAluno,
-        cpfPedgogicoAluno: dados.cpfPedgogicoAluno
+        cpfPedgogicoAluno: dados.cpfPedagogicoAluno
     }
 
     
@@ -2108,6 +2108,73 @@ function verFollowUp(id) {
     })
     
 }
+
+function addResponsavelAutorizado(matricula) {
+    abrirModal('modal', 'Adicionar um reponsável autorizado', `
+    <form id="formAddResponsavel">
+        <label class="h6">Dados do responsável autorizado</label>
+        <div class="form-row border border-success rounded">
+        
+        <div class="form-group col-md-4">
+            <label for="inputAddress">Responsável</label>
+            <input type="text" class="form-control" id="addResponsavelNome" name="addResponsavelNome" placeholder="Nome" onblur="maiusculo(this)">
+        </div>
+        <div class="form-group col-md-2">
+            <label for="inputAddress">Relação</label>
+            <br>
+            <select class="form-control form-control-md" name="addResponsavelRelacao" id="addResponsavelRelacao">
+            <option hidden selected>Escolha...</option>
+            <option value="Mãe">Mãe</option>
+            <option value="Pai">Pai</option>
+            <option value="Tio/Tia">Tio/Tia</option>
+            <option value="Avô/Avó">Avô/Avó</option>
+            <option value="Outros">Outros</option>
+            </select>
+        </div>
+        <div class="form-group col-md-2">
+            <label for="inputAddress">Número Celular</label>
+            <input type="text" class="form-control" id="addResponsavelNumeroCelular" name="addResponsavelNumeroCelular" placeholder="Celular">
+        </div>
+        <div class="form-group col-md-5">
+            <label for="inputPassword4">Email</label>
+            <input type="email" class="form-control" id="addResponsavelEmail" name="addResponsavelEmail" placeholder="Email">
+        </div>
+        <div class="form-group col-auto">
+            <label for="inputEmail4">RG</label>
+            <input type="text" class="form-control" id="addResponsavelRg" name="addResponsavelRg" placeholder="RG">
+        </div>
+        <div class="form-group col-auto">
+            <label for="inputPassword4">CPF</label>
+            <input type="text" class="form-control" id="addResponsavelCpf" name="addResponsavelCpf" placeholder="CPF" onchange="verificaCPF(this.value)">
+            <small id="cpfHelp3" class="form-text text-muted">Digite um CPF válido, existe um algoritmo de validação neste campo.</small>
+        </div>
+        </div>
+        <button id="addResponsavelAutorizado" class="btn btn-primary float-md-right" type="submit" style="margin-top: 10px;">Adicionar</button>
+    </form>
+    `, `<button class="btn btn-secondary" data-dismiss="modal">Fechar</button>`);
+
+    document.getElementById('formAddResponsavel').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const dados = new FormData(e.target);
+        let responsavel = {
+            addResponsavelNome: dados.get('addResponsavelNome'),
+            addResponsavelRelacao: dados.get('addResponsavelRelacao'),
+            addResponsavelNumeroCelular: dados.get('addResponsavelNumeroCelular'),
+            addResponsavelEmail: dados.get('addResponsavelEmail'),
+            addResponsavelRg: dados.get('addResponsavelRg'),
+            addResponsavelCpf: dados.get('addResponsavelCpf')
+        };
+
+        alunosRef.child(`${matricula}/responsaveisAutorizados`).push(responsavel).then(() => {
+            document.getElementById('formAddResponsavel').reset();
+            $('#modal').modal('hide');
+            AstNotif.notify('Sucesso', 'Responsável cadastrado com sucesso');
+        }).catch(error => {
+            AstNotif.dialog('Erro', error.message);
+        })
+    })
+}
+
 function mostraDadosResponsaveis() {
     abrirModal('modal', 'Dados dos reponsáveis', 
         `
@@ -2228,7 +2295,7 @@ function mostraDadosResponsaveis() {
           </div>
         </div>
         <br>
-        <label class="h6">Dados do responsável Financeiro</label>
+        <label class="h6">Dados do responsável Pedagógico</label>
         <div class="form-row border border-success rounded">
           
           <div class="form-group col-md-4">

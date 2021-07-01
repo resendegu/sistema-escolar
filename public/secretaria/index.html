@@ -180,17 +180,10 @@
 
           <!-- Inicialização do Firebase -->
         <!-- update the version number as needed -->
-        <script defer src="/__/firebase/8.2.3/firebase-app.js"></script>
-        <!-- include only the Firebase features as you need -->
-        <script defer src="/__/firebase/8.2.3/firebase-auth.js"></script>
-        <script defer src="/__/firebase/8.2.3/firebase-database.js"></script>
-        <!-- <script defer src="/__/firebase/8.2.3/firebase-firestore.js"></script> -->
-        <script defer src="/__/firebase/8.2.3/firebase-functions.js"></script>
-        <!-- <script defer src="/__/firebase/8.2.3/firebase-messaging.js"></script> -->
-        <script defer src="/__/firebase/8.2.3/firebase-storage.js"></script>
-        <script defer src="/__/firebase/8.2.3/firebase-analytics.js"></script>
-        <!-- <script defer src="/__/firebase/8.1.1/firebase-remote-config.js"></script> -->
-        <script defer src="/__/firebase/8.2.3/firebase-performance.js"></script>
+        <script defer src="/__/firebase/8.6.8/firebase-app.js"></script>
+        
+        
+        <script defer src="/__/firebase/8.6.8/firebase.js"></script>
         <!-- 
           initialize the SDK after all desired features are loaded, set useEmulator to false
           to avoid connecting the SDK to running emulators.
@@ -641,8 +634,9 @@
                                   <label class="text-secondary mb-1" id="mostraTurmaAluno">Turma</label>
                                   <p class="text-muted font-size-sm" id="mostraHoraEDiasAluno">Horário e dia de aula</p>
                                   <button class="btn btn-primary" onclick="followUpAluno(`${document.getElementById('mostraMatriculaAluno').innerText}`)">Follow Up</button>
-                                  <button class="btn btn-outline-primary" onclick="mostraDadosResponsaveis()">Responsáveis</button>
-                                  <br><br>
+                                  <button class="btn btn-outline-primary" onclick="mostraDadosResponsaveis()">Responsáveis</button><br><br>
+                                  <button class="btn btn-block btn-outline-primary" onclick="addResponsavelAutorizado(document.getElementById('mostraMatriculaAluno').innerText)"><span data-feather="plus"></span> Add responsável autorizado</button>
+                                  <br>
                                   <section id="secGeraFicha"></section>
                                   
                                   
@@ -1325,7 +1319,7 @@
                   </div>
                 </div>
                 <br>
-                <label class="h6">Dados do responsável Financeiro</label>
+                <label class="h6">Dados do responsável Pedagógico</label>
                 <div class="form-row border border-success rounded">
                   
                   <div class="form-group col-md-4">
