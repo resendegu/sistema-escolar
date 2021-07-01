@@ -971,6 +971,7 @@ document.querySelector('#formCadastroAluno').addEventListener('submit', (e) => {
     dadosAluno.numeroCelularPedagogicoAluno = dados.get('numeroCelularPedagogicoAluno')
     dadosAluno.rgPedagogicoAluno = dados.get('rgPedagogicoAluno')
     dadosAluno.cpfPedagogicoAluno = dados.get('cpfPedagogicoAluno')
+    dadosAluno.emailResponsavelPedagogico = dados.get('emailResponsavelPedagogico')
     // Gera ou não o PDF do aluno
     dadosAluno.geraPDFAluno = document.getElementById('geraPDFAluno')
     function emailRegularExpression(email) {
@@ -2162,10 +2163,11 @@ function addResponsavelAutorizado(matricula) {
             addResponsavelNumeroCelular: dados.get('addResponsavelNumeroCelular'),
             addResponsavelEmail: dados.get('addResponsavelEmail'),
             addResponsavelRg: dados.get('addResponsavelRg'),
-            addResponsavelCpf: dados.get('addResponsavelCpf')
+            addResponsavelCpf: dados.get('addResponsavelCpf'),
+            matriculaAluno: matricula
         };
 
-        alunosRef.child(`${matricula}/responsaveisAutorizados`).push(responsavel).then(() => {
+        secretariaRef.child(`responsaveisAutorizados`).push(responsavel).then(() => {
             document.getElementById('formAddResponsavel').reset();
             $('#modal').modal('hide');
             AstNotif.notify('Sucesso', 'Responsável cadastrado com sucesso');
@@ -2182,7 +2184,7 @@ function mostraDadosResponsaveis() {
         <div class="form-row border border-secondary rounded">
           <div class="form-group col-md-4">
             <label for="inputAddress">Filiação ou Responsável legal 1</label>
-            <input type="text" class="form-control" id="nomeResponsavelAluno1AbaAlunos" name="nomeResponsavelAluno1" placeholder="Nome"  onblur="maiusculo(this)">
+            <input type="text" class="form-control" id="nomeResponsavelAluno1AbaAlunos" name="nomeResponsavelAluno1" placeholder="Nome"  onblur="maiusculo(this)" required>
           </div>
           <div class="form-group col-md-2">
             <label for="inputAddress">Relação</label>
@@ -2202,7 +2204,7 @@ function mostraDadosResponsaveis() {
           </div>
           <div class="form-group col-md-2">
             <label for="inputAddress">Número Celular</label>
-            <input type="text" class="form-control" id="numeroCelularResponsavel1AbaAlunos" name="numeroCelularResponsavel1" placeholder="Celular">
+            <input type="text" class="form-control" id="numeroCelularResponsavel1AbaAlunos" name="numeroCelularResponsavel1" placeholder="Celular" required>
           </div>
           <div class="form-group col-auto">
             <label for="inputEmail4">RG</label>
@@ -2210,7 +2212,7 @@ function mostraDadosResponsaveis() {
           </div>
           <div class="form-group col-auto">
             <label for="inputPassword4">CPF</label>
-            <input type="text" class="form-control" id="cpfResponsavel1AbaAlunos" name="cpfResponsavel1" placeholder="CPF" onchange="verificaCPF(this.value)">
+            <input type="text" class="form-control" id="cpfResponsavel1AbaAlunos" name="cpfResponsavel1" placeholder="CPF" onchange="verificaCPF(this.value)" required>
             <small id="cpfHelp" class="form-text text-muted">Digite um CPF válido, existe um algoritmo de validação neste campo.</small>
           </div>
         </div>

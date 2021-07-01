@@ -115,6 +115,34 @@
       </div>
     </div>
 
+    <div class="modal fade bd-example-modal-xl" tabindex="-1" role="dialog" id="modalConsultaResponsaveis">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="titulo">Consultar responsável por CPF</h5>
+            <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button> -->
+          </div>
+          <div class="modal-body" id="corpo">
+            <form id="addLivroTabela">
+              <div class="form-row">
+                <div class="form-group col-md-6">
+                  <label for="inputPassword4">Digite o CPF do responsável cadastrado</label>
+                    <input type="text" class="form-control" id="nomeLivroAdd" name="nomeLivroAdd" placeholder="Nome do livro (Ex.: Aprendendo Inglês - Edição para Crianças)">
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary btn-block">Procurar</button>
+            </form>
+          </div>
+          <div class="modal-footer" id="botoes">
+            
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="modal fade bd-example-modal-xl" tabindex="-1" role="dialog" id="modalAdicionaCurso">
       <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
@@ -446,7 +474,7 @@
             <button type="button" class="btn btn-light btn-sm" onclick="document.getElementById('btnAbaTurmas').click()">
               Turmas Cadastradas <span class="badge badge-success" id="turmasCadastradasNum">0</span>
             </button>
-            
+            <button class="btn btn-sm btn-light float-md-right" data-toggle="modal" data-target="#modalConsultaResponsaveis">Consultar responsáveis</button>
           </div>
           <hr>
           <!-- Gráfico -->
@@ -1356,7 +1384,7 @@
                   </div>
                   <div class="form-group col-auto">
                     <label for="inputPassword4">CPF</label>
-                    <input type="text" class="form-control" id="cpfPedagogicoAluno" name="cpfPedgogicoAluno" placeholder="CPF" onchange="verificaCPF(this.value)">
+                    <input type="text" class="form-control" id="cpfPedagogicoAluno" name="cpfPedagogicoAluno" placeholder="CPF" onchange="verificaCPF(this.value)">
                     <small id="cpfHelp3" class="form-text text-muted">Digite um CPF válido, existe um algoritmo de validação neste campo.</small>
                   </div>
                 </div>
