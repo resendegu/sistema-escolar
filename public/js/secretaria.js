@@ -2177,6 +2177,19 @@ function addResponsavelAutorizado(matricula) {
     })
 }
 
+document.getElementById('formBuscaResponsavel').addEventListener('submit', (e) => {
+    e.preventDefault();
+    let respAutorizadosRef = firebase.database().ref('sistemaEscolar/secretaria/responsaveisAutorizados')
+    let dados = new FormData(e.target);
+    let cpf = dados.get('cpfBuscaResponsavel');
+    respAutorizadosRef.orderByChild('addResponsavelCpf').equalTo(cpf).once('value', (resp) => {
+        let dadosResp = resp.val()
+        console.log(resp)
+        console.log(resp.val())
+        AstNotif.dialog('Responsável encontrado', `O estudante de matricula ${dadosResp.matriculaAluno}, pode ser liberado para o responsável ${dadosResp.addResponsavelNome}. <b>Esta parte ainda está em desenvolvimento. - Gustavo Resende :-)</b>`)
+    })
+})
+
 function mostraDadosResponsaveis() {
     abrirModal('modal', 'Dados dos reponsáveis', 
         `
