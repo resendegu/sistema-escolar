@@ -318,7 +318,7 @@ exports.cadastraAluno = functions.https.onCall((data, context) => {
                 return admin.database().ref('sistemaEscolar/alunos/' + dadosAluno.matriculaAluno).set(dadosAluno).then(() => {
                     return admin.database().ref('sistemaEscolar/turmas').child(dadosAluno.turmaAluno + '/alunos').child(dadosAluno.matriculaAluno).set({nome: dadosAluno.nomeAluno, prof: dadosAluno.profAluno}).then(() => {
                         return admin.database().ref('sistemaEscolar/ultimaMatricula').set(dadosAluno.matriculaAluno).then(() => {
-                            return admin.database().ref('sistemaEscolar/responsaveisAutorizados').push({
+                            return admin.database().ref('sistemaEscolar/secretaria/responsaveisAutorizados').push({
                                 addResponsavelNome: dadosAluno.nomeResponsavelPedagogicoAluno,
                                 addResponsavelRelacao: dadosAluno.relacaoPedagogicoAluno,
                                 addResponsavelNumeroCelular: dadosAluno.numeroCelularPedagogicoAluno,

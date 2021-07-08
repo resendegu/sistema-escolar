@@ -299,3 +299,15 @@ async function storageDelete(ref) {
 		throw new Error(error.message)
 	})
 }
+
+async function retornaDadosAluno(matricula='') {
+	let alunosDBRef = firebase.database().ref('sistemaEscolar/alunos')
+
+	try {
+		let dados = await alunosDBRef.child(matricula).once('value')
+		return dados.val()
+	} catch (error) {
+		throw new Error(error);
+	}
+	
+}

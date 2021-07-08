@@ -2184,9 +2184,108 @@ document.getElementById('formBuscaResponsavel').addEventListener('submit', (e) =
     let cpf = dados.get('cpfBuscaResponsavel');
     respAutorizadosRef.orderByChild('addResponsavelCpf').equalTo(cpf).once('value', (resp) => {
         let dadosResp = resp.val()
-        console.log(resp)
-        console.log(resp.val())
-        AstNotif.dialog('Responsável encontrado', `O estudante de matricula ${dadosResp.matriculaAluno}, pode ser liberado para o responsável ${dadosResp.addResponsavelNome}. <b>Esta parte ainda está em desenvolvimento. - Gustavo Resende :-)</b>`)
+        let dadosResponsavel = []
+        for (const key in dadosResp) {
+            if (Object.hasOwnProperty.call(dadosResp, key)) {
+                dadosResponsavel.push(dadosResp[key])
+            }
+        }
+
+        if (dadosResponsaveis.length > 1) {
+            
+        } else {
+            
+            $('#modalConsultaResponsaveis').modal('hide');
+            abrirModal('modal', 'Responsável', `
+                <form id="formVerResponsavel">
+                    <label class="h6">Dados do responsável autorizado</label>
+                    <div class="form-row border border-success rounded">
+                    
+                    <div class="form-group col-md-4">
+                        <label for="inputAddress">Responsável</label>
+                        <input type="text" class="form-control" id="addResponsavelNome" name="addResponsavelNome" placeholder="Nome" onblur="maiusculo(this)" readonly>
+                    </div>
+                    <div class="form-group col-md-2">
+                        <label for="inputAddress">Relação</label>
+                        <br>
+                        <select class="form-control form-control-md" name="addResponsavelRelacao" id="addResponsavelRelacao" readonly>
+                        <option hidden selected>Escolha...</option>
+                        <option value="Mãe">Mãe</option>
+                        <option value="Pai">Pai</option>
+                        <option value="Tio/Tia">Tio/Tia</option>
+                        <option value="Avô/Avó">Avô/Avó</option>
+                        <option value="Outros">Outros</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="inputAddress">Número Celular</label>
+                        <input type="text" class="form-control" id="addResponsavelNumeroCelular" name="addResponsavelNumeroCelular" placeholder="Celular" readonly>
+                    </div>
+                    <div class="form-group col-md-5">
+                        <label for="inputPassword4">Email</label>
+                        <input type="email" class="form-control" id="addResponsavelEmail" name="addResponsavelEmail" placeholder="Email" readonly>
+                    </div>
+                    <div class="form-group col-auto">
+                        <label for="inputEmail4">RG</label>
+                        <input type="text" class="form-control" id="addResponsavelRg" name="addResponsavelRg" placeholder="RG" readonly>
+                    </div>
+                    <div class="form-group col-auto">
+                        <label for="inputPassword4">CPF</label>
+                        <input type="text" class="form-control" id="addResponsavelCpf" name="addResponsavelCpf" placeholder="CPF" onchange="verificaCPF(this.value)" readonly>
+                        <small id="cpfHelp3" class="form-text text-muted">Digite um CPF válido, existe um algoritmo de validação neste campo.</small>
+                    </div>
+                    </div>
+                </form>
+                <section>
+                    <label class="h6">Dados do aluno</label>
+                    
+                    <div class="row form-row">
+                        <div class="form-group col-md-4">
+                            <label for="inputAddress">Nome</label>
+                            <input type="text" class="form-control" id="nomeAlunoRespAutorizado" placeholder="Nome" onblur="maiusculo(this)" readonly>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="inputAddress">Turma</label>
+                            <input type="text" class="form-control" id="turmaAlunoRespAutorizado" placeholder="Turma" readonly>
+                        </div>
+
+                        <div class="form-group col-md-4">
+                            <br>
+                            <button class="btn btn-primary mt-2" id="abreDadosAlunoRespAutorizado">Abrir dados do aluno</button>
+                        </div>
+                    </div>
+                </section>
+                `, `<button class="btn btn-secondary" data-dismiss="modal">Fechar</button>`);
+                let formElement = document.getElementById('formVerResponsavel');
+                // let dados = new FormData(formElement);
+                let matricula
+                for(let key in dadosResponsavel[0]) {
+                    let field = dadosResponsavel[0][key];
+                    console.log(key, field);
+                    document.getElementById(key).value = field;
+                    if (key == 'matriculaAluno'){
+                        matricula = field
+                        retornaDadosAluno(matricula).then(dadosAluno => {
+                            console.log(dadosAluno)
+                            document.getElementById('nomeAlunoRespAutorizado').value = dadosAluno.nomeAluno
+                            document.getElementById('turmaAlunoRespAutorizado').value = dadosAluno.turmaAluno
+                        }).catch(error => {
+                            AstNotif.dialog('Erro', error.message)
+                        })
+                    } 
+                }
+
+                document.getElementById('abreDadosAlunoRespAutorizado').addEventListener('click', (e) => {
+                    e.preventDefault()
+                    $('#modal').modal('hide')
+                    document.getElementById('btnAbaAlunos').click()
+                    abreDadosDoAluno(matricula)
+                    
+                })
+
+                
+                
+        }
     })
 })
 
