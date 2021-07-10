@@ -1608,7 +1608,7 @@ function abreDadosDoAluno(matricula, desativado=false, notasDesativado=false) {
         numeroComercialPedagogicoAluno: dados.numeroComercialPedagogicoAluno,
         numeroCelularPedagogicoAluno: dados.numeroCelularPedagogicoAluno,
         rgPedagogicoAluno: dados.rgPedagogicoAluno,
-        cpfPedgogicoAluno: dados.cpfPedagogicoAluno
+        cpfPedagogicoAluno: dados.cpfPedagogicoAluno
     }
 
     
@@ -2290,166 +2290,172 @@ document.getElementById('formBuscaResponsavel').addEventListener('submit', (e) =
 })
 
 function mostraDadosResponsaveis() {
-    abrirModal('modal', 'Dados dos reponsáveis', 
+    abrirModal('modal', 'Ver/Alterar dados reponsáveis', 
         `
-        <label class="h6">Dados de filiação</label>
-        <div class="form-row border border-secondary rounded">
-          <div class="form-group col-md-4">
-            <label for="inputAddress">Filiação ou Responsável legal 1</label>
-            <input type="text" class="form-control" id="nomeResponsavelAluno1AbaAlunos" name="nomeResponsavelAluno1" placeholder="Nome"  onblur="maiusculo(this)" required>
-          </div>
-          <div class="form-group col-md-2">
-            <label for="inputAddress">Relação</label>
-            <br>
-            <select class="form-control form-control-md" name="relacaoAluno1" id="relacaoAluno1AbaAlunos">
-              <option hidden selected>Escolha...</option>
-              <option value="Mãe">Mãe</option>
-              <option value="Pai">Pai</option>
-              <option value="Tio/Tia">Tio/Tia</option>
-              <option value="Avô/Avó">Avô/Avó</option>
-              <option value="Outros">Outros</option>
-            </select>
-          </div>
-          <div class="form-group col-md-2">
-            <label for="inputAddress">Número comercial</label>
-            <input type="text" class="form-control" id="numeroComercialResponsavel1AbaAlunos" name="numeroComercialResponsavel1"  placeholder="Comercial">
-          </div>
-          <div class="form-group col-md-2">
-            <label for="inputAddress">Número Celular</label>
-            <input type="text" class="form-control" id="numeroCelularResponsavel1AbaAlunos" name="numeroCelularResponsavel1" placeholder="Celular" required>
-          </div>
-          <div class="form-group col-auto">
-            <label for="inputEmail4">RG</label>
-            <input type="text" class="form-control" id="rgResponsavel1AbaAlunos" name="rgResponsavel1" placeholder="RG">
-          </div>
-          <div class="form-group col-auto">
-            <label for="inputPassword4">CPF</label>
-            <input type="text" class="form-control" id="cpfResponsavel1AbaAlunos" name="cpfResponsavel1" placeholder="CPF" onchange="verificaCPF(this.value)" required>
-            <small id="cpfHelp" class="form-text text-muted">Digite um CPF válido, existe um algoritmo de validação neste campo.</small>
-          </div>
-        </div>
+        <div><button class="btn btn-secondary float-right" data-dismiss="modal">Fechar</button></div>
         <br>
+        <form id="formEditaResponsaveis">
+            <label class="h6">Dados de filiação</label>
+            <div class="form-row border border-secondary rounded">
+            <div class="form-group col-md-4">
+                <label for="inputAddress">Filiação ou Responsável legal 1</label>
+                <input type="text" class="form-control" id="nomeResponsavelAluno1AbaAlunos" name="nomeResponsavelAluno1" placeholder="Nome"  onblur="maiusculo(this)" required>
+            </div>
+            <div class="form-group col-md-2">
+                <label for="inputAddress">Relação</label>
+                <br>
+                <select class="form-control form-control-md" name="relacaoAluno1" id="relacaoAluno1AbaAlunos">
+                <option hidden selected>Escolha...</option>
+                <option value="Mãe">Mãe</option>
+                <option value="Pai">Pai</option>
+                <option value="Tio/Tia">Tio/Tia</option>
+                <option value="Avô/Avó">Avô/Avó</option>
+                <option value="Outros">Outros</option>
+                </select>
+            </div>
+            <div class="form-group col-md-2">
+                <label for="inputAddress">Número comercial</label>
+                <input type="text" class="form-control" id="numeroComercialResponsavel1AbaAlunos" name="numeroComercialResponsavel1"  placeholder="Comercial">
+            </div>
+            <div class="form-group col-md-2">
+                <label for="inputAddress">Número Celular</label>
+                <input type="text" class="form-control" id="numeroCelularResponsavel1AbaAlunos" name="numeroCelularResponsavel1" placeholder="Celular" required>
+            </div>
+            <div class="form-group col-auto">
+                <label for="inputEmail4">RG</label>
+                <input type="text" class="form-control" id="rgResponsavel1AbaAlunos" name="rgResponsavel1" placeholder="RG">
+            </div>
+            <div class="form-group col-auto">
+                <label for="inputPassword4">CPF</label>
+                <input type="text" class="form-control" id="cpfResponsavel1AbaAlunos" name="cpfResponsavel1" placeholder="CPF" onchange="verificaCPF(this.value)" required>
+                <small id="cpfHelp" class="form-text text-muted">Digite um CPF válido, existe um algoritmo de validação neste campo.</small>
+            </div>
+            </div>
+            <br>
+            
+            <div class="form-row border border-secondary rounded">
+            <div class="form-group col-md-4">
+                <label for="inputAddress">Filiação ou Responsável legal 2</label>
+                <input type="text" class="form-control" id="nomeResponsavelAluno2AbaAlunos" name="nomeResponsavelAluno2" placeholder="Nome" onblur="maiusculo(this)">
+            </div>
+            <div class="form-group col-md-2">
+                <label for="inputAddress">Relação</label>
+                <br>
+                <select class="form-control form-control-md" name="relacaoAluno2" id="relacaoAluno2AbaAlunos">
+                <option hidden selected>Escolha...</option>
+                <option value="Mãe">Mãe</option>
+                <option value="Pai">Pai</option>
+                <option value="Tio/Tia">Tio/Tia</option>
+                <option value="Avô/Avó">Avô/Avó</option>
+                <option value="Outros">Outros</option>
+                </select>
+            </div>
+            <div class="form-group col-md-2">
+                <label for="inputAddress">Número comercial</label>
+                <input type="text" class="form-control" id="numeroComercialResponsavel2AbaAlunos" name="numeroComercialResponsavel2" placeholder="Comercial">
+            </div>
+            <div class="form-group col-md-2">
+                <label for="inputAddress">Número Celular</label>
+                <input type="text" class="form-control" id="numeroCelularResponsavel2AbaAlunos" name="numeroCelularResponsavel2" placeholder="Celular">
+            </div>
+            <div class="form-group col-auto">
+                <label for="inputEmail4">RG</label>
+                <input type="text" class="form-control" id="rgResponsavel2AbaAlunos" name="rgResponsavel2" placeholder="RG">
+            </div>
+            <div class="form-group col-auto">
+                <label for="inputPassword4">CPF</label>
+                <input type="text" class="form-control" id="cpfResponsavel2AbaAlunos" name="cpfResponsavel2" placeholder="CPF" onchange="verificaCPF(this.value)">
+                <small id="cpfHelp" class="form-text text-muted">Digite um CPF válido, existe um algoritmo de validação neste campo.</small>
+            </div>
+            &nbsp;&nbsp;&nbsp;
+            </div>
+            <br>
+            <hr>
+            <label class="h6">Dados do responsável Financeiro</label>
+            <div class="form-row border border-primary rounded">
+            <div class="form-group col-md-4">
+                <label for="inputAddress">Responsável financeiro</label>
+                <input type="text" class="form-control" id="nomeResponsavelFinanceiroAlunoAbaAlunos" name="nomeResponsavelFinanceiroAluno" placeholder="Nome" onblur="maiusculo(this)">
+            </div>
+            <div class="form-group col-md-2">
+                <label for="inputAddress">Relação</label>
+                <br>
+                <select class="form-control form-control-md" name="relacaoFinanceiroAluno" id="relacaoFinanceiroAlunoAbaAlunos">
+                <option hidden selected>Escolha...</option>
+                <option value="Mãe">Mãe</option>
+                <option value="Pai">Pai</option>
+                <option value="Tio/Tia">Tio/Tia</option>
+                <option value="Avô/Avó">Avô/Avó</option>
+                <option value="Outros">Outros</option>
+                </select>
+            </div>
+            <div class="form-group col-md-2">
+                <label for="inputAddress">Número comercial</label>
+                <input type="text" class="form-control" id="numeroComercialFinanceiroAlunoAbaAlunos" name="numeroComercialFinanceiroAluno" placeholder="Comercial">
+            </div>
+            <div class="form-group col-md-2">
+                <label for="inputAddress">Número Celular</label>
+                <input type="text" class="form-control" id="numeroCelularFinanceiroAlunoAbaAlunos" name="numeroCelularFinanceiroAluno" placeholder="Celular">
+            </div>
+            <div class="form-group col-md-5">
+                <label for="inputPassword4">Email</label>
+                <input type="email" class="form-control" id="emailResponsavelFinanceiroAbaAlunos" name="emailresponsavelFinanceiro" placeholder="Email">
+            </div>
+            <div class="form-group col-auto">
+                <label for="inputEmail4">RG</label>
+                <input type="text" class="form-control" id="rgFinanceiroAlunoAbaAlunos" name="rgFinanceiroAluno" placeholder="RG">
+            </div>
+            <div class="form-group col-auto">
+                <label for="inputPassword4">CPF</label>
+                <input type="text" class="form-control" id="cpfFinanceiroAlunoAbaAlunos" name="cpfFinanceiroAluno"  placeholder="CPF" onchange="verificaCPF(this.value)">
+                <small id="cpfHelp4" class="form-text text-muted">Digite um CPF válido, existe um algoritmo de validação neste campo.</small>
+            </div>
+            </div>
+            <br>
+            <label class="h6">Dados do responsável Pedagógico</label>
+            <div class="form-row border border-success rounded">
+            
+            <div class="form-group col-md-4">
+                <label for="inputAddress">Responsável pedagógico/didático</label>
+                <input type="text" class="form-control" id="nomeResponsavelPedagogicoAlunoAbaAlunos" placeholder="Nome" onblur="maiusculo(this)">
+            </div>
+            <div class="form-group col-md-2">
+                <label for="inputAddress">Relação</label>
+                <br>
+                <select class="form-control form-control-md" name="relacaoPedagogicoAluno" id="relacaoPedagogicoAlunoAbaAlunos">
+                <option hidden selected>Escolha...</option>
+                <option value="Mãe">Mãe</option>
+                <option value="Pai">Pai</option>
+                <option value="Tio/Tia">Tio/Tia</option>
+                <option value="Avô/Avó">Avô/Avó</option>
+                <option value="Outros">Outros</option>
+                </select>
+            </div>
+            <div class="form-group col-md-2">
+                <label for="inputAddress">Número comercial</label>
+                <input type="text" class="form-control" id="numeroComercialPedagogicoAlunoAbaAlunos" name="numeroComercialPedagogicoAluno" placeholder="Comercial">
+            </div>
+            <div class="form-group col-md-2">
+                <label for="inputAddress">Número Celular</label>
+                <input type="text" class="form-control" id="numeroCelularPedagogicoAlunoAbaAlunos" name="numeroCelularPedagogicoAluno" placeholder="Celular">
+            </div>
+            <div class="form-group col-md-5">
+                <label for="inputPassword4">Email</label>
+                <input type="email" class="form-control" id="emailResponsavelPedagogicoAbaAlunos" name="emailResponsavelPedagogico" placeholder="Email">
+            </div>
+            <div class="form-group col-auto">
+                <label for="inputEmail4">RG</label>
+                <input type="text" class="form-control" id="rgPedagogicoAlunoAbaAlunos" name="rgPedagogicoAluno" placeholder="RG">
+            </div>
+            <div class="form-group col-auto">
+                <label for="inputPassword4">CPF</label>
+                <input type="text" class="form-control" id="cpfPedagogicoAlunoAbaAlunos" name="cpfPedgogicoAluno" placeholder="CPF" onchange="verificaCPF(this.value)">
+                <small id="cpfHelp3" class="form-text text-muted">Digite um CPF válido, existe um algoritmo de validação neste campo.</small>
+            </div>
+            </div>
+            <button type="submit" class="btn btn-primary mt-2">Salvar dados dos responsáveis</button>
+        </form>
         
-        <div class="form-row border border-secondary rounded">
-          <div class="form-group col-md-4">
-            <label for="inputAddress">Filiação ou Responsável legal 2</label>
-            <input type="text" class="form-control" id="nomeResponsavelAluno2AbaAlunos" name="nomeResponsavelAluno2" placeholder="Nome" onblur="maiusculo(this)">
-          </div>
-          <div class="form-group col-md-2">
-            <label for="inputAddress">Relação</label>
-            <br>
-            <select class="form-control form-control-md" name="relacaoAluno2" id="relacaoAluno2AbaAlunos">
-              <option hidden selected>Escolha...</option>
-              <option value="Mãe">Mãe</option>
-              <option value="Pai">Pai</option>
-              <option value="Tio/Tia">Tio/Tia</option>
-              <option value="Avô/Avó">Avô/Avó</option>
-              <option value="Outros">Outros</option>
-            </select>
-          </div>
-          <div class="form-group col-md-2">
-            <label for="inputAddress">Número comercial</label>
-            <input type="text" class="form-control" id="numeroComercialResponsavel2AbaAlunos" name="numeroComercialResponsavel2" placeholder="Comercial">
-          </div>
-          <div class="form-group col-md-2">
-            <label for="inputAddress">Número Celular</label>
-            <input type="text" class="form-control" id="numeroCelularResponsavel2AbaAlunos" name="numeroCelularResponsavel2" placeholder="Celular">
-          </div>
-          <div class="form-group col-auto">
-            <label for="inputEmail4">RG</label>
-            <input type="text" class="form-control" id="rgResponsavel2AbaAlunos" name="rgResponsavel2" placeholder="RG">
-          </div>
-          <div class="form-group col-auto">
-            <label for="inputPassword4">CPF</label>
-            <input type="text" class="form-control" id="cpfResponsavel2AbaAlunos" name="cpfResponsavel2" placeholder="CPF" onchange="verificaCPF(this.value)">
-            <small id="cpfHelp" class="form-text text-muted">Digite um CPF válido, existe um algoritmo de validação neste campo.</small>
-          </div>
-          &nbsp;&nbsp;&nbsp;
-        </div>
-        <br>
-        <hr>
-        <label class="h6">Dados do responsável Financeiro</label>
-        <div class="form-row border border-primary rounded">
-          <div class="form-group col-md-4">
-            <label for="inputAddress">Responsável financeiro</label>
-            <input type="text" class="form-control" id="nomeResponsavelFinanceiroAlunoAbaAlunos" name="nomeResponsavelFinanceiroAluno" placeholder="Nome" onblur="maiusculo(this)">
-          </div>
-          <div class="form-group col-md-2">
-            <label for="inputAddress">Relação</label>
-            <br>
-            <select class="form-control form-control-md" name="relacaoFinanceiroAluno" id="relacaoFinanceiroAlunoAbaAlunos">
-              <option hidden selected>Escolha...</option>
-              <option value="Mãe">Mãe</option>
-              <option value="Pai">Pai</option>
-              <option value="Tio/Tia">Tio/Tia</option>
-              <option value="Avô/Avó">Avô/Avó</option>
-              <option value="Outros">Outros</option>
-            </select>
-          </div>
-          <div class="form-group col-md-2">
-            <label for="inputAddress">Número comercial</label>
-            <input type="text" class="form-control" id="numeroComercialFinanceiroAlunoAbaAlunos" name="numeroComercialFinanceiroAluno" placeholder="Comercial">
-          </div>
-          <div class="form-group col-md-2">
-            <label for="inputAddress">Número Celular</label>
-            <input type="text" class="form-control" id="numeroCelularFinanceiroAlunoAbaAlunos" name="numeroCelularFinanceiroAluno" placeholder="Celular">
-          </div>
-          <div class="form-group col-md-5">
-            <label for="inputPassword4">Email</label>
-            <input type="email" class="form-control" id="emailResponsavelFinanceiroAbaAlunos" name="emailresponsavelFinanceiro" placeholder="Email">
-          </div>
-          <div class="form-group col-auto">
-            <label for="inputEmail4">RG</label>
-            <input type="text" class="form-control" id="rgFinanceiroAlunoAbaAlunos" name="rgFinanceiroAluno" placeholder="RG">
-          </div>
-          <div class="form-group col-auto">
-            <label for="inputPassword4">CPF</label>
-            <input type="text" class="form-control" id="cpfFinanceiroAlunoAbaAlunos" name="cpfFinanceiroAluno"  placeholder="CPF" onchange="verificaCPF(this.value)">
-            <small id="cpfHelp4" class="form-text text-muted">Digite um CPF válido, existe um algoritmo de validação neste campo.</small>
-          </div>
-        </div>
-        <br>
-        <label class="h6">Dados do responsável Pedagógico</label>
-        <div class="form-row border border-success rounded">
-          
-          <div class="form-group col-md-4">
-            <label for="inputAddress">Responsável pedagógico/didático</label>
-            <input type="text" class="form-control" id="nomeResponsavelPedagogicoAlunoAbaAlunos" placeholder="Nome" onblur="maiusculo(this)">
-          </div>
-          <div class="form-group col-md-2">
-            <label for="inputAddress">Relação</label>
-            <br>
-            <select class="form-control form-control-md" name="relacaoPedagogicoAluno" id="relacaoPedagogicoAlunoAbaAlunos">
-              <option hidden selected>Escolha...</option>
-              <option value="Mãe">Mãe</option>
-              <option value="Pai">Pai</option>
-              <option value="Tio/Tia">Tio/Tia</option>
-              <option value="Avô/Avó">Avô/Avó</option>
-              <option value="Outros">Outros</option>
-            </select>
-          </div>
-          <div class="form-group col-md-2">
-            <label for="inputAddress">Número comercial</label>
-            <input type="text" class="form-control" id="numeroComercialPedagogicoAlunoAbaAlunos" name="numeroComercialPedagogicoAluno" placeholder="Comercial">
-          </div>
-          <div class="form-group col-md-2">
-            <label for="inputAddress">Número Celular</label>
-            <input type="text" class="form-control" id="numeroCelularPedagogicoAlunoAbaAlunos" name="numeroCelularPedagogicoAluno" placeholder="Celular">
-          </div>
-          <div class="form-group col-md-5">
-            <label for="inputPassword4">Email</label>
-            <input type="email" class="form-control" id="emailResponsavelPedagogicoAbaAlunos" name="emailResponsavelPedagogico" placeholder="Email">
-          </div>
-          <div class="form-group col-auto">
-            <label for="inputEmail4">RG</label>
-            <input type="text" class="form-control" id="rgPedagogicoAlunoAbaAlunos" name="rgPedagogicoAluno" placeholder="RG">
-          </div>
-          <div class="form-group col-auto">
-            <label for="inputPassword4">CPF</label>
-            <input type="text" class="form-control" id="cpfPedagogicoAlunoAbaAlunos" name="cpfPedgogicoAluno" placeholder="CPF" onchange="verificaCPF(this.value)">
-            <small id="cpfHelp3" class="form-text text-muted">Digite um CPF válido, existe um algoritmo de validação neste campo.</small>
-          </div>
-        </div>
         `, 
         `<button class="btn btn-secondary" data-dismiss="modal">Fechar</button>`
     )
@@ -2481,7 +2487,31 @@ function mostraDadosResponsaveis() {
     document.getElementById('numeroComercialPedagogicoAlunoAbaAlunos').value = dadosResponsaveis.numeroComercialPedagogicoAluno
     document.getElementById('numeroCelularPedagogicoAlunoAbaAlunos').value = dadosResponsaveis.numeroCelularPedagogicoAluno
     document.getElementById('rgPedagogicoAlunoAbaAlunos').value = dadosResponsaveis.rgPedagogicoAluno
-    document.getElementById('cpfPedgogicoAlunoAbaAlunos').value = dadosResponsaveis.cpfPedgogicoAluno
+    document.getElementById('cpfPedagogicoAlunoAbaAlunos').value = dadosResponsaveis.cpfPedagogicoAluno
+    
+    let matriculaAtual = document.getElementById('mostraMatriculaAluno').innerText
+    document.getElementById('formEditaResponsaveis').addEventListener('submit', (e) => {
+        e.preventDefault();
+        let dadosResp = $('#formEditaResponsaveis').serializeArray();
+        let dadosRespObj = {}
+
+        for (const key in dadosResp) {
+            if (Object.hasOwnProperty.call(dadosResp, key)) {
+                const campo = dadosResp[key];
+                dadosRespObj[campo.name] = campo.value
+            }
+        }
+        console.log(dadosRespObj)
+
+        alunosRef.child(matriculaAtual).update(dadosRespObj).then(() => {
+            $('#modal').modal('hide')
+            AstNotif.notify('Sucesso', 'Dados atualizados com sucesso.')
+        }).catch(error => {
+            console.log(error)
+            AstNotif.dialog('Erro', error.message)
+        })
+    })
+    console.log($('#formEditaResponsaveis').serializeArray())
 }
 
 function carregaHistoricoAluno(matricula) {
