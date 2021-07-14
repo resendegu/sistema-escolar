@@ -879,11 +879,10 @@ function verificaCPF(strCPF) {
     var Soma;
     var Resto;
     Soma = 0;
-  if (strCPF == "00000000000") {
+  if (strCPF == "00000000000" || strCPF.length != 11) {
     AstNotif.dialog('CPF inválido.', 'Digite e Verifique as informações de CPF novamente.')
     cpfAluno.value = ''
-  } 
-
+  }
   for (i=1; i<=9; i++) Soma = Soma + parseInt(strCPF.substring(i-1, i)) * (11 - i);
   Resto = (Soma * 10) % 11;
 
@@ -1377,7 +1376,7 @@ function editarDadosAluno(matricula) {
         <div class="form-row">
         <div class="form-group col-sm-2">
             <label for="inputEmail4">Matrícula</label>
-            <input type="number" class="form-control" id="matriculaAluno" name="matriculaAluno" placeholder="Número de matrícula" required>
+            <input type="number" class="form-control" id="matriculaAluno" name="matriculaAluno" placeholder="Número de matrícula" required readonly>
         </div>
         <div class="form-group col-md-4">
             <label for="inputPassword4">Nome</label>
@@ -1432,46 +1431,6 @@ function editarDadosAluno(matricula) {
             <input type="text" class="form-control" id="cpfAluno" name="cpfAluno" placeholder="CPF" onchange="verificaCPF(this.value)" required>
             <small id="cpfHelp" class="form-text text-muted">Digite um CPF válido, existe um algoritmo de validação neste campo.</small>
         </div>
-        </div>
-        <hr>
-        <label class="h6">Envio de documentos pessoais</label>
-        <p>Aqui podem ser enviados os documentos como Identidade, CPF, Comprovante de Residência e outros que achar pertinente. Não é obrigatório fazê-lo agora. <br> Você poderá <b>alterar e enviar</b> documentos depois no <b>cadastro do aluno</b>.</p>
-        <div id="drop-area" class="drop-area">
-        <section class="my-form">
-            <p><b>Arraste e solte</b> os arquivos para enviar </p> ou
-            <input type="file" id="fileElemCadastroAluno" class="fileElem" multiple>
-            
-            <label class="button" for="fileElemCadastroAluno">Escolher arquivos...</label>
-        </section>
-        <div class="progress" style="position: relative;">
-            <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" id="progress">0%</div>
-        </div>
-        </div>
-        <hr>
-        <label class="h6">Dados para o curso</label>
-        <div class="form-row">
-        <div class="form-group col-auto">
-            <label for="inputAddress">Turma</label>
-            <select class="form-control" name="turmaAluno" id="turmaAluno" onclick="mostraProfsAlunoESetaTurma(this.value)">
-            <option hidden selected>Escolha a turma...</option>
-            
-            </select>
-        </div>
-        
-        
-        <div class="form-group col-auto">
-            <label for="inputAddress">Horário</label>
-            <input type="text" readonly class="form-control" id="horaAluno" name="horaAluno">
-        </div>
-        <div class="form-group col-auto">
-            <label for="inputAddress">Professor</label>
-            <input type="text" readonly class="form-control" id="nomeProfAluno" name="nomeProfAluno">
-        </div>
-        <div class="form-group col-auto">
-            <label for="inputAddress">E-mail do Professor</label>
-            <input type="text" readonly class="form-control" id="emailProfAluno" name="emailProfAluno">
-        </div>
-        
         </div>
         <hr>
         <label class="h6">Dados de endereço</label>
@@ -1679,15 +1638,8 @@ function editarDadosAluno(matricula) {
         </div>
         </div>
 
-        <div class="form-group">
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="geraPDFAluno" name="geraPDFAluno">
-            <label class="form-check-label" for="geraPDFAluno">
-            Gerar ficha de matrícula
-            </label>
-        </div>
-        </div>
-        <button type="submit" class="btn btn-primary" id="cadastrarAluno">Cadastrar Aluno</button>
+        
+        <button type="submit" class="btn btn-primary" id="cadastrarAluno">Salvar dados</button>
         <br><br>
     </form>
     `, '<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>');
@@ -1700,13 +1652,29 @@ function editarDadosAluno(matricula) {
         if (Object.hasOwnProperty.call(campos, key)) {
             const element = campos[key];
             console.log(element)
-            document.getElementById(element.name).value = aluno[element.name];
+            document.getElementById(element.name).value = aluno[element.name] == undefined ? null : aluno[element.name] ;
         }
     }
     
     formEditaAluno.addEventListener('submit', (e) => {
         e.preventDefault();
-        console.log(FormData(e.target))
+        campos = $('#formEditaAluno').serializeArray();
+        console.log(campos)
+        let alunoObjNew = {}
+        for (const key in campos) {
+            if (Object.hasOwnProperty.call(campos, key)) {
+                const element = campos[key];
+                alunoObjNew[element.name] = element.value
+            }
+        }
+        console.log(alunoObjNew)
+        alunosRef.child(alunoObjNew.matriculaAluno).update(alunoObjNew).then(() => {
+            AstNotif.notify('Sucesso', 'Dados alterados com sucesso.')
+            $('#modal').modal('hide');
+        }).catch(error => {
+            AstNotif.dialog('Erro', error.message)
+            console.log(error)
+        })
     })
 }
 
