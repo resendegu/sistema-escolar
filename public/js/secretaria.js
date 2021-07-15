@@ -874,35 +874,6 @@ function arrumaNumMatricula() {
     input.value=input.value.slice(-5,-1)+input.value.slice(-1);
 }
 
-function verificaCPF(strCPF) {
-    let cpfAluno = document.getElementById('cpfAluno')
-    var Soma;
-    var Resto;
-    Soma = 0;
-  if (strCPF == "00000000000" || strCPF.length != 11) {
-    AstNotif.dialog('CPF inválido.', 'Digite e Verifique as informações de CPF novamente.')
-    cpfAluno.value = ''
-  }
-  for (i=1; i<=9; i++) Soma = Soma + parseInt(strCPF.substring(i-1, i)) * (11 - i);
-  Resto = (Soma * 10) % 11;
-
-    if ((Resto == 10) || (Resto == 11))  Resto = 0;
-    if (Resto != parseInt(strCPF.substring(9, 10)) ) {
-        AstNotif.dialog('CPF inválido.', 'Digite e Verifique as informações de CPF novamente.')
-        cpfAluno.value = ''
-    } 
-
-  Soma = 0;
-    for (i = 1; i <= 10; i++) Soma = Soma + parseInt(strCPF.substring(i-1, i)) * (12 - i);
-    Resto = (Soma * 10) % 11;
-
-    if ((Resto == 10) || (Resto == 11))  Resto = 0;
-    if (Resto != parseInt(strCPF.substring(10, 11) ) ) {
-        AstNotif.dialog('CPF inválido.', 'Digite e Verifique as informações de CPF novamente.')
-        cpfAluno.value = ''
-    } 
-    return true;
-}
 
 // JS PDF
 function criaPDFAluno() {
@@ -1369,9 +1340,6 @@ function editarDadosAluno(matricula) {
 
     abrirModal('modal', 'Editar dados de ' + aluno.nomeAluno, `
     <form id="formEditaAluno" onkeydown="return event.key != 'Enter';">
-        <input type='reset' class="btn btn-warning btn-sm" id="resetForm" value='Limpar todos os campos'/>
-        <a class="btn btn-info btn-sm" onclick="carregaProfsETurmas()"><span data-feather="refresh-cw"></span> Atualizar número de matrícula e turmas</a>
-        <br> <br>
         <label class="h6">Dados pessoais</label>
         <div class="form-row">
         <div class="form-group col-sm-2">
@@ -1428,7 +1396,7 @@ function editarDadosAluno(matricula) {
         </div>
         <div class="form-group col-auto">
             <label for="inputPassword4">CPF</label>
-            <input type="text" class="form-control" id="cpfAluno" name="cpfAluno" placeholder="CPF" onchange="verificaCPF(this.value)" required>
+            <input type="text" class="form-control" id="cpfAluno" name="cpfAluno" placeholder="CPF" onchange="verificaCPF(this)" required>
             <small id="cpfHelp" class="form-text text-muted">Digite um CPF válido, existe um algoritmo de validação neste campo.</small>
         </div>
         </div>
@@ -1494,7 +1462,7 @@ function editarDadosAluno(matricula) {
         </div>
         <div class="form-group col-auto">
             <label for="inputPassword4">CPF</label>
-            <input type="text" class="form-control" id="cpfResponsavel1" name="cpfResponsavel1" placeholder="CPF" onchange="verificaCPF(this.value)">
+            <input type="text" class="form-control" id="cpfResponsavel1" name="cpfResponsavel1" placeholder="CPF" onchange="verificaCPF(this)">
             <small id="cpfHelp" class="form-text text-muted">Digite um CPF válido, existe um algoritmo de validação neste campo.</small>
         </div>
         
@@ -1541,7 +1509,7 @@ function editarDadosAluno(matricula) {
         </div>
         <div class="form-group col-auto">
             <label for="inputPassword4">CPF</label>
-            <input type="text" class="form-control" id="cpfResponsavel2" name="cpfResponsavel2" placeholder="CPF" onchange="verificaCPF(this.value)">
+            <input type="text" class="form-control" id="cpfResponsavel2" name="cpfResponsavel2" placeholder="CPF" onchange="verificaCPF(this)">
             <small id="cpfHelp" class="form-text text-muted">Digite um CPF válido, existe um algoritmo de validação neste campo.</small>
         </div>
         &nbsp;&nbsp;&nbsp;
@@ -1591,7 +1559,7 @@ function editarDadosAluno(matricula) {
         </div>
         <div class="form-group col-auto">
             <label for="inputPassword4">CPF</label>
-            <input type="text" class="form-control" id="cpfFinanceiroAluno" name="cpfFinanceiroAluno"  placeholder="CPF" onchange="verificaCPF(this.value)">
+            <input type="text" class="form-control" id="cpfFinanceiroAluno" name="cpfFinanceiroAluno"  placeholder="CPF" onchange="verificaCPF(this)">
             <small id="cpfHelp4" class="form-text text-muted">Digite um CPF válido, existe um algoritmo de validação neste campo.</small>
         </div>
         </div>
@@ -1633,7 +1601,7 @@ function editarDadosAluno(matricula) {
         </div>
         <div class="form-group col-auto">
             <label for="inputPassword4">CPF</label>
-            <input type="text" class="form-control" id="cpfPedagogicoAluno" name="cpfPedagogicoAluno" placeholder="CPF" onchange="verificaCPF(this.value)">
+            <input type="text" class="form-control" id="cpfPedagogicoAluno" name="cpfPedagogicoAluno" placeholder="CPF" onchange="verificaCPF(this)">
             <small id="cpfHelp3" class="form-text text-muted">Digite um CPF válido, existe um algoritmo de validação neste campo.</small>
         </div>
         </div>
@@ -1671,6 +1639,7 @@ function editarDadosAluno(matricula) {
         alunosRef.child(alunoObjNew.matriculaAluno).update(alunoObjNew).then(() => {
             AstNotif.notify('Sucesso', 'Dados alterados com sucesso.')
             $('#modal').modal('hide');
+            carregaListaDeAlunos();
         }).catch(error => {
             AstNotif.dialog('Erro', error.message)
             console.log(error)
@@ -2458,7 +2427,7 @@ function addResponsavelAutorizado(matricula) {
         </div>
         <div class="form-group col-auto">
             <label for="inputPassword4">CPF</label>
-            <input type="text" class="form-control" id="addResponsavelCpf" name="addResponsavelCpf" placeholder="CPF" onchange="verificaCPF(this.value)">
+            <input type="text" class="form-control" id="addResponsavelCpf" name="addResponsavelCpf" placeholder="CPF" onchange="verificaCPF(this)">
             <small id="cpfHelp3" class="form-text text-muted">Digite um CPF válido, existe um algoritmo de validação neste campo.</small>
         </div>
         </div>
@@ -2543,7 +2512,7 @@ document.getElementById('formBuscaResponsavel').addEventListener('submit', (e) =
                     </div>
                     <div class="form-group col-auto">
                         <label for="inputPassword4">CPF</label>
-                        <input type="text" class="form-control" id="addResponsavelCpf" name="addResponsavelCpf" placeholder="CPF" onchange="verificaCPF(this.value)" readonly>
+                        <input type="text" class="form-control" id="addResponsavelCpf" name="addResponsavelCpf" placeholder="CPF" onchange="verificaCPF(this)" readonly>
                         <small id="cpfHelp3" class="form-text text-muted">Digite um CPF válido, existe um algoritmo de validação neste campo.</small>
                     </div>
                     </div>
@@ -2639,7 +2608,7 @@ function mostraDadosResponsaveis() {
             </div>
             <div class="form-group col-auto">
                 <label for="inputPassword4">CPF</label>
-                <input type="text" class="form-control" id="cpfResponsavel1AbaAlunos" name="cpfResponsavel1" placeholder="CPF" onchange="verificaCPF(this.value)" required>
+                <input type="text" class="form-control" id="cpfResponsavel1AbaAlunos" name="cpfResponsavel1" placeholder="CPF" onchange="verificaCPF(this)" required>
                 <small id="cpfHelp" class="form-text text-muted">Digite um CPF válido, existe um algoritmo de validação neste campo.</small>
             </div>
             </div>
@@ -2676,7 +2645,7 @@ function mostraDadosResponsaveis() {
             </div>
             <div class="form-group col-auto">
                 <label for="inputPassword4">CPF</label>
-                <input type="text" class="form-control" id="cpfResponsavel2AbaAlunos" name="cpfResponsavel2" placeholder="CPF" onchange="verificaCPF(this.value)">
+                <input type="text" class="form-control" id="cpfResponsavel2AbaAlunos" name="cpfResponsavel2" placeholder="CPF" onchange="verificaCPF(this)">
                 <small id="cpfHelp" class="form-text text-muted">Digite um CPF válido, existe um algoritmo de validação neste campo.</small>
             </div>
             &nbsp;&nbsp;&nbsp;
@@ -2719,7 +2688,7 @@ function mostraDadosResponsaveis() {
             </div>
             <div class="form-group col-auto">
                 <label for="inputPassword4">CPF</label>
-                <input type="text" class="form-control" id="cpfFinanceiroAlunoAbaAlunos" name="cpfFinanceiroAluno"  placeholder="CPF" onchange="verificaCPF(this.value)">
+                <input type="text" class="form-control" id="cpfFinanceiroAlunoAbaAlunos" name="cpfFinanceiroAluno"  placeholder="CPF" onchange="verificaCPF(this)">
                 <small id="cpfHelp4" class="form-text text-muted">Digite um CPF válido, existe um algoritmo de validação neste campo.</small>
             </div>
             </div>
@@ -2761,7 +2730,7 @@ function mostraDadosResponsaveis() {
             </div>
             <div class="form-group col-auto">
                 <label for="inputPassword4">CPF</label>
-                <input type="text" class="form-control" id="cpfPedagogicoAlunoAbaAlunos" name="cpfPedgogicoAluno" placeholder="CPF" onchange="verificaCPF(this.value)">
+                <input type="text" class="form-control" id="cpfPedagogicoAlunoAbaAlunos" name="cpfPedgogicoAluno" placeholder="CPF" onchange="verificaCPF(this)">
                 <small id="cpfHelp3" class="form-text text-muted">Digite um CPF válido, existe um algoritmo de validação neste campo.</small>
             </div>
             </div>

@@ -17,7 +17,7 @@ firebase.auth().onAuthStateChanged((usuario) => {
 })
 
 function update() {
-	let versao = 0.990
+	let versao = 0.991
 	updatesRef.on('value', (snapshot) => {
 		let dados = snapshot.val()
 		if (versao < dados.versao) {
@@ -310,4 +310,35 @@ async function retornaDadosAluno(matricula='') {
 		throw new Error(error);
 	}
 	
+}
+
+function verificaCPF(element) {
+    let cpfAluno = element;
+	let strCPF = element.value;
+    var Soma;
+    var Resto;
+    Soma = 0;
+  if (strCPF == "00000000000" || strCPF.length != 11) {
+    AstNotif.dialog('CPF inválido.', 'Digite e Verifique as informações de CPF novamente.')
+    cpfAluno.value = ''
+  }
+  for (i=1; i<=9; i++) Soma = Soma + parseInt(strCPF.substring(i-1, i)) * (11 - i);
+  Resto = (Soma * 10) % 11;
+
+    if ((Resto == 10) || (Resto == 11))  Resto = 0;
+    if (Resto != parseInt(strCPF.substring(9, 10)) ) {
+        AstNotif.dialog('CPF inválido.', 'Digite e Verifique as informações de CPF novamente.')
+        cpfAluno.value = ''
+    } 
+
+  Soma = 0;
+    for (i = 1; i <= 10; i++) Soma = Soma + parseInt(strCPF.substring(i-1, i)) * (12 - i);
+    Resto = (Soma * 10) % 11;
+
+    if ((Resto == 10) || (Resto == 11))  Resto = 0;
+    if (Resto != parseInt(strCPF.substring(10, 11) ) ) {
+        AstNotif.dialog('CPF inválido.', 'Digite e Verifique as informações de CPF novamente.')
+        cpfAluno.value = ''
+    } 
+    return true;
 }

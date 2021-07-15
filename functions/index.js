@@ -114,6 +114,44 @@ exports.criaContaAluno = functions.database.ref('sistemaEscolar/alunos/{registro
     })
 })
 
+exports.modificaSenhaContaAluno = functions.database.ref('sistemaEscolar/alunos/{matricula}/senhaAluno').onUpdate((snapshot, context) => {
+    async function start() {
+        let senhaAluno = snapshot.after.val();
+        let matricula = context.params.matricula;
+        let firestoreRef = admin.firestore().collection('mail');
+        let dadosAluno = await admin.database().ref('sistemaEscolar/alunos/' + matricula).once('value');
+        let nomeEscola = await admin.database().ref('sistemaEscolar/infoEscola/dadosBasicos/nomeEscola').once('value');
+        let user = await admin.auth().getUserByEmail(dadosAluno.val().emailAluno)
+        let emailContent = {
+            to: dadosAluno.val().emailAluno,
+            message: {
+                subject: `${nomeEscola.val()}: Senha alterada no portal do Aluno`,
+                text: `Sua nova senha para login no portal do aluno é ${senhaAluno}. Em caso de dificuldades entre em contato com sua escola para maiores informações. Sistemas ProjetoX.`,
+                html: `<h3>Olá ${dadosAluno.val().nomeAluno.split(' ')[0]}!</h3><p>O sistema detectou uma mudança na sua senha do portal do aluno e sua nova senha para login no portal do aluno é <b>${senhaAluno}</b>.</p><p>Em caso de dificuldades <b>entre em contato com sua escola para maiores informações</b>.</p><p>Sistemas ProjetoX.</p>`
+            }
+        }
+
+        admin.auth().updateUser(user.uid, {password: senhaAluno}).then((newUser) => {
+            firestoreRef.add(emailContent).then(() => {
+                console.log('Queued email for delivery to ' + dadosAluno.val().emailAluno)
+            }).catch(error => {
+                console.error(error)
+                throw new Error(error.message)
+            })
+        }).catch(error => {
+            console.error(error)
+            throw new Error(error.message)
+        })
+    }
+
+    start(() => {
+        return 'Function ended';
+    }).catch(error => {
+        throw new Error(error.message)
+    })
+      
+})
+
 exports.cadastroUser = functions.auth.user().onCreate((user) => {
     console.log(user.displayName) 
     var dadosNoBanco = admin.database().ref(`sistemaEscolar/usuarios/${user.uid}/`)
