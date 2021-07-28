@@ -1085,15 +1085,16 @@ function preventDefaults(e) {
         
                     mostraArquivos.innerHTML += `
                     <div class="block-list__item">
-                    ${Number(i) + 1}<br>
-                    <label class="h6">${file.name}</label>
-                    <br>
-                    <b>Tamanho:</b> ${formatBytes(file.size)}
-                    <br>
-                    <b>Qual arquivo é este?</b>
-                    <br><input type="radio" ${cpf} name="tipo${i}" value="${i}|cpf" id="cpfIdentidade${i}"> Identidade e CPF
-                    <br><input type="radio" ${endereco} name="tipo${i}" value="${i}|endereco" id="endereco${i}"> Comprovante de endereço
-                    <br><input type="radio" ${outros} name="tipo${i}" value="${i}|outros" id="outros${i}"> Outros
+                        ${Number(i) + 1}<br>
+                        <label class="h6">${file.name}</label>
+                        <br>
+                        <b>Tamanho:</b> ${formatBytes(file.size)}
+                        <br>
+                        <b>Qual arquivo é este?</b>
+                        <br><input type="radio" ${cpf} name="tipo${i}" value="${i}|cpf" id="cpfIdentidade${i}"> Identidade e CPF
+                        <br><input type="radio" ${endereco} name="tipo${i}" value="${i}|endereco" id="endereco${i}"> Comprovante de endereço
+                        <br><input type="radio" name="tipo${i}" value="${i}|foto3x4" id="foto3x4${i}"> Foto 3x4 do aluno
+                        <br><input type="radio" ${outros} name="tipo${i}" value="${i}|outros" id="outros${i}"> Outros
                     </div>
                     `
                     c++
@@ -1113,7 +1114,7 @@ function preventDefaults(e) {
                 c2++
             }
             
-            document.getElementById('enviarArquivosCadastro').addEventListener('click', (e) => {
+            document.getElementById('enviarArquivosCadastro').addEventListener('click', async function(e) {
                 for (const i in files) {
                     if (Object.hasOwnProperty.call(files, i)) {
                         const file = files[i];
@@ -1123,7 +1124,17 @@ function preventDefaults(e) {
                             }
                         }
                         let path = 'alunos/' + matriculaAluno + '/arquivos/'
-                        uploadFile(file, metadata, path)
+                        await uploadFile(file, metadata, path)
+                        firebase.storage().ref('alunos/' + matriculaAluno + '/arquivos/' + file.name).downloadURL().then(function(url) {
+                            console.log(url)
+                            alunosRef.child(matriculaAluno).update({fotoAluno: url}).then(() => {
+                                console.log('Foto atualizada com sucesso')
+                            }).catch((error) => {
+                                AstNotif.dialog('Erro', error.message)
+                                console.log(error)
+                            })
+                        })
+                        
                     }
                 }
             }) 
@@ -1207,6 +1218,7 @@ function preventDefaults(e) {
                     <b>Qual arquivo é este?</b>
                     <br><input type="radio" ${cpf} name="tipo${i}" value="${i}|cpf" id="cpfIdentidade${i}"> Identidade e CPF
                     <br><input type="radio" ${endereco} name="tipo${i}" value="${i}|endereco" id="endereco${i}"> Comprovante de endereço
+                    <br><input type="radio" name="tipo${i}" value="${i}|foto3x4" id="foto3x4${i}"> Foto 3x4 do aluno
                     <br><input type="radio" ${outros} name="tipo${i}" value="${i}|outros" id="outros${i}"> Outros
                     </div>
                     `
@@ -1227,7 +1239,7 @@ function preventDefaults(e) {
                 c2++
             }
             
-            document.getElementById('enviarArquivosCadastro').addEventListener('click', (e) => {
+            document.getElementById('enviarArquivosCadastro').addEventListener('click', async function(e) {
                 for (const i in files) {
                     if (Object.hasOwnProperty.call(files, i)) {
                         const file = files[i];
@@ -1237,7 +1249,17 @@ function preventDefaults(e) {
                             }
                         }
                         let path = 'alunos/' + matriculaAluno + '/arquivos/'
-                        uploadFile(file, metadata, path)
+                        await uploadFile(file, metadata, path)
+                        firebase.storage().ref('sistemaEscolar/alunos/' + matriculaAluno + '/arquivos/').child(file.name).getDownloadURL().then(function(url) {
+                            console.log(url)
+                            alunosRef.child(matriculaAluno).update({fotoAluno: url}).then(() => {
+                                console.log('Foto atualizada com sucesso')
+                            }).catch((error) => {
+                                AstNotif.dialog('Erro', error.message)
+                                console.log(error)
+                            })
+                        })
+                        
                     }
                 }
             }) 
@@ -1263,7 +1285,7 @@ function uploadFile(file, metadata, path) {
     } */
     var uploadTask = firebase.storage().ref('sistemaEscolar/' + path).child(file.name.split('.')[0]).put(file, metadata)
         // Listen for state changes, errors, and completion of the upload.
-    uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED, // or 'state_changed'
+    return uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED, // or 'state_changed'
     function(snapshot) {
     // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
     var progress = ((snapshot.bytesTransferred / snapshot.totalBytes) * 100).toFixed(2);
@@ -1299,8 +1321,9 @@ function uploadFile(file, metadata, path) {
     }
     }, function() {
     // Upload completed successfully, now we can get the download URL
-    AstNotif.notify("Sucesso", 'Arquivo "' + file.name +  '" enviado aos servidores com sucesso', "<i>agora</i>", {'length': 90000})
-    $('#modal').modal('hide')
+        AstNotif.notify("Sucesso", 'Arquivo "' + file.name +  '" enviado aos servidores com sucesso', "<i>agora</i>", {'length': 90000})
+        $('#modal').modal('hide')
+    
     });
 }
 
@@ -1790,7 +1813,7 @@ function chamaDelete(ref, nomeArquivo, confirma = false) {
     }
 }
 
-function carregaArquivosAluno(matricula) {
+async function carregaArquivosAluno(matricula) {
     let listaArquivosAluno = document.getElementById('listaArquivosAluno')
     listaArquivosAluno.innerHTML = ''
     let storageRef = alunosStorageRef.child(matricula + '/arquivos')
@@ -1798,29 +1821,31 @@ function carregaArquivosAluno(matricula) {
     
 
         // Find all the prefixes and items.
-    storageRef.listAll().then(function(res) {
-        res.prefixes.forEach(function(folderRef) {
+    storageRef.listAll().then(async function(res) {
+        res.prefixes.forEach(async function(folderRef) {
         // All the prefixes under listRef.
         // You may call listAll() recursively on them.
         });
-        res.items.forEach(function(itemRef) {
+        res.items.forEach(async function(itemRef) {
             // All the items under listRef.
-            itemRef.getMetadata().then(function(metadata) {
+            itemRef.getMetadata().then(async function(metadata) {
                 console.log(metadata)
                 let imagem
-                if (metadata.customMetadata.tipo == 'cpf') imagem = 'cpf-icon.png'
-                else if(metadata.customMetadata.tipo == 'endereco') imagem = 'home.png'
+                if (metadata.customMetadata.tipo == 'cpf') imagem = '../images/cpf-icon.png'
+                else if(metadata.customMetadata.tipo == 'endereco') imagem = '../images/home.png'
+                else if(metadata.customMetadata.tipo == 'foto3x4') imagem = await itemRef.getDownloadURL()
                 listaArquivosAluno.innerHTML += `
                     <div class="col-lg-3 col-xl-2">
                         <div class="file-man-box">
                         <a class="file-close" onclick="chamaDelete('${metadata.fullPath}', '${metadata.name}')"><i data-feather="x"></i></a>
                         <div class="file-img-box">
-                            <img src="../images/${imagem}" alt="icon">
+                            <img src="${imagem}" alt="icon">
                         </div>
                         <a onclick="chamaDownload('${metadata.fullPath}', '${metadata.name}')" class="file-download" name="downBtns"><i data-feather="download"></i></a>
                         <div class="file-man-title">
                             <h6 class="mb-0 text-overflow" data-toggle="tooltip" data-placement="top" title="${metadata.name}">${metadata.name}</h5>
                             <p class="mb-0"><small>${formatBytes(metadata.size)}</small></p>
+                            <p class="mb-0"><small>${metadata.customMetadata.tipo}</small></p>
                         </div>
                         </div>
                     </div>

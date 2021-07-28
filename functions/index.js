@@ -1,5 +1,6 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
+const path = require('path');
 const { auth } = require('firebase-admin');
 const { HttpsError } = require('firebase-functions/lib/providers/https');
 const { firebaseConfig } = require('firebase-functions');
@@ -815,3 +816,35 @@ exports.fechaTurma = functions.https.onCall((data, context) => {
         throw new functions.https.HttpsError('permission-denied', 'Você não possui permissão para fazer alterações nesta área.')
     }
 })
+
+// exports.adicionaFotoAluno = functions.storage.object().onFinalize(async (object) => {
+//     const fileBucket = object.bucket; // The Storage bucket that contains the file.
+//     const filePath = object.name; // File path in the bucket.
+//     const contentType = object.contentType; // File content type.
+//     const metageneration = object.metageneration; // Number of times metadata has been generated. New objects have a value of 1.
+//     const metadata = object.metadata; // File metadata.
+//     // Exit if this is triggered on a file that is not an image.
+//     functions.logger.log(filePath);
+//     functions.logger.log(path.dirname(filePath));
+    
+//     if (!contentType.startsWith('image/') && filePath.indexOf('alunos') == -1) {
+//         return functions.logger.log('This is not an image.');
+        
+//     }
+//     let url = admin.storage().bucket().file(filePath).publicUrl()
+//     // Get the file name.
+//     functions.logger.log("URL: ", url);
+//     const fileName = path.basename(filePath);
+//     const matricula = path.dirname(filePath).split('/')[2];
+//     functions.logger.log(matricula);
+//     return admin.database().ref(`sistemaEscolar/alunos/${matricula}/fotoAluno`).set(url).then(() => {
+//         functions.logger.log("Foto adicionada com sucesso!");
+//         return {
+//             answer: 'Foto adicionada com sucesso.'
+//         }
+//     }).catch(error => {
+//         functions.logger.log(error);
+//     })
+
+    
+// })

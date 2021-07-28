@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Escolar</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #FAFAFA;
+            font: 12pt "Tahoma";
+        }
+
+        * {
+            box-sizing: border-box;
+            -moz-box-sizing: border-box;
+        }
+
+        .page {
+            width: 21cm;
+            min-height: 29.7cm;
+            padding: 1cm;
+            margin: 1cm auto;
+            border: 1px #D3D3D3 solid;
+            border-radius: 5px;
+            background: white;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .subpage {
+            padding: 0.5cm;
+            height: 256mm;
+            outline: 2cm #ffffff solid;
+        }
+
+        @page {
+            size: A4;
+            margin: 0;
+        }
+
+        @media print {
+            .page {
+                margin: 0;
+                border: initial;
+                border-radius: initial;
+                width: initial;
+                min-height: initial;
+                box-shadow: initial;
+                background: initial;
+                page-break-after: always;
+            }
+            .actionButtons {
+                display: none !important;
+            }
+        }
+
+        .actionButtons {
+            width: 21cm;
+            padding: 1cm;
+            margin: 1cm auto;
+        }
+    </style>
+</head>
+<body>
+     <!-- Inicialização do Firebase -->
+        <!-- update the version number as needed -->
+        <script defer src="/__/firebase/8.2.3/firebase-app.js"></script>
+        <script defer src="/__/firebase/8.2.3/firebase-auth.js"></script>
+        <script defer src="/__/firebase/8.2.3/firebase-database.js"></script>
+        <script defer src="/__/firebase/8.2.3/firebase-storage.js"></script>
+        <script defer src="/__/firebase/8.2.3/firebase-analytics.js"></script>
+        <script defer src="/__/firebase/8.2.3/firebase-functions.js"></script>
+        <!-- <script defer src="/__/firebase/8.1.1/firebase-remote-config.js"></script> -->
+        <script defer src="/__/firebase/8.2.3/firebase-performance.js"></script>
+        <!-- 
+          initialize the SDK after all desired features are loaded, set useEmulator to false
+          to avoid connecting the SDK to running emulators.
+        -->
+        <script defer src="/__/firebase/init.js?useEmulator=true"></script>
+
+    <div class="actionButtons">
+        <table border="1" style="width: 100%; border-style: hidden;">
+            <tbody>
+                <tr>
+                    <td style="width: 20%; text-align: center; border-style: hidden;"><button id="previousMatricula">Aluno Anterior</button></td>
+                    <td style="width: 20%; text-align: center; border-style: hidden;"><button id="previousId">Anterior</button></td>
+                    <td style="width: 20%; text-align: center; border-style: hidden;"><button onclick="window.print()">Imprimir</button></td>
+                    <td style="width: 20%; text-align: center; border-style: hidden;"><button id="nextId">Próximo</button></td>
+                    <td style="width: 20%; text-align: center; border-style: hidden;"><button id="nextMatricula">Próximo Aluno</button></td>
+                </tr>
+            </tbody>
+        </table>
+        
+        
+    </div>
+    <div class="book">
+        <div class="page">
+            <div class="subpage">
+                <table border="1" style="height: 73px; width: 100%; border-collapse: collapse;" height="73">
+                    <tbody>
+                        <tr>
+                            <td style="width: 25%; text-align: center;" id="logoEscola">Logo escola</td>
+                            <td style="width: 50%; text-align: center;">
+                                <p id="nomeEscola">Nome da Escola</p>
+                                <p><em>Emitido em <label id="dataEmissao">[data]</label></em></p>
+                            </td>
+                            <td style="width: 25%; text-align: center;" id="logoSecundaria">Outra logo ou inforrma&ccedil;&atilde;o</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p>
+                    <img id="imagemAluno" src="../../images/espaco_foto_aluno.png" alt="Espa&ccedil;o foto 3x4 do aluno" style="float: right; margin-bottom: 15px; margin-top: 15px; width: 3cm; height: 4cm;" />
+                </p>
+                <h1 style="color: #4485b8;">
+                    <br />
+                    <strong style="color: #000;"><label id="tipoDocumento"></label></strong>
+                    <span style="font-family: inherit;">&nbsp;</span>
+                </h1>
+                <table border="1" style="height: 40px; width: 75.8669%; border-collapse: collapse; border-style: inset;">
+                    <tbody id="cabecalho">
+                        <tr style="height: 20px;" id="cabecalho0">
+                            <td style="width: 35.7142%; height: 20px; border-style: hidden; text-align: start;"><strong>Nome:&nbsp;</strong> <label id="nomeAluno"></label> </td>
+                            <td style="width: 36.1352%; height: 20px; border-style: hidden;"><strong>Matricula:</strong> <label id="matriculaAluno"></label></td>
+                        </tr>
+                        
+                    </tbody>
+                </table>
+                <p></p>
+                <p><br /><br /></p>
+                <table border="1" style="height: 58px; width: 100%; vertical-align: top; margin-left: auto; margin-right: auto; border-style: inset; border-collapse: collapse;">
+                    <tbody>
+                        <tr style="height: 25px;">
+                            <td style="min-width: 140px; width: 99.8407%; height: 25px; text-align: center;" colspan="2"><label id="tituloSecao"></label></td>
+                        </tr>
+                        <section id="dadosTabela">
+                            <tr style="height: 33px;">
+                                <td style="min-width: 140px; height: 33px; width: 25.7961%;">nome</td>
+                                <td style="height: 33px; width: 74.0446%;">dados</td>
+                            </tr>
+                        </section>
+                        <tr>
+                            <td style="min-width: 140px; width: 25.7961%; text-align: right;" colspan="2"><label id="dadosFinais"></label></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <hr />
+                <table border="1" style="width: 100%; border-collapse: collapse; border-style: dotted; margin-left: auto; margin-right: auto;">
+                    <tbody>
+                        <tr>
+                            <td style="width: 100%; text-align: center;">Sistema Escolar ProjetoX - comercial@agenciaprojetox.com</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script defer src="../../js/app.js"></script>
+    <script defer src="script.js"></script>
+    
+</body>
+</html>
