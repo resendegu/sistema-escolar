@@ -824,6 +824,7 @@ exports.fechaTurma = functions.https.onCall((data, context) => {
 //     const metageneration = object.metageneration; // Number of times metadata has been generated. New objects have a value of 1.
 //     const metadata = object.metadata; // File metadata.
 //     // Exit if this is triggered on a file that is not an image.
+//     functions.logger.log(fileBucket)
 //     functions.logger.log(filePath);
 //     functions.logger.log(path.dirname(filePath));
     
@@ -831,7 +832,6 @@ exports.fechaTurma = functions.https.onCall((data, context) => {
 //         return functions.logger.log('This is not an image.');
         
 //     }
-//     let url = admin.storage().bucket().file(filePath).publicUrl()
 //     // Get the file name.
 //     functions.logger.log("URL: ", url);
 //     const fileName = path.basename(filePath);

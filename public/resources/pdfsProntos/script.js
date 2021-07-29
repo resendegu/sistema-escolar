@@ -57,10 +57,10 @@ window.addEventListener('DOMContentLoaded', (e) => {
         }
 
         function adicionaDadosTabela(texto1='', texto2='', id='') {
-        dadosTabela.innerHTML = `
+        dadosTabela.innerHTML += `
             <tr style="height: 33px;" id="${id}">
-                <td style="min-width: 140px; height: 33px; width: 25.7961%;">${texto1}</td>
-                <td style="height: 33px; width: 74.0446%;">${texto2}</td>
+                <td style="min-width: 140px; height: 33px; width: 30%; background-color: lightgray; text-align: center;">&nbsp;${texto1}</td>
+                <td style="height: 33px; width: 60%;">&nbsp;${texto2}</td>
             </tr>
         ` 
         }
@@ -86,14 +86,32 @@ window.addEventListener('DOMContentLoaded', (e) => {
             }
             function gerador(matricula) {
                 alunosRef.child(matricula).once('value').then((alunoInfo) => {
-                    alunosStorageRef.child(matricula + '/arquivos').getDownloadURL().then((url) => {
-
-                    })
                     let aluno = alunoInfo.val();
                     console.log(aluno);
+                    let titulos = [
+                        'Data de Nascimento',
+                        'CPF',
+                        'RG',
+                        'E-mail',
+                        'Celular',
+                        'Telefone',
+                    ]
+                    let dados = [
+                        aluno.dataNascimentoAluno.split('-').reverse().join('/'),
+                        aluno.cpfAluno,
+                        aluno.rgAluno,
+                        aluno.emailAluno,
+                        aluno.celularAluno,
+                        aluno.telefoneAluno,
+                    ]
                     setaDadosAluno(aluno.nomeAluno, aluno.matriculaAluno, aluno.fotoAluno);
                     c++;
-                    
+                    tituloSecao.innerText = 'DADOS DO ALUNO'
+                    for (let i = 0; i < titulos.length; i++) {
+                        const titulo = titulos[i];
+                        const dado = dados[i];
+                        adicionaDadosTabela(titulo, dado, i)
+                    }
                 })
             }
 

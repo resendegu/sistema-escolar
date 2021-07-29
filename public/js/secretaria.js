@@ -1124,16 +1124,11 @@ function preventDefaults(e) {
                             }
                         }
                         let path = 'alunos/' + matriculaAluno + '/arquivos/'
-                        await uploadFile(file, metadata, path)
-                        firebase.storage().ref('alunos/' + matriculaAluno + '/arquivos/' + file.name).downloadURL().then(function(url) {
-                            console.log(url)
-                            alunosRef.child(matriculaAluno).update({fotoAluno: url}).then(() => {
-                                console.log('Foto atualizada com sucesso')
-                            }).catch((error) => {
-                                AstNotif.dialog('Erro', error.message)
-                                console.log(error)
-                            })
-                        })
+                        let pathDatabase = false
+                        if (metadados[i] == 'foto3x4') {
+                            pathDatabase = 'sistemaEscolar/alunos/' + matriculaAluno + '/fotoAluno'
+                        }
+                        uploadFile(file, metadata, path, pathDatabase)
                         
                     }
                 }
@@ -1249,16 +1244,8 @@ function preventDefaults(e) {
                             }
                         }
                         let path = 'alunos/' + matriculaAluno + '/arquivos/'
-                        await uploadFile(file, metadata, path)
-                        firebase.storage().ref('sistemaEscolar/alunos/' + matriculaAluno + '/arquivos/').child(file.name).getDownloadURL().then(function(url) {
-                            console.log(url)
-                            alunosRef.child(matriculaAluno).update({fotoAluno: url}).then(() => {
-                                console.log('Foto atualizada com sucesso')
-                            }).catch((error) => {
-                                AstNotif.dialog('Erro', error.message)
-                                console.log(error)
-                            })
-                        })
+                        let pathDatabase = 'sistemaEscolar/alunos/' + matriculaAluno + '/fotoAluno'
+                        uploadFile(file, metadata, path, pathDatabase)
                         
                     }
                 }
@@ -1274,9 +1261,10 @@ console.log('SIM')
 
 
 
-function uploadFile(file, metadata, path) {
+function uploadFile(file, metadata, path, database=false) {
     console.log(file)
     console.log(metadata)
+    loaderRun(true, 'Enviando arquivo')
     /* Exemplo de como se usa metadados customizados apenas para referência
     let metadata = {
         customMetadata: {
@@ -1321,8 +1309,21 @@ function uploadFile(file, metadata, path) {
     }
     }, function() {
     // Upload completed successfully, now we can get the download URL
-        AstNotif.notify("Sucesso", 'Arquivo "' + file.name +  '" enviado aos servidores com sucesso', "<i>agora</i>", {'length': 90000})
+    uploadTask.snapshot.ref.getDownloadURL().then(function(downloadURL) {
+        console.log('File available at', downloadURL);
+        
         $('#modal').modal('hide')
+        if (database != false) {
+            firebase.database().ref(database).set(downloadURL).then(() => {
+                console.log('Foto atualizada com sucesso')
+                loaderRun(false)
+                AstNotif.notify("Sucesso", 'Arquivo "' + file.name +  '" enviado aos servidores com sucesso', "<i>agora</i>", {'length': 90000})
+            })
+        }
+    });
+        
+
+        
     
     });
 }
