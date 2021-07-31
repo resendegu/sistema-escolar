@@ -17,7 +17,7 @@ firebase.auth().onAuthStateChanged((usuario) => {
 })
 
 function update() {
-	let versao = 0.991
+	let versao = 0.992
 	updatesRef.on('value', (snapshot) => {
 		let dados = snapshot.val()
 		if (versao < dados.versao) {
@@ -78,6 +78,7 @@ async function getAddress(numCep) {
 * @return Retorna uma string com a idade da pessoa em anos.
 */
 function calcularIdadePrecisa(dataNasc) {
+	console.log(dataNasc)
 	let nascimento = dataNasc
 	nascimento = nascimento.split('-')
     let data = new Date()

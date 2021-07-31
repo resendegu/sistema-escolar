@@ -1268,12 +1268,9 @@ function abreDadosDoAluno(matricula, desativado=false, notasDesativado=false) {
     document.getElementById('timestampDoAluno').innerText = 'Aluno cadastrado em: ' + new Date(dados.timestamp._seconds * 1000)
     document.getElementById('mostraDataNascimentoAluno').innerText = dados.dataNascimentoAluno.split('-').reverse().join('/');
 
-    let nascimento = dados.dataNascimentoAluno.split('-')
-    let nascimentoObj = new Date()
-    nascimentoObj.setDate(Number(nascimento[2]))
-    nascimentoObj.setFullYear(Number(nascimento[0]))
-    nascimentoObj.setMonth(Number(nascimento[1]) - 1)
-    calcularIdadePrecisa(nascimentoObj).then(function(idade){
+    let nascimento = dados.dataNascimentoAluno
+    
+    calcularIdadePrecisa(nascimento).then(function(idade){
         document.getElementById('mostraIdadeAluno').innerText = `${idade.years} anos, ${idade.months} mês(es), e ${idade.days} dias`
     }).catch(function(error){
         AstNotif.dialog('Erro', error.message)
