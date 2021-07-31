@@ -77,7 +77,19 @@ async function getAddress(numCep) {
 * @params data - String referente à data de nascimento da pessoa, no formato dd/mm/yyyy
 * @return Retorna uma string com a idade da pessoa em anos.
 */
-function calcularIdadePrecisa(data) {
+function calcularIdadePrecisa(dataNasc) {
+	let nascimento = dataNasc
+	nascimento = nascimento.split('-')
+    let data = new Date()
+    data.setDate(Number(nascimento[2]))
+    data.setFullYear(Number(nascimento[0]))
+    data.setMonth(Number(nascimento[1]) - 1)
+    for (const key in nascimento) {
+        if (Object.hasOwnProperty.call(nascimento, key)) {
+            const element = nascimento[key];
+            nascimento[key] = parseInt(element)
+        }
+    }
 	let timestampNow = firebase.functions().httpsCallable('timestamp')
 	return timestampNow().then(function(result){
 		var now = new Date(result.data.timestamp._seconds * 1000)

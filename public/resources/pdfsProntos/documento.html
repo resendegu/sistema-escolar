@@ -5,6 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema Escolar</title>
+    <link rel="stylesheet" href="../../../css/loader.css">
     <style>
         body {
             margin: 0;
@@ -79,6 +80,10 @@
           to avoid connecting the SDK to running emulators.
         -->
         <script defer src="/__/firebase/init.js?useEmulator=true"></script>
+        <div id="loader" class="window-loader">
+            <label id="loaderMsg">Aguarde...</label>
+              <div class="loader"></div>
+        </div>
 
     <div class="actionButtons">
         <table border="1" style="width: 100%; border-style: hidden;">
@@ -104,9 +109,9 @@
                             <td style="width: 25%; text-align: center;" id="logoEscola">Logo escola</td>
                             <td style="width: 50%; text-align: center;">
                                 <p id="nomeEscola">Nome da Escola</p>
-                                <p><em>Emitido em <label id="dataEmissao">[data]</label></em></p>
+                                <p style="font-size: small;"><em>Emitido em <label id="dataEmissao">[data]</label></em></p>
                             </td>
-                            <td style="width: 25%; text-align: center;" id="logoSecundaria">Outra logo ou inforrma&ccedil;&atilde;o</td>
+                            <td style="width: 25%; text-align: center;" id="logoSecundaria">Outra logo ou informa&ccedil;&atilde;o</td>
                         </tr>
                     </tbody>
                 </table>
@@ -147,6 +152,9 @@
             </div>
         </div>
     </div>
+    <script src="../../../resources/jQuery/jquery-3.2.1.slim.min.js"></script>
+    <script src="../../../resources/jQuery/jquery.mask.min.js"></script>
+    <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery-slim.min.js"><\/script>')</script>
     <script defer src="../../js/app.js"></script>
     <script defer src="script.js"></script>
     

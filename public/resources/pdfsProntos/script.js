@@ -29,10 +29,14 @@ window.addEventListener('DOMContentLoaded', (e) => {
         var dadosFinais = document.getElementById('dadosFinais');
 
         // Setting info from school
+        loaderRun(true, 'Carregando dados da escola...')
         infoEscolaRef.once('value').then((infoEscola) => {
             let infos = infoEscola.val();
             nomeEscola.innerText =  infos.dadosBasicos.nomeEscola
             dataEmissao.innerText = `${dataEhora.getDate()}/${dataEhora.getMonth() + 1}/${dataEhora.getFullYear()} ${dataEhora.getHours()}:${dataEhora.getMinutes()}`
+            logoEscola.innerHTML = `<img src="${infos.logoEscola}" style="width: 70px; height: 70px;"></img>`
+            logoSecundaria.innerHTML = `<p style="font-size: x-small;">${infos.dadosBasicos.cnpjEscola}</p><p style="font-size: x-small;">${infos.dadosBasicos.telefoneEscola}</p><p style="font-size: x-small;">${infos.dadosBasicos.enderecoEscola}</p>`
+            loaderRun()
         })
 
         let hash = window.location.hash;
@@ -48,7 +52,7 @@ window.addEventListener('DOMContentLoaded', (e) => {
 
 
         function adicionaEspacoCabeçalho(texto1='', texto2='', id='') {
-            cabecalho.innerHTML = `
+            cabecalho.innerHTML += `
             <tr style="height: 20px;" id="cabecalho${id}">
                 <td style="width: 35.7142%; height: 20px; border-style: hidden;"><label>${texto1}</label></td>
                 <td style="width: 36.1352%; height: 20px; border-style: hidden;">&nbsp;<label>${texto2}</label></td>
@@ -57,12 +61,25 @@ window.addEventListener('DOMContentLoaded', (e) => {
         }
 
         function adicionaDadosTabela(texto1='', texto2='', id='') {
-        dadosTabela.innerHTML += `
-            <tr style="height: 33px;" id="${id}">
-                <td style="min-width: 140px; height: 33px; width: 30%; background-color: lightgray; text-align: center;">&nbsp;${texto1}</td>
-                <td style="height: 33px; width: 60%;">&nbsp;${texto2}</td>
-            </tr>
-        ` 
+            if (texto1[0] == true) {
+                dadosTabela.innerHTML += `
+                <tr style="height: 20px; " id="${id}">
+                    <th colspan=2 style="height: 33px; width: 100%; text-align: center;"><b>${texto1[1]}</b></th>
+                </tr>
+                `
+            } else {
+                for (let i = 0; i < texto1.length; i++) {
+                    const topico = texto1[i];
+                    const texto = texto2[i]
+                    dadosTabela.innerHTML += `
+                    <tr style="height: 20px; " id="${id}">
+                        <td style="min-width: 140px; height: 33px; width: 30%; background-color: lightgray; text-align: center;">&nbsp;${topico}</td>
+                        <td style="height: 33px; width: 60%;">&nbsp;${texto}</td>
+                    </tr>
+                    `
+                }
+            }
+            
         }
 
         function setaDadosAluno(nome, matricula, foto='', ) {
@@ -79,50 +96,94 @@ window.addEventListener('DOMContentLoaded', (e) => {
                 matriculas = matriculas.split(',');
                 nextMatricula.style.display = 'block'
                 previousMatricula.style.display = 'block'
+                nextId.style.display = 'none'
+                previousId.style.display = 'none'
                 console.log(matriculas);
-                gerador(matriculas[0]); 
+                gerador(matriculas[c]); 
             } else {
-                
+                nextMatricula.style.display = 'none'
+                previousMatricula.style.display = 'none'
+                nextId.style.display = 'none'
+                previousId.style.display = 'none'
+                gerador(matriculas)
             }
+            
             function gerador(matricula) {
-                alunosRef.child(matricula).once('value').then((alunoInfo) => {
+                loaderRun(true, 'Carregando dados da matrícula...')
+                alunosRef.child(matricula).once('value').then(async (alunoInfo) => {
                     let aluno = alunoInfo.val();
+                    let idade = await calcularIdadePrecisa(aluno.dataNascimentoAluno)
                     console.log(aluno);
                     let titulos = [
-                        'Data de Nascimento',
-                        'CPF',
-                        'RG',
-                        'E-mail',
-                        'Celular',
-                        'Telefone',
+                        [true, 'Dados do Aluno'],
+                        [
+                            'Data de Nascimento',
+                            'CPF',
+                            'RG',
+                            'E-mail',
+                            'Celular',
+                            'Telefone',
+                            'Endereço',
+                            'Cidade - Estado',
+                        ],
+                        
+                        idade.years < 18 ? [true, `${aluno.relacaoAluno1} do aluno`] : null,
+                        idade.years < 18 ? [
+                            'Nome', 'RG', 'CPF', 'Celular', 'Telefone comercial', 
+                        ] : null,
+
+                        idade.years < 18 && aluno.nomeResponsavelAluno2 != '' ? [true, `${aluno.relacaoAluno2 == 'Outros' ? 'Responsável' : aluno.relacaoAluno2} do aluno`] : null,
+                        idade.years < 18 && aluno.nomeResponsavelAluno2 != '' ? [
+                            'Nome', 'RG', 'CPF', 'Celular', 'Telefone comercial', 
+                        ] : null,
                     ]
                     let dados = [
-                        aluno.dataNascimentoAluno.split('-').reverse().join('/'),
-                        aluno.cpfAluno,
-                        aluno.rgAluno,
-                        aluno.emailAluno,
-                        aluno.celularAluno,
-                        aluno.telefoneAluno,
+                        '',
+                        [
+                            aluno.dataNascimentoAluno.split('-').reverse().join('/'),
+                            aluno.cpfAluno,
+                            aluno.rgAluno,
+                            aluno.emailAluno,
+                            aluno.celularAluno,
+                            aluno.telefoneAluno,
+                            `${aluno.enderecoAluno}, ${aluno.bairroAluno}, CEP ${aluno.cepAluno} `,
+                            aluno.cidadeAluno + ' - ' + aluno.estadoAluno,
+                        ],
+
+                        idade.years < 18 ? [''] : null,
+                        idade.years < 18 ? [
+                            aluno.nomeResponsavelAluno1, aluno.rgResponsavel1, aluno.cpfResponsavel1, aluno.numeroCelularResponsavel1, aluno.numeroComercialResponsavel1
+                        ] : null,
+
+                        idade.years < 18 && aluno.nomeResponsavelAluno2 != '' ? [''] : null,
+                        idade.years < 18 && aluno.nomeResponsavelAluno2 != '' ? [
+                            aluno.nomeResponsavelAluno2, aluno.rgResponsavel2, aluno.cpfResponsavel2, aluno.numeroCelularResponsavel2, aluno.numeroComercialResponsavel2
+                        ] : null,
+
                     ]
+
+                    
                     setaDadosAluno(aluno.nomeAluno, aluno.matriculaAluno, aluno.fotoAluno);
-                    c++;
-                    tituloSecao.innerText = 'DADOS DO ALUNO'
+                    tituloSecao.innerText = ''
                     for (let i = 0; i < titulos.length; i++) {
                         const titulo = titulos[i];
                         const dado = dados[i];
                         adicionaDadosTabela(titulo, dado, i)
                     }
+                    loaderRun()
                 })
             }
 
             nextMatricula.addEventListener('click', (e) => {
                 if (c < matriculas.length - 1) {
+                    c++
                     gerador(matriculas[c])
                 }  
             })
 
             previousMatricula.addEventListener('click', (e) => {
                 if (c > 0) {
+                    c--
                     gerador(matriculas[c])
                 }
             })

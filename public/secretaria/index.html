@@ -1593,12 +1593,27 @@
               <label class="h3">Informações da Escola</label>
               <button class="btn btn-light btn-sm float-right" onclick="alteraNotasDesempenho()">Alterar distribuição de desempenho <span data-feather="edit"></span></button>
               <hr>
-              <label class="h4">Dados básicos</label>
+              <label class="h4">Dados básicos</label> 
               <form id="infoEscolaForm">
                 <div class="form-group">
+                  <label for="exampleInputEmail1">CNPJ da Escola:</label>
+                  <input type="text" class="form-control" id="cnpjEscola" name="cnpjEscola" aria-describedby="cnpjEscola" placeholder="Digite o CNPJ da sua escola" onkeypress='$(this).mask("99.999.999/9999-99")'>
+                  <small id="cnpjEscola" class="form-text text-muted">O CNPJ da escola aparecerá nos boletins e outros documentos que serão emitidos pelo sistema.</small>
+                </div>
+                <div class="form-group">
                   <label for="exampleInputEmail1">Nome da Escola:</label>
-                  <input type="text" required class="form-control" id="nomeEscola" name="nomeEscola" aria-describedby="nomeEscola" placeholder="Digite o nome da sua escola">
+                  <input type="text" class="form-control" id="nomeEscola" name="nomeEscola" aria-describedby="nomeEscola" placeholder="Digite o nome da sua escola">
                   <small id="nomeEscolaHElp" class="form-text text-muted">O nome da escola aparecerá nos boletins e outros documentos que serão emitidos pelo sistema.</small>
+                </div>
+                <div class="form-group">
+                  <label for="exampleInputEmail1">Endereço da escola:</label>
+                  <input type="text" class="form-control" id="enderecoEscola" name="enderecoEscola" aria-describedby="enderecoEscola" placeholder="Digite o endereço da sua escola">
+                  <small id="nomeEscolaHElp" class="form-text text-muted">O endereço da escola aparecerá nos boletins e outros documentos que serão emitidos pelo sistema.</small>
+                </div>
+                <div class="form-group">
+                  <label for="exampleInputEmail1">Telefone da escola:</label>
+                  <input type="text" onkeypress='$(this).mask("(99) 999999999")' class="form-control" id="telefoneEscola" name="telefoneEscola" aria-describedby="enderecoEscola" placeholder="Digite o telefone da sua escola">
+                  <small id="telefoneHElp" class="form-text text-muted">O telefone da escola aparecerá nos boletins e outros documentos que serão emitidos pelo sistema.</small>
                 </div>
                 <label class="h6">Critérios de Aprovação/Reprovação</label>
                 <div class="row">
@@ -1630,6 +1645,16 @@
                 
                 <button type="submit" class="btn btn-primary btn-block">Aplicar dados básicos</button>
               </form>
+              <hr>
+              <label class="h4">Logo da escola</label>
+              <div>
+                <img src="../images/profile_placeholder.png" alt="Logo da escola" style="max-width: 100px; max-height: 100px;" id="imgLogoEscola">
+                <br>
+                <label for="alteraLogoEscola" class="h5">Alterar logo da escola:</label><br>
+                <input type="file" accept="image/*" class="btn btn-primary" id="alteraLogoEscola"></input>
+                <small id="nomeEscolaHElp" class="form-text text-muted">A logo da escola aparecerá nos boletins e outros documentos que serão emitidos pelo sistema. O tamanho recomendado para o logo é de <b>400x400px</b></small>
+              </div>
+              
               <hr>
               <form id="formListaLivros">
                 <div class="container-xl">

@@ -976,8 +976,7 @@ document.querySelector('#formCadastroAluno').addEventListener('submit', (e) => {
             loaderRun()
             AstNotif.dialog('Sucesso', result.data.answer)
             if (dadosAluno.geraPDFAluno.checked) {
-                document.getElementById('corpoMatricula').innerHTML = `<iframe src="../resources/pdfsProntos/matriculaPdf.html#${dadosAluno.matriculaAluno}" frameborder="0" width="100%" height="max-content" id="fichaPdf" name="fichaPdf"></iframe>`
-                $('#matriculaModal').modal({backdrop: 'static'})
+                gerarFichaAluno(dadosAluno.matriculaAluno)
             }
             
             document.getElementById('resetForm').click()
@@ -996,21 +995,11 @@ function calculaIdade(dataNasc) {
     loader.style.display = 'block'
     loaderMsg.innerText = 'Buscando data atual do servidor...'
     console.log(dataNasc)
-    let nascimento = dataNasc.split('-')
-    let nascimentoObj = new Date()
-    nascimentoObj.setDate(Number(nascimento[2]))
-    nascimentoObj.setFullYear(Number(nascimento[0]))
-    nascimentoObj.setMonth(Number(nascimento[1]) - 1)
-    for (const key in nascimento) {
-        if (Object.hasOwnProperty.call(nascimento, key)) {
-            const element = nascimento[key];
-            nascimento[key] = parseInt(element)
-        }
-    }
+    
     console.log(nascimento)
 
     
-        calcularIdadePrecisa(nascimentoObj).then(function(idade){
+        calcularIdadePrecisa(dataNasc).then(function(idade){
             idadeAluno = idade
             console.log(idadeAluno)
             document.getElementById('idadeCalculada').innerText = `Idade: ${idadeAluno.years} ano(s), ${idadeAluno.months} mes(es), ${idadeAluno.days} dia(s)`
@@ -1928,12 +1917,9 @@ function abreDadosDoAluno(matricula, desativado=false, notasDesativado=false) {
     document.getElementById('timestampDoAluno').innerText = 'Aluno cadastrado em: ' + new Date(dados.timestamp._seconds * 1000)
     document.getElementById('mostraDataNascimentoAluno').innerText = dados.dataNascimentoAluno
 
-    let nascimento = dados.dataNascimentoAluno.split('-')
-    let nascimentoObj = new Date()
-    nascimentoObj.setDate(Number(nascimento[2]))
-    nascimentoObj.setFullYear(Number(nascimento[0]))
-    nascimentoObj.setMonth(Number(nascimento[1]) - 1)
-    calcularIdadePrecisa(nascimentoObj).then(function(idade){
+    let nascimento = dados.dataNascimentoAluno
+    
+    calcularIdadePrecisa(nascimento).then(function(idade){
         document.getElementById('mostraIdadeAluno').innerText = `${idade.years} anos, ${idade.months} mês(es), e ${idade.days} dias`
     }).catch(function(error){
         AstNotif.dialog('Erro', error.message)
@@ -2932,7 +2918,7 @@ function desativaAlunos(confirma=false) {
 }
 
 function gerarFichaAluno(matricula) {
-    document.getElementById('corpoMatricula').innerHTML = `<iframe src="../resources/pdfsProntos/matriculaPdf.html#${matricula}" frameborder="0" width="100%" height="400px" id="fichaPdf" name="fichaPdf"></iframe>`
+    document.getElementById('corpoMatricula').innerHTML = `<iframe src="../resources/pdfsProntos/documento.html#fichaCadastral?${matricula}" frameborder="0" width="100%" height="400px" id="fichaPdf" name="fichaPdf"></iframe>`
     $('#matriculaModal').modal({backdrop: 'static'})
 }
 
@@ -3111,9 +3097,12 @@ function dadosInfoEscola() {
     infoEscolaRef.once('value').then(snapshot => {
         let dados = snapshot.val()
         if (dados != null) {
-            document.getElementById('nomeEscola').value = dados.dadosBasicos.nomeEscola
-            document.getElementById('frequenciaAprovacao').value = dados.dadosBasicos.frequenciaAprovacao
-            document.getElementById('pontosAprovacao').value = dados.dadosBasicos.pontosAprovacao
+            for (const key in dados.dadosBasicos) {
+                if (Object.hasOwnProperty.call(dados.dadosBasicos, key)) {
+                    const campo = dados.dadosBasicos[key];
+                    document.getElementById(key).value = campo
+                }
+            }
         }  
     }).catch(error => {
         AstNotif.dialog('Erro', error.message)
@@ -3215,6 +3204,9 @@ document.getElementById('infoEscolaForm').addEventListener('submit', (e) => {
     infoEscola.nomeEscola = dados.get('nomeEscola')
     infoEscola.frequenciaAprovacao = dados.get('frequenciaAprovacao')
     infoEscola.pontosAprovacao = dados.get('pontosAprovacao')
+    infoEscola.cnpjEscola = dados.get('cnpjEscola')
+    infoEscola.enderecoEscola = dados.get('enderecoEscola')
+    infoEscola.telefoneEscola = dados.get('telefoneEscola')
     loaderRun(true, 'Enviando dados básicos...')
     infoEscolaRef.child('dadosBasicos').set(infoEscola).then(() => {
         AstNotif.dialog('Sucesso', 'Os dados básicos foram atualizados e aplicados com sucesso.')
@@ -3395,4 +3387,21 @@ document.getElementById('formCodDiasSemana').addEventListener('submit', (e) => {
         AstNotif.dialog('Erro', error.message)
         console.log(error)
     })
+})
+
+// Altera logo Escola
+let alteraLogoEscola = document.getElementById('alteraLogoEscola')
+let imgLogoEscola = document.getElementById('imgLogoEscola')
+
+infoEscolaRef.child('logoEscola').on('value', link => {
+    imgLogoEscola.setAttribute('src', link.val())
+})
+
+alteraLogoEscola.addEventListener('input', (e) => {
+    e.preventDefault()
+    let files = e.target.files
+    console.log(files[0])
+    if (files[0] != undefined) {
+        uploadFile(files[0], {tipo: 'logoEscola'}, 'infoEscola', 'sistemaEscolar/infoEscola/logoEscola')
+    }
 })
