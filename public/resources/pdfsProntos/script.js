@@ -105,11 +105,6 @@ window.addEventListener('DOMContentLoaded', (e) => {
             
         }
 
-        function setaDadosAluno(nome, matricula, foto='') {
-            nomeAluno.innerText = nome;
-            matriculaAluno.innerText = matricula;
-            imagemAluno.src = foto;
-        }
 
         async function geraBoletim(matriculas, ids) {
             let c = 0
@@ -128,28 +123,29 @@ window.addEventListener('DOMContentLoaded', (e) => {
             } else {
                 nextMatricula.style.display = 'none'
                 previousMatricula.style.display = 'none'
-                nextId.style.display = 'block'
-                previousId.style.display = 'block'
+                if (ids.indexOf(',') == -1) {
+                    nextId.style.display = 'none'
+                    previousId.style.display = 'none'
+                } else {
+                    nextId.style.display = 'block'
+                    previousId.style.display = 'block'
+                }
+                
                 gerador(matriculas, ids)
             }
             
             function gerador(matricula, id) {
                 loaderRun(true, 'Carregando dados da matrícula...')
-                cabecalho.innerHTML = `
-                <tr style="height: 20px;" id="cabecalho0">
-                    <td style="width: 35.7142%; height: 20px; border-style: hidden; text-align: start;"><strong>Nome:&nbsp;</strong> <label id="nomeAluno"></label> </td>
-                    <td style="width: 36.1352%; height: 20px; border-style: hidden;"><strong>Matricula:</strong> <label id="matriculaAluno"></label></td>
-                </tr>
-                `
                 dadosTabela.innerHTML = ''
                 alunosRef.child(matricula).once('value').then(async (alunoInfo) => {
                     let aluno = alunoInfo.val();
                     let historico = aluno.historicoEscolar[id]
+                    
                     let idade = await calcularIdadePrecisa(aluno.dataNascimentoAluno)
                     console.log(aluno);
 
 
-                    setaDadosAluno(aluno.nomeAluno, aluno.matriculaAluno, aluno.fotoAluno);
+                    
                     // Adiciona o semestre mais os livros
                     let semestreLivros = historico.infoAluno.nomePeriodo + ' - '
                     let c1 = 0
@@ -165,6 +161,8 @@ window.addEventListener('DOMContentLoaded', (e) => {
                         
                         c1++
                     }
+                    adicionaEspacoCabeçalho('Nome: ', aluno.nomeAluno, 'Matrícula:', aluno.matriculaAluno)
+                    imagemAluno.src = aluno.fotoAluno
                     adicionaEspacoCabeçalho('Turma:', historico.turma, 'Curso:', infos.cursos[historico.infoAluno.curso].nomeCurso)
                     adicionaEspacoCabeçalho('Data Início:', historico.infoAluno.inicio.split('-').reverse().join('/'), 'Data término:', historico.infoAluno.fim.split('-').reverse().join('/'))
                     adicionaEspacoCabeçalho('Semestre - Livro:', semestreLivros, '', '', 'colspan=2')
@@ -175,7 +173,7 @@ window.addEventListener('DOMContentLoaded', (e) => {
                     let topicos = []
                     let soma = 0
                     console.log(notasDesempenho)
-                    adicionaDadosTabela([true, 'Notas de desempenho'])
+                    notasDesempenho != undefined ? adicionaDadosTabela([true, 'Notas de desempenho']) : null
                     for (const topicoDesempenho in notasDesempenho) {
                         if (Object.hasOwnProperty.call(notasDesempenho, topicoDesempenho)) {
                             const nota = notasDesempenho[topicoDesempenho];
@@ -211,7 +209,7 @@ window.addEventListener('DOMContentLoaded', (e) => {
                     }
                     let porcentagemFrequencia = (100*aulasPresente)/Number(historico.infoAluno.qtdeAulas)
                     let faltas = Number(historico.infoAluno.qtdeAulas) - aulasPresente
-                    adicionaDadosTabela(['Frequência (%)', 'Faltas'], [porcentagemFrequencia + '%', `${faltas} de um total de ${historico.infoAluno.qtdeAulas} ministradas`])
+                    adicionaDadosTabela(['Frequência (%)', 'Faltas'], [porcentagemFrequencia + '%', faltas == 0 ? 'Nenhuma falta' :`${faltas} de um total de ${historico.infoAluno.qtdeAulas} aulas ministradas`])
                     if (soma >= infos.dadosBasicos.pontosAprovacao) {
                         if (porcentagemFrequencia >= infos.dadosBasicos.frequenciaAprovacao) {
                             adicionaDadosTabela([false, 'Situação final: APROVADO'])
@@ -248,6 +246,7 @@ window.addEventListener('DOMContentLoaded', (e) => {
                         </tbody>
                     </table>
                     `
+                    
                     loaderRun()
                 })
             }
@@ -341,7 +340,8 @@ window.addEventListener('DOMContentLoaded', (e) => {
                     ]
 
                     
-                    setaDadosAluno(aluno.nomeAluno, aluno.matriculaAluno, aluno.fotoAluno);
+                    adicionaEspacoCabeçalho('Nome: ', aluno.nomeAluno, 'Matrícula:', aluno.matriculaAluno)
+                    imagemAluno.src = aluno.fotoAluno
                     tituloSecao.innerText = ''
                     for (let i = 0; i < titulos.length; i++) {
                         const titulo = titulos[i];

@@ -1863,6 +1863,6 @@ function historicoAluno(matricula, turma) {
 }
 
 function emiteBoletim(matricula, chave) {
-    document.getElementById('corpoBoletim').innerHTML = `<iframe src="../resources/pdfsProntos/modeloBoletim.html#${matricula}?${chave}" frameborder="0" width="100%" height="300px" id="boletimPdf" name="boletimPdf"></iframe>`
+    document.getElementById('corpoBoletim').innerHTML = `<iframe src="../resources/pdfsProntos/documento.html#boletim?${matricula}?${chave}" frameborder="0" width="100%" height="300px" id="boletimPdf" name="boletimPdf"></iframe>`
     $('#boletimModal').modal({backdrop: 'static'})
 }
