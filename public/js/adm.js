@@ -1871,22 +1871,133 @@ async function carregaFinanceiro() {
     loaderRun(true, 'Carregando dados financeiros...')
     let cursosFirebase = await cursosRef.once('value')
     let cursos = cursosFirebase.val()
+    let listaPlanosCurso = document.getElementById('listaPlanosCurso')
+    let listaCursos = document.getElementById('listaCursos')
     console.log(cursos)
     mostraCursos(cursos)
+    
     function mostraCursos(cursos) {
-        let listaCursos = document.getElementById('listaCursos')
-        listaCursos.innerHTML = '<option hidden>Escolha um curso...</option>'
+        
+        listaCursos.innerHTML = '<option selected hidden value="">Escolha um curso...</option>'
         let c = 0
         cursos.forEach(curso => {
             listaCursos.innerHTML += `
-                <option>${curso.nomeCurso}</option>
+                <option value="${curso.codSistema}">${curso.nomeCurso}</option>
             `
             c++
         });
     }
+
+    function mostraPlanos(codSistema) {
+        let planos = cursos[codSistema].planos
+        let c = 0
+        for (const key in planos) {
+            if (Object.hasOwnProperty.call(planos, key)) {
+                const plano = planos[key];
+                listaPlanosCurso.innerHTML = `
+                <tr>
+                    <td>
+                        <span class="custom-checkbox">
+                            <input type="checkbox" id="checkbox${c}" name="options[]" value="${c}">
+                            <label for="checkbox${c}"></label>
+                        </span>
+                    </td>
+                    <td>Book 1</td>
+                    <td>Learning English Better</td>
+                    <td>1</td>
+                    <td>
+                        <a href="#editEmployeeModal" class="action" data-toggle="modal"><i data-feather="edit" data-toggle="tooltip" title="Reativar aluno">&#xE254;</i></a>
+                        <a href="#deleteEmployeeModal" class="delete" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Deletar">&#xE872;</i></a>
+                    </td>
+                </tr>
+                `
+                c++
+            }
+        }
+        
+    }
     
     document.getElementById('btnAddPlano').addEventListener('click', (e) => {
+        if (listaCursos.value == '') {
+            AstNotif.dialog('Erro', 'Você esqueceu de selecionar um curso. Escolha um curso para poder adicionar um plano.')
+        } else {
+            let codSistema = listaCursos.value
+            let curso = cursos[codSistema]
+            abrirModal('modal', 'Adicionar plano ao curso' + curso.nomeCurso, `
+            <form id="addCursoTabela">
+            <h3>Dados do Curso</h3>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="inputEmail4">Nome do curso</label>
+                        <input type="text" class="form-control" id="nomeCursoAdd" name="nomeCursoAdd" value="${curso.nomeCurso}" placeholder="Nome do curso (Ex.: Inglês Básico para Adultos)" readonly>
+                        <small id="idCursoHElp" class="form-text text-muted">Identificação que aparece nos boletins e nos demais documentos emitidos pelo sistema.</small>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="exampleInputEmail1">Código</label>
+                        <input type="text" required class="form-control" value="${curso.codCurso}" id="codigoCursoAdd" name="codigoCursoAdd" aria-describedby="nomeEscola" placeholder="Código do Curso" readonly>
+                        <small id="nomeEscolaHElp" class="form-text text-muted">Código utilizado para formar os códigos automáticos de turma.</small>  
+                    </div>
+                </div>
+                <hr>
+                <h3>Dados do Plano</h3>
+                <small id="idPlano" class="form-text text-muted">Os dados do plano serão utilizados para geração de boletos no momento da matrícula de um aluno.</small>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="inputEmail4">Nome do Plano</label>
+                        <input type="text" required class="form-control" id="nomePlano" name="nomePlano" placeholder="Nome do plano (Ex.: Valor Intergral com 50% de desconto)">
+                        <small id="idPlano" class="form-text text-muted">Este nome ajudará a secretaria a identificar mais os planos para realizar as matrículas de novos estudantes.</small>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="exampleInputEmail1">Valor integral do Curso</label>
+                        <input type="number" required class="form-control" id="valorCurso" name="valorCurso" aria-describedby="valorCurso" placeholder="Valor do curso">
+                        <small id="nomeEscolaHElp" class="form-text text-muted">Valor integral do curso sem descontos.</small>  
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="inputEmail4">Desconto (%)</label>
+                        <input type="number" class="form-control" id="descontoPlano" name="descontoPlano" placeholder="Desconto em % (Ex.: 50)">
+                        <small id="idPlano" class="form-text text-muted">Desconto nesse plano do curso em porcentagem. (Digite apenas números)</small>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-3">
+                        <label for="exampleInputEmail1">Valor do desconto</label>
+                        <input type="text" required class="form-control" id="valorDesconto" name=valorDesconto" aria-describedby="nomeEscola" placeholder="Valor do desconto" readonly>
+                        <small id="nomeEscolaHElp" class="form-text text-muted">O valor calculado do desconto aplicado.</small>  
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="inputEmail4">Valor integral final</label>
+                        <input type="number" class="form-control" id="descontoPlano" name="valorFinal" placeholder="Valor integral final" readonly>
+                        <small id="idPlano" class="form-text text-muted" >Valor integral final calculado do curso utilizando-se deste plano no momento da matrícula.</small>
+                    </div>
+                </div>
+                <h5>Parcelas</h5>
+                <div class="form-row">
+                    <div class="form-group col-md-2">
+                        <label for="inputEmail4">Nº máximo de parcelas</label>
+                        <input type="number" class="form-control" id="numeroMaximoParcelasPlano" name="numeroMaximoParcelasPlano" placeholder="Nº máximo de parcelas">
+                        <small id="idPlano" class="form-text text-muted">Número máximo de parcelas para este plano.</small>
+                    </div> 
+                    <div class="form-group col-md-2">
+                        <label for="inputEmail4">Nº máximo de parcelas)</label>
+                        <input type="number" class="form-control" id="numeroMaximoParcelasPlano" name="numeroMaximoParcelasPlano" placeholder="Nº máximo de parcelas">
+                        <small id="idPlano" class="form-text text-muted">Número máximo de parcelas para este plano.</small>
+                    </div>   
+                </div>
+                <div class="form-row">
+                    
+                </div>
+                
+              
+              <button type="submit" class="btn btn-primary btn-block">Adicionar</button>
+            </form>
+            `, `<button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>`)
+        }
+        
+    })
 
+    listaCursos.addEventListener('change', (e) => {
+        let codSistema = e.target.value
+        mostraPlanos(codSistema)
     })
     loaderRun()
 }
