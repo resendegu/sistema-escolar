@@ -1891,6 +1891,7 @@ async function carregaFinanceiro() {
     function mostraPlanos(codSistema) {
         let planos = cursos[codSistema].planos
         let c = 0
+        listaPlanosCurso.innerHTML = ''
         if (planos == undefined) {
             AstNotif.notify('Falha', 'Não existem planos cadastrados para este curso.')
             listaPlanosCurso.innerHTML = 'Vazio'
@@ -1898,7 +1899,7 @@ async function carregaFinanceiro() {
         for (const key in planos) {
             if (Object.hasOwnProperty.call(planos, key)) {
                 const plano = planos[key];
-                listaPlanosCurso.innerHTML = `
+                listaPlanosCurso.innerHTML += `
                 <tr>
                     <td>
                         <span class="custom-checkbox">
