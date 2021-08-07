@@ -359,8 +359,8 @@ exports.cadastraAluno = functions.https.onCall((data, context) => {
                     throw new functions.https.HttpsError('already-exists', 'Este número de matrícula já consta no sistema. Por favor, clique no botão azul no início deste formulário para atualizar o número de matrícula, para gerar um novo número de matrícula.')
                 }
                 return admin.database().ref('sistemaEscolar/alunos/' + dadosAluno.matriculaAluno).set(dadosAluno).then(() => {
-                    return admin.database().ref('sistemaEscolar/infoEscola/cursos' + planoOriginal.codCurso + '/contratos/' + dadosAluno.planoAluno).push({contratoConfigurado: contratoConfigurado, planoOriginal: planoOriginal, matricula: dadosAluno.matriculaAluno, timestamp: admin.firestore.Timestamp.now()}).then(() => {
-                        return admin.database().ref('sistemaEscolar/turmas').child(dadosAluno.turmaAluno + '/alunos').child(dadosAluno.matriculaAluno).set({nome: dadosAluno.nomeAluno, prof: dadosAluno.profAluno}).then(() => {
+                    return admin.database().ref('sistemaEscolar/infoEscola/cursos/' + planoOriginal.codCurso + '/contratos/' + dadosAluno.planoAluno).push({contratoConfigurado: contratoConfigurado, planoOriginal: planoOriginal, matricula: dadosAluno.matriculaAluno, timestamp: admin.firestore.Timestamp.now()}).then(() => {
+                        return admin.database().ref('sistemaEscolar/turmas').child(dadosAluno.turmaAluno + '/alunos').child(dadosAluno.matriculaAluno).set({nome: dadosAluno.nomeAluno, prof: dadosAluno.emailProfAluno}).then(() => {
                             return admin.database().ref('sistemaEscolar/ultimaMatricula').set(dadosAluno.matriculaAluno).then(() => {
                                 return admin.database().ref('sistemaEscolar/secretaria/responsaveisAutorizados').push({
                                     addResponsavelNome: dadosAluno.nomeResponsavelPedagogicoAluno,
@@ -368,7 +368,7 @@ exports.cadastraAluno = functions.https.onCall((data, context) => {
                                     addResponsavelNumeroCelular: dadosAluno.numeroCelularPedagogicoAluno,
                                     addResponsavelEmail: dadosAluno.emailResponsavelPedagogico,
                                     addResponsavelRg: dadosAluno.rgPedagogicoAluno,
-                                    addResponsavelCpf: dadosAluno.cpdPedagogicoAluno,
+                                    addResponsavelCpf: dadosAluno.cpfPedagogicoAluno,
                                     matriculaAluno: dadosAluno.matriculaAluno
                                 }).then(() => {
                                     admin.database().ref('sistemaEscolar/numeros/alunosMatriculados').transaction(function (current_value) {
@@ -386,38 +386,8 @@ exports.cadastraAluno = functions.https.onCall((data, context) => {
                                         }
                                         
                                     })
-                                    let horaEDias = dadosAluno.horaEDiasAluno.split(',') // Output: ['20h', 'MON', 'WED' ...]
-                                            let hora = horaEDias[0]
-                                            hora = hora.split('h')
-                                            hora = Number(hora[0])
-                                            var horario
-                                            if (hora >= 12 && hora <= 17) {
-                                                horario = 'Tarde'
-                                            } else if (hora >= 18 && hora <= 23) {
-                                                horario = 'Noite'
-                                            } else if (hora >= 4 && hora <= 11) {
-                                                horario = 'Manha'
-                                            }
-                                            let dias = horaEDias.slice(1)
-                                            for (const index in dias) {
-                                                if (Object.hasOwnProperty.call(dias, index)) {
-                                                    const dia = dias[index];
-                                                    admin.database().ref('sistemaEscolar/numeros/tabelaSemanal/' + dia + '/' + horario).transaction(function(current_value){
-                                                        if (current_value === null){
-                                                            return 1
-                                                        } else {
-                                                            return current_value + 1
-                                                        }
-                                                    }, function(error, comitted, snapshot){
-                                                        if (error) {
-                                                            throw new functions.https.HttpsError(error.code, error.message, error)
-                                                        } else if(!comitted) {
-                                                            throw new functions.https.HttpsError('already-exists', 'Já existe. isso pode ser um erro')
-                                                        }
-                                                    })
-                                                }
-                                            }
-                                            return {answer: 'Aluno cadastrado e distribuído nas turmas e nos professores com sucesso!'}
+                                    
+                                    return {answer: 'Aluno cadastrado e distribuído nas turmas e nos professores com sucesso!'}
                                 }).catch(error => {
                                     throw new functions.https.HttpsError('unknown', error.message, error)
                                 })

@@ -950,7 +950,7 @@ async function configuraContrato(codCursoSistema) {
                 <div class="form-group col-md-1"></div>
                 <div class="form-group col-md-3">
                     <label for="exampleFormControlSelect2">Escolha quando começará o vencimento:</label>
-                    <input type="month" class="form-control" id="ano-mes" name="ano-mes">
+                    <input type="month" required class="form-control" id="ano-mes" name="ano-mes">
                     <small id="idPlano" class="form-text text-muted">Escolha o mês e o ano para iniciar a geração dos boletos.</small>
                 </div>
                 
@@ -1270,8 +1270,10 @@ formCadastroAluno.addEventListener('submit', async (e) => {
         loaderMsg.innerText = 'Enviando dados para o servidor...'
         let cadastraAluno = firebase.functions().httpsCallable('cadastraAluno')
         cadastraAluno({dados: dadosAluno, contratoConfigurado: contratoConfigurado, planoOriginal: planoOriginal}).then(function(result) {
+            sessionStorage.removeItem('contratoConfigurado')
+            sessionStorage.removeItem('planoOriginal')
             loaderRun()
-            AstNotif.dialog('Sucesso', result.data.answer)
+            AstNotif.notify('Sucesso', result.data.answer)
             if (dadosAluno.geraPDFAluno == 'on') {
                 gerarFichaAluno(dadosAluno.matriculaAluno)
             }

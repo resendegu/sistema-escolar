@@ -120,6 +120,8 @@
 
             async function geraBoletos(matricula, codContrato) {
                 let alunoRef = firebase.database().ref('sistemaEscolar/alunos/' + matricula + '/')
+                let infoEscola = await firebase.database().ref('sistemaEscolar/infoEscola').once('value')
+                let dadosEscola = infoEscola.val()
                 let dadosAluno = await alunoRef.once('value')
                 let aluno = dadosAluno.val()
                 let contratos = aluno.contratos
@@ -200,7 +202,7 @@
                             <table style="height: 100%; width: 96.3454%; border-collapse: collapse; border-style: hidden;" border="1">
                             <tbody>
                             <tr style="height: 18px;">
-                                <td style="width: 38.8889%; height: 33px;" rowspan="2"><img src="https://firebasestorage.googleapis.com/v0/b/projetoxagencia.appspot.com/o/sistemaEscolar%2FinfoEscola%2Fdomain?alt=media&amp;token=790b58da-f9a9-4a31-91bf-e5d27a415832" alt="Logo" width="30" height="30" /></td>
+                                <td style="width: 38.8889%; height: 33px;" rowspan="2"><img src="${dadosEscola.logoEscola}" alt="Logo" width="30" height="30" /></td>
                                 <td style="width: 189.264%; height: 18px; border-left: hidden;">
                                     <section style="font-size: 8pt;">
                                         Parcela
@@ -213,7 +215,7 @@
                             </tr>
                             <tr style="height: 15px;">
                             <td style="width: 189.264%; height: 15px; border-left: hidden;">
-                                <section style="font-size: 8pt;">
+                                    <section style="font-size: 8pt;">
                                         Vencimento
                                     </section>
                                     
@@ -225,8 +227,24 @@
                         </tbody>
                         </table>
                         </td>
-                        <td style="width: 7.60226%; text-align: center; height: 20px; border-left: dotted;" rowspan="2"><img src="https://firebasestorage.googleapis.com/v0/b/projetoxagencia.appspot.com/o/sistemaEscolar%2FinfoEscola%2Fdomain?alt=media&amp;token=790b58da-f9a9-4a31-91bf-e5d27a415832" alt="Logo" width="30" height="30" /></td>
-                        <td style="height: 20px; width: 43.8475%;" colspan="3" rowspan="2">Cedente</td>
+                        <td style="width: 7.60226%; text-align: center; height: 20px; border-left: dotted;" rowspan="2"><img src="${dadosEscola.logoEscola}" alt="Logo" width="30" height="30" /></td>
+                        <td style="height: 20px; width: 43.8475%;" colspan="3" rowspan="2">
+                            <section style="font-size: 8pt;">
+                                Cedente
+                            </section>
+                            <section style="font-size: x-small;">
+                                ${dadosEscola.dadosBasicos.nomeEscola}
+                            </section>
+                            <section style="font-size: x-small;">
+                                ${dadosEscola.dadosBasicos.cnpjEscola}
+                            </section>
+                            <section style="font-size: x-small;">
+                                ${dadosEscola.dadosBasicos.enderecoEscola}
+                            </section>
+                            <section style="font-size: x-small;">
+                                ${dadosEscola.dadosBasicos.telefoneEscola}
+                            </section>
+                        </td>
                         <td style="width: 64.5223%; height: 10px;">parcela</td>
                         </tr>
                         <tr style="height: 10px;">
