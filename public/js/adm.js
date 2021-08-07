@@ -2004,7 +2004,7 @@ async function carregaFinanceiro() {
                         <select class="form-control" id="quandoAplicar" name="quandoAplicar" disabled>
                             
                         </select>
-                        <small id="idPlano" class="form-text text-muted">A partir de qual parcela começar a aplicar os descontos e acréscimos.</small>
+                        <small id="idPlano" class="form-text text-muted">A partir de qual parcela começar a aplicar os descontos e acréscimos. Isso forçará os contratos à terem um número mínimo de parcelas.</small>
                     </div>
                     <div class="form-group col-md-5">
                         <label for="exampleFormControlSelect2">Detalhamento de exemplo utilizando-se o máximo de parcelas</label>
@@ -2215,6 +2215,7 @@ async function carregaFinanceiro() {
                     let values = formData.getAll(field.name)
                     values.length == 1 ? data[field.name] = values[0] : data[field.name] = values
                 })
+                data.codCurso = codSistema
                 console.log(data)
                 cursosRef.child(listaCursos.value + '/planos').push(data).then(() => {
                     loaderRun()

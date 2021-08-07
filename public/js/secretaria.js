@@ -943,10 +943,16 @@ async function configuraContrato(codCursoSistema) {
                     <small id="idPlano" class="form-text text-muted">Escolha o dia de vencimento do boleto/carnê.</small>
                 </div>
                 <div class="form-group col-md-2">
-                <label for="exampleFormControlSelect2">Dia escolhido:</label>
-                <input class="form-control" type="text" id="vencimentoEscolhido" name="vencimentoEscolhido" placeholder="Dia escolhido..." readonly>
-                <small class="form-text text-muted">Estas informações aparecerão impressas em cada parcela de pagamento.</small>
-            </div>
+                    <label for="exampleFormControlSelect2">Dia escolhido:</label>
+                    <input class="form-control" type="text" id="vencimentoEscolhido" name="vencimentoEscolhido" placeholder="Dia escolhido..." readonly>
+                    <small class="form-text text-muted">Estas informações aparecerão impressas em cada parcela de pagamento.</small>
+                </div>
+                <div class="form-group col-md-1"></div>
+                <div class="form-group col-md-3">
+                    <label for="exampleFormControlSelect2">Escolha quando começará o vencimento:</label>
+                    <input type="month" class="form-control" id="ano-mes" name="ano-mes">
+                    <small id="idPlano" class="form-text text-muted">Escolha o mês e o ano para iniciar a geração dos boletos.</small>
+                </div>
                 
             </div>
             <div class="form-row">
@@ -1018,6 +1024,9 @@ async function configuraContrato(codCursoSistema) {
             data.vencimentoEscolhido = data.diasDeVencimento
             if (data.numeroParcelas > plano.numeroMaximoParcelasPlano) {
                 AstNotif.dialog('Parcelamento não permitido', 'Este plano permite apenas o parcelamento em até ' + plano.numeroMaximoParcelasPlano + ' parcelas. Para ter um parcelamento maior, tente usar outro plano compatível com sua necessidade, ou solicite ao setor Administrativo/Financeiro para possível mudança de parcelamento deste plano.')
+                data.numeroParcelas = ''
+            } else if (data.numeroParcelas < plano.quandoAplicar + 1) {
+                AstNotif.dialog('Parcelamento não permitido', `O contrato deve possuir pelo menos ${Number(plano.quandoAplicar) + 1} parcelas. Para outros tipos de parcelamento ou pagamento á vista, tente usar outro plano compatível com sua necessidade, ou solicite ao setor Administrativo/Financeiro para possível mudança de parcelamento deste plano.`)
                 data.numeroParcelas = ''
             } else {
                 try {
@@ -1161,7 +1170,7 @@ function criaPDFAluno() {
 var idadeAluno
 var matriculaPDF = ''
 let formCadastroAluno = document.querySelector('#formCadastroAluno')
-formCadastroAluno.addEventListener('submit', (e) => {
+formCadastroAluno.addEventListener('submit', async (e) => {
     e.preventDefault()
     loader.style.display = 'block'
     loaderMsg.innerText = 'Processando dados...'
@@ -1234,12 +1243,9 @@ formCadastroAluno.addEventListener('submit', (e) => {
         return re.test(email)
     }
 
-    dadosAluno.contratos = []
-    dadosAluno.contratos.push({
-        contrato: JSON.parse(sessionStorage.getItem('contratoConfigurado')), 
-        planoOriginal: JSON.parse(sessionStorage.getItem('planoOriginal'))
-    })
-    sessionStorage.removeItem('contratoConfigurado')
+    let contratoConfigurado = JSON.parse(sessionStorage.getItem('contratoConfigurado'))
+    let planoOriginal = JSON.parse(sessionStorage.getItem('planoOriginal'))
+    
 
     console.log(dadosAluno)
     if (dadosAluno.dataNascimentoAluno == '' || dadosAluno.nomeAluno == '') {
@@ -1263,7 +1269,7 @@ formCadastroAluno.addEventListener('submit', (e) => {
     } else {
         loaderMsg.innerText = 'Enviando dados para o servidor...'
         let cadastraAluno = firebase.functions().httpsCallable('cadastraAluno')
-        cadastraAluno({dados: dadosAluno}).then(function(result) {
+        cadastraAluno({dados: dadosAluno, contratoConfigurado: contratoConfigurado, planoOriginal: planoOriginal}).then(function(result) {
             loaderRun()
             AstNotif.dialog('Sucesso', result.data.answer)
             if (dadosAluno.geraPDFAluno == 'on') {
@@ -1286,7 +1292,7 @@ formCadastroAluno.addEventListener('submit', (e) => {
 
 function geraBoleto(matricula, codContrato) {
     abrirModal('modal', 'Boleto(s) de pagamento', `
-        <iframe src="../resources/pdfsProntos/modeloBoleto.html#${matricula}?${codContrato}" frameborder="0" width="100%" height="400px" id="boletoPdf" name="boletoPdf"></iframe>
+        <iframe src="../resources/pdfsProntos/modeloBoleto.html#${codContrato}" frameborder="0" width="100%" height="400px" id="boletoPdf" name="boletoPdf"></iframe>
     `, `<button type="button" class="btn btn-primary" onclick="window.frames['boletoPdf'].focus(), window.frames['boletoPdf'].print()">Imprimir</button>
     <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>`)
 }
