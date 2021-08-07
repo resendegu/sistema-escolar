@@ -7,64 +7,268 @@
     <title>Boleto</title>
 </head>
 <body>
-    <table style="height: 179px; width: 100%; border-collapse: collapse; border-style: solid;" border="1">
-        <tbody>
-            <tr style="height: 10px; border-style: none;">
-                <td style="width: 4.97079%; height: 179px;" rowspan="9">&nbsp;</td>
-                <td style="width: 22.9045%; height: 20px; text-align: center;" rowspan="2">
-                <table style="height: 100%; width: 96.3454%; border-collapse: collapse; border-style: hidden;" border="1">
-                <tbody>
-                <tr style="height: 18px;">
-                    <td style="width: 38.8889%; height: 33px;" rowspan="2"><img src="https://firebasestorage.googleapis.com/v0/b/projetoxagencia.appspot.com/o/sistemaEscolar%2FinfoEscola%2Fdomain?alt=media&amp;token=790b58da-f9a9-4a31-91bf-e5d27a415832" alt="Logo" width="30" height="30" /></td>
-                    <td style="width: 189.264%; height: 18px; border-left: hidden;">parcel</td>
+              <!-- Inicialização do Firebase -->
+        <!-- update the version number as needed -->
+        <script defer src="/__/firebase/8.2.3/firebase-app.js"></script>
+        <!-- include only the Firebase features as you need -->
+        <script defer src="/__/firebase/8.2.3/firebase-auth.js"></script>
+        <script defer src="/__/firebase/8.2.3/firebase-database.js"></script>
+        <!-- <script defer src="/__/firebase/8.2.3/firebase-firestore.js"></script> -->
+        <script defer src="/__/firebase/8.2.3/firebase-functions.js"></script>
+        <!-- <script defer src="/__/firebase/8.2.3/firebase-messaging.js"></script> -->
+        <script defer src="/__/firebase/8.2.3/firebase-storage.js"></script>
+        <script defer src="/__/firebase/8.2.3/firebase-analytics.js"></script>
+        <!-- <script defer src="/__/firebase/8.1.1/firebase-remote-config.js"></script> -->
+        <script defer src="/__/firebase/8.2.3/firebase-performance.js"></script>
+        <!-- 
+          initialize the SDK after all desired features are loaded, set useEmulator to false
+          to avoid connecting the SDK to running emulators.
+        -->
+        <script defer src="/__/firebase/init.js?useEmulator=true"></script>
+    <div id="boletos">
+        <table style="height: 179px; width: 100%; border-collapse: collapse; border-style: solid;" border="1">
+            <tbody>
+                <tr style="height: 10px; border-style: none;">
+                    <td style="width: 4.97079%; height: 179px;" rowspan="9">&nbsp;</td>
+                    <td style="width: 22.9045%; height: 20px; text-align: center;" rowspan="2">
+                    <table style="height: 100%; width: 96.3454%; border-collapse: collapse; border-style: hidden;" border="1">
+                    <tbody>
+                    <tr style="height: 18px;">
+                        <td style="width: 38.8889%; height: 33px;" rowspan="2"><img src="https://firebasestorage.googleapis.com/v0/b/projetoxagencia.appspot.com/o/sistemaEscolar%2FinfoEscola%2Fdomain?alt=media&amp;token=790b58da-f9a9-4a31-91bf-e5d27a415832" alt="Logo" width="30" height="30" /></td>
+                        <td style="width: 189.264%; height: 18px; border-left: hidden;">
+                            <section style="font-size: 8pt;">
+                                Parcela
+                            </section>
+                            
+                            <section style="font-size: x-small;">
+                                1/6
+                            </section>
+                        </td>
+                    </tr>
+                    <tr style="height: 15px;">
+                    <td style="width: 189.264%; height: 15px; border-left: hidden;">venci</td>
                 </tr>
-                <tr style="height: 15px;">
-                <td style="width: 189.264%; height: 15px; border-left: hidden;">venci</td>
-            </tr>
+                </tbody>
+                </table>
+                </td>
+                <td style="width: 7.60226%; text-align: center; height: 20px; border-left: dotted;" rowspan="2"><img src="https://firebasestorage.googleapis.com/v0/b/projetoxagencia.appspot.com/o/sistemaEscolar%2FinfoEscola%2Fdomain?alt=media&amp;token=790b58da-f9a9-4a31-91bf-e5d27a415832" alt="Logo" width="30" height="30" /></td>
+                <td style="height: 20px; width: 43.8475%;" colspan="3" rowspan="2">Cedente</td>
+                <td style="width: 64.5223%; height: 10px;">parcela</td>
+                </tr>
+                <tr style="height: 10px;">
+                <td style="width: 64.5223%; height: 10px;">vencimento</td>
+                </tr>
+                <tr style="height: 33px;">
+                <td style="width: 22.9045%; height: 33px;">documento</td>
+                <td style="width: 19.286%; height: 33px; border-left: dotted;" colspan="2">documento</td>
+                <td style="width: 14.2301%; height: 33px;">especie</td>
+                <td style="width: 17.9337%; height: 33px;">processame</td>
+                <td style="width: 64.5223%; height: 33px;">valor doc</td>
+                </tr>
+                <tr style="height: 24px;">
+                <td style="width: 22.9045%; height: 24px;">valor doc</td>
+                <td style="width: 51.4498%; height: 88px; border-left: dotted;" colspan="4" rowspan="4">
+                <p>dasd</p>
+                <hr />
+                <p>&nbsp;</p>
+                </td>
+                <td style="width: 64.5223%; height: 24px;">descontos</td>
+                </tr>
+                <tr style="height: 22px;">
+                    <td style="width: 22.9045%; height: 22px;">descontos</td>
+                    <td style="width: 64.5223%; height: 22px;">acrescimos</td>
+                </tr>
+                <tr style="height: 21px;">
+                    <td style="width: 22.9045%; height: 21px;">acrescimos</td>
+                    <td style="width: 64.5223%; height: 21px;">total cobrado</td>
+                </tr>
+                <tr style="height: 21px;">
+                    <td style="width: 22.9045%; height: 21px;">total cobrado</td>
+                    <td style="width: 64.5223%; height: 21px;">data pagam</td>
+                </tr>
+                <tr style="height: 20px;">
+                    <td style="width: 22.9045%; height: 20px;" rowspan="2">data pagam</td>
+                    <td style="width: 51.4498%; height: 38px; border-left: dotted;" colspan="4" rowspan="2">Sacado</td>
+                    <td style="width: 64.5223%; height: 38px;" rowspan="2">assinatura</td>
+                </tr>
             </tbody>
-            </table>
-            </td>
-            <td style="width: 7.60226%; text-align: center; height: 20px; border-left: dotted;" rowspan="2"><img src="https://firebasestorage.googleapis.com/v0/b/projetoxagencia.appspot.com/o/sistemaEscolar%2FinfoEscola%2Fdomain?alt=media&amp;token=790b58da-f9a9-4a31-91bf-e5d27a415832" alt="Logo" width="30" height="30" /></td>
-            <td style="height: 20px; width: 43.8475%;" colspan="3" rowspan="2">Cedente</td>
-            <td style="width: 64.5223%; height: 10px;">parcela</td>
-            </tr>
-            <tr style="height: 10px;">
-            <td style="width: 64.5223%; height: 10px;">vencimento</td>
-            </tr>
-            <tr style="height: 33px;">
-            <td style="width: 22.9045%; height: 33px;">documento</td>
-            <td style="width: 19.286%; height: 33px; border-left: dotted;" colspan="2">documento</td>
-            <td style="width: 14.2301%; height: 33px;">especie</td>
-            <td style="width: 17.9337%; height: 33px;">processame</td>
-            <td style="width: 64.5223%; height: 33px;">valor doc</td>
-            </tr>
-            <tr style="height: 24px;">
-            <td style="width: 22.9045%; height: 24px;">valor doc</td>
-            <td style="width: 51.4498%; height: 88px; border-left: dotted;" colspan="4" rowspan="4">
-            <p>dasd</p>
-            <hr />
-            <p>&nbsp;</p>
-            </td>
-            <td style="width: 64.5223%; height: 24px;">descontos</td>
-            </tr>
-            <tr style="height: 22px;">
-                <td style="width: 22.9045%; height: 22px;">descontos</td>
-                <td style="width: 64.5223%; height: 22px;">acrescimos</td>
-            </tr>
-            <tr style="height: 21px;">
-                <td style="width: 22.9045%; height: 21px;">acrescimos</td>
-                <td style="width: 64.5223%; height: 21px;">total cobrado</td>
-            </tr>
-            <tr style="height: 21px;">
-                <td style="width: 22.9045%; height: 21px;">total cobrado</td>
-                <td style="width: 64.5223%; height: 21px;">data pagam</td>
-            </tr>
-            <tr style="height: 20px;">
-                <td style="width: 22.9045%; height: 20px;" rowspan="2">data pagam</td>
-                <td style="width: 51.4498%; height: 38px; border-left: dotted;" colspan="4" rowspan="2">Sacado</td>
-                <td style="width: 64.5223%; height: 38px;" rowspan="2">assinatura</td>
-            </tr>
-        </tbody>
         </table>
+    </div>
+    
+        <script>
+            window.addEventListener('DOMContentLoaded', (e) => {
+                let hash = window.location.hash;
+                if (hash) {
+                    let matricula = hash.split('?')[0].substring(1);
+                    let codContrato = hash.split('?')[1];
+                    let yes = true
+                    
+                    while (yes == true) {
+                        if (typeof mes != 'number' && mes < 1 && mes > 12) {
+                            window.alert('Digite um mês válido')
+                            let mes = window.prompt('Digite o mês da primeira parcela')
+                        } else {
+                            yes = false
+                        }
+                    }
+                    
+                    
+                    geraBoletos(matricula, codContrato, mes)
+                }
+            })
+            
+
+            async function geraBoletos(matricula, codContrato) {
+                let alunoRef = firebase.database().ref('sistemaEscolar/alunos/' + matricula + '/')
+                let dadosAluno = await alunoRef.once('value')
+                let aluno = dadosAluno.val()
+                let contratos = aluno.contratos
+                let data = contratos[codContrato].contrato
+                let plano = contratos[codContrato].planoOriginal
+
+
+                try {
+                    data.valorDesconto = (Number(data.valorCurso) * (data.descontoPlano/100)).toFixed(2)
+                    data.valorAcrescimo = (Number(data.valorCurso) * (data.acrescimoPlano/100)).toFixed(2)
+                    data.valorFinal = (Number(data.valorCurso) + (data.valorAcrescimo - data.valorDesconto)).toFixed(2)
+                    let saldo = data.valorCurso
+                    let saldoAcrescimo = data.valorAcrescimo
+                    let saldoDesconto = data.valorDesconto
+                    let contadorParcelas = data.numeroParcelas
+                    let somaParcelas = 0
+                    let valorParcelaGlobal = 0
+
+                    limpa()
+                    for (let parcela = 0; parcela < data.numeroParcelas; parcela++) {
+                        let parcelaText
+                        if (plano.distribuirAcrescimosEDescontos == 'on') {
+                            
+                            
+                            let acrescimoParcela 
+                            let descontoParcela 
+                            let valorParcela
+                            parcela == 0 ? valorParcelaGlobal = parseFloat(saldo / contadorParcelas).toFixed(2) : null
+                            if (parcela >= plano.quandoAplicar) {
+                                // parcela == data.quandoAplicar ? saldo = data.valorFinal - somaParcelas : null
+                                parcela == plano.quandoAplicar ? valorParcelaGlobal = parseFloat(saldo / contadorParcelas).toFixed(2) : null
+                                valorParcela = valorParcelaGlobal
+                                acrescimoParcela = (saldoAcrescimo/contadorParcelas).toFixed(2)
+                                descontoParcela = (saldoDesconto/contadorParcelas).toFixed(2)
+                                // saldo = (Number(saldo) - valorParcela) - Number(acrescimoParcela - descontoParcela)
+                            } else {
+                                valorParcela = valorParcelaGlobal
+                                
+                                // saldo = saldo - valorParcela
+                                acrescimoParcela = 0
+                                descontoParcela = 0
+                            }
+                            
+                            saldoAcrescimo = saldoAcrescimo - acrescimoParcela
+                            saldoDesconto = saldoDesconto - descontoParcela
+                            
+                            plano.quandoAplicar != undefined ? parcelaText = `Parcela ${parcela + 1}: R$${valorParcela} ${acrescimoParcela != 0 || acrescimoParcela != '' ? '+ R$' + acrescimoParcela : ''} ${descontoParcela != 0 || descontoParcela != '' ? '- R$' + descontoParcela : ''} = R$${(Number(valorParcela) + (acrescimoParcela - descontoParcela)).toFixed(2)}` : null
+                            somaParcelas += (Number(valorParcela) + (acrescimoParcela - descontoParcela))
+                        } else {
+                            parcela == 0 ? saldo = data.valorFinal : null
+                             parcelaText = `Parcela ${parcela + 1}:  R$${parseFloat(data.valorFinal / data.numeroParcelas).toFixed(2)}`
+                            // saldo = saldo - parseFloat(data.valorFinal / data.numeroMaximoParcelasPlano).toFixed(2)
+                            somaParcelas += Number(parseFloat(data.valorFinal / data.numeroParcelas))
+                        }
+                        saldo = (parcela >= plano.quandoAplicar ? data.valorFinal : data.valorCurso) - somaParcelas
+                        console.log(saldo)
+                        addParcela(parcelaText)
+                        // addParcela(`Saldo: R$${saldo}`)
+                        contadorParcelas--
+                    }
+    
+                } catch (error) {
+                    console.log(error)
+                }
+            }
+
+            function limpa() {
+                document.getElementById('boeltos').innerHTML = ''
+            }
+            function addParcela(parcelaAtual, numDeParcelas, vencimento, numeroDoc, valorDoc, descontos, acrescimos, totalCobrado, cedente, dataProcessamento, informacoes) {
+                let boletos = document.getElementById('boletos')
+                boletos.innerHTML += `
+                <table style="height: 179px; width: 100%; border-collapse: collapse; border-style: solid;" border="1">
+                    <tbody>
+                        <tr style="height: 10px; border-style: none;">
+                            <td style="width: 4.97079%; height: 179px;" rowspan="9">&nbsp;</td>
+                            <td style="width: 22.9045%; height: 20px; text-align: center;" rowspan="2">
+                            <table style="height: 100%; width: 96.3454%; border-collapse: collapse; border-style: hidden;" border="1">
+                            <tbody>
+                            <tr style="height: 18px;">
+                                <td style="width: 38.8889%; height: 33px;" rowspan="2"><img src="https://firebasestorage.googleapis.com/v0/b/projetoxagencia.appspot.com/o/sistemaEscolar%2FinfoEscola%2Fdomain?alt=media&amp;token=790b58da-f9a9-4a31-91bf-e5d27a415832" alt="Logo" width="30" height="30" /></td>
+                                <td style="width: 189.264%; height: 18px; border-left: hidden;">
+                                    <section style="font-size: 8pt;">
+                                        Parcela
+                                    </section>
+                                    
+                                    <section style="font-size: x-small;">
+                                        ${parcelaAtual}/${numDeParcelas}
+                                    </section>
+                                </td>
+                            </tr>
+                            <tr style="height: 15px;">
+                            <td style="width: 189.264%; height: 15px; border-left: hidden;">
+                                <section style="font-size: 8pt;">
+                                        Vencimento
+                                    </section>
+                                    
+                                    <section style="font-size: x-small;">
+                                        ${vencimento}
+                                    </section>
+                            </td>
+                        </tr>
+                        </tbody>
+                        </table>
+                        </td>
+                        <td style="width: 7.60226%; text-align: center; height: 20px; border-left: dotted;" rowspan="2"><img src="https://firebasestorage.googleapis.com/v0/b/projetoxagencia.appspot.com/o/sistemaEscolar%2FinfoEscola%2Fdomain?alt=media&amp;token=790b58da-f9a9-4a31-91bf-e5d27a415832" alt="Logo" width="30" height="30" /></td>
+                        <td style="height: 20px; width: 43.8475%;" colspan="3" rowspan="2">Cedente</td>
+                        <td style="width: 64.5223%; height: 10px;">parcela</td>
+                        </tr>
+                        <tr style="height: 10px;">
+                        <td style="width: 64.5223%; height: 10px;">vencimento</td>
+                        </tr>
+                        <tr style="height: 33px;">
+                        <td style="width: 22.9045%; height: 33px;">documento</td>
+                        <td style="width: 19.286%; height: 33px; border-left: dotted;" colspan="2">documento</td>
+                        <td style="width: 14.2301%; height: 33px;">especie</td>
+                        <td style="width: 17.9337%; height: 33px;">processame</td>
+                        <td style="width: 64.5223%; height: 33px;">valor doc</td>
+                        </tr>
+                        <tr style="height: 24px;">
+                        <td style="width: 22.9045%; height: 24px;">valor doc</td>
+                        <td style="width: 51.4498%; height: 88px; border-left: dotted;" colspan="4" rowspan="4">
+                        <p>dasd</p>
+                        <hr />
+                        <p>&nbsp;</p>
+                        </td>
+                        <td style="width: 64.5223%; height: 24px;">descontos</td>
+                        </tr>
+                        <tr style="height: 22px;">
+                            <td style="width: 22.9045%; height: 22px;">descontos</td>
+                            <td style="width: 64.5223%; height: 22px;">acrescimos</td>
+                        </tr>
+                        <tr style="height: 21px;">
+                            <td style="width: 22.9045%; height: 21px;">acrescimos</td>
+                            <td style="width: 64.5223%; height: 21px;">total cobrado</td>
+                        </tr>
+                        <tr style="height: 21px;">
+                            <td style="width: 22.9045%; height: 21px;">total cobrado</td>
+                            <td style="width: 64.5223%; height: 21px;">data pagam</td>
+                        </tr>
+                        <tr style="height: 20px;">
+                            <td style="width: 22.9045%; height: 20px;" rowspan="2">data pagam</td>
+                            <td style="width: 51.4498%; height: 38px; border-left: dotted;" colspan="4" rowspan="2">Sacado</td>
+                            <td style="width: 64.5223%; height: 38px;" rowspan="2">assinatura</td>
+                        </tr>
+                    </tbody>
+                </table>
+                `
+            }
+        </script>
 </body>
 </html>

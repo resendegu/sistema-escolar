@@ -1162,14 +1162,14 @@
                 <div class="form-row">
                   <div class="form-group col-auto">
                     <label for="inputAddress">Turma</label>
-                    <select class="form-control" name="turmaAluno" id="turmaAluno" onclick="mostraProfsAlunoESetaTurma(this.value)">
+                    <select class="form-control" name="turmaAluno" id="turmaAluno" onclick="mostraProfsAlunoESetaTurma(this.value.split(',')[0], this.value.split(',')[1])">
                       <option hidden selected>Escolha a turma...</option>
                       
                     </select>
                   </div>
                   
                   
-                  <div class="form-group col-auto">
+                  <div class="form-group col-1">
                     <label for="inputAddress">Horário</label>
                     <input type="text" readonly class="form-control" id="horaAluno" name="horaAluno">
                   </div>
@@ -1177,9 +1177,16 @@
                     <label for="inputAddress">Professor</label>
                     <input type="text" readonly class="form-control" id="nomeProfAluno" name="nomeProfAluno">
                   </div>
-                  <div class="form-group col-auto">
+                  <div class="form-group col-4">
                     <label for="inputAddress">E-mail do Professor</label>
                     <input type="text" readonly class="form-control" id="emailProfAluno" name="emailProfAluno">
+                  </div>
+                  <div class="form-group col-auto">
+                    <label for="inputAddress">Plano para contrato</label>
+                    <select class="form-control" name="planoAluno" id="planoAluno" disabled>
+                      <option hidden selected>Escolha o plano...</option>
+                      
+                    </select>
                   </div>
                   
                 </div>
@@ -1394,6 +1401,14 @@
                     <input class="form-check-input" type="checkbox" id="geraPDFAluno" name="geraPDFAluno">
                     <label class="form-check-label" for="geraPDFAluno">
                       Gerar ficha de matrícula
+                    </label>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="geraBoleto" name="geraBoleto">
+                    <label class="form-check-label" for="geraPDFAluno">
+                      Gerar boletos/carnê de pagamento
                     </label>
                   </div>
                 </div>

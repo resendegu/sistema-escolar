@@ -2111,7 +2111,7 @@ async function carregaFinanceiro() {
             formAddPlanoCurso.addEventListener('change', async (e) => {
                 let dadosForm = $("#addPlanoCurso").serializeArray()
                 let formData = new FormData(formAddPlanoCurso)
-                // Objeto contendo os dados do plano par enviar ao firebasew
+                // Objeto contendo os dados do plano par enviar ao firebase
                 let data = {}
                 console.log(dadosForm)
                 dadosForm.forEach(field => {

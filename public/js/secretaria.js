@@ -11,6 +11,7 @@ var transfereAlunos = firebase.functions().httpsCallable('transfereAlunos')
 var desempenhoRef = firebase.database().ref('sistemaEscolar/notasDesempenho/referencia')
 var infoEscolaRef = firebase.database().ref('sistemaEscolar/infoEscola')
 var alunosStorageRef = firebase.storage().ref('sistemaEscolar/alunos')
+var cursosRef = firebase.database().ref('sistemaEscolar/infoEscola/cursos')
 
 var loader = document.getElementById('loader')
 var loaderMsg = document.getElementById('loaderMsg')
@@ -794,7 +795,7 @@ function carregaProfsETurmas() {
             for (const cod in turmas) {
                 if (Object.hasOwnProperty.call(turmas, cod)) {
                     const infoDaTurma = turmas[cod];
-                    turmaAluno.innerHTML += `<option value="${cod}">${cod} \(${cursos[infoDaTurma.curso].nomeCurso})</option>`
+                    turmaAluno.innerHTML += `<option value="${cod},${cursos[infoDaTurma.curso].codSistema}">${cod} \(${cursos[infoDaTurma.curso].nomeCurso})</option>`
                 }
             }
             loaderRun()
@@ -820,16 +821,289 @@ function carregaProfsETurmas() {
 
 }
 
-function mostraProfsAlunoESetaTurma(codTurma) {
+async function mostraProfsAlunoESetaTurma(codTurma, codCursoSistema) {
     if (codTurma != 'Escolha uma turma...') {
         let horaAluno = document.getElementById('horaAluno')
         let nomeProfAluno = document.getElementById('nomeProfAluno')
         let emailProfAluno = document.getElementById('emailProfAluno')
+        let planoAluno = document.getElementById('planoAluno')
         horaAluno.value = turmasLocal[codTurma].hora + 'h'
         nomeProfAluno.value = turmasLocal[codTurma].professor[0].nome
         emailProfAluno.value = turmasLocal[codTurma].professor[0].email
+        planoAluno.disabled = false
+        let curso = await cursosRef.child(codCursoSistema).once('value')
+        let planos = curso.val().planos
+        planoAluno.innerHTML = '<option hidden>Escolha um plano...</option>'
+        for (const key in planos) {
+            if (Object.hasOwnProperty.call(planos, key)) {
+                const plano = planos[key];
+                planoAluno.innerHTML += `
+                    <option value='${key}'>${plano.nomePlano}</option>
+                `
+            }
+        }
+        configuraContrato(codCursoSistema)
+        
     }
     
+}
+
+async function configuraContrato(codCursoSistema) {
+    let planoAluno = document.getElementById('planoAluno')
+    let curso = await cursosRef.child(codCursoSistema).once('value')
+    let planos = curso.val().planos
+    planoAluno.addEventListener('change', (e) => {
+        let planoKey = e.target.value
+        let plano = planos[planoKey]
+        abrirModal('modal', `Contrato do aluno`, `
+        <form id="configuraContratoAluno">
+        <h3>Dados do Curso</h3>
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="inputEmail4">Nome do curso</label>
+                    <input type="text" class="form-control" id="nomeCursoAdd" name="nomeCursoAdd" value="${plano.nomeCursoAdd}" placeholder="Nome do curso (Ex.: Inglês Básico para Adultos)" readonly>
+                    <small id="idCursoHElp" class="form-text text-muted">Identificação que aparece nos boletins e nos demais documentos emitidos pelo sistema.</small>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="exampleInputEmail1">Código</label>
+                    <input type="text" required class="form-control" value="${plano.codCursoAdd}" id="codigoCursoAdd" name="codigoCursoAdd" aria-describedby="nomeEscola" placeholder="Código do Curso" readonly>
+                    <small id="nomeEscolaHElp" class="form-text text-muted">Código utilizado para formar os códigos automáticos de turma.</small>  
+                </div>
+            </div>
+            <hr>
+            <h3>Dados do Plano</h3>
+            <small id="idPlano" class="form-text text-muted">Os dados do plano serão utilizados para geração de boletos no momento da matrícula de um aluno. Todos os valores brutos estão em R$ (BRL - Brazilian Real / Real Brasileiro)</small>
+            <div class="form-row">
+                <div class="form-group col-md-3">
+                    <label for="inputEmail4">Nome do Plano *</label>
+                    <input type="text" required class="form-control" id="nomePlano" name="nomePlano" placeholder="Nome do plano (Ex.: Promoção Gold)" readonly>
+                    <small id="idPlano" class="form-text text-muted">Este nome ajudará a secretaria a identificar mais os planos para realizar as matrículas de novos estudantes.</small>
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="exampleInputEmail1">Valor integral do Curso *</label>
+                    <input type="number" required class="form-control" id="valorCurso" name="valorCurso" aria-describedby="valorCurso" placeholder="Valor do curso" readonly>
+                    <small id="nomeEscolaHElp" class="form-text text-muted">Valor integral do curso sem descontos.</small>  
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="inputEmail4">Desconto (%)</label>
+                    <input type="number" class="form-control" id="descontoPlano" name="descontoPlano" placeholder="Desconto em % (Ex.: 50)" readonly>
+                    <small id="idPlano" class="form-text text-muted">Desconto nesse plano do curso em porcentagem com base no valor integral do curso. (Digite apenas números)</small>
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="exampleInputEmail1">Valor do desconto</label>
+                    <input type="text" required class="form-control" id="valorDesconto" name="valorDesconto" aria-describedby="nomeEscola" placeholder="Valor do desconto" readonly>
+                    <small id="nomeEscolaHElp" class="form-text text-muted">O valor calculado do desconto aplicado.</small>  
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-3">
+                    <label for="exampleInputEmail1">Acréscimo (%)</label>
+                    <input type="text" class="form-control" id="acrescimoPlano" name="acrescimoPlano" aria-describedby="nomeEscola" placeholder="Desconto em % (Ex.: 5)" readonly>
+                    <small id="nomeEscolaHElp" class="form-text text-muted">Acréscimos nesse plano do curso em porcentagem com base no valor integral do curso. (Digite apenas números)</small>  
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="exampleInputEmail1">Valor do Acréscimo</label>
+                    <input type="text" required class="form-control" id="valorAcrescimo" name="valorAcrescimo" aria-describedby="nomeEscola" placeholder="Valor do desconto" readonly>
+                    <small id="nomeEscolaHElp" class="form-text text-muted">O valor calculado do acréscimo aplicado.</small>  
+                </div>
+                <div class="form-group col-md-3">
+                    
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="inputEmail4">Valor integral final</label>
+                    <input type="number" class="form-control" id="valorFinal" name="valorFinal" placeholder="Valor integral final" readonly>
+                    <small id="idPlano" class="form-text text-muted" >Valor integral final calculado do curso utilizando-se deste plano no momento da matrícula.</small>
+                </div>
+            </div>
+            <h5>Parcelas</h5>
+            <div class="form-row">
+                <div class="form-group col-md-4">
+                    <label for="inputEmail4">Nº de parcelas*</label>
+                    <input type="number" required class="form-control" id="numeroParcelas" name="numeroParcelas" min="1" max="${plano.numeroMaximoParcelasPlano}" placeholder="Nº de parcelas para pagamento">
+                    <small id="idPlano" class="form-text text-muted">O número máximo de parcelas deste plano é de ${plano.numeroMaximoParcelasPlano} parcelas</small>
+                </div>
+                <div class="form-group col-md-5">
+                    <label for="exampleFormControlSelect2">Detalhamento de exemplo utilizando-se o máximo de parcelas</label>
+                    <select multiple class="form-control" id="detalhamentoParcelas" name="detalhamentoParcelas">
+                        <option>1</option>
+                        <option>2</option>
+                        <option>3</option>
+                        <option>4</option>
+                        <option>5</option>
+                    </select>
+                </div>
+            </div>
+            <h5>Vencimento</h5>
+            <div class="form-row">
+                <div class="form-group col-md-2">
+                    <label for="exampleFormControlSelect2">Escolha um dia:</label>
+                    <select class="form-control" id="diasDeVencimento" name="diasDeVencimento">
+                        
+                    </select>
+                    <small id="idPlano" class="form-text text-muted">Escolha o dia de vencimento do boleto/carnê.</small>
+                </div>
+                <div class="form-group col-md-2">
+                <label for="exampleFormControlSelect2">Dia escolhido:</label>
+                <input class="form-control" type="text" id="vencimentoEscolhido" name="vencimentoEscolhido" placeholder="Dia escolhido..." readonly>
+                <small class="form-text text-muted">Estas informações aparecerão impressas em cada parcela de pagamento.</small>
+            </div>
+                
+            </div>
+            <div class="form-row">
+                
+                <div class="form-group col-md-10">
+                    <label for="exampleFormControlSelect2">Informações e Avisos</label>
+                    <input class="form-control" type="text" id="descricaoPlano" name="descricaoPlano" placeholder="Informações e Avisos (Ex.: Em caso de atraso no pagamento será cobrado...)" readonly>
+                    <small class="form-text text-muted">Dia do vencimento.</small>
+                </div>
+                    
+            </div>
+            
+          
+          <button type="submit" class="btn btn-primary btn-block">Salvar detalhes do plano e continuar com a matrícula</button>
+        </form>
+        `, `<button class="btn btn-secondary" data-dismiss="modal">Fechar</button>`)
+
+        for (const id in plano) {
+            if (Object.hasOwnProperty.call(plano, id)) {
+                const value = plano[id];
+                console.log(id, value)
+                try {
+                    value.length != 1 && typeof value == 'object' ? (
+                        value.forEach(item => {
+                            let opt = document.createElement('option')
+                            opt.value = item
+                            opt.innerHTML = item
+                            document.getElementById(id).appendChild(opt)
+                        })
+                    ) : document.getElementById(id).value = value 
+                } catch (error) {
+                    console.log(error)
+                }
+                
+            }
+        }
+        if (plano.vencimento == "false") {
+            for (let i = 0; i < 28; i++) {
+                let opt = document.createElement('option')
+                opt.value = i + 1
+                opt.innerHTML = i + 1
+                document.getElementById('diasDeVencimento').appendChild(opt)                 
+            }
+        }
+        escutaForm(planoKey, plano)
+    })
+
+    async function escutaForm(planoKey, plano) {
+
+        function addParcela(dadosParcela='') {
+            if (dadosParcela == '') {
+                document.getElementById('detalhamentoParcelas').innerHTML = ''
+            } else {
+                document.getElementById('detalhamentoParcelas').innerHTML += `<option>${dadosParcela}</option>`
+            }
+            
+        }
+
+        let configuraContratoAluno = document.getElementById('configuraContratoAluno')
+        configuraContratoAluno.addEventListener('change', async (e) => {
+            let dadosForm = $("#configuraContratoAluno").serializeArray()
+            let formData = new FormData(configuraContratoAluno)
+            // Objeto contendo os dados do plano par enviar ao firebase
+            let data = {}
+            dadosForm.forEach(field => {
+                let values = formData.getAll(field.name)
+                values.length == 1 ? data[field.name] = values[0] : data[field.name] = values
+            })
+            data.vencimentoEscolhido = data.diasDeVencimento
+            if (data.numeroParcelas > plano.numeroMaximoParcelasPlano) {
+                AstNotif.dialog('Parcelamento não permitido', 'Este plano permite apenas o parcelamento em até ' + plano.numeroMaximoParcelasPlano + ' parcelas. Para ter um parcelamento maior, tente usar outro plano compatível com sua necessidade, ou solicite ao setor Administrativo/Financeiro para possível mudança de parcelamento deste plano.')
+                data.numeroParcelas = ''
+            } else {
+                try {
+                    data.valorDesconto = (Number(data.valorCurso) * (data.descontoPlano/100)).toFixed(2)
+                    data.valorAcrescimo = (Number(data.valorCurso) * (data.acrescimoPlano/100)).toFixed(2)
+                    data.valorFinal = (Number(data.valorCurso) + (data.valorAcrescimo - data.valorDesconto)).toFixed(2)
+                    addParcela()
+                    let saldo = data.valorCurso
+                    let saldoAcrescimo = data.valorAcrescimo
+                    let saldoDesconto = data.valorDesconto
+                    let contadorParcelas = data.numeroParcelas
+                    let somaParcelas = 0
+                    let valorParcelaGlobal = 0
+                    for (let parcela = 0; parcela < data.numeroParcelas; parcela++) {
+                        let parcelaText
+                        if (plano.distribuirAcrescimosEDescontos == 'on') {
+                            
+                            
+                            let acrescimoParcela 
+                            let descontoParcela 
+                            let valorParcela
+                            parcela == 0 ? valorParcelaGlobal = parseFloat(saldo / contadorParcelas).toFixed(2) : null
+                            if (parcela >= plano.quandoAplicar) {
+                                // parcela == data.quandoAplicar ? saldo = data.valorFinal - somaParcelas : null
+                                parcela == plano.quandoAplicar ? valorParcelaGlobal = parseFloat(saldo / contadorParcelas).toFixed(2) : null
+                                valorParcela = valorParcelaGlobal
+                                acrescimoParcela = (saldoAcrescimo/contadorParcelas).toFixed(2)
+                                descontoParcela = (saldoDesconto/contadorParcelas).toFixed(2)
+                                // saldo = (Number(saldo) - valorParcela) - Number(acrescimoParcela - descontoParcela)
+                            } else {
+                                valorParcela = valorParcelaGlobal
+                                
+                                // saldo = saldo - valorParcela
+                                acrescimoParcela = 0
+                                descontoParcela = 0
+                            }
+                            
+                            saldoAcrescimo = saldoAcrescimo - acrescimoParcela
+                            saldoDesconto = saldoDesconto - descontoParcela
+                            
+                            plano.quandoAplicar != undefined ? parcelaText = `Parcela ${parcela + 1}: R$${valorParcela} ${acrescimoParcela != 0 || acrescimoParcela != '' ? '+ R$' + acrescimoParcela : ''} ${descontoParcela != 0 || descontoParcela != '' ? '- R$' + descontoParcela : ''} = R$${(Number(valorParcela) + (acrescimoParcela - descontoParcela)).toFixed(2)}` : null
+                            somaParcelas += (Number(valorParcela) + (acrescimoParcela - descontoParcela))
+                        } else {
+                            parcela == 0 ? saldo = data.valorFinal : null
+                             parcelaText = `Parcela ${parcela + 1}:  R$${parseFloat(data.valorFinal / data.numeroParcelas).toFixed(2)}`
+                            // saldo = saldo - parseFloat(data.valorFinal / data.numeroMaximoParcelasPlano).toFixed(2)
+                            somaParcelas += Number(parseFloat(data.valorFinal / data.numeroParcelas))
+                        }
+                        saldo = (parcela >= plano.quandoAplicar ? data.valorFinal : data.valorCurso) - somaParcelas
+                        console.log(saldo)
+                        addParcela(parcelaText)
+                        // addParcela(`Saldo: R$${saldo}`)
+                        contadorParcelas--
+                    }
+                    addParcela(`Total: R$${somaParcelas.toFixed(2)}`)
+    
+                } catch (error) {
+                    console.log(error)
+                }
+            }
+            
+
+            for (const id in data) {
+                if (Object.hasOwnProperty.call(data, id)) {
+                    const value = data[id];
+                    document.getElementById(id).value = value
+                }
+            }
+        })
+
+        configuraContratoAluno.addEventListener('submit', (e) => {
+            e.preventDefault()
+            let dadosForm = $("#configuraContratoAluno").serializeArray()
+            let formData = new FormData(configuraContratoAluno)
+            // Objeto contendo os dados do plano par enviar ao firebase
+            let data = {}
+            dadosForm.forEach(field => {
+                let values = formData.getAll(field.name)
+                values.length == 1 ? data[field.name] = values[0] : data[field.name] = values
+            })
+            sessionStorage.setItem('contratoConfigurado', JSON.stringify(data))
+            sessionStorage.setItem('planoOriginal', JSON.stringify(plano))
+            $('#modal').modal('hide')
+            
+        })
+    }
 }
 
 function setaRespFinan(num) { 
@@ -886,69 +1160,86 @@ function criaPDFAluno() {
 // Esperando o submit para o cadastro efetivo
 var idadeAluno
 var matriculaPDF = ''
-document.querySelector('#formCadastroAluno').addEventListener('submit', (e) => {
+let formCadastroAluno = document.querySelector('#formCadastroAluno')
+formCadastroAluno.addEventListener('submit', (e) => {
     e.preventDefault()
     loader.style.display = 'block'
     loaderMsg.innerText = 'Processando dados...'
+    $('#formCadastroAluno').serializeArray()
     const dados = new FormData(e.target);
     var dadosAluno = {}
-    // Dados pessoais
-    dadosAluno.matriculaAluno = dados.get('matriculaAluno')
-    dadosAluno.nomeAluno = dados.get('nomeAluno')
-    dadosAluno.dataNascimentoAluno = dados.get('dataNascimentoAluno')
-    dadosAluno.telefoneAluno = dados.get('telefoneAluno')
-    dadosAluno.celularAluno = dados.get('celularAluno')
-    dadosAluno.emailAluno = dados.get('emailAluno')
-    dadosAluno.rgAluno = dados.get('rgAluno')
-    dadosAluno.cpfAluno = dados.get('cpfAluno')
-    dadosAluno.senhaAluno = dados.get('senhaAluno')
-    // Dados para o curso
-    dadosAluno.turmaAluno = dados.get('turmaAluno')
-    dadosAluno.horaEDiasAluno = dados.get('horaAluno')
-    dadosAluno.profAluno = dados.get('emailProfAluno')
-    // Dados de endereço
-    dadosAluno.cepAluno = dados.get('cepAluno')
-    dadosAluno.enderecoAluno = dados.get('enderecoAluno')
-    dadosAluno.numeroAluno = dados.get('numeroAluno')
-    dadosAluno.bairroAluno = dados.get('bairroAluno')
-    dadosAluno.cidadeAluno = dados.get('cidadeAluno')
-    dadosAluno.estadoAluno = dados.get('estadoAluno')
-    // Dados de Filiação Responsavel 1
-    dadosAluno.nomeResponsavelAluno1 = dados.get('nomeResponsavelAluno1')
-    dadosAluno.relacaoAluno1 = dados.get('relacaoAluno1')
-    dadosAluno.numeroComercialResponsavel1 = dados.get('numeroComercialResponsavel1')
-    dadosAluno.numeroCelularResponsavel1 = dados.get('numeroCelularResponsavel1')
-    dadosAluno.rgResponsavel1 = dados.get('rgResponsavel1')
-    dadosAluno.cpfResponsavel1 = dados.get('cpfResponsavel1')
-    // Dados de Filiação responsável 2
-    dadosAluno.nomeResponsavelAluno2 = dados.get('nomeResponsavelAluno2')
-    dadosAluno.relacaoAluno2 = dados.get('relacaoAluno2')
-    dadosAluno.numeroComercialResponsavel2 = dados.get('numeroComercialResponsavel2')
-    dadosAluno.numeroCelularResponsavel2 = dados.get('numeroCelularResponsavel2')
-    dadosAluno.rgResponsavel2 = dados.get('rgResponsavel2')
-    dadosAluno.cpfResponsavel2 = dados.get('cpfResponsavel2')
-    // Dados de Filiação Responsável financeiro
-    dadosAluno.nomeResponsavelFinanceiroAluno = dados.get('nomeResponsavelFinanceiroAluno')
-    dadosAluno.relacaoFinanceiroAluno = dados.get('relacaoFinanceiroAluno')
-    dadosAluno.numeroComercialFinanceiroAluno = dados.get('numeroComercialFinanceiroAluno')
-    dadosAluno.numeroCelularFinanceiroAluno = dados.get('numeroCelularFinanceiroAluno')
-    dadosAluno.rgFinanceiroAluno = dados.get('rgFinanceiroAluno')
-    dadosAluno.cpfFinanceiroAluno = dados.get('cpfFinanceiroAluno')
-    dadosAluno.emailResponsavelFinanceiro = dados.get('emailResponsavelFinanceiro')
-    // Dados de Filiação responsável pedagógico/didático
-    dadosAluno.nomeResponsavelPedagogicoAluno = dados.get('nomeResponsavelPedagogicoAluno')
-    dadosAluno.relacaoPedagogicoAluno = dados.get('relacaoPedagogicoAluno')
-    dadosAluno.numeroComercialPedagogicoAluno = dados.get('numeroComercialPedagogicoAluno')
-    dadosAluno.numeroCelularPedagogicoAluno = dados.get('numeroCelularPedagogicoAluno')
-    dadosAluno.rgPedagogicoAluno = dados.get('rgPedagogicoAluno')
-    dadosAluno.cpfPedagogicoAluno = dados.get('cpfPedagogicoAluno')
-    dadosAluno.emailResponsavelPedagogico = dados.get('emailResponsavelPedagogico')
+    let dadosForm = $("#formCadastroAluno").serializeArray()
+    let formData = new FormData(formCadastroAluno)
+    // Objeto contendo os dados do plano par enviar ao firebase
+    dadosForm.forEach(field => {
+        let values = formData.getAll(field.name)
+        values.length == 1 ? dadosAluno[field.name] = values[0] : dadosAluno[field.name] = values
+    })
+    // // Dados pessoais
+    // dadosAluno.matriculaAluno = dados.get('matriculaAluno')
+    // dadosAluno.nomeAluno = dados.get('nomeAluno')
+    // dadosAluno.dataNascimentoAluno = dados.get('dataNascimentoAluno')
+    // dadosAluno.telefoneAluno = dados.get('telefoneAluno')
+    // dadosAluno.celularAluno = dados.get('celularAluno')
+    // dadosAluno.emailAluno = dados.get('emailAluno')
+    // dadosAluno.rgAluno = dados.get('rgAluno')
+    // dadosAluno.cpfAluno = dados.get('cpfAluno')
+    // dadosAluno.senhaAluno = dados.get('senhaAluno')
+    // // Dados para o curso
+    // dadosAluno.turmaAluno = dados.get('turmaAluno')
+    // dadosAluno.horaEDiasAluno = dados.get('horaAluno')
+    // dadosAluno.profAluno = dados.get('emailProfAluno')
+    // // Dados de endereço
+    // dadosAluno.cepAluno = dados.get('cepAluno')
+    // dadosAluno.enderecoAluno = dados.get('enderecoAluno')
+    // dadosAluno.numeroAluno = dados.get('numeroAluno')
+    // dadosAluno.bairroAluno = dados.get('bairroAluno')
+    // dadosAluno.cidadeAluno = dados.get('cidadeAluno')
+    // dadosAluno.estadoAluno = dados.get('estadoAluno')
+    // // Dados de Filiação Responsavel 1
+    // dadosAluno.nomeResponsavelAluno1 = dados.get('nomeResponsavelAluno1')
+    // dadosAluno.relacaoAluno1 = dados.get('relacaoAluno1')
+    // dadosAluno.numeroComercialResponsavel1 = dados.get('numeroComercialResponsavel1')
+    // dadosAluno.numeroCelularResponsavel1 = dados.get('numeroCelularResponsavel1')
+    // dadosAluno.rgResponsavel1 = dados.get('rgResponsavel1')
+    // dadosAluno.cpfResponsavel1 = dados.get('cpfResponsavel1')
+    // // Dados de Filiação responsável 2
+    // dadosAluno.nomeResponsavelAluno2 = dados.get('nomeResponsavelAluno2')
+    // dadosAluno.relacaoAluno2 = dados.get('relacaoAluno2')
+    // dadosAluno.numeroComercialResponsavel2 = dados.get('numeroComercialResponsavel2')
+    // dadosAluno.numeroCelularResponsavel2 = dados.get('numeroCelularResponsavel2')
+    // dadosAluno.rgResponsavel2 = dados.get('rgResponsavel2')
+    // dadosAluno.cpfResponsavel2 = dados.get('cpfResponsavel2')
+    // // Dados de Filiação Responsável financeiro
+    // dadosAluno.nomeResponsavelFinanceiroAluno = dados.get('nomeResponsavelFinanceiroAluno')
+    // dadosAluno.relacaoFinanceiroAluno = dados.get('relacaoFinanceiroAluno')
+    // dadosAluno.numeroComercialFinanceiroAluno = dados.get('numeroComercialFinanceiroAluno')
+    // dadosAluno.numeroCelularFinanceiroAluno = dados.get('numeroCelularFinanceiroAluno')
+    // dadosAluno.rgFinanceiroAluno = dados.get('rgFinanceiroAluno')
+    // dadosAluno.cpfFinanceiroAluno = dados.get('cpfFinanceiroAluno')
+    // dadosAluno.emailResponsavelFinanceiro = dados.get('emailResponsavelFinanceiro')
+    // // Dados de Filiação responsável pedagógico/didático
+    // dadosAluno.nomeResponsavelPedagogicoAluno = dados.get('nomeResponsavelPedagogicoAluno')
+    // dadosAluno.relacaoPedagogicoAluno = dados.get('relacaoPedagogicoAluno')
+    // dadosAluno.numeroComercialPedagogicoAluno = dados.get('numeroComercialPedagogicoAluno')
+    // dadosAluno.numeroCelularPedagogicoAluno = dados.get('numeroCelularPedagogicoAluno')
+    // dadosAluno.rgPedagogicoAluno = dados.get('rgPedagogicoAluno')
+    // dadosAluno.cpfPedagogicoAluno = dados.get('cpfPedagogicoAluno')
+    // dadosAluno.emailResponsavelPedagogico = dados.get('emailResponsavelPedagogico')
     // Gera ou não o PDF do aluno
-    dadosAluno.geraPDFAluno = document.getElementById('geraPDFAluno')
+    // dadosAluno.geraPDFAluno = document.getElementById('geraPDFAluno')
+    // dadosAluno.geraBoleto = document.getElementById('geraBoleto')
     function emailRegularExpression(email) {
         var re = /\S+@\S+\.\S+/
         return re.test(email)
     }
+
+    dadosAluno.contratos = []
+    dadosAluno.contratos.push({
+        contrato: JSON.parse(sessionStorage.getItem('contratoConfigurado')), 
+        planoOriginal: JSON.parse(sessionStorage.getItem('planoOriginal'))
+    })
+    sessionStorage.removeItem('contratoConfigurado')
 
     console.log(dadosAluno)
     if (dadosAluno.dataNascimentoAluno == '' || dadosAluno.nomeAluno == '') {
@@ -975,8 +1266,11 @@ document.querySelector('#formCadastroAluno').addEventListener('submit', (e) => {
         cadastraAluno({dados: dadosAluno}).then(function(result) {
             loaderRun()
             AstNotif.dialog('Sucesso', result.data.answer)
-            if (dadosAluno.geraPDFAluno.checked) {
+            if (dadosAluno.geraPDFAluno == 'on') {
                 gerarFichaAluno(dadosAluno.matriculaAluno)
+            }
+            if (dadosAluno.geraBoleto == 'on') {
+                geraBoleto(dadosAluno.matriculaAluno, 0)
             }
             
             document.getElementById('resetForm').click()
@@ -989,14 +1283,20 @@ document.querySelector('#formCadastroAluno').addEventListener('submit', (e) => {
     }
     
 })
+
+function geraBoleto(matricula, codContrato) {
+    abrirModal('modal', 'Boleto(s) de pagamento', `
+        <iframe src="../resources/pdfsProntos/modeloBoleto.html#${matricula}?${codContrato}" frameborder="0" width="100%" height="400px" id="boletoPdf" name="boletoPdf"></iframe>
+    `, `<button type="button" class="btn btn-primary" onclick="window.frames['boletoPdf'].focus(), window.frames['boletoPdf'].print()">Imprimir</button>
+    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>`)
+}
+
 var diaAtualServidor
 function calculaIdade(dataNasc) {
     idadeAluno = 0
     loader.style.display = 'block'
     loaderMsg.innerText = 'Buscando data atual do servidor...'
     console.log(dataNasc)
-    
-    console.log(nascimento)
 
     
         calcularIdadePrecisa(dataNasc).then(function(idade){
