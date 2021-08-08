@@ -346,12 +346,13 @@ exports.desconectaProf = functions.database.ref('sistemaEscolar/turmas/{codTurma
     
 }) 
 
-exports.cadastraAluno = functions.https.onCall((data, context) => {
+exports.cadastraAluno = functions.https.onCall(async (data, context) => {
     if (context.auth.token.master == true || context.auth.token.secretaria == true) {
         let dadosAluno = data.dados
         let contratoConfigurado = data.contratoConfigurado
         let planoOriginal = data.planoOriginal
         let contratos = [dadosAluno.planoAluno]
+        let codContrato = await admin.database().ref('/').push().key
         dadosAluno.contratos = contratos
         dadosAluno.timestamp = admin.firestore.Timestamp.now()
             return admin.database().ref('sistemaEscolar/alunos').child(dadosAluno.matriculaAluno).once('value').then(alunoRecord => {
@@ -359,7 +360,7 @@ exports.cadastraAluno = functions.https.onCall((data, context) => {
                     throw new functions.https.HttpsError('already-exists', 'Este número de matrícula já consta no sistema. Por favor, clique no botão azul no início deste formulário para atualizar o número de matrícula, para gerar um novo número de matrícula.')
                 }
                 return admin.database().ref('sistemaEscolar/alunos/' + dadosAluno.matriculaAluno).set(dadosAluno).then(() => {
-                    return admin.database().ref('sistemaEscolar/infoEscola/cursos/' + planoOriginal.codCurso + '/contratos/' + dadosAluno.planoAluno).push({contratoConfigurado: contratoConfigurado, planoOriginal: planoOriginal, matricula: dadosAluno.matriculaAluno, timestamp: admin.firestore.Timestamp.now()}).then(() => {
+                    return admin.database().ref('sistemaEscolar/infoEscola/contratos/' + codContrato).set({contratoConfigurado: contratoConfigurado, planoOriginal: planoOriginal, matricula: dadosAluno.matriculaAluno, timestamp: admin.firestore.Timestamp.now(), codContrato: codContrato}).then(() => {
                         return admin.database().ref('sistemaEscolar/turmas').child(dadosAluno.turmaAluno + '/alunos').child(dadosAluno.matriculaAluno).set({nome: dadosAluno.nomeAluno, prof: dadosAluno.emailProfAluno}).then(() => {
                             return admin.database().ref('sistemaEscolar/ultimaMatricula').set(dadosAluno.matriculaAluno).then(() => {
                                 return admin.database().ref('sistemaEscolar/secretaria/responsaveisAutorizados').push({
@@ -387,7 +388,7 @@ exports.cadastraAluno = functions.https.onCall((data, context) => {
                                         
                                     })
                                     
-                                    return {answer: 'Aluno cadastrado e distribuído nas turmas e nos professores com sucesso!'}
+                                    return {answer: 'Aluno cadastrado e distribuído nas turmas e nos professores com sucesso!', codContrato: codContrato}
                                 }).catch(error => {
                                     throw new functions.https.HttpsError('unknown', error.message, error)
                                 })

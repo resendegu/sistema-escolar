@@ -1022,7 +1022,7 @@ async function configuraContrato(codCursoSistema) {
                 values.length == 1 ? data[field.name] = values[0] : data[field.name] = values
             })
             data.vencimentoEscolhido = data.diasDeVencimento
-            if (data.numeroParcelas > plano.numeroMaximoParcelasPlano) {
+            if (Number(data.numeroParcelas) > Number(plano.numeroMaximoParcelasPlano)) {
                 AstNotif.dialog('Parcelamento não permitido', 'Este plano permite apenas o parcelamento em até ' + plano.numeroMaximoParcelasPlano + ' parcelas. Para ter um parcelamento maior, tente usar outro plano compatível com sua necessidade, ou solicite ao setor Administrativo/Financeiro para possível mudança de parcelamento deste plano.')
                 data.numeroParcelas = ''
             } else if (data.numeroParcelas < plano.quandoAplicar + 1) {
@@ -1184,6 +1184,8 @@ formCadastroAluno.addEventListener('submit', async (e) => {
         let values = formData.getAll(field.name)
         values.length == 1 ? dadosAluno[field.name] = values[0] : dadosAluno[field.name] = values
     })
+    dadosAluno.codCurso = dadosAluno.turmaAluno.split(',')[1]
+    dadosAluno.turmaAluno = dadosAluno.turmaAluno.split(',')[0]
     // // Dados pessoais
     // dadosAluno.matriculaAluno = dados.get('matriculaAluno')
     // dadosAluno.nomeAluno = dados.get('nomeAluno')
@@ -1278,7 +1280,7 @@ formCadastroAluno.addEventListener('submit', async (e) => {
                 gerarFichaAluno(dadosAluno.matriculaAluno)
             }
             if (dadosAluno.geraBoleto == 'on') {
-                geraBoleto(dadosAluno.matriculaAluno, 0)
+                geraBoleto(dadosAluno.matriculaAluno, result.data.codContrato)
             }
             
             document.getElementById('resetForm').click()
@@ -1294,7 +1296,7 @@ formCadastroAluno.addEventListener('submit', async (e) => {
 
 function geraBoleto(matricula, codContrato) {
     abrirModal('modal', 'Boleto(s) de pagamento', `
-        <iframe src="../resources/pdfsProntos/modeloBoleto.html#${codContrato}" frameborder="0" width="100%" height="400px" id="boletoPdf" name="boletoPdf"></iframe>
+        <iframe src="../resources/pdfsProntos/modeloBoleto.html#${matricula}?${codContrato}" frameborder="0" width="100%" height="400px" id="boletoPdf" name="boletoPdf"></iframe>
     `, `<button type="button" class="btn btn-primary" onclick="window.frames['boletoPdf'].focus(), window.frames['boletoPdf'].print()">Imprimir</button>
     <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>`)
 }
