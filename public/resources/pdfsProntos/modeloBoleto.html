@@ -5,6 +5,11 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Boleto</title>
+    <style>
+        body {
+            -webkit-print-color-adjust: exact;
+        }
+    </style>
 </head>
 <body>
               <!-- Inicialização do Firebase -->
@@ -129,9 +134,12 @@
                 let docsSistema = dadosEscola.docsBoletos
                 let qtdeDocs = 0
 
-                let timestamp = await firebase.functions().httpsCallable('timestamp')
-                var now = new Date(timestamp._seconds * 1000)
-                var dataProcessamento = `${now.getDate()}/${now.getMonth()}/${now.getYear()}`
+                let timestampF = firebase.functions().httpsCallable('timestamp')
+                let timestamp = await timestampF()
+                console.log(timestamp)
+                var now = new Date(timestamp.data.timestamp._seconds * 1000)
+                console.log(now)
+                var dataProcessamento = `${Number(now.getDate()) <= 9 ? '0' + now.getDate() : now.getDate()}/${Number(now.getMonth()) + 1 <= 9 ? '0' + (Number(now.getMonth()) + 1) : now.getMonth()}/${now.getFullYear()}`
                 for (const key in docsSistema) {
                     if (Object.hasOwnProperty.call(docsSistema, key)) {
                         qtdeDocs++
@@ -215,7 +223,29 @@
                 }
 
                 function limpa() {
-                    document.getElementById('boletos').innerHTML = ''
+                    document.getElementById('boletos').innerHTML = `
+                    <table style="height: 241px; width: 100%; border-collapse: collapse; border-style: solid; margin-top: 18px;" border="1" >
+                        <tbody>
+                            <tr style="text-align: center;">
+                                <td style="width: 4.97079%; height: 241px;" rowspan="9">&nbsp;</td>
+                                <td style="background-color: lightgray; text-align: center; border-style: solid;">
+                                    
+                                    <img src="${dadosEscola.logoEscola}" alt="Logo" width="140" height="140" />
+                                        
+                                    
+                                    
+                                    <tr style="background-color: ${dadosEscola.dadosBasicos.corSecundariaEscola}; height: 12px;">
+                                        <td style="color: ${dadosEscola.dadosBasicos.corPrimariaEscola};"></td>
+                                    </tr>
+                                    <tr style="background-color: ${dadosEscola.dadosBasicos.corPrimariaEscola}; height: 43px;">
+                                        <td style="background-color: ${dadosEscola.dadosBasicos.corPrimariaEscola};"></td>
+                                    </tr>
+                                    
+                                </td>    
+                            </tr>
+                        </tbody>
+                    </table>
+                    `
                 }
                 function addParcela(parcelaAtual, numDeParcelas, vencimento, numeroDoc, valorDoc, descontos, acrescimos, totalCobrado, dataProcessamento, informacoes) {
                     let boletos = document.getElementById('boletos')
@@ -234,7 +264,7 @@
                         console.log(error)
                     })
                     boletos.innerHTML += `
-                    <table style="height: 179px; width: 100%; border-collapse: collapse; border-style: solid; margin-top: 18px;" border="1" >
+                    <table style="height: 241px; width: 100%; border-collapse: collapse; border-style: solid; margin-top: 18px;" border="1" >
                         <tbody>
                             <tr style="height: 10px; border-style: none;">
                                 <td style="width: 4.97079%; height: 179px;" rowspan="9">&nbsp;</td>
@@ -244,22 +274,22 @@
                                 <tr style="height: 18px;">
                                     <td style="width: 38.8889%; height: 33px;" rowspan="2"><img src="${dadosEscola.logoEscola}" alt="Logo" width="30" height="30" /></td>
                                     <td style="width: 189.264%; height: 18px; border-left: hidden;">
-                                        <section style="font-size: 8pt;">
+                                        <section style="font-size: 8pt; text-align: center;">
                                             Parcela
                                         </section>
                                         
-                                        <section style="font-size: x-small;">
+                                        <section style="font-size: x-small; text-align: center;">
                                             ${parcelaAtual}/${numDeParcelas}
                                         </section>
                                     </td>
                                 </tr>
                                 <tr style="height: 15px;">
                                 <td style="width: 189.264%; height: 15px; border-left: hidden;">
-                                        <section style="font-size: 8pt;">
+                                        <section style="font-size: 8pt; text-align: center;">
                                             Vencimento
                                         </section>
                                         
-                                        <section style="font-size: x-small;">
+                                        <section style="font-size: x-small; text-align: center;">
                                             ${vencimento}
                                         </section>
                                 </td>
@@ -335,11 +365,11 @@
                                 </section>        
                             </td>
                             <td style="width: 17.9337%; height: 33px;">
-                                <section style="font-size: 8pt;">
+                                <section style="font-size: 8pt; text-align: center;">
                                     Processamento
                                 </section>
                                 
-                                <section style="font-size: x-small;">
+                                <section style="font-size: x-small; text-align: center;">
                                     ${dataProcessamento}
                                 </section>    
                             </td>

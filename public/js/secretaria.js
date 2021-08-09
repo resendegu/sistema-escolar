@@ -1276,6 +1276,7 @@ formCadastroAluno.addEventListener('submit', async (e) => {
             sessionStorage.removeItem('planoOriginal')
             loaderRun()
             AstNotif.notify('Sucesso', result.data.answer)
+            console.log(result.data)
             if (dadosAluno.geraPDFAluno == 'on') {
                 gerarFichaAluno(dadosAluno.matriculaAluno)
             }
@@ -3517,6 +3518,9 @@ document.getElementById('infoEscolaForm').addEventListener('submit', (e) => {
     infoEscola.cnpjEscola = dados.get('cnpjEscola')
     infoEscola.enderecoEscola = dados.get('enderecoEscola')
     infoEscola.telefoneEscola = dados.get('telefoneEscola')
+    infoEscola.emailEscola = dados.get('emailEscola')
+    infoEscola.corPrimariaEscola = dados.get('corPrimariaEscola')
+    infoEscola.corSecundariaEscola = dados.get('corSecundariaEscola')
     loaderRun(true, 'Enviando dados básicos...')
     infoEscolaRef.child('dadosBasicos').set(infoEscola).then(() => {
         AstNotif.dialog('Sucesso', 'Os dados básicos foram atualizados e aplicados com sucesso.')
