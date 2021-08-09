@@ -5,6 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Boleto</title>
+    <link rel="stylesheet" href="../../css/loader.css">
     <style>
         body {
             -webkit-print-color-adjust: exact;
@@ -12,6 +13,13 @@
     </style>
 </head>
 <body>
+
+    <!-- Loader -->
+      
+    <div id="loader" class="window-loader">
+        <label id="loaderMsg">Aguarde...</label>
+          <div class="loader"></div>
+      </div>
               <!-- Inicialização do Firebase -->
         <!-- update the version number as needed -->
         <script defer src="/__/firebase/8.2.3/firebase-app.js"></script>
@@ -104,13 +112,21 @@
             window.addEventListener('DOMContentLoaded', (e) => {
                 let hash = window.location.hash;
                 if (hash) {
-                    let matricula = hash.split('?')[0].substring(1);
-                    let codContrato = hash.split('?')[1];
+                    let servico = hash.split('?')[0].substring(1);
+                    let matricula = hash.split('?')[1];
+                    let codContrato = hash.split('?')[2];
                     
             
-                    let emitir = window.confirm('A emissão do boleto fará com que números de documentos sejam gerados. Você confirma a emissão?')
-                    if (emitir) {
-                        geraBoletos(matricula, codContrato)
+                    switch (servico) {
+                        case 'geraBoletos':
+                            let emitir = window.confirm('A emissão do boleto fará com que números de documentos sejam gerados. Você confirma a emissão?')
+                            emitir ? geraBoletos(matricula, codContrato) : null
+                            break;
+                        case 'segundaVia':
+                            segundaViaBoletos(matricula, codContrato)
+                            break;
+                        default:
+                            break;
                     }
                     
                 }
@@ -118,7 +134,9 @@
             
 
             async function geraBoletos(matricula, codContrato) {
+                loaderRun(true, 'Aguarde, processando...')
                 let alunoRef = firebase.database().ref('sistemaEscolar/alunos/' + matricula + '/')
+                let contratoRef = firebase.database().ref('sistemaEscolar/infoEscola/contratos').child(codContrato)
                 let infoEscola = await firebase.database().ref('sistemaEscolar/infoEscola').once('value')
                 let dadosEscola = infoEscola.val()
                 console.log(dadosEscola)
@@ -160,6 +178,7 @@
                     let valorParcelaGlobal = 0
                     let mesParcela
                     let numDoc = qtdeDocs + 1
+                    let numerosDeDoc = []
 
                     limpa()
                     for (let parcela = 0; parcela < data.numeroParcelas; parcela++) {
@@ -167,6 +186,7 @@
                         let valorCobrado
                         let acrescimoParcela = 0
                         let descontoParcela = 0
+                        numerosDeDoc.push(numDoc)
                         if (plano.distribuirAcrescimosEDescontos == 'on') {
                             
                             
@@ -217,6 +237,13 @@
                         numDoc++
                         
                     }
+
+                    contratoRef.child('docsBoletos').set(numerosDeDoc).then(() => {
+                        console.log('Docs Cadastrados')
+                        loaderRun()
+                    }).catch(error => {
+                        console.log('Erro', error.message)
+                    })
     
                 } catch (error) {
                     console.log(error)
@@ -249,15 +276,19 @@
                 }
                 function addParcela(parcelaAtual, numDeParcelas, vencimento, numeroDoc, valorDoc, descontos, acrescimos, totalCobrado, dataProcessamento, informacoes) {
                     let boletos = document.getElementById('boletos')
-                    firebase.database().ref('sistemaEscolar/infoEscola').child('docsBoletos').push({
-                        num: numeroDoc,
+                    firebase.database().ref('sistemaEscolar').child('docsBoletos').push({
+                        numeroDoc: numeroDoc,
                         valorDoc: valorDoc,
                         vencimento: vencimento,
                         parcelaAtual: parcelaAtual,
                         numDeParcelas: numDeParcelas,
                         descontos: descontos,
                         acrescimos: acrescimos,
-                        totalCobrado: totalCobrado  
+                        totalCobrado: totalCobrado,
+                        dataProcessamento: dataProcessamento,
+                        informacoes: data.descricaoPlano,
+                        codContrato: codContrato,
+                        matricula: matricula  
                     }).then(() => {
 
                     }).catch(error => {
@@ -518,6 +549,350 @@
 
             }
 
+            async function segundaViaBoletos(matricula, codContrato) {
+                loaderRun(true, 'Aguarde, buscando dados do boleto...')
+                let alunoRef = firebase.database().ref('sistemaEscolar/alunos/' + matricula + '/')
+                let contratoRef = firebase.database().ref('sistemaEscolar/infoEscola/contratos').child(codContrato)
+                let docsBoletosRef = firebase.database().ref('sistemaEscolar/docsBoletos')
+                let infoEscola = await firebase.database().ref('sistemaEscolar/infoEscola').once('value')
+                let dadosEscola = infoEscola.val()
+                console.log(dadosEscola)
+                let dadosAluno = await alunoRef.once('value')
+                let aluno = dadosAluno.val()
+                let contratos = aluno.contratos
+                let contrato = contratos[contratos.indexOf(codContrato)]
+                let data = dadosEscola.contratos[codContrato].contratoConfigurado
+                let plano = dadosEscola.contratos[codContrato].planoOriginal
+                let mesInicio = Number(data['ano-mes'].split('-')[1])
+                let anoInicio = Number(data['ano-mes'].split('-')[0])
+                console.log(codContrato)
+                let docsSistema = dadosEscola.docsBoletos
+                let qtdeDocs = 0
+
+                let timestampF = firebase.functions().httpsCallable('timestamp')
+                let timestamp = await timestampF()
+                console.log(timestamp)
+                var now = new Date(timestamp.data.timestamp._seconds * 1000)
+                console.log(now)
+                var dataProcessamento = `${Number(now.getDate()) <= 9 ? '0' + now.getDate() : now.getDate()}/${Number(now.getMonth()) + 1 <= 9 ? '0' + (Number(now.getMonth()) + 1) : now.getMonth()}/${now.getFullYear()}`
+                for (const key in docsSistema) {
+                    if (Object.hasOwnProperty.call(docsSistema, key)) {
+                        qtdeDocs++
+                        
+                    }
+                }
+
+
+                try {
+                    
+                    let docsBoletosGerados = await contratoRef.child('docsBoletos').once('value')
+                    let numerosDeDoc = docsBoletosGerados.val()
+                    let docsFiltrados = await docsBoletosRef.orderByChild('numeroDoc').startAt(numerosDeDoc[0]).endAt(numerosDeDoc[numerosDeDoc.length - 1]).once('value')
+                    let docsDoContrato = docsFiltrados.val()
+                    console.log(docsDoContrato)
+                    console.log(numerosDeDoc)
+
+                    limpa()
+
+                    for (const key in docsDoContrato) {
+                        if (Object.hasOwnProperty.call(docsDoContrato, key)) {
+                            const doc = docsDoContrato[key];
+                            addParcela(doc.parcelaAtual, doc.numDeParcelas, doc.vencimento, doc.numeroDoc, doc.valorDoc, doc.descontos, doc.acrescimos, doc.totalCobrado, doc.dataProcessamento, doc.informacoes)
+                        }
+                    }
+
+                    loaderRun()
+
+    
+                } catch (error) {
+                    console.log(error)
+                }
+
+                function limpa() {
+                    document.getElementById('boletos').innerHTML = `
+                    <table style="height: 241px; width: 100%; border-collapse: collapse; border-style: solid; margin-top: 18px;" border="1" >
+                        <tbody>
+                            <tr style="text-align: center;">
+                                <td style="width: 4.97079%; height: 241px;" rowspan="9">&nbsp;</td>
+                                <td style="background-color: lightgray; text-align: center; border-style: solid;">
+                                    
+                                    <img src="${dadosEscola.logoEscola}" alt="Logo" width="140" height="140" />
+                                        
+                                    
+                                    
+                                    <tr style="background-color: ${dadosEscola.dadosBasicos.corSecundariaEscola}; height: 12px;">
+                                        <td style="color: ${dadosEscola.dadosBasicos.corPrimariaEscola};"></td>
+                                    </tr>
+                                    <tr style="background-color: ${dadosEscola.dadosBasicos.corPrimariaEscola}; height: 43px;">
+                                        <td style="background-color: ${dadosEscola.dadosBasicos.corPrimariaEscola};"></td>
+                                    </tr>
+                                    
+                                </td>    
+                            </tr>
+                        </tbody>
+                    </table>
+                    `
+                }
+                function addParcela(parcelaAtual, numDeParcelas, vencimento, numeroDoc, valorDoc, descontos, acrescimos, totalCobrado, dataProcessamento, informacoes) {
+                    let boletos = document.getElementById('boletos')
+                    boletos.innerHTML += `
+                    <table style="height: 241px; width: 100%; border-collapse: collapse; border-style: solid; margin-top: 18px;" border="1" >
+                        <tbody>
+                            <tr style="height: 10px; border-style: none;">
+                                <td style="width: 4.97079%; height: 179px;" rowspan="9">&nbsp;</td>
+                                <td style="width: 22.9045%; height: 20px; text-align: center;" rowspan="2">
+                                <table style="height: 100%; width: 96.3454%; border-collapse: collapse; border-style: hidden;" border="1">
+                                <tbody>
+                                <tr style="height: 18px;">
+                                    <td style="width: 38.8889%; height: 33px;" rowspan="2"><img src="${dadosEscola.logoEscola}" alt="Logo" width="30" height="30" /></td>
+                                    <td style="width: 189.264%; height: 18px; border-left: hidden;">
+                                        <section style="font-size: 8pt; text-align: center;">
+                                            Parcela
+                                        </section>
+                                        
+                                        <section style="font-size: x-small; text-align: center;">
+                                            ${parcelaAtual}/${numDeParcelas}
+                                        </section>
+                                    </td>
+                                </tr>
+                                <tr style="height: 15px;">
+                                <td style="width: 189.264%; height: 15px; border-left: hidden;">
+                                        <section style="font-size: 8pt; text-align: center;">
+                                            Vencimento
+                                        </section>
+                                        
+                                        <section style="font-size: x-small; text-align: center;">
+                                            ${vencimento}
+                                        </section>
+                                </td>
+                            </tr>
+                            </tbody>
+                            </table>
+                            </td>
+                            <td style="width: 7.60226%; text-align: center; height: 20px; border-left: dotted;" rowspan="2"><img src="${dadosEscola.logoEscola}" alt="Logo" width="30" height="30" /></td>
+                            <td style="height: 20px; width: 43.8475%;" colspan="3" rowspan="2">
+                                <section style="font-size: 8pt;">
+                                    &nbsp;<b>Cedente</b>
+                                </section>
+                                <section style="font-size: x-small;">
+                                    &nbsp;${dadosEscola.dadosBasicos.nomeEscola}
+                                </section>
+                                <section style="font-size: x-small;">
+                                    &nbsp;${dadosEscola.dadosBasicos.cnpjEscola}
+                                </section>
+                                <section style="font-size: x-small;">
+                                    &nbsp;${dadosEscola.dadosBasicos.enderecoEscola}
+                                </section>
+                                <section style="font-size: x-small;">
+                                    &nbsp;${dadosEscola.dadosBasicos.telefoneEscola}
+                                </section>
+                            </td>
+                            <td style="width: 64.5223%; height: 10px; ">
+                                <section style="font-size: 8pt;">
+                                    Parcela
+                                </section>
+                                
+                                <section style="font-size: x-small;">
+                                    ${parcelaAtual}/${numDeParcelas}
+                                </section>    
+                            </td>
+                            </tr>
+                            <tr style="height: 10px;">
+                            <td style="width: 64.5223%; height: 10px;">
+                                <section style="font-size: 8pt;">
+                                    Vencimento
+                                </section>
+                                
+                                <section style="font-size: x-small;">
+                                    ${vencimento}
+                                </section>    
+                            </td>
+                            </tr>
+                            <tr style="height: 33px;">
+                            <td style="width: 22.9045%; height: 33px; text-align: start;">
+                                <section style="font-size: 8pt; text-align: center;">
+                                    Documento
+                                </section>
+                                
+                                <section style="font-size: x-small; width: 100%; text-align: center;">
+                                    ${numeroDoc}
+                                </section>    
+                            </td>
+                            <td style="width: 19.286%; height: 33px; border-left: dotted;" colspan="2">
+                                <section style="font-size: 8pt; text-align: center;">
+                                    Documento
+                                </section>
+                                
+                                <section style="font-size: x-small; width: 100%; text-align: center;">
+                                    ${numeroDoc}
+                                </section>        
+                            </td>
+                            <td style="width: 14.2301%; height: 33px;">
+                                <section style="font-size: 8pt; text-align: center;">
+                                    Espécie
+                                </section>
+                                
+                                <section style="font-size: x-small; width: 100%; text-align: center;">
+                                    R$
+                                </section>        
+                            </td>
+                            <td style="width: 17.9337%; height: 33px;">
+                                <section style="font-size: 8pt; text-align: center;">
+                                    Processamento
+                                </section>
+                                
+                                <section style="font-size: x-small; text-align: center;">
+                                    ${dataProcessamento}
+                                </section>    
+                            </td>
+                            <td style="width: 64.5223%; height: 33px;">
+                                <section style="font-size: 8pt; text-align: center;">
+                                    (=) Valor do documento
+                                </section>
+                                
+                                <section style="font-size: x-small; width: 100%; text-align: center;">
+                                    R$${valorDoc}
+                                </section>        
+                            </td>
+                            </tr>
+                            <tr style="height: 24px;">
+                            <td style="width: 22.9045%; height: 24px;">
+                                <section style="font-size: 8pt; text-align: center;">
+                                    (=) Valor do documento
+                                </section>
+                                
+                                <section style="font-size: x-small; width: 100%; text-align: center;">
+                                    R$${valorDoc}
+                                </section>          
+                            </td>
+                            <td style="width: 51.4498%; height: 88px; border-left: dotted;" colspan="4" rowspan="4">
+                                <section style="font-size: 8pt;">
+                                    &nbsp;Informações
+                                </section>
+                                
+                                <section style="font-size: x-small;">
+                                    &nbsp;${data.nomeCursoAdd}
+                                </section>
+                                <section style="font-size: x-small;">
+                                    &nbsp;Pagamento realizado por:
+                                    <p>&nbsp;</p>
+                                    
+                                </section>
+                            <hr />
+                            <p style="font-size: x-small; width: 100%; text-align: start;">&nbsp;${data.descricaoPlano}</p>
+                            </td>
+                            <td style="width: 64.5223%; height: 24px;">
+                                <section style="font-size: 8pt; text-align: center;">
+                                    (-) Descontos
+                                </section>
+                                
+                                <section style="font-size: x-small; width: 100%; text-align: center;">
+                                    ${descontos}
+                                </section>          
+                            </td>
+                            </tr>
+                            <tr style="height: 22px;">
+                                <td style="width: 22.9045%; height: 22px;">
+                                    <section style="font-size: 8pt; text-align: center;">
+                                        (-) Descontos
+                                    </section>
+                                    
+                                    <section style="font-size: x-small; width: 100%; text-align: center;">
+                                        R$${descontos}
+                                    </section>    
+                                </td>
+                                <td style="width: 64.5223%; height: 22px;">
+                                    <section style="font-size: 8pt; text-align: center;">
+                                        (+) Acréscimos
+                                    </section>
+                                    
+                                    <section style="font-size: x-small; width: 100%; text-align: center;">
+                                        R$${acrescimos}
+                                    </section>    
+                                </td>
+                            </tr>
+                            <tr style="height: 21px;">
+                                <td style="width: 22.9045%; height: 21px;">
+                                    <section style="font-size: 8pt; text-align: center;">
+                                        (+) Acréscimos
+                                    </section>
+                                    
+                                    <section style="font-size: x-small; width: 100%; text-align: center;">
+                                        R$${acrescimos}
+                                    </section>     
+                                </td>
+                                <td style="width: 64.5223%; height: 21px;">
+                                    <section style="font-size: 8pt; text-align: center;">
+                                        (=) Total Cobrado
+                                    </section>
+                                    
+                                    <section style="font-size: x-small; width: 100%; text-align: center;">
+                                        R$${totalCobrado}
+                                    </section>     
+                                </td>
+                            </tr>
+                            <tr style="height: 21px;">
+                                <td style="width: 22.9045%; height: 21px;">
+                                    <section style="font-size: 8pt; text-align: center;">
+                                        (=) Total Cobrado
+                                    </section>
+                                    
+                                    <section style="font-size: x-small; width: 100%; text-align: center;">
+                                        R$${totalCobrado}
+                                    </section>    
+                                </td>
+                                <td style="width: 64.5223%; height: 21px;">
+                                    <section style="font-size: 8pt; text-align: center;">
+                                        Data de Pagamento:
+                                    </section>
+                                    
+                                    <section style="font-size: small; width: 100%; text-align: center;">
+                                        ____/____/______
+                                    </section>
+                                </td>
+                            </tr>
+                            <tr style="height: 20px;">
+                                <td style="width: 22.9045%; height: 20px;" rowspan="2">
+                                    <section style="font-size: 8pt; text-align: center;">
+                                        Data de Pagamento:
+                                    </section>
+                                    
+                                    <section style="font-size: small; width: 100%; text-align: center;">
+                                        ____/____/______
+                                    </section>    
+                                </td>
+                                <td style="width: 51.4498%; height: 38px; border-left: dotted;" colspan="4" rowspan="2">
+                                    <section style="font-size: 8pt;">
+                                        &nbsp;<b>Sacado</b>
+                                    </section>
+                                    
+                                    <section style="font-size: x-small;">
+                                        &nbsp;${aluno.nomeAluno}&nbsp;&nbsp;&nbsp; CPF Nº: ${aluno.cpfAluno}<br>
+                                        &nbsp;${aluno.enderecoAluno}, ${aluno.numeroAluno}, ${aluno.bairroAluno}, ${aluno.cidadeAluno}-${aluno.estadoAluno}
+                                    </section>    
+                                </td>
+                                <td style="width: 64.5223%; height: 38px;" rowspan="2">
+                                    <section style="font-size: 8pt; text-align: center;">
+                                        Assinatura:
+                                    </section>
+                                    
+                                    <section style="font-size: small; width: 100%; text-align: center;">
+                                       &nbsp;
+                                    </section>    
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    `
+                }
+
+                
+
+            }
+
         </script>
+
+        <script src="../../js/app.js"></script>
+        
 </body>
 </html>

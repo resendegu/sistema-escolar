@@ -1297,7 +1297,7 @@ formCadastroAluno.addEventListener('submit', async (e) => {
 
 function geraBoleto(matricula, codContrato) {
     abrirModal('modal', 'Boleto(s) de pagamento', `
-        <iframe src="../resources/pdfsProntos/modeloBoleto.html#${matricula}?${codContrato}" frameborder="0" width="100%" height="400px" id="boletoPdf" name="boletoPdf"></iframe>
+        <iframe src="../resources/pdfsProntos/modeloBoleto.html#geraBoletos?${matricula}?${codContrato}" frameborder="0" width="100%" height="400px" id="boletoPdf" name="boletoPdf"></iframe>
     `, `<button type="button" class="btn btn-primary" onclick="window.frames['boletoPdf'].focus(), window.frames['boletoPdf'].print()">Imprimir</button>
     <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>`)
 }
