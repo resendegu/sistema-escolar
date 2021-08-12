@@ -353,6 +353,20 @@ exports.cadastraAluno = functions.https.onCall(async (data, context) => {
         let planoOriginal = data.planoOriginal
         let codContrato = admin.database().ref('/').push().key
         let contratos = [codContrato]
+
+        let firestoreRef = admin.firestore().collection('mail');
+        let infoEscola = await admin.database().ref('sistemaEscolar/infoEscola/dadosBasicos').once('value')
+        let dadosEscola = infoEscola.val()
+        let emailContent = {
+            to: dadosAluno.emailAluno,
+            bcc: dadosAluno.emailResponsavelPedagogico || null,
+            message: {
+                subject: `${dadosEscola.nomeEscola}: Seja bem-vindo!`,
+                text: `Olá ${dadosAluno.nomeAluno.split(' ')[0]} ${dadosAluno.nomeAluno.split(' ')[1]}, você foi corretamente cadastrado em nosso sistema e está pronto para iniciar essa jornada conosco. Sistemas ProjetoX.`,
+                html: `<h3>Olá ${dadosAluno.nomeAluno.split(' ')[0]} ${dadosAluno.nomeAluno.split(' ')[1]}!</h3><p>Você está matriculado e está pronto para iniciar a jornada conosco. Use seu e-mail e senha cadastrados para acessar o sistema. Só lembrando, sua senha é: <b>${dadosAluno.senhaAluno}</b>.</p><p>Em caso de dificuldades <b>entre em contato com sua escola para maiores informações</b>.</p><p><b>Dados de contato da sua escola:</b><br>Telefone: ${dadosEscola.telefoneEscola}<br>E-mail: ${dadosEscola.emailEscola}<br>Endereço: ${dadosEscola.enderecoEscola}</p><p>Sistemas ProjetoX.</p>`
+            }
+        }
+
         dadosAluno.contratos = contratos
         dadosAluno.timestamp = admin.firestore.Timestamp.now()
             return admin.database().ref('sistemaEscolar/alunos').child(dadosAluno.matriculaAluno).once('value').then(alunoRecord => {
@@ -387,8 +401,17 @@ exports.cadastraAluno = functions.https.onCall(async (data, context) => {
                                         }
                                         
                                     })
+
+                                    return firestoreRef.add(emailContent).then(() => {
+                                        console.log('Queued email for delivery to ' + dadosAluno.emailAluno)
+                                        return {answer: 'Aluno cadastrado com sucesso! O aluno e, se houver, o seu responsável pedagógico, receberão em seu e-mail a senha do aluno para acesso ao portal.', codContrato: codContrato}
+                                        
+                                    }).catch(error => {
+                                        console.error(error)
+                                        throw new Error(error.message)
+                                    })
                                     
-                                    return {answer: 'Aluno cadastrado e distribuído nas turmas e nos professores com sucesso!', codContrato: codContrato}
+                                    
                                 }).catch(error => {
                                     throw new functions.https.HttpsError('unknown', error.message, error)
                                 })
