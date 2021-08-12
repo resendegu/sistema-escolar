@@ -9,6 +9,8 @@ var followUpRef = firebase.database().ref('sistemaEscolar/followUp')
 var usuarioRef = firebase.database().ref('sistemaEscolar/usuarios')
 var desempenhoRef = firebase.database().ref('sistemaEscolar/notasDesempenho/referencia')
 var cursosRef = firebase.database().ref('sistemaEscolar/infoEscola/cursos')
+var contratosRef = firebase.database().ref('sistemaEscolar/infoEscola/contratos')
+var docsBoletosRef = firebase.database().ref('sistemaEscolar/docsBoletos')
 
 var loader = document.getElementById('loader')
 var loaderMsg = document.getElementById('loaderMsg')
@@ -2241,3 +2243,365 @@ async function carregaFinanceiro() {
     loaderRun()
 }
 
+// Funcções Aba Contratos
+async function carregaContratos(filtro=null) {
+    loaderRun(true, 'Carregando dados dos contratos...')
+    
+    let listaContratos = document.getElementById('listaContratos')
+    
+    mostraContratos(filtro)
+
+    async function mostraContratos(filtro) {
+        let contratosFirebase = filtro == null ? await contratosRef.orderByChild('matricula').once('value') : await contratosRef.orderByChild('matricula').equalTo(filtro).once('value')
+        let contratos = contratosFirebase.val()
+        let c = 0
+        listaContratos.innerHTML = ''
+        if (contratos == undefined) {
+            AstNotif.notify('Falha', 'Não existem contratos cadastrados')
+            listaContratos.innerHTML = 'Vazio'
+        }
+        for (const key in contratos) {
+            if (Object.hasOwnProperty.call(contratos, key)) {
+                const contrato = contratos[key];
+                listaContratos.innerHTML += `
+                <tr>
+                    <td>
+                        <span class="custom-checkbox">
+                            <input type="checkbox" id="checkbox${c}" name="options[]" value="${c}">
+                            <label for="checkbox${c}"></label>
+                        </span>
+                    </td>
+                    <td>${contrato.matricula}</td>
+                    <td>${contrato.contratoConfigurado.nomePlano}</td>
+                    <td>?/${contrato.contratoConfigurado.numeroParcelas}</td>
+                    <td>${contrato.situacao}</td>
+                    <td>
+                        <a href="#editEmployeeModal" class="action" data-toggle="modal"><i data-feather="edit" data-toggle="tooltip" title="Reativar aluno">&#xE254;</i></a>
+                        <a href="#deleteEmployeeModal" class="delete" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Deletar">&#xE872;</i></a>
+                    </td>
+                </tr>
+                `
+                c++
+            }
+        }
+        
+    }
+    
+    document.getElementById('btnAddPlano').addEventListener('click', (e) => {
+        if (listaCursos.value == '') {
+            AstNotif.dialog('Erro', 'Você esqueceu de selecionar um curso. Escolha um curso para poder adicionar um plano.')
+        } else {
+            let codSistema = listaCursos.value
+            let curso = cursos[codSistema]
+            abrirModal('modal', 'Adicionar plano ao curso ' + curso.nomeCurso, `
+            <form id="addPlanoCurso">
+            <h3>Dados do Curso</h3>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="inputEmail4">Nome do curso</label>
+                        <input type="text" class="form-control" id="nomeCursoAdd" name="nomeCursoAdd" value="${curso.nomeCurso}" placeholder="Nome do curso (Ex.: Inglês Básico para Adultos)" readonly>
+                        <small id="idCursoHElp" class="form-text text-muted">Identificação que aparece nos boletins e nos demais documentos emitidos pelo sistema.</small>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="exampleInputEmail1">Código</label>
+                        <input type="text" required class="form-control" value="${curso.codCurso}" id="codigoCursoAdd" name="codigoCursoAdd" aria-describedby="nomeEscola" placeholder="Código do Curso" readonly>
+                        <small id="nomeEscolaHElp" class="form-text text-muted">Código utilizado para formar os códigos automáticos de turma.</small>  
+                    </div>
+                </div>
+                <hr>
+                <h3>Dados do Plano</h3>
+                <small id="idPlano" class="form-text text-muted">Os dados do plano serão utilizados para geração de boletos no momento da matrícula de um aluno. Todos os valores brutos estão em R$ (BRL - Brazilian Real / Real Brasileiro)</small>
+                <div class="form-row">
+                    <div class="form-group col-md-3">
+                        <label for="inputEmail4">Nome do Plano *</label>
+                        <input type="text" required class="form-control" id="nomePlano" name="nomePlano" placeholder="Nome do plano (Ex.: Promoção Gold)">
+                        <small id="idPlano" class="form-text text-muted">Este nome ajudará a secretaria a identificar mais os planos para realizar as matrículas de novos estudantes.</small>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="exampleInputEmail1">Valor integral do Curso *</label>
+                        <input type="number" required class="form-control" id="valorCurso" name="valorCurso" aria-describedby="valorCurso" placeholder="Valor do curso">
+                        <small id="nomeEscolaHElp" class="form-text text-muted">Valor integral do curso sem descontos.</small>  
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="inputEmail4">Desconto (%)</label>
+                        <input type="number" class="form-control" id="descontoPlano" name="descontoPlano" placeholder="Desconto em % (Ex.: 50)">
+                        <small id="idPlano" class="form-text text-muted">Desconto nesse plano do curso em porcentagem com base no valor integral do curso. (Digite apenas números)</small>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="exampleInputEmail1">Valor do desconto</label>
+                        <input type="text" required class="form-control" id="valorDesconto" name="valorDesconto" aria-describedby="nomeEscola" placeholder="Valor do desconto" readonly>
+                        <small id="nomeEscolaHElp" class="form-text text-muted">O valor calculado do desconto aplicado.</small>  
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-3">
+                        <label for="exampleInputEmail1">Acréscimo (%)</label>
+                        <input type="text" class="form-control" id="acrescimoPlano" name="acrescimoPlano" aria-describedby="nomeEscola" placeholder="Desconto em % (Ex.: 5)">
+                        <small id="nomeEscolaHElp" class="form-text text-muted">Acréscimos nesse plano do curso em porcentagem com base no valor integral do curso. (Digite apenas números)</small>  
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="exampleInputEmail1">Valor do Acréscimo</label>
+                        <input type="text" required class="form-control" id="valorAcrescimo" name="valorAcrescimo" aria-describedby="nomeEscola" placeholder="Valor do desconto" readonly>
+                        <small id="nomeEscolaHElp" class="form-text text-muted">O valor calculado do acréscimo aplicado.</small>  
+                    </div>
+                    <div class="form-group col-md-3">
+                        
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="inputEmail4">Valor integral final</label>
+                        <input type="number" class="form-control" id="valorFinal" name="valorFinal" placeholder="Valor integral final" readonly>
+                        <small id="idPlano" class="form-text text-muted" >Valor integral final calculado do curso utilizando-se deste plano no momento da matrícula.</small>
+                    </div>
+                </div>
+                <h5>Parcelas</h5>
+                <div class="form-row">
+                    <div class="form-group col-md-4">
+                        <label for="inputEmail4">Nº máximo de parcelas *</label>
+                        <input type="number" required class="form-control" id="numeroMaximoParcelasPlano" name="numeroMaximoParcelasPlano" placeholder="Nº máximo de parcelas">
+                        <small id="idPlano" class="form-text text-muted">Número máximo de parcelas para este plano.</small>
+                        <div class="form-group form-check">
+                            <input type="checkbox" class="form-check-input" id="distribuirAcrescimosEDescontos" name="distribuirAcrescimosEDescontos">
+                            <label class="form-check-label" for="exampleCheck1">Aplicar os <b>descontos e acréscimos</b> distribuídos nas parcelas</label>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-2">
+                        <label for="inputEmail4">Aplicar apartir da:</label>
+                        <select class="form-control" id="quandoAplicar" name="quandoAplicar" disabled>
+                            
+                        </select>
+                        <small id="idPlano" class="form-text text-muted">A partir de qual parcela começar a aplicar os descontos e acréscimos. Isso forçará os contratos à terem um número mínimo de parcelas.</small>
+                    </div>
+                    <div class="form-group col-md-5">
+                        <label for="exampleFormControlSelect2">Detalhamento de exemplo utilizando-se o máximo de parcelas</label>
+                        <select multiple class="form-control" id="detalhamentoParcelas" name="detalhamentoParcelas">
+                            <option>1</option>
+                            <option>2</option>
+                            <option>3</option>
+                            <option>4</option>
+                            <option>5</option>
+                        </select>
+                    </div>
+                </div>
+                <h5>Vencimento</h5>
+                <div class="form-row">
+                    <div class="form-group col-md-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="vencimento" id="permitirDefinirVencimento1" value="false" checked>
+                            <label class="form-check-label" for="exampleRadios1">
+                            Permitir definir vencimento no ato da matrícula
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="vencimento" id="definirVencimentoEspecifico" value="true">
+                            <label class="form-check-label" for="exampleRadios2">
+                            Definir datas específicas para o vencimento
+                            </label>
+                        </div>
+                        <label for="inputEmail4">Adicione um dia</label>
+                        <div class="input-group mb-3">
+                            <input type="number" class="form-control" id="addDatasVencimento" name="addDatasVencimento" placeholder="Digite um dia (Ex.: 10)" disabled>
+                            <div class="input-group-append">
+                                <button class="btn btn-primary" type="button" id="btnAddDia" disabled><span data-feather="plus"></span>Adicionar</button>
+                            </div>
+                        </div>
+                        
+                        <small id="idPlano" class="form-text text-muted">Adicione os dias possíveis para vencimento.</small>
+                    </div>
+                    <div class="form-group col-md-2">
+                        <label for="exampleFormControlSelect2">Dias escolhidos</label>
+                        <select multiple class="form-control" id="diasDeVencimento" name="diasDeVencimento" disabled>
+                            
+                        </select>
+                        <small id="idPlano" class="form-text text-muted">Clique em um dia para removê-lo.</small>
+                    </div>
+                    
+                </div>
+                <div class="form-row">
+                    
+                    <div class="form-group col-md-10">
+                        <label for="exampleFormControlSelect2">Informações e Avisos</label>
+                        <input class="form-control" type="text" id="descricaoPlano" name="descricaoPlano" placeholder="Informações e Avisos (Ex.: Em caso de atraso no pagamento será cobrado...)">
+                        <small class="form-text text-muted">Estas informações aparecerão impressas em cada parcela de pagamento.</small>
+                    </div>
+                        
+                </div>
+                
+              
+              <button type="submit" class="btn btn-primary btn-block">Adicionar plano</button>
+            </form>
+            `, `<button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>`)
+
+            feather.replace()
+
+            document.getElementsByName('vencimento').forEach(element => {
+                element.addEventListener('click', (e) => {
+                    console.log(e.target.value, e.target.checked)
+                    if (e.target.value == 'false' && e.target.checked == true) {
+                        document.getElementById('btnAddDia').disabled = true
+                        document.getElementById('diasDeVencimento').disabled = true
+                        document.getElementById('addDatasVencimento').disabled = true
+                    } else {
+                        document.getElementById('btnAddDia').disabled = false
+                        document.getElementById('diasDeVencimento').disabled = false
+                        document.getElementById('addDatasVencimento').disabled = false
+                        document.getElementById('diasDeVencimento').innerHTML = ''
+                    }
+                })
+            })
+
+            document.getElementById('btnAddDia').addEventListener('click', (e) => {
+                let dia = document.getElementById('addDatasVencimento')
+                addDia(dia.value)
+                dia.value = ''
+            })
+            
+            function addDia(dia) {
+                if (dia < 1 || dia > 28) {
+                    AstNotif.dialog('Opa...', 'Por favor, escolha um dia entre os dias 1 e 28')
+                } else {
+                    document.getElementById('diasDeVencimento').innerHTML += `<option onclick="this.remove()" id="dia${dia}" value="${dia}" selected>${dia}</option>`
+                }
+            }
+
+            function addParcela(dadosParcela='') {
+                if (dadosParcela == '') {
+                    document.getElementById('detalhamentoParcelas').innerHTML = ''
+                } else {
+                    document.getElementById('detalhamentoParcelas').innerHTML += `<option>${dadosParcela}</option>`
+                }
+                
+            }
+
+            let formAddPlanoCurso = document.getElementById('addPlanoCurso')
+            formAddPlanoCurso.addEventListener('change', async (e) => {
+                let dadosForm = $("#addPlanoCurso").serializeArray()
+                let formData = new FormData(formAddPlanoCurso)
+                // Objeto contendo os dados do plano par enviar ao firebase
+                let data = {}
+                console.log(dadosForm)
+                dadosForm.forEach(field => {
+                    let values = formData.getAll(field.name)
+                    values.length == 1 ? data[field.name] = values[0] : data[field.name] = values
+                })
+                console.log(data)
+                try {
+                    data.valorDesconto = (Number(data.valorCurso) * (data.descontoPlano/100)).toFixed(2)
+                    data.valorAcrescimo = (Number(data.valorCurso) * (data.acrescimoPlano/100)).toFixed(2)
+                    data.valorFinal = (Number(data.valorCurso) + (data.valorAcrescimo - data.valorDesconto)).toFixed(2)
+                    addParcela()
+                    document.getElementById('quandoAplicar').innerHTML = '<option hidden selected>Escolha a parcela...</option>'
+                    for (let i = 0; i < data.numeroMaximoParcelasPlano; i++) {
+                        document.getElementById('quandoAplicar').innerHTML += `<option value="${i}">Parcela ${i + 1}</option>`
+                    }
+                    let saldo = data.valorCurso
+                    let saldoAcrescimo = data.valorAcrescimo
+                    let saldoDesconto = data.valorDesconto
+                    let contadorParcelas = data.numeroMaximoParcelasPlano
+                    let somaParcelas = 0
+                    let valorParcelaGlobal = 0
+                    for (let parcela = 0; parcela < data.numeroMaximoParcelasPlano; parcela++) {
+                        let parcelaText
+                        if (data.distribuirAcrescimosEDescontos == 'on') {
+                            document.getElementById('quandoAplicar').disabled = false
+                            
+                            
+                            let acrescimoParcela 
+                            let descontoParcela 
+                            let valorParcela
+                            parcela == 0 ? valorParcelaGlobal = parseFloat(saldo / contadorParcelas).toFixed(2) : null
+                            if (parcela >= data.quandoAplicar) {
+                                // parcela == data.quandoAplicar ? saldo = data.valorFinal - somaParcelas : null
+                                parcela == data.quandoAplicar ? valorParcelaGlobal = parseFloat(saldo / contadorParcelas).toFixed(2) : null
+                                valorParcela = valorParcelaGlobal
+                                acrescimoParcela = (saldoAcrescimo/contadorParcelas).toFixed(2)
+                                descontoParcela = (saldoDesconto/contadorParcelas).toFixed(2)
+                                // saldo = (Number(saldo) - valorParcela) - Number(acrescimoParcela - descontoParcela)
+                            } else {
+                                valorParcela = valorParcelaGlobal
+                                
+                                // saldo = saldo - valorParcela
+                                acrescimoParcela = 0
+                                descontoParcela = 0
+                            }
+                            
+                            saldoAcrescimo = saldoAcrescimo - acrescimoParcela
+                            saldoDesconto = saldoDesconto - descontoParcela
+                            
+                            data.quandoAplicar != undefined ? parcelaText = `Parcela ${parcela + 1}: R$${valorParcela} ${acrescimoParcela != 0 || acrescimoParcela != '' ? '+ R$' + acrescimoParcela : ''} ${descontoParcela != 0 || descontoParcela != '' ? '- R$' + descontoParcela : ''} = R$${(Number(valorParcela) + (acrescimoParcela - descontoParcela)).toFixed(2)}` : null
+                            somaParcelas += (Number(valorParcela) + (acrescimoParcela - descontoParcela))
+                        } else {
+                            parcela == 0 ? saldo = data.valorFinal : null
+                            document.getElementById('quandoAplicar').disabled = true
+                            document.getElementById('quandoAplicar').innerHTML = ''
+                             parcelaText = `Parcela ${parcela + 1}:  R$${parseFloat(data.valorFinal / data.numeroMaximoParcelasPlano).toFixed(2)}`
+                            // saldo = saldo - parseFloat(data.valorFinal / data.numeroMaximoParcelasPlano).toFixed(2)
+                            somaParcelas += Number(parseFloat(data.valorFinal / data.numeroMaximoParcelasPlano))
+                        }
+                        saldo = (parcela >= data.quandoAplicar ? data.valorFinal : data.valorCurso) - somaParcelas
+                        console.log(saldo)
+                        addParcela(parcelaText)
+                        // addParcela(`Saldo: R$${saldo}`)
+                        contadorParcelas--
+                    }
+                    addParcela(`Total: R$${somaParcelas.toFixed(2)}`)
+
+                } catch (error) {
+                    console.log(error)
+                }
+
+                for (const id in data) {
+                    if (Object.hasOwnProperty.call(data, id)) {
+                        const value = data[id];
+                        id == 'vencimento' ? document.getElementsByName(id).value = value : document.getElementById(id).value = value
+                    }
+                }
+            })
+            
+
+            formAddPlanoCurso.addEventListener('submit', (e) => {
+                e.preventDefault()
+                loaderRun(true, 'Enviando dados do plano...')
+                let obj = document.getElementById('diasDeVencimento')
+                try {
+                    for (var i = 0; i < obj.options.length; i++) {
+                        obj.options[i].selected = true;
+                    }  
+                } catch (error) {
+                    console.log(error)
+                }
+                
+                
+                
+                let dadosForm = $("#addPlanoCurso").serializeArray()
+                let formData = new FormData(formAddPlanoCurso)
+                let data = {}
+                console.log(dadosForm)
+                dadosForm.forEach(field => {
+                    let values = formData.getAll(field.name)
+                    values.length == 1 ? data[field.name] = values[0] : data[field.name] = values
+                })
+                data.codCurso = codSistema
+                console.log(data)
+                cursosRef.child(listaCursos.value + '/planos').push(data).then(() => {
+                    loaderRun()
+                    AstNotif.notify('Sucesso', 'Dados enviados com sucesso!')
+                    $('#modal').modal('hide')
+                }).catch(error => {
+                    AstNotif.dialog('Erro', error.message)
+                })
+            })
+
+
+        }
+        
+    })
+
+    listaCursos.addEventListener('change', (e) => {
+        let codSistema = e.target.value
+        mostraPlanos(codSistema)
+    })
+
+    
+
+    loaderRun()
+}

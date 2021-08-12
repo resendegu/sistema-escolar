@@ -12,6 +12,7 @@ var desempenhoRef = firebase.database().ref('sistemaEscolar/notasDesempenho/refe
 var infoEscolaRef = firebase.database().ref('sistemaEscolar/infoEscola')
 var alunosStorageRef = firebase.storage().ref('sistemaEscolar/alunos')
 var cursosRef = firebase.database().ref('sistemaEscolar/infoEscola/cursos')
+var contratosRef = firebase.database().ref('sistemaEscolar/infoEscola/contratos')
 
 var loader = document.getElementById('loader')
 var loaderMsg = document.getElementById('loaderMsg')
@@ -1277,12 +1278,13 @@ formCadastroAluno.addEventListener('submit', async (e) => {
             loaderRun()
             AstNotif.notify('Sucesso', result.data.answer)
             console.log(result.data)
+            if (dadosAluno.geraBoleto == 'on') {
+                boleto('geraBoletos', dadosAluno.matriculaAluno, result.data.codContrato)
+            }
             if (dadosAluno.geraPDFAluno == 'on') {
                 gerarFichaAluno(dadosAluno.matriculaAluno)
             }
-            if (dadosAluno.geraBoleto == 'on') {
-                geraBoleto(dadosAluno.matriculaAluno, result.data.codContrato)
-            }
+            
             
             document.getElementById('resetForm').click()
             carregaProfsETurmas()
@@ -1295,9 +1297,9 @@ formCadastroAluno.addEventListener('submit', async (e) => {
     
 })
 
-function geraBoleto(matricula, codContrato) {
+function boleto(tipo, matricula, codContrato) {
     abrirModal('modal', 'Boleto(s) de pagamento', `
-        <iframe src="../resources/pdfsProntos/modeloBoleto.html#geraBoletos?${matricula}?${codContrato}" frameborder="0" width="100%" height="400px" id="boletoPdf" name="boletoPdf"></iframe>
+        <iframe src="../resources/pdfsProntos/modeloBoleto.html#${tipo}?${matricula}?${codContrato}" frameborder="0" width="100%" height="400px" id="boletoPdf" name="boletoPdf"></iframe>
     `, `<button type="button" class="btn btn-primary" onclick="window.frames['boletoPdf'].focus(), window.frames['boletoPdf'].print()">Imprimir</button>
     <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>`)
 }
@@ -1352,7 +1354,10 @@ function preventDefaults(e) {
   function handleDrop(e) {
     console.log(e)
     let dt = e.target
+    let dataTransfer = e.dataTransfer
     let files = dt.files
+    files == undefined ? files = dataTransfer.files : null
+    console.log(files)
 
     let matriculaAluno = document.getElementById('matriculaAluno').value
         if (matriculaAluno != '') {
@@ -1472,7 +1477,10 @@ function preventDefaults(e) {
   function handleDrop(e) {
     console.log(e)
     let dt = e.target
+    let dataTransfer = e.dataTransfer
     let files = dt.files
+    files == undefined ? files = dataTransfer.files : null
+    console.log(files)
 
     let matriculaAluno = document.getElementById('mostraMatriculaAluno').innerText
         if (matriculaAluno != '') {
@@ -2170,15 +2178,97 @@ async function carregaArquivosAluno(matricula) {
         AstNotif.dialog('Erro', error.message)
     });
 }
+function segundaViaBoleto(matricula, codContrato) {
+    let visualizaBoletos = document.getElementById('visualizaBoletos')
+    visualizaBoletos.innerHTML = `
+    <iframe src="../resources/pdfsProntos/modeloBoleto.html#segundaVia?${matricula}?${codContrato}" frameborder="0" width="100%" height="400px" id="boletoPdf" name="boletoPdf"></iframe>
+
+    <button type="button" class="btn btn-primary" onclick="window.frames['boletoPdf'].focus(), window.frames['boletoPdf'].print()">Imprimir</button>
+    
+    <button type="button" class="btn btn-secondary" onclick="document.getElementById('visualizaBoletos').innerHTML = ''">Fechar</button>
+    `
+    
+}
+
+function geraBoletoContrato(matricula, codContrato) {
+    let visualizaBoletos = document.getElementById('visualizaBoletos')
+    visualizaBoletos.innerHTML = `
+    <iframe src="../resources/pdfsProntos/modeloBoleto.html#geraBoletos?${matricula}?${codContrato}" frameborder="0" width="100%" height="400px" id="boletoPdf" name="boletoPdf"></iframe>
+
+    <button type="button" class="btn btn-primary" onclick="window.frames['boletoPdf'].focus(), window.frames['boletoPdf'].print()">Imprimir</button>
+    
+    <button type="button" class="btn btn-secondary" onclick="document.getElementById('visualizaBoletos').innerHTML = ''">Fechar</button>
+    `
+    
+}
+
+async function carregaContratosAluno(matricula) {
+    
+    let dadosAluno = alunos[matricula]
+    let contratos = dadosAluno.contratos
+    let dadosContratos = {}
+    
+    show()
+    async function show() {
+        loaderRun(true, 'Carregando contratos do aluno...')
+        document.getElementById('visualizaBoletos').innerHTML = ''
+        for (const i in contratos) {
+            if (Object.hasOwnProperty.call(contratos, i)) {
+                const codContrato = contratos[i];
+                let data = await contratosRef.child(codContrato).once('value')
+                dadosContratos[codContrato] = data.val()
+            }
+        }
+        console.log(dadosAluno, contratos, dadosContratos)
+        let listaContratos = document.getElementById('listaContratos')
+        listaContratos.innerHTML = ''
+        for (const codContrato in dadosContratos) {
+            if (Object.hasOwnProperty.call(dadosContratos, codContrato)) {
+                const contrato = dadosContratos[codContrato];
+                listaContratos.innerHTML += `
+                <tr>
+                <td>
+                  <span class="custom-checkbox">
+                    <!-- <input type="checkbox" id="checkbox1" name="options[]" value="1">
+                    <label for="checkbox1"></label> -->
+                  </span>
+                </td>
+                <td>${contrato.contratoConfigurado.nomePlano}</td>
+                <td>${contrato.contratoConfigurado.nomeCursoAdd}</td>
+                <td>${contrato.situacao || ''}</td>
+                <td>
+                  <a href="#" class="action" onclick="segundaViaBoleto('${matricula}', '${codContrato}')" ><i data-feather="file-text" data-toggle="tooltip" title="Segunda via de boletos">&#xE254;</i></a>
+                  <a href="#" class="action" data-toggle="modal" onclick="geraBoletoContrato('${matricula}', '${codContrato}')"><i data-feather="dollar-sign" data-toggle="tooltip" title="Gerar boletos de pagamento">&#xE872;</i></a>
+                </td>
+              </tr>
+                `
+            }
+        }
+        loaderRun()
+        feather.replace()
+        $('[data-toggle="tooltip"]').tooltip()
+
+
+
+    }
+
+    
+    
+    
+
+    document.getElementById('atualizaContratosAlunos').addEventListener('click', (e) => {
+        show()
+    })
+     
+}
 
 var dadosResponsaveis = {}
 function abreDadosDoAluno(matricula, desativado=false, notasDesativado=false) {
+
+    
+
     carregaHistoricoAluno(matricula)
     carregaArquivosAluno(matricula)
-    
-    document.getElementById('infoDoAluno').style.display = 'block'
-    document.getElementById('rolaTelaAbaixoAlunos').style.display = 'block'
-    document.getElementById('secGeraFicha').innerHTML = `<button class="btn btn-outline-primary" id="btnGeraFicha" onclick="gerarFichaAluno('${matricula}')">Gerar ficha de matrícula em PDF</button>`
     let dados
     if (desativado != false) {
         dados = desativado
@@ -2187,6 +2277,11 @@ function abreDadosDoAluno(matricula, desativado=false, notasDesativado=false) {
         dados = alunos[matricula]
         document.getElementById('alunoDesativado').style.display = 'none'
     }
+    document.getElementById('infoDoAluno').style.display = 'block'
+    document.getElementById('rolaTelaAbaixoAlunos').style.display = 'block'
+    document.getElementById('secGeraFicha').innerHTML = `<button class="btn btn-outline-primary btn-block" id="btnGeraFicha" onclick="gerarFichaAluno('${matricula}')">Gerar ficha de matrícula em PDF</button>
+    <button class="btn btn-outline-primary btn-block" id="btnBoletosAluno" data-toggle="modal" data-target="#contratosAluno" onclick="carregaContratosAluno('${matricula}')">Ver contratos/boletos do aluno</button>`
+    
     carregaFrequenciaAluno(matricula, dados.turmaAluno)
     dadosResponsaveis = {
         nomeResponsavelAluno1: dados.nomeResponsavelAluno1,
@@ -2219,7 +2314,7 @@ function abreDadosDoAluno(matricula, desativado=false, notasDesativado=false) {
     }
 
     
-    
+    dados.fotoAluno != undefined ? document.getElementById('mostraFotoAluno').setAttribute('src', dados.fotoAluno) : document.getElementById('mostraFotoAluno').setAttribute('src', '../images/profile_placeholder.png')
     document.getElementById('mostraNomeAluno').innerText = dados.nomeAluno
     document.getElementById('mostraCpfAluno').innerText = dados.cpfAluno
     document.getElementById('mostraRgAluno').innerText = dados.rgAluno

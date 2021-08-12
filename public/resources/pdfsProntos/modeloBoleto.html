@@ -10,6 +10,65 @@
         body {
             -webkit-print-color-adjust: exact;
         }
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #FAFAFA;
+            font: 12pt "Arial";
+        }
+
+        body {
+            -webkit-print-color-adjust: exact;
+        }
+
+        * {
+            box-sizing: border-box;
+            -moz-box-sizing: border-box;
+        }
+
+        .page {
+            width: 21cm;
+            min-height: 29.7cm;
+            padding: 0.3cm;
+            margin: 0.3cm auto;
+            border: 1px #D3D3D3 solid;
+            border-radius: 5px;
+            background: white;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .subpage {
+            padding: 0.5cm;
+            height: 256mm;
+            outline: 2cm #ffffff00 solid;
+        }
+
+        @page {
+            size: A4;
+            margin: 0;
+        }
+
+        @media print {
+            .page {
+                margin: 0;
+                border: initial;
+                border-radius: initial;
+                width: initial;
+                min-height: initial;
+                box-shadow: initial;
+                background: initial;
+                page-break-after: always;
+            }
+            .actionButtons {
+                display: none !important;
+            }
+        }
+
+        .actionButtons {
+            width: 21cm;
+            padding: 1cm;
+            margin: 1cm auto;
+        }
     </style>
 </head>
 <body>
@@ -38,75 +97,82 @@
           to avoid connecting the SDK to running emulators.
         -->
         <script defer src="/__/firebase/init.js?useEmulator=true"></script>
-    <div id="boletos">
-        <table style="height: 179px; width: 100%; border-collapse: collapse; border-style: solid;" border="1">
-            <tbody>
-                <tr style="height: 10px; border-style: none;">
-                    <td style="width: 4.97079%; height: 179px;" rowspan="9">&nbsp;</td>
-                    <td style="width: 22.9045%; height: 20px; text-align: center;" rowspan="2">
-                    <table style="height: 100%; width: 96.3454%; border-collapse: collapse; border-style: hidden;" border="1">
-                    <tbody>
-                    <tr style="height: 18px;">
-                        <td style="width: 38.8889%; height: 33px;" rowspan="2"><img src="https://firebasestorage.googleapis.com/v0/b/projetoxagencia.appspot.com/o/sistemaEscolar%2FinfoEscola%2Fdomain?alt=media&amp;token=790b58da-f9a9-4a31-91bf-e5d27a415832" alt="Logo" width="30" height="30" /></td>
-                        <td style="width: 189.264%; height: 18px; border-left: hidden;">
-                            <section style="font-size: 8pt;">
-                                Parcela
-                            </section>
-                            
-                            <section style="font-size: x-small;">
-                                1/6
-                            </section>
-                        </td>
-                    </tr>
-                    <tr style="height: 15px;">
-                    <td style="width: 189.264%; height: 15px; border-left: hidden;">venci</td>
-                </tr>
-                </tbody>
-                </table>
-                </td>
-                <td style="width: 7.60226%; text-align: center; height: 20px; border-left: dotted;" rowspan="2"><img src="https://firebasestorage.googleapis.com/v0/b/projetoxagencia.appspot.com/o/sistemaEscolar%2FinfoEscola%2Fdomain?alt=media&amp;token=790b58da-f9a9-4a31-91bf-e5d27a415832" alt="Logo" width="30" height="30" /></td>
-                <td style="height: 20px; width: 43.8475%;" colspan="3" rowspan="2">Cedente</td>
-                <td style="width: 64.5223%; height: 10px;">parcela</td>
-                </tr>
-                <tr style="height: 10px;">
-                <td style="width: 64.5223%; height: 10px;">vencimento</td>
-                </tr>
-                <tr style="height: 33px;">
-                <td style="width: 22.9045%; height: 33px;">documento</td>
-                <td style="width: 19.286%; height: 33px; border-left: dotted;" colspan="2">documento</td>
-                <td style="width: 14.2301%; height: 33px;">especie</td>
-                <td style="width: 17.9337%; height: 33px;">processame</td>
-                <td style="width: 64.5223%; height: 33px;">valor doc</td>
-                </tr>
-                <tr style="height: 24px;">
-                <td style="width: 22.9045%; height: 24px;">valor doc</td>
-                <td style="width: 51.4498%; height: 88px; border-left: dotted;" colspan="4" rowspan="4">
-                <p>dasd</p>
-                <hr />
-                <p>&nbsp;</p>
-                </td>
-                <td style="width: 64.5223%; height: 24px;">descontos</td>
-                </tr>
-                <tr style="height: 22px;">
-                    <td style="width: 22.9045%; height: 22px;">descontos</td>
-                    <td style="width: 64.5223%; height: 22px;">acrescimos</td>
-                </tr>
-                <tr style="height: 21px;">
-                    <td style="width: 22.9045%; height: 21px;">acrescimos</td>
-                    <td style="width: 64.5223%; height: 21px;">total cobrado</td>
-                </tr>
-                <tr style="height: 21px;">
-                    <td style="width: 22.9045%; height: 21px;">total cobrado</td>
-                    <td style="width: 64.5223%; height: 21px;">data pagam</td>
-                </tr>
-                <tr style="height: 20px;">
-                    <td style="width: 22.9045%; height: 20px;" rowspan="2">data pagam</td>
-                    <td style="width: 51.4498%; height: 38px; border-left: dotted;" colspan="4" rowspan="2">Sacado</td>
-                    <td style="width: 64.5223%; height: 38px;" rowspan="2">assinatura</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+        <div class="book" id="livro">
+            <div class="page">
+                <div class="subpage">
+                    <div id="boletos1">
+                        <table style="height: 179px; width: 100%; border-collapse: collapse; border-style: solid;" border="1">
+                            <tbody>
+                                <tr style="height: 10px; border-style: none;">
+                                    <td style="width: 4.97079%; height: 179px;" rowspan="9">&nbsp;</td>
+                                    <td style="width: 22.9045%; height: 20px; text-align: center;" rowspan="2">
+                                    <table style="height: 100%; width: 96.3454%; border-collapse: collapse; border-style: hidden;" border="1">
+                                    <tbody>
+                                    <tr style="height: 18px;">
+                                        <td style="width: 38.8889%; height: 33px;" rowspan="2"><img src="https://firebasestorage.googleapis.com/v0/b/projetoxagencia.appspot.com/o/sistemaEscolar%2FinfoEscola%2Fdomain?alt=media&amp;token=790b58da-f9a9-4a31-91bf-e5d27a415832" alt="Logo" width="30" height="30" /></td>
+                                        <td style="width: 189.264%; height: 18px; border-left: hidden;">
+                                            <section style="font-size: 8pt;">
+                                                Parcela
+                                            </section>
+                                            
+                                            <section style="font-size: x-small;">
+                                                1/6
+                                            </section>
+                                        </td>
+                                    </tr>
+                                    <tr style="height: 15px;">
+                                    <td style="width: 189.264%; height: 15px; border-left: hidden;">venci</td>
+                                </tr>
+                                </tbody>
+                                </table>
+                                </td>
+                                <td style="width: 7.60226%; text-align: center; height: 20px; border-left: dotted;" rowspan="2"><img src="https://firebasestorage.googleapis.com/v0/b/projetoxagencia.appspot.com/o/sistemaEscolar%2FinfoEscola%2Fdomain?alt=media&amp;token=790b58da-f9a9-4a31-91bf-e5d27a415832" alt="Logo" width="30" height="30" /></td>
+                                <td style="height: 20px; width: 43.8475%;" colspan="3" rowspan="2">Cedente</td>
+                                <td style="width: 64.5223%; height: 10px;">parcela</td>
+                                </tr>
+                                <tr style="height: 10px;">
+                                <td style="width: 64.5223%; height: 10px;">vencimento</td>
+                                </tr>
+                                <tr style="height: 33px;">
+                                <td style="width: 22.9045%; height: 33px;">documento</td>
+                                <td style="width: 19.286%; height: 33px; border-left: dotted;" colspan="2">documento</td>
+                                <td style="width: 14.2301%; height: 33px;">especie</td>
+                                <td style="width: 17.9337%; height: 33px;">processame</td>
+                                <td style="width: 64.5223%; height: 33px;">valor doc</td>
+                                </tr>
+                                <tr style="height: 24px;">
+                                <td style="width: 22.9045%; height: 24px;">valor doc</td>
+                                <td style="width: 51.4498%; height: 88px; border-left: dotted;" colspan="4" rowspan="4">
+                                <p>dasd</p>
+                                <hr />
+                                <p>&nbsp;</p>
+                                </td>
+                                <td style="width: 64.5223%; height: 24px;">descontos</td>
+                                </tr>
+                                <tr style="height: 22px;">
+                                    <td style="width: 22.9045%; height: 22px;">descontos</td>
+                                    <td style="width: 64.5223%; height: 22px;">acrescimos</td>
+                                </tr>
+                                <tr style="height: 21px;">
+                                    <td style="width: 22.9045%; height: 21px;">acrescimos</td>
+                                    <td style="width: 64.5223%; height: 21px;">total cobrado</td>
+                                </tr>
+                                <tr style="height: 21px;">
+                                    <td style="width: 22.9045%; height: 21px;">total cobrado</td>
+                                    <td style="width: 64.5223%; height: 21px;">data pagam</td>
+                                </tr>
+                                <tr style="height: 20px;">
+                                    <td style="width: 22.9045%; height: 20px;" rowspan="2">data pagam</td>
+                                    <td style="width: 51.4498%; height: 38px; border-left: dotted;" colspan="4" rowspan="2">Sacado</td>
+                                    <td style="width: 64.5223%; height: 38px;" rowspan="2">assinatura</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
     
         <script>
             window.addEventListener('DOMContentLoaded', (e) => {
@@ -119,8 +185,7 @@
             
                     switch (servico) {
                         case 'geraBoletos':
-                            let emitir = window.confirm('A emissão do boleto fará com que números de documentos sejam gerados. Você confirma a emissão?')
-                            emitir ? geraBoletos(matricula, codContrato) : null
+                            geraBoletos(matricula, codContrato)
                             break;
                         case 'segundaVia':
                             segundaViaBoletos(matricula, codContrato)
@@ -138,6 +203,7 @@
                 let alunoRef = firebase.database().ref('sistemaEscolar/alunos/' + matricula + '/')
                 let contratoRef = firebase.database().ref('sistemaEscolar/infoEscola/contratos').child(codContrato)
                 let infoEscola = await firebase.database().ref('sistemaEscolar/infoEscola').once('value')
+                let docsSistemaVal = await firebase.database().ref('sistemaEscolar/docsBoletos').once('value')
                 let dadosEscola = infoEscola.val()
                 console.log(dadosEscola)
                 let dadosAluno = await alunoRef.once('value')
@@ -149,7 +215,7 @@
                 let mesInicio = Number(data['ano-mes'].split('-')[1])
                 let anoInicio = Number(data['ano-mes'].split('-')[0])
                 console.log(codContrato)
-                let docsSistema = dadosEscola.docsBoletos
+                let docsSistema = docsSistemaVal.val()
                 let qtdeDocs = 0
 
                 let timestampF = firebase.functions().httpsCallable('timestamp')
@@ -158,124 +224,163 @@
                 var now = new Date(timestamp.data.timestamp._seconds * 1000)
                 console.log(now)
                 var dataProcessamento = `${Number(now.getDate()) <= 9 ? '0' + now.getDate() : now.getDate()}/${Number(now.getMonth()) + 1 <= 9 ? '0' + (Number(now.getMonth()) + 1) : now.getMonth()}/${now.getFullYear()}`
+                
                 for (const key in docsSistema) {
                     if (Object.hasOwnProperty.call(docsSistema, key)) {
                         qtdeDocs++
                         
                     }
                 }
-
+                let pag = 1
+                let bol = 0
 
                 try {
-                    data.valorDesconto = (Number(data.valorCurso) * (data.descontoPlano/100)).toFixed(2)
-                    data.valorAcrescimo = (Number(data.valorCurso) * (data.acrescimoPlano/100)).toFixed(2)
-                    data.valorFinal = (Number(data.valorCurso) + (data.valorAcrescimo - data.valorDesconto)).toFixed(2)
-                    let saldo = data.valorCurso
-                    let saldoAcrescimo = data.valorAcrescimo
-                    let saldoDesconto = data.valorDesconto
-                    let contadorParcelas = data.numeroParcelas
-                    let somaParcelas = 0
-                    let valorParcelaGlobal = 0
-                    let mesParcela
-                    let numDoc = qtdeDocs + 1
-                    let numerosDeDoc = []
 
-                    limpa()
-                    for (let parcela = 0; parcela < data.numeroParcelas; parcela++) {
-                        let valorParcela
-                        let valorCobrado
-                        let acrescimoParcela = 0
-                        let descontoParcela = 0
-                        numerosDeDoc.push(numDoc)
-                        if (plano.distribuirAcrescimosEDescontos == 'on') {
-                            
-                            
-                            
-                            
-                            parcela == 0 ? valorParcelaGlobal = parseFloat(saldo / contadorParcelas).toFixed(2) : null
-                            if (parcela >= plano.quandoAplicar) {
-                                // parcela == data.quandoAplicar ? saldo = data.valorFinal - somaParcelas : null
-                                parcela == plano.quandoAplicar ? valorParcelaGlobal = parseFloat(saldo / contadorParcelas).toFixed(2) : null
-                                valorParcela = valorParcelaGlobal
-                                acrescimoParcela = (saldoAcrescimo/contadorParcelas).toFixed(2)
-                                descontoParcela = (saldoDesconto/contadorParcelas).toFixed(2)
-                                // saldo = (Number(saldo) - valorParcela) - Number(acrescimoParcela - descontoParcela)
-                            } else {
-                                valorParcela = valorParcelaGlobal
-                                
-                                // saldo = saldo - valorParcela
-                                acrescimoParcela = 0
-                                descontoParcela = 0
-                            }
-                            
-                            saldoAcrescimo = saldoAcrescimo - acrescimoParcela
-                            saldoDesconto = saldoDesconto - descontoParcela
-                            
-                            valorCobrado = (Number(valorParcela) + (acrescimoParcela - descontoParcela)).toFixed(2)
-                            somaParcelas += (Number(valorParcela) + (acrescimoParcela - descontoParcela))
-                        } else {
-                            parcela == 0 ? saldo = data.valorFinal : null
-                            valorCobrado = parseFloat(data.valorFinal / data.numeroParcelas).toFixed(2)
-                            // saldo = saldo - parseFloat(data.valorFinal / data.numeroMaximoParcelasPlano).toFixed(2)
-                            somaParcelas += Number(parseFloat(data.valorFinal / data.numeroParcelas))
-                        }
-                        saldo = (parcela >= plano.quandoAplicar ? data.valorFinal : data.valorCurso) - somaParcelas
-                        console.log(saldo)
-                        mesParcela = mesInicio + parcela
-                        if ((mesInicio + parcela) == 13) {
-                            mesParcela = 0
-                        }
-                        mesParcela == 0 ? anoInicio++ : null
-                        if ((mesInicio + parcela) > 12) {
-                            mesParcela++
-                        }
-                        
-                        
-                        addParcela(parcela + 1, data.numeroParcelas, `${data.vencimentoEscolhido}/${mesParcela <= 9 ? '0' + mesParcela : mesParcela}/${anoInicio}`, numDoc, valorParcela, descontoParcela, acrescimoParcela, valorCobrado, dataProcessamento, )
-                        // addParcela(`Saldo: R$${saldo}`)
-                        contadorParcelas--
-                        numDoc++
+                    let docsBoletosGerados = await contratoRef.child('docsBoletos').once('value')
+                    let numerosDeDoc = docsBoletosGerados.val()
+                    let continuar = true
+                    if (numerosDeDoc != null) {
+                        loaderRun()
+                        continuar = window.confirm('O sistema identificou débitos ativos para este contrato. Deseja gerar novos débitos/boletos? (Para gerar, clique em OK)')
                         
                     }
 
-                    contratoRef.child('docsBoletos').set(numerosDeDoc).then(() => {
-                        console.log('Docs Cadastrados')
-                        loaderRun()
-                    }).catch(error => {
-                        console.log('Erro', error.message)
-                    })
+                    if (continuar) {
+                        data.valorDesconto = (Number(data.valorCurso) * (data.descontoPlano/100)).toFixed(2)
+                        data.valorAcrescimo = (Number(data.valorCurso) * (data.acrescimoPlano/100)).toFixed(2)
+                        data.valorFinal = (Number(data.valorCurso) + (data.valorAcrescimo - data.valorDesconto)).toFixed(2)
+                        let saldo = data.valorCurso
+                        let saldoAcrescimo = data.valorAcrescimo
+                        let saldoDesconto = data.valorDesconto
+                        let contadorParcelas = data.numeroParcelas
+                        let somaParcelas = 0
+                        let valorParcelaGlobal = 0
+                        let mesParcela
+                        let numDoc = qtdeDocs + 1
+                        let numerosDeDoc = []
+
+                        limpa()
+                        for (let parcela = 0; parcela < data.numeroParcelas; parcela++) {
+                            let valorParcela
+                            let valorCobrado
+                            let acrescimoParcela = 0
+                            let descontoParcela = 0
+                            numerosDeDoc.push(numDoc)
+                            if (plano.distribuirAcrescimosEDescontos == 'on') {
+                                
+                                
+                                
+                                
+                                parcela == 0 ? valorParcelaGlobal = parseFloat(saldo / contadorParcelas).toFixed(2) : null
+                                if (parcela >= plano.quandoAplicar) {
+                                    // parcela == data.quandoAplicar ? saldo = data.valorFinal - somaParcelas : null
+                                    parcela == plano.quandoAplicar ? valorParcelaGlobal = parseFloat(saldo / contadorParcelas).toFixed(2) : null
+                                    valorParcela = valorParcelaGlobal
+                                    acrescimoParcela = (saldoAcrescimo/contadorParcelas).toFixed(2)
+                                    descontoParcela = (saldoDesconto/contadorParcelas).toFixed(2)
+                                    // saldo = (Number(saldo) - valorParcela) - Number(acrescimoParcela - descontoParcela)
+                                } else {
+                                    valorParcela = valorParcelaGlobal
+                                    
+                                    // saldo = saldo - valorParcela
+                                    acrescimoParcela = 0
+                                    descontoParcela = 0
+                                }
+                                
+                                saldoAcrescimo = saldoAcrescimo - acrescimoParcela
+                                saldoDesconto = saldoDesconto - descontoParcela
+                                
+                                valorCobrado = (Number(valorParcela) + (acrescimoParcela - descontoParcela)).toFixed(2)
+                                somaParcelas += (Number(valorParcela) + (acrescimoParcela - descontoParcela))
+                            } else {
+                                parcela == 0 ? saldo = data.valorFinal : null
+                                valorCobrado = parseFloat(data.valorFinal / data.numeroParcelas).toFixed(2)
+                                // saldo = saldo - parseFloat(data.valorFinal / data.numeroMaximoParcelasPlano).toFixed(2)
+                                somaParcelas += Number(parseFloat(data.valorFinal / data.numeroParcelas))
+                            }
+                            saldo = (parcela >= plano.quandoAplicar ? data.valorFinal : data.valorCurso) - somaParcelas
+                            console.log(saldo)
+                            mesParcela = mesInicio + parcela
+                            if ((mesInicio + parcela) > 12) {
+                                mesParcela = mesParcela - 12
+                            }
+                            mesParcela == 1 && parcela != 0 ? anoInicio++ : null
+                            
+                            
+                            
+                            addParcela(parcela + 1, data.numeroParcelas, `${data.vencimentoEscolhido <= 9 ? '0' + data.vencimentoEscolhido : data.vencimentoEscolhido}/${mesParcela <= 9 ? '0' + mesParcela : mesParcela}/${anoInicio}`, numDoc, valorParcela, descontoParcela, acrescimoParcela, valorCobrado, dataProcessamento, )
+                            // addParcela(`Saldo: R$${saldo}`)
+                            contadorParcelas--
+                            numDoc++
+                            
+                        }
+
+                        contratoRef.child('docsBoletos').set(numerosDeDoc).then(() => {
+                            console.log('Docs Cadastrados')
+                            loaderRun()
+                        }).catch(error => {
+                            console.log('Erro', error.message)
+                        })
+                    } else {
+                        limpa()
+                    }
+
+                    
     
                 } catch (error) {
                     console.log(error)
                 }
 
                 function limpa() {
-                    document.getElementById('boletos').innerHTML = `
-                    <table style="height: 241px; width: 100%; border-collapse: collapse; border-style: solid; margin-top: 18px;" border="1" >
-                        <tbody>
-                            <tr style="text-align: center;">
-                                <td style="width: 4.97079%; height: 241px;" rowspan="9">&nbsp;</td>
-                                <td style="background-color: lightgray; text-align: center; border-style: solid;">
-                                    
-                                    <img src="${dadosEscola.logoEscola}" alt="Logo" width="140" height="140" />
-                                        
-                                    
-                                    
-                                    <tr style="background-color: ${dadosEscola.dadosBasicos.corSecundariaEscola}; height: 12px;">
-                                        <td style="color: ${dadosEscola.dadosBasicos.corPrimariaEscola};"></td>
-                                    </tr>
-                                    <tr style="background-color: ${dadosEscola.dadosBasicos.corPrimariaEscola}; height: 43px;">
-                                        <td style="background-color: ${dadosEscola.dadosBasicos.corPrimariaEscola};"></td>
-                                    </tr>
-                                    
-                                </td>    
-                            </tr>
-                        </tbody>
-                    </table>
+                    document.getElementById('livro').innerHTML = `
+                    <div class="page">
+                        <div class="subpage">
+                            <div id="boletos1">
+                                <table style="height: 4.8cm; width: 100%; border-collapse: collapse; border-style: solid; margin-top: 18px;" border="1" >
+                                    <tbody>
+                                        <tr style="text-align: center;">
+                                            <td style="width: 4.97079%; height: 241px;" rowspan="9">&nbsp;</td>
+                                            <td style="background-color: lightgray; text-align: center; border-style: solid;">
+                                                
+                                                <img src="${dadosEscola.logoEscola}" alt="Logo" width="140" height="140" />
+                                                    
+                                                
+                                                
+                                                <tr style="background-color: ${dadosEscola.dadosBasicos.corSecundariaEscola}; height: 12px;">
+                                                    <td style="color: ${dadosEscola.dadosBasicos.corPrimariaEscola};"></td>
+                                                </tr>
+                                                <tr style="background-color: ${dadosEscola.dadosBasicos.corPrimariaEscola}; height: 43px;">
+                                                    <td style="background-color: ${dadosEscola.dadosBasicos.corPrimariaEscola};"></td>
+                                                </tr>
+                                                
+                                            </td>    
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
                     `
                 }
+                
                 function addParcela(parcelaAtual, numDeParcelas, vencimento, numeroDoc, valorDoc, descontos, acrescimos, totalCobrado, dataProcessamento, informacoes) {
-                    let boletos = document.getElementById('boletos')
+                    
+                    
+                    
+                    bol++
+                    if (bol > 3 && pag >= 1) {
+                        pag++
+                        bol = 0
+                        document.getElementById('livro').innerHTML += `
+                        <div class="page">
+                            <div class="subpage">
+                                <div id="boletos${pag}"></div>
+                            </div>
+                        </div>
+                        `
+                    }
+                    let boletos = document.getElementById('boletos' + pag)
                     firebase.database().ref('sistemaEscolar').child('docsBoletos').push({
                         numeroDoc: numeroDoc,
                         valorDoc: valorDoc,
@@ -346,23 +451,23 @@
                                     &nbsp;${dadosEscola.dadosBasicos.telefoneEscola}
                                 </section>
                             </td>
-                            <td style="width: 64.5223%; height: 10px; ">
+                            <td style="width: 64.5223%; height: 10px; text-align: center;">
                                 <section style="font-size: 8pt;">
                                     Parcela
                                 </section>
                                 
-                                <section style="font-size: x-small;">
+                                <section style="font-size: x-small; text-align: center;">
                                     ${parcelaAtual}/${numDeParcelas}
                                 </section>    
                             </td>
                             </tr>
                             <tr style="height: 10px;">
                             <td style="width: 64.5223%; height: 10px;">
-                                <section style="font-size: 8pt;">
+                                <section style="font-size: 8pt; text-align: center;">
                                     Vencimento
                                 </section>
                                 
-                                <section style="font-size: x-small;">
+                                <section style="font-size: x-small; text-align: center;">
                                     ${vencimento}
                                 </section>    
                             </td>
@@ -581,12 +686,19 @@
                         
                     }
                 }
+                let pag = 1
+                let bol = 0
 
 
                 try {
                     
                     let docsBoletosGerados = await contratoRef.child('docsBoletos').once('value')
                     let numerosDeDoc = docsBoletosGerados.val()
+                    if (numerosDeDoc == null) {
+                        loaderRun()
+                        window.alert('Não foram gerados boletos para este contrato ainda.')
+                        limpa()
+                    }
                     let docsFiltrados = await docsBoletosRef.orderByChild('numeroDoc').startAt(numerosDeDoc[0]).endAt(numerosDeDoc[numerosDeDoc.length - 1]).once('value')
                     let docsDoContrato = docsFiltrados.val()
                     console.log(docsDoContrato)
@@ -609,34 +721,56 @@
                 }
 
                 function limpa() {
-                    document.getElementById('boletos').innerHTML = `
-                    <table style="height: 241px; width: 100%; border-collapse: collapse; border-style: solid; margin-top: 18px;" border="1" >
-                        <tbody>
-                            <tr style="text-align: center;">
-                                <td style="width: 4.97079%; height: 241px;" rowspan="9">&nbsp;</td>
-                                <td style="background-color: lightgray; text-align: center; border-style: solid;">
-                                    
-                                    <img src="${dadosEscola.logoEscola}" alt="Logo" width="140" height="140" />
-                                        
-                                    
-                                    
-                                    <tr style="background-color: ${dadosEscola.dadosBasicos.corSecundariaEscola}; height: 12px;">
-                                        <td style="color: ${dadosEscola.dadosBasicos.corPrimariaEscola};"></td>
+                    document.getElementById('livro').innerHTML = `
+                    <div class="page">
+                        <div class="subpage">
+                            <div id="boletos1">
+                                <table style="height: 4.8cm; width: 100%; border-collapse: collapse; border-style: solid; margin-top: 18px;" border="1" >
+                                <tbody>
+                                    <tr style="text-align: center;">
+                                        <td style="width: 4.97079%; height: 241px;" rowspan="9">&nbsp;</td>
+                                        <td style="background-color: lightgray; text-align: center; border-style: solid;">
+                                            
+                                            <img src="${dadosEscola.logoEscola}" alt="Logo" width="140" height="140" />
+                                                
+                                            
+                                            
+                                            <tr style="background-color: ${dadosEscola.dadosBasicos.corSecundariaEscola}; height: 12px;">
+                                                <td style="color: ${dadosEscola.dadosBasicos.corPrimariaEscola};"></td>
+                                            </tr>
+                                            <tr style="background-color: ${dadosEscola.dadosBasicos.corPrimariaEscola}; height: 43px;">
+                                                <td style="background-color: ${dadosEscola.dadosBasicos.corPrimariaEscola};"></td>
+                                            </tr>
+                                            
+                                        </td>    
                                     </tr>
-                                    <tr style="background-color: ${dadosEscola.dadosBasicos.corPrimariaEscola}; height: 43px;">
-                                        <td style="background-color: ${dadosEscola.dadosBasicos.corPrimariaEscola};"></td>
-                                    </tr>
-                                    
-                                </td>    
-                            </tr>
-                        </tbody>
-                    </table>
+                                </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
                     `
                 }
+
                 function addParcela(parcelaAtual, numDeParcelas, vencimento, numeroDoc, valorDoc, descontos, acrescimos, totalCobrado, dataProcessamento, informacoes) {
-                    let boletos = document.getElementById('boletos')
+                    
+                    bol++
+                    if (bol > 3 && pag >= 1) {
+                        pag++
+                        bol = 0
+                        document.getElementById('livro').innerHTML += `
+                        <div class="page">
+                            <div class="subpage">
+                                <div id="boletos${pag}"></div>
+                            </div>
+                        </div>
+                        `
+                    }
+                    let boletos = document.getElementById('boletos' + pag)
+                    
                     boletos.innerHTML += `
-                    <table style="height: 241px; width: 100%; border-collapse: collapse; border-style: solid; margin-top: 18px;" border="1" >
+                    <table style="height: 4.8cm; width: 100%; border-collapse: collapse; border-style: solid; margin-top: 18px;" border="1" >
                         <tbody>
                             <tr style="height: 10px; border-style: none;">
                                 <td style="width: 4.97079%; height: 179px;" rowspan="9">&nbsp;</td>
@@ -688,22 +822,22 @@
                                 </section>
                             </td>
                             <td style="width: 64.5223%; height: 10px; ">
-                                <section style="font-size: 8pt;">
+                                <section style="font-size: 8pt; text-align: center;">
                                     Parcela
                                 </section>
                                 
-                                <section style="font-size: x-small;">
+                                <section style="font-size: x-small; text-align: center;">
                                     ${parcelaAtual}/${numDeParcelas}
                                 </section>    
                             </td>
                             </tr>
                             <tr style="height: 10px;">
                             <td style="width: 64.5223%; height: 10px;">
-                                <section style="font-size: 8pt;">
+                                <section style="font-size: 8pt; text-align: center; ">
                                     Vencimento
                                 </section>
                                 
-                                <section style="font-size: x-small;">
+                                <section style="font-size: x-small; text-align: center;">
                                     ${vencimento}
                                 </section>    
                             </td>

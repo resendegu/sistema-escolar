@@ -109,12 +109,18 @@
       updateData.prioridade = dados.get('prioridade')
       updateData.versao = Number(dados.get('versao'))
       console.log(updateData)
-      refUpdates.set(updateData).then(() =>{
-        AstNotif.toast('Versão lançada')
+      refUpdates.child('pastUpdates').push(updateData).then(() => {
+          refUpdates.child('lastUpdate').set(updateData).then(() => {
+          AstNotif.toast('Versão lançada')
+        }).catch(error => {
+          console.log(error)
+          AstNotif.dialog('Erro', error.message)
+        })
       }).catch(error => {
         console.log(error)
         AstNotif.dialog('Erro', error.message)
       })
+      
     })
   </script>
 

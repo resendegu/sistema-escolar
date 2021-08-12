@@ -17,9 +17,10 @@ firebase.auth().onAuthStateChanged((usuario) => {
 })
 
 function update() {
-	let versao = 0.993
+	let versao = 0.994
 	updatesRef.on('value', (snapshot) => {
-		let dados = snapshot.val()
+		let dados = snapshot.val().lastUpdate
+
 		if (versao < dados.versao) {
 			abrirModal('modal', 'Atualização do site', `<b>Uma atualização foi lançada:</b><br>Nova versão: ${dados.versao}<br>Sua versão: ${versao}<br>Descrição do novo Update: ${dados.descricao}<br>Importância: ${dados.prioridade}<br>Data do lançamento: ${dados.data}<br><br><a class="btn btn-primary" onclick="window.location.reload(true)">Clique aqui para atualizar</a><br>Caso você tenha clicado para atualizar mas continua vendo esta mensagem, segure a tecla shift e aperte o botão recarregar do navegador para atualizar.`, `<button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>`)
 		}
