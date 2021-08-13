@@ -2262,6 +2262,51 @@ async function carregaContratosAluno(matricula) {
      
 }
 
+async function carregaChecklistAluno(matricula) {
+    let checklistRef = firebase.database().ref('sistemaEscolar/infoEscola/checklist')
+    let checklistAlunoRef = alunosRef.child(matricula + '/checklist')
+    let checklistFire = await checklistRef.once('value')
+    let checklistSistema = checklistFire.val()
+    let checklistAluno
+
+    let checklistSequencial = document.getElementById('checklistSequencial')
+    
+    let checklistAlunoFire = checklistAlunoRef.on('value', (snapshot) => {
+        checklistAluno = snapshot.val()
+        sequencial()
+    })
+    
+    
+    function sequencial() {
+        checklistSequencial.innerHTML = ''
+        let c = 0
+        for (const key in checklistSistema) {
+            if (Object.hasOwnProperty.call(checklistSistema, key)) {
+                const checklist = checklistSistema[key];
+                checklistSequencial.innerHTML += `
+                <div>
+                  <h5>${checklist.topicoChecklist}</h5>
+                  <div id="checkSeq${key}">
+                  
+                  </div>
+                  <hr>
+                </div>
+                `
+                for (let i = 0; i < checklist.qtdeChecklist; i++) {
+                    document.getElementById(`checkSeq${key}`).innerHTML += `
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="${checklist.nomeChecklist}${i}" value="${key},${i}" name="${checklist.topicoChecklist}">
+                        <label class="custom-control-label" for="${checklist.nomeChecklist}${i}">${checklist.nomeChecklist} ${i+1}</label>
+                    </div>
+                    `
+                    
+                }
+            }
+            c++
+        }
+    }
+}
+
 var dadosResponsaveis = {}
 function abreDadosDoAluno(matricula, desativado=false, notasDesativado=false) {
 
@@ -2280,7 +2325,8 @@ function abreDadosDoAluno(matricula, desativado=false, notasDesativado=false) {
     document.getElementById('infoDoAluno').style.display = 'block'
     document.getElementById('rolaTelaAbaixoAlunos').style.display = 'block'
     document.getElementById('secGeraFicha').innerHTML = `<button class="btn btn-outline-primary btn-block" id="btnGeraFicha" onclick="gerarFichaAluno('${matricula}')">Gerar ficha de matrícula em PDF</button>
-    <button class="btn btn-outline-primary btn-block" id="btnBoletosAluno" data-toggle="modal" data-target="#contratosAluno" onclick="carregaContratosAluno('${matricula}')">Ver contratos/boletos do aluno</button>`
+    <button class="btn btn-outline-primary btn-block" id="btnBoletosAluno" data-toggle="modal" data-target="#contratosAluno" onclick="carregaContratosAluno('${matricula}')">Ver contratos/boletos do aluno</button>
+    <button class="btn btn-outline-primary btn-block" id="btnBoletosAluno" data-toggle="modal" data-target="#checklistAluno" onclick="carregaChecklistAluno('${matricula}')">Checklist do Aluno</button>`
     
     carregaFrequenciaAluno(matricula, dados.turmaAluno)
     dadosResponsaveis = {
@@ -3500,6 +3546,7 @@ function alteraTipoDeBuscaDesativados(tipo) {
 function dadosInfoEscola() {
     let listaLivros = document.getElementById('listaLivros')
     let listaCursos = document.getElementById('listaCursos')
+    let listaChecklist = document.getElementById('listaChecklist')
     infoEscolaRef.once('value').then(snapshot => {
         let dados = snapshot.val()
         if (dados != null) {
@@ -3575,6 +3622,36 @@ function dadosInfoEscola() {
         ativaCheckboxes()
     })
 
+    infoEscolaRef.child('checklist').on('value', (snapshot) => {
+        listaChecklist.innerHTML = ''
+        let checklistsCadastrados = snapshot.val()
+        for (const key in checklistsCadastrados) {
+            if (Object.hasOwnProperty.call(checklistsCadastrados, key)) {
+                const checklist = checklistsCadastrados[key];
+                listaChecklist.innerHTML += `
+                    <tr>
+                        <td>
+                            <span class="custom-checkbox">
+                                <input type="checkbox" id="checkboxChecklist${key}" name="checklists" value="${key}">
+                                <label for="checkboxChecklist${key}"></label>
+                            </span>
+                        </td>
+                        <td>${checklist.topicoChecklist}</td>
+                        <td>${checklist.nomeChecklist}</td>
+                        <td>${checklist.qtdeChecklist}</td>
+                        <td>
+                            
+                            <a href="#deleteEmployeeModal" class="action" data-toggle="modal"><i data-feather="eye" data-toggle="tooltip" title="Ver Estatísticas"></i></a>
+                        </td>
+                    </tr>
+                `
+            }
+        }
+        
+        feather.replace()
+        ativaCheckboxes()
+    })
+
     infoEscolaRef.child('codDiasSemana').on('value', (snapshot) => {
         let i = 0
         let diasSemana = snapshot.val()
@@ -3602,6 +3679,7 @@ function carregaDadosCurso(codSistema) {
         document.getElementById('codigoCursoSistemaAdd').value = snapshot.val().codSistema
     })
 }
+
 
 document.getElementById('infoEscolaForm').addEventListener('submit', (e) => {
     e.preventDefault()
@@ -3772,6 +3850,57 @@ document.getElementById('formListaCursos').addEventListener('submit', (e) => {
                         c++
                         if (c == cursosSelecionados.length) {
                             AstNotif.notify('Sucesso', 'Cursos deletados com sucesso.', 'agora')
+                            $('#modal').modal('hide')
+                        }
+                    }).catch(error => {
+                        AstNotif.dialog('Erro', error.message)
+                        console.log(error)
+                    })
+                }
+           }
+       }) 
+    }
+    
+})
+
+// Checklists
+document.getElementById('addChecklistTabela').addEventListener('submit', (e) => {
+    e.preventDefault()
+    const dados = new FormData(e.target);
+    let checklist = {}
+    checklist.topicoChecklist = dados.get('topicoChecklistAdd')
+    checklist.nomeChecklist = dados.get('nomeChecklistAdd')
+    checklist.qtdeChecklist = dados.get('qtdeChecklistAdd')
+    loaderRun(true, 'Enviando dados do Checklist...')
+    infoEscolaRef.child('checklist').push(checklist).then(() => {
+        AstNotif.notify('Checklist Adicionado', 'Checklist adicionado com sucesso', 'agora', {length: 5000})
+        $('#modalAdicionaChecklist').modal('hide')
+        loaderRun()
+    }).catch(error => {
+        AstNotif.dialog('Erro', error.message)
+        console.log(error)
+        loaderRun()
+    })
+})
+
+document.getElementById('formListaChecklist').addEventListener('submit', (e) => {
+    e.preventDefault()
+    const dados = new FormData(e.target);
+    let checklistsSelecionados = dados.getAll('checklists')
+    if (checklistsSelecionados.length == 0) {
+        AstNotif.dialog('Opa...', 'Você esqueceu de selecionar os checklists. Volte, e marque as caixas dos checklists que deseja deletar.')
+    } else {
+        abrirModal('modal', 'Confirmação', 'Você confirma a exclusão dos checklists selecionados?', '<button id="confirmaDeletaChecklists" class="btn btn-danger">Sim</button><button class="btn btn-secondary" data-dismiss="modal">Cancelar</button>')
+        document.getElementById('confirmaDeletaChecklists').addEventListener('click', (e) => {
+            e.preventDefault()
+            let c = 0
+            for (const i in checklistsSelecionados) {
+                if (Object.hasOwnProperty.call(checklistsSelecionados, i)) {
+                    const codChecklist = checklistsSelecionados[i];
+                    infoEscolaRef.child('checklist/' + codChecklist).remove().then(() => {
+                        c++
+                        if (c == checklistsSelecionados.length) {
+                            AstNotif.notify('Sucesso', 'Checklists deletados com sucesso.', 'agora')
                             $('#modal').modal('hide')
                         }
                     }).catch(error => {

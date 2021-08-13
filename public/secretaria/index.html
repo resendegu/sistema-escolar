@@ -208,12 +208,12 @@
       <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="tituloMatricula">Contratos cadastrados</h5>
+            <h5 class="modal-title" id="tituloContratos">Contratos cadastrados</h5>
             <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button> -->
           </div>
-          <div class="modal-body" id="corpoMatricula">
+          <div class="modal-body" id="corpoContratos">
             <div class="container-xl" id="tabelaContratosAluno">
               <div class="table-responsive">
                 <div class="table-wrapper">
@@ -269,7 +269,85 @@
               
             </div>
           </div>
-          <div class="modal-footer" id="botoesMatricula">
+          <div class="modal-footer" id="botoesContratos">
+            <!--<button type="button" class="btn btn-primary" onclick="window.frames['fichaPdf'].focus(), window.frames['fichaPdf'].print()">Imprimir</button>-->
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade bd-example-modal-xl" tabindex="-1" role="dialog" id="modalAdicionaChecklist">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="tituloAddChecklist">Adicionar Tópico de Checklist Sequencial</h5>
+            <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button> -->
+          </div>
+          <div class="modal-body" id="corpoAddChecklist">
+            <form id="addChecklistTabela">
+              <div class="form-row">
+                <div class="form-group col-md-6">
+                  <label for="inputEmail4">Tópico do Checklist</label>
+                  <input type="text" class="form-control" id="topicoChecklistAdd" name="topicoChecklistAdd" placeholder="Tópico para este grupo de checklists">
+                  <small id="idCursoHElp" class="form-text text-muted">Este será o nome do grupo de checkboxes.</small>
+                </div>
+                <div class="form-group col-md-6">
+                  <label for="exampleInputEmail1">Nome das checkboxes</label>
+                  <input type="text" required class="form-control" id="nomeChecklistAdd" name="nomeChecklistAdd" aria-describedby="nomeChecklist" placeholder="Nome do checklist">
+                  <small id="nomeChecklistHElp" class="form-text text-muted">Este será o nome que aparecerá em frente de cada checkbox.</small>  
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group col-md-6">
+                  <label for="inputPassword4">Quantidade</label>
+                    <input type="number" class="form-control" id="qtdeChecklistAdd" name="qtdeChecklistAdd" placeholder="Quantidade de checklists">
+                    <small id="qtdeChecklistHElp" class="form-text text-muted">Quantidade de vezes que esse checklist se repete.</small>
+                </div>
+              </div>
+              
+              <button type="submit" class="btn btn-primary btn-block">Adicionar</button>
+            </form>
+          </div>
+          <div class="modal-footer" id="botoesAddChecklist">
+            
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" id="checklistAluno">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="tituloChecklist">Contratos cadastrados</h5>
+            <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button> -->
+          </div>
+          <div class="modal-body" id="corpoChecklist">
+            <form id="checklistAluno">
+              <div class="container">
+                <h3>Checklists Sequenciais</h3>
+              </div>
+              <div id="checklistSequencial">
+                <div>
+                  <h5>Livros</h5>
+                  <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="livro1" name="livro">
+                    <label class="custom-control-label" for="customCheck1">Checkbox</label>
+                  </div>
+                  <hr>
+                </div>
+                
+              </div>
+              
+            </form>
+          </div>
+          <div class="modal-footer" id="botoesChecklist">
             <!--<button type="button" class="btn btn-primary" onclick="window.frames['fichaPdf'].focus(), window.frames['fichaPdf'].print()">Imprimir</button>-->
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
           </div>
@@ -1851,6 +1929,57 @@
                             <td>1</td>
                             <td>
                               <a href="#editEmployeeModal" class="action" data-toggle="modal"><i data-feather="edit" data-toggle="tooltip" title="Reativar aluno">&#xE254;</i></a>
+                              <a href="#deleteEmployeeModal" class="delete" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Deletar">&#xE872;</i></a>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                      
+                    </div>
+                  </div>
+                </div>
+              </form>
+              <hr>
+              <form id="formListaChecklist">
+                <div class="container-xl">
+                  <div class="table-responsive">
+                    <div class="table-wrapper">
+                      <div class="table-title">
+                        <div class="row">
+                          <div class="col-sm-6">
+                            <h2>Tópicos do <b>Checklist Sequencial</b></h2>
+                          </div>
+                          <div class="col-sm-6">
+                            <a href="#modalAdicionaChecklist" onclick="buscaProximoIdCurso()" class="btn btn-primary" data-toggle="modal">&nbsp; <span class="feather-24" data-feather="plus"></span><span>Adicionar</span></a>
+                            <button type="submit" class="btn btn-danger" data-toggle="modal">&nbsp;<span class="feather-24" data-feather="trash"></span> <span>Deletar</span></button>						
+                          </div>
+                        </div>
+                      </div>
+                      <table class="table table-striped table-hover">
+                        <thead>
+                          <tr>
+                            <th>
+                              
+                            </th>
+                            <th>Título do tópico <span data-feather="help-circle" data-toggle="tooltip" data-placement="top" title="O título do grupo de checklist."></span> </th>
+                            <th>Nome de cada checkbox <span data-feather="help-circle" data-toggle="tooltip" data-placement="top" title="O nome das checkboxes que serão precedidos de números para contagem do checklist."></span></th>
+                            <th>Quantidade <span data-feather="help-circle" data-toggle="tooltip" data-placement="top" title="A quantidade de nomes à serem replicados para marcações."></span> </th>
+                            <th>Ações</th>
+                          </tr>
+                        </thead>
+                        <tbody id="listaChecklist">
+                          <tr>
+                            <td>
+                              <span class="custom-checkbox">
+                                <input type="checkbox" id="checkbox1" name="cursos" value="1">
+                                <label for="checkbox1"></label>
+                              </span>
+                            </td>
+                            <td>Livros</td>
+                            <td>Livro</td>
+                            <td>8</td>
+                            <td>
+                              <a href="#editEmployeeModal" class="action" data-toggle="modal"><i data-feather="edit" data-toggle="tooltip" title="Editar">&#xE254;</i></a>
                               <a href="#deleteEmployeeModal" class="delete" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Deletar">&#xE872;</i></a>
                             </td>
                           </tr>
