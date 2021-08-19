@@ -2266,7 +2266,7 @@ async function carregaChecklistAluno(matricula) {
     let checklistRef = firebase.database().ref('sistemaEscolar/infoEscola/checklist')
     let checklistAcompanhamentoRef = firebase.database().ref('sistemaEscolar/infoEscola/checklistAcompanhamento')
     let checklistAlunoRef = alunosRef.child(matricula + '/checklist')
-    let checklistAlunoAcompanhamentoRef = alunosRef.child(matricula + '/checklistaAcompanhamento')
+    let checklistAlunoAcompanhamentoRef = alunosRef.child(matricula + '/checklistAcompanhamento')
     let checklistFire = await checklistRef.once('value')
     let checklistAcompanhamentoFire = await checklistAcompanhamentoRef.once('value')
     let checklistSistema = checklistFire.val()
@@ -2277,12 +2277,12 @@ async function carregaChecklistAluno(matricula) {
     let checklistSequencial = document.getElementById('checklistSequencial')
     let checklistAcompanhamento = document.getElementById('checklistAcompanhamento')
     
-    checklistAlunoRef.on('value', (snapshot) => {
+    checklistAlunoRef.once('value', (snapshot) => {
         checklistAluno = snapshot.val()
         sequencial(checklistSistema)
     })
 
-    checklistAlunoAcompanhamentoRef.on('value', (snapshot) => {
+    checklistAlunoAcompanhamentoRef.once('value', (snapshot) => {
         checklistAlunoAcompanhamento = snapshot.val()
         acompanhamento(checkListSistemaAcompanhamento)
     })
@@ -2308,14 +2308,32 @@ async function carregaChecklistAluno(matricula) {
                 for (let i = 0; i < checklist.qtdeChecklist; i++) {
                     document.getElementById(`checkSeq${key}`).innerHTML += `
                     <div class="custom-control custom-checkbox col-auto">
-                        <input type="checkbox" class="custom-control-input" ${checklistAluno != null && checklistAluno[key].indexOf(`'${i}'`) ? 'checked' : null} id="${checklist.nomeChecklist}${i}" value="${key},${i}" name="${checklist.topicoChecklist}">
+                        <input type="checkbox" class="custom-control-input" id="${checklist.nomeChecklist}${i}" value="${key},${i},${checklist.nomeChecklist}" name="${checklist.topicoChecklist}">
                         <label class="custom-control-label" for="${checklist.nomeChecklist}${i}">${checklist.nomeChecklist} ${i+1 <= 9 ? '0' + (i+1) : i+1 }</label>
                     </div>
                     `
                     
                 }
+
+                
             }
             c++
+        }
+
+        console.log(checklistAluno)
+        for (const key in checklistAluno) {
+            if (Object.hasOwnProperty.call(checklistAluno, key)) {
+                const array = checklistAluno[key];
+
+                for (const i in array) {
+                    if (Object.hasOwnProperty.call(array, i)) {
+                        const element = array[i];
+                        console.log(element.name + i)
+                        document.getElementById(`${element.value.split(',')[2]}${i}`).checked = true
+                    }
+                }
+                
+            }
         }
         escutaForm()
     }
@@ -2327,41 +2345,35 @@ async function carregaChecklistAluno(matricula) {
             if (Object.hasOwnProperty.call(checklistBase, key)) {
                 const checklist = checklistBase[key];
                 checklistAcompanhamento.innerHTML += `
-                <h5>${checklist.topicoChecklist}</h5>
-                <div class="container">
-                    
-                    <div id="checkSeq${key}">
-                    
-                    </div>
-                   
+                <div id="checkAcomp${key}" class="col" style="margin-bottom: 5px;">
+                    <h5>${checklist.topicoChecklist}</h5>
+                        
                 </div>
-                <hr>
+                
                 `
                 for (let i = 0; i < checklist.qtdeChecklist; i++) {
-                    document.getElementById(`checkSeq${key}`).innerHTML += `
-                    <div class="custom-control custom-checkbox">
+                    document.getElementById(`checkAcomp${key}`).innerHTML += `
+                    <div class="custom-control custom-checkbox" style="margin-top: 3px;">
                         <div class="row">
-                            <div class="col-auto">
-                                <input type="checkbox" class="custom-control-input" id="${checklist.nomeChecklist}${i}" value="${key},${i}" name="${checklist.topicoChecklist}">
+                            <div class="col">
+                                <input type="checkbox" class="custom-control-input" id="${checklist.nomeChecklist}${i}checkbox" value="${key},${i},checkbox,${checklist.nomeChecklist}" name="${checklist.topicoChecklist}">
                                 <label class="custom-control-label" for="${checklist.nomeChecklist}${i}">${checklist.nomeChecklist} ${i+1 <= 9 ? '0' + (i+1) : i+1 }</label>
                             </div>
-                            <div class="col-auto">
-                                <input type="checkbox" class="custom-control-input" id="${checklist.nomeChecklist}${i}Situacao1" value="${key},${i},situacao1" name="${checklist.topicoChecklist}Situacoes">
-                                <label class="custom-control-label" for="${checklist.nomeChecklist}${i}Situacao1">${checklist.situacao1}</label>
+                            <div class="col">
+                                <input type="checkbox" class="custom-control-input" id="${checklist.nomeChecklist}${i}situacao1" value="${key},${i},situacao1,${checklist.nomeChecklist}" name="${checklist.topicoChecklist}Situacoes">
+                                <label class="custom-control-label" for="${checklist.nomeChecklist}${i}situacao1">${checklist.situacao1}</label>
                             </div>
-                            <div class="col-auto">
-                                <input type="checkbox" class="custom-control-input" id="${checklist.nomeChecklist}${i}Situacao2" value="${key},${i},situacao2" name="${checklist.topicoChecklist}Situacoes">
-                                <label class="custom-control-label" for="${checklist.nomeChecklist}${i}Situacao2">${checklist.situacao2}</label>
+                            <div class="col">
+                                <input type="checkbox" class="custom-control-input" id="${checklist.nomeChecklist}${i}situacao2" value="${key},${i},situacao2,${checklist.nomeChecklist}" name="${checklist.topicoChecklist}Situacoes">
+                                <label class="custom-control-label" for="${checklist.nomeChecklist}${i}situacao2">${checklist.situacao2}</label>
                             </div>
-                            <div class="col-auto">
-                                <input type="checkbox" class="custom-control-input" id="${checklist.nomeChecklist}${i}Situacao3" value="${key},${i},situacao3" name="${checklist.topicoChecklist}Situacoes">
-                                <label class="custom-control-label" for="${checklist.nomeChecklist}${i}Situacao3">${checklist.situacao3}</label>
+                            <div class="col">
+                                <input type="checkbox" class="custom-control-input" id="${checklist.nomeChecklist}${i}situacao3" value="${key},${i},situacao3,${checklist.nomeChecklist}" name="${checklist.topicoChecklist}Situacoes">
+                                <label class="custom-control-label" for="${checklist.nomeChecklist}${i}situacao3">${checklist.situacao3}</label>
                             </div>
-                        
                         </div>
-                        
                     </div>
-                    <hr>
+                    
                     
                     `
                     
@@ -2369,28 +2381,66 @@ async function carregaChecklistAluno(matricula) {
             }
             c++
         }
+
+        for (const key in checklistAlunoAcompanhamento) {
+            if (Object.hasOwnProperty.call(checklistAlunoAcompanhamento, key)) {
+                const array = checklistAlunoAcompanhamento[key];
+
+                for (const i in array) {
+                    if (Object.hasOwnProperty.call(array, i)) {
+                        const grupo = array[i];
+                        for (const check in grupo) {
+                            if (Object.hasOwnProperty.call(grupo, check)) {
+                                const element = grupo[check];
+                                document.getElementById(`${element.value.split(',')[3]}${i}${element.value.split(',')[2]}`).checked = true
+                            }
+                        }
+                        
+                    }
+                }
+                
+            }
+        }
         escutaForm()
     }
 
     function escutaForm() {
         let formChecklistSequencial = document.getElementById('formChecklistSequencial')
         let formChecklistAcompanhamento = document.getElementById('formChecklistAcompanhamento')
-        formChecklistSequencial.addEventListener('change', (e) => {
-            console.log(e.target.value)
+        formChecklistSequencial.addEventListener('submit', (e) => {
+            e.preventDefault()
+        
             let data = new FormData(formChecklistSequencial)
-            let dados = data.getAll(e.target.name)
+            let dados = $('#formChecklistSequencial').serializeArray();
             console.log(dados)
+            dados.length == 0 ? checklistAlunoRef.set(null).then(() => {}) : null;
+            dados.forEach(elem => {
+                checklistAlunoRef.child(elem.value.split(',')[0] + '/' + elem.value.split(',')[1]).set(elem).then(() => {
 
-            checklistAlunoRef.child(e.target.value.split(',')[0]).set(dados).then(() => {
-
-            }).catch(error => {
-                AstNotif.dialog('Erro', error.message)
-                console.log(error)
+                }).catch(error => {
+                    AstNotif.dialog('Erro', error.message)
+                    console.log(error)
+                })
             })
+            
         })
 
-        formChecklistAcompanhamento.addEventListener('change', (e) => {
-            console.log(e.target.value)
+        formChecklistAcompanhamento.addEventListener('submit', (e) => {
+            e.preventDefault()
+       
+            let data = new FormData(formChecklistSequencial)
+            let dados = $('#formChecklistAcompanhamento').serializeArray();
+            console.log(dados)
+            let checklists = {}
+            dados.length == 0 ? checklistAlunoAcompanhamentoRef.set(null).then(() => {}) : null;
+            dados.forEach(elem => {
+                checklistAlunoAcompanhamentoRef.child(elem.value.split(',')[0] + '/' + elem.value.split(',')[1] + '/' + elem.value.split(',')[2]).set(elem).then(() => {
+
+                }).catch(error => {
+                    AstNotif.dialog('Erro', error.message)
+                    console.log(error)
+                })
+            })
         })
     }
 }
