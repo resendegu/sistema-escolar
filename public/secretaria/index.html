@@ -25,6 +25,7 @@
     <link rel="stylesheet" href="../resources/AST-Notif/css/ast-notif.min.css">
     <!-- Carregando arquivos da biblioteca driver.js. Créditos: https://github.com/kamranahmedse/driver.js -->
     <link rel="stylesheet" href="../resources/driver/driver.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.13.3/css/selectize.bootstrap4.min.css" integrity="sha512-MMojOrCQrqLg4Iarid2YMYyZ7pzjPeXKRvhW9nZqLo6kPBBTuvNET9DBVWptAo/Q20Fy11EIHM5ig4WlIrJfQw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="shortcut icon" href="../images/domain.png" type="image/x-icon">
   </head>
 
@@ -429,6 +430,53 @@
       </div>
     </div>
 
+    <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" id="escreverEmail">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Escrever e enviar email</h5>
+            <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button> -->
+          </div>
+          <form id="emailForm">
+            <div class="modal-body" id="corpoEmail">
+              <div class="form-group">
+                <label for="toEmail">Para:</label>
+                <input name="to" required type="email" id="toEmail" class="form-control demo-default selectized" placeholder="Para">
+        
+              </div>
+              
+              <div class="form-group">
+                <label for="toEmail">Cc:</label>
+                <input name="cc" id="ccEmail" type="email" class="form-control demo-default selectized" placeholder="Cc">
+              </div>
+              <div class="form-group">
+                <label for="toEmail">Bcc:</label>
+                <input name="bcc" id="bccEmail" type="email" class="form-control demo-default selectized" placeholder="Bcc">
+              </div>
+              <div class="form-group">
+                <label for="toEmail">Assunto:</label>
+                <input name="subject" type="text" class="form-control" placeholder="Assunto">
+              </div>
+              <div class="form-group">
+                <label for="toEmail">Mensagem:</label>
+                <textarea name="message" id="email_message" class="form-control" placeholder="Message" style="height: 120px;"></textarea>
+              </div>
+              <div class="form-group">
+                <input type="file" name="attachment">
+              </div>
+            </div>
+          
+          <div class="modal-footer" id="botoesEmail">
+            <button type="submit" class="btn btn-primary">Enviar</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+          </div>
+        </form>
+        </div>
+      </div>
+    </div>
+
     
 
           <!-- Inicialização do Firebase -->
@@ -489,9 +537,9 @@
                   </a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" data-toggle="list" href="#abaEnviarNotificacoes" role="tab" id="btnAbaAlunosDesativados" aria-controls="alunosDesativados">
+                  <a class="nav-link" data-toggle="list" href="#abaEnviarEmails" role="tab" id="btnAbaEnviarEmails" aria-controls="Enviar emails" onclick="abaEmail()">
                     <span data-feather="send"></span>
-                    Enviar notificações
+                    Enviar e-mails
                   </a>
                 </li>
                 <li class="nav-item">
@@ -634,9 +682,9 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" data-toggle="list" href="#abaEnviarNotificacoes" role="tab" id="btnAbaEnviarNotificacoes" aria-controls="alunosDesativados">
+                <a class="nav-link" data-toggle="list" href="#abaEnviarEmails" role="tab" id="btnAbaEnviarEmails" aria-controls="Enviar emails" onclick="abaEmail()">
                   <span data-feather="send"></span>
-                  Enviar notificações
+                  Enviar e-mails
                 </a>
               </li>
               <li class="nav-item">
@@ -1700,132 +1748,259 @@
               
             </div>
 
-            <div class="container tab-pane fade" id="abaEnviarNotificacoes" role="tabpanel" aria-labelledby="Enviar notificações">
-              <label class="h3">Enviar Notificações</label>
-              <br>
-              <label class="h5">Escolha para quem enviar:</label>
-              <div class="row">
-                <div class="col-2">
-                  <div class="list-group" id="list-tab" role="tablist">
-                  
-                    <a class="list-group-item list-group-item-action active" data-toggle="list" href="#notificaAlunos" role="tab" aria-controls="home">Alunos</a>
-                  
-                  
-                    <a class="list-group-item list-group-item-action" id="list-profile-list" data-toggle="list" href="#notificaTurmas" role="tab" aria-controls="profile">Turmas</a>
-                  
-                  </div>
-                </div>
-              </div>
-              <div>
-                <div>
-                  <div class="tab-content" id="nav-tabContent">
-                    <div class="tab-pane fade show active" id="notificaAlunos" role="tabpanel" aria-labelledby="Notificar alunos">
-                      <br>
-                      <form id="formNotificaAlunos" >
-                        <h3>Conteúdo da notificação</h3>
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" id="basic-addon3">ID da Notificação</span>
-                            </div>
-                            <input type="text" class="form-control" id="idNotifAlunos" name="idNotif" aria-describedby="basic-addon3" readonly>
+            <div class="container tab-pane fade" id="abaEnviarEmails" role="tabpanel" aria-labelledby="Enviar e-mails">
+                
+              <div class="container-fluid py-3">
+                <div class="row">
+                    <div class="col-md-2">
+                        <div class="btn-group w-100">
+                            <button type="button" class="btn btn-primary btn-lg dropdown-toggle disabled" data-toggle="dropdown" disabled> Inbox <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu" role="menu">
+                                <li class="dropdown-item"><a href="#">Mail</a></li>
+                                <li class="dropdown-item"><a href="#">Contacts</a></li>
+                                <li class="dropdown-item"><a href="#">Tasks</a></li>
+                            </ul>
                         </div>
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" >Título</span>
-                            </div>
-                            <input type="text" class="form-control" name="tituloNotifAluno" id="tituloNotifAluno" aria-describedby="basic-addon3">
-                        </div>
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">Mensagem</span>
-                            </div>
-                            <textarea class="form-control" aria-label="With textarea" name="mensagemNotifAluno"></textarea>
-                        </div>
-                        <hr>
-                        <h3>Selecione os alunos para enviar</h3>
-                        <div>
-                          <div class="container">
-                            <div class="row">
-                              <div class="form-group col-auto">
-                                <label for="inputAddress">Campo de busca</label>
-                                <input class="form-control" type="search" placeholder="Digite a busca..." aria-label="Search" onchange="carregaListaDeAlunos(maiusculo(this))">
-                              </div>
-                              <div class="form-group col-auto">
-                                <label for="inputAddress">Buscar por:</label>
-                                <select class="form-control" name="tipoDeBusca" id="tipoDeBusca" onchange="alteraTipoDeBusca(this.value)">
-                                  <option selected value="nomeAluno">Nome do aluno</option>
-                                  <option value="matriculaAluno">Número de matrícula</option>
-                                  <option value="cpfAluno">CPF do aluno</option>
-                                  <option value="rgAluno">RG do aluno</option>
-                                  <option value="emailAluno">E-mail do aluno</option>
-                                  <option value="celularAluno">Celular do aluno</option>
-                                  <option value="telefoneAluno">Telefone do aluno</option>
-                                </select>
-                                
-                              </div>
-                            </div> 
-                          </div>
-                          <div class="container-xl" id="tabelaAlunosNotif">
-                            <div class="table-responsive">
-                              <div class="table-wrapper">
-                                <div class="table-title">
-                                  <div class="row">
-                                    <div class="col-sm-6">
-                                      <h2>Lista de <b>Alunos</b></h2>
-                                    </div>
-                                    <div class="col-sm-6">
-                                      <a href="#" class="btn btn-success" onclick="carregaListaDeAlunos()">&nbsp; <span class="feather-24" data-feather="refresh-cw"></span><span>Atualizar lista</span></a>
-                                      <a href="#deleteEmployeeModal" class="btn btn-danger" data-toggle="modal">&nbsp;<span class="feather-24" data-feather="trash"></span> <span>Delete</span></a>						
-                                    </div>
-                                  </div>
-                                </div>
-                                <table class="table table-striped table-hover">
-                                  <thead>
-                                    <tr>
-                                      <th>
-                                        <span class="custom-checkbox">
-                                          <input type="checkbox" id="selectAll">
-                                          <label for="selectAll"></label>
-                                        </span>
-                                      </th>
-                                      <th><a href="#" id="ordenaNome">Nome</a></th>
-                                      <th><a href="#" id="ordenaMatricula">Matrícula</a></th>
-                                      <th><a href="#" id="ordenaUltimaTurma">Turma</a></th>
-                                      <th>Ações</th>
-                                    </tr>
-                                  </thead>
-                                  <tbody id="listaAlunosNotif">
-                                    <tr>
-                                      <td>
-                                        <span class="custom-checkbox">
-                                          <input type="checkbox" id="checkbox1" name="options[]" value="1">
-                                          <label for="checkbox1"></label>
-                                        </span>
-                                      </td>
-                                      <td>Gustavo Resende</td>
-                                      <td>teste@resende.app</td>
-                                      <td>KIDS</td>
-                                      <td>
-                                        <a href="#editEmployeeModal" class="action" data-toggle="modal"><i data-feather="edit" data-toggle="tooltip" title="Reativar aluno">&#xE254;</i></a>
-                                        <a href="#deleteEmployeeModal" class="delete" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Deletar">&#xE872;</i></a>
-                                      </td>
-                                    </tr>
-                                  </tbody>
-                                </table>
-                                
-                              </div>
-                            </div>
-                          </div>
-          
-                          
-                        </div>
-                        <button class="btn btn-primary" type="submit" id="enviarNotifAluno">Enviar</button>
-                    </form>
                     </div>
-                    <div class="tab-pane fade" id="notificaTurmas" role="tabpanel" aria-labelledby="list-profile-list">...</div>
-                  </div>
+                    <div class="col-md-10">
+                      <a href="#" data-toggle="modal" data-target="#escreverEmail" class="btn btn-danger btn-lg" role="button" id="abreEscreveEmail"><i data-feather="edit"></i> Escrever</a>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-light">
+                                <input type="checkbox" aria-label="..." style="margin:1px;">
+                            </button>
+                            <button type="button" class="btn btn-light dropdown-toggle" data-toggle="dropdown">
+                                <span class="caret"></span><span class="sr-only">Toggle Dropdown</span>
+                            </button>
+                            <ul class="dropdown-menu" role="menu">
+                                <li class="dropdown-item"><a href="#">All</a></li>
+                                <li class="dropdown-item"><a href="#">None</a></li>
+                                <li class="dropdown-item"><a href="#">Read</a></li>
+                                <li class="dropdown-item"><a href="#">Unread</a></li>
+                                <li class="dropdown-item"><a href="#">Starred</a></li>
+                                <li class="dropdown-item"><a href="#">Unstarred</a></li>
+                            </ul>
+                        </div>
+                        <button type="button" class="btn btn-light" data-toggle="tooltip" id="atualizaEmail" title="Atualizar">
+                            <i data-feather="refresh-cw"></i> </button>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-light dropdown-toggle" data-toggle="dropdown"> Mais <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu" role="menu">
+                                <li class="dropdown-item"><a href="#">Mark all as read</a></li>
+                                <li class="divider"></li>
+                                <li class="dropdown-item text-center"><small class="text-muted">Selecione mensagens para ver mais ações</small></li>
+                            </ul>
+                        </div>
+                        <div class="float-right">
+                            <span class="text-muted"><b>1</b>–<b><label id="emailLengthPage"></label></b> de <b><label id="emailTotal"></label></b></span>
+                            <div class="btn-group btn-group-sm">
+                                <button type="button" class="btn btn-default">
+                                    <span data-feather="chevron-left"></span>
+                                </button>
+                                <button type="button" class="btn btn-default">
+                                    <span data-feather="chevron-right"></span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-              </div>
+                <hr>
+                <div class="row">
+                    <!--left-->
+                    <!-- <aside class="col-sm-3 col-md-2 pb-3">
+                        
+                        <hr>
+                         <ul class="nav nav-pills flex-column">
+                            <li class="active"><a href="#"><span class="badge badge-primary float-right">32</span> Inbox </a></li>
+                            <li><a href="#">Arquivados</a></li>
+                            <li><a href="#">Importante</a></li>
+                            <li><a href="#">Enviados</a></li>
+                            <li><a href="#"><span class="badge badge-primary float-right">3</span>Rascunhos</a></li>
+                         </ul>
+                        <hr> 
+                         <div class="storage">
+                            <small>2.85 GB of <strong>15 GB</strong></small>
+                            <div class="progress progress-sm">
+                                <div class="progress-bar progress-bar-primary" style="width:30%;"></div>
+                            </div>
+                        </div>
+                    </aside> -->
+                    <!--main-->
+                    <div class="col">
+                        <!-- tabs -->
+                        <ul class="nav nav-tabs border-0">
+                            <li class="nav-item">
+                                <a class="nav-link" href="#inboxTab" data-toggle="tab">
+                                    <i data-feather="inbox"></i> Inbox
+                                </a>
+                            </li>
+                            <li><a href="#sentTab" class="nav-link active" data-toggle="tab">
+                                <i data-feather="send"></i> Enviados</a></li>
+                            <li><a href="#settings" class="nav-link disabled" data-toggle="tab" disabled>
+                                <i data-feather="plus"></i>
+                                </a>
+                            </li>
+                        </ul>
+                        <!-- tab panes -->
+                        <div class="tab-content py-4">
+                            <div class="tab-pane in" id="inboxTab">
+                                <table class="table table-striped table-hover">
+                                    <tbody>
+                                        <!-- inbox header -->
+                                        <tr>
+                                            <td>
+                                                <btn class="btn btn-outline-primary">
+                                                    <input type="checkbox" class="all" title="select all"> Tudo 
+                                                </btn>
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-light"><i title="delete selected" data-feather="trash"></i></button>
+                                                <button class="btn btn-light"><i title="move to folder" data-feather="folder"></i></button>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        <!-- inbox item -->
+                                        <tr>
+                                            <td>
+                                                <label>
+                                                    <input type="checkbox">
+                                                </label> <span class="name text-truncate">Mark Otto</span></td>
+                                            <td><span class="subject">Nice work on the docs for lastest version</span> <small class="text-muted">- Joe, I just reviewed the last...</small></td>
+                                            <td><span class="badge">12:10 AM</span> <span data-feather="paperclip"></span></td>
+                                        </tr>
+                                        <!-- inbox item -->
+                                        <tr>
+                                            <td>
+                                                <label>
+                                                    <input type="checkbox">
+                                                </label> <span class="name text-truncate">Anil Judah</span></td>
+                                            <td><span class="subject">GAE Project</span> <small class="text-muted">- Can you take a second to look..</small></td>
+                                            <td><span class="badge badge-inverse">11:33 AM</span> <span class="float-right fa fa-warning-sign text-danger"></span></td>
+                                        </tr>
+                                        <!-- inbox item -->
+                                        <tr class="unread">
+                                            <td>
+                                                <label>
+                                                    <input type="checkbox">
+                                                </label> <span class="name text-truncate">Terry Lincoln</span></td>
+                                            <td><span class="subject">Vacation pics</span> <small class="text-muted">(this message contains images)</small></td>
+                                            <td><span class="badge">11:13 AM</span> <span class="float-right"></span></td>
+                                        </tr>
+                                        <!-- inbox item -->
+                                        <tr>
+                                            <td>
+                                                <label>
+                                                    <input type="checkbox">
+                                                </label> <span class="name text-truncate">Mark Brown</span></td>
+                                            <td><span class="subject">Last call for this weekend</span> <small class="text-muted">- Hi Joe, Thanks for sending over those..</small></td>
+                                            <td><span class="badge">11:05 AM</span> <span class="pull-right"></span></td>
+                                        </tr>
+                                        <!-- inbox item -->
+                                        <tr>
+                                            <td class=" text-truncate">
+                                                <label>
+                                                    <input type="checkbox">
+                                                </label> <span class="name text-truncate">Jorge Anodonolgez</span></td>
+                                            <td><span class="subject">Meeting with Simco</span> <small class="text-muted">- Joe I included your contact info for the...</small></td>
+                                            <td><span class="badge">10:54 AM</span> <span class="pull-right glyphicon glyphicon-paperclip"></span></td>
+                                        </tr>
+                                        <!-- inbox item -->
+                                        <tr>
+                                            <td class="text-nowrap">
+                                                <label>
+                                                    <input type="checkbox">
+                                                </label> <span class="name text-truncate">Mark Otto</span></td>
+                                            <td><span class="subject">FYI: New Release</span> <small class="text-muted">this message is high priority</small></td>
+                                            <td><span class="badge badge-dark">9:58 AM</span> <span class="float-right"></span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="tab-pane in active" id="sentTab">
+                              <table class="table table-striped table-hover">
+                                <tbody>
+                                    <!-- inbox header -->
+                                    <tr>
+                                        <td>
+                                            <btn class="btn btn-outline-primary">
+                                                <input type="checkbox" class="all" title="select all"> Tudo 
+                                            </btn>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-light"><i title="delete selected" class="fa fa-trash"></i></button>
+                                            <button class="btn btn-light"><i title="move to folder" class="fa fa-folder-open"></i></button>
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                    <!-- inbox item -->
+                                    <tr>
+                                        <td>
+                                            <label>
+                                                <input type="checkbox">
+                                            </label> <span class="name text-truncate">Mark Otto</span></td>
+                                        <td><span class="subject">Nice work on the docs for lastest version</span> <small class="text-muted">- Joe, I just reviewed the last...</small></td>
+                                        <td><span class="badge">12:10 AM</span> <span class="float-right fa fa-paperclip"></span></td>
+                                    </tr>
+                                    <!-- inbox item -->
+                                    <tr>
+                                        <td>
+                                            <label>
+                                                <input type="checkbox">
+                                            </label> <span class="name text-truncate">Anil Judah</span></td>
+                                        <td><span class="subject">GAE Project</span> <small class="text-muted">- Can you take a second to look..</small></td>
+                                        <td><span class="badge badge-inverse">11:33 AM</span> <span class="float-right fa fa-warning-sign text-danger"></span></td>
+                                    </tr>
+                                    <!-- inbox item -->
+                                    <tr class="unread">
+                                        <td>
+                                            <label>
+                                                <input type="checkbox">
+                                            </label> <span class="name text-truncate">Terry Lincoln</span></td>
+                                        <td><span class="subject">Vacation pics</span> <small class="text-muted">(this message contains images)</small></td>
+                                        <td><span class="badge">11:13 AM</span> <span class="float-right"></span></td>
+                                    </tr>
+                                    <!-- inbox item -->
+                                    <tr>
+                                        <td>
+                                            <label>
+                                                <input type="checkbox">
+                                            </label> <span class="name text-truncate">Mark Brown</span></td>
+                                        <td><span class="subject">Last call for this weekend</span> <small class="text-muted">- Hi Joe, Thanks for sending over those..</small></td>
+                                        <td><span class="badge">11:05 AM</span> <span class="pull-right"></span></td>
+                                    </tr>
+                                    <!-- inbox item -->
+                                    <tr>
+                                        <td class=" text-truncate">
+                                            <label>
+                                                <input type="checkbox">
+                                            </label> <span class="name text-truncate">Jorge Anodonolgez</span></td>
+                                        <td><span class="subject">Meeting with Simco</span> <small class="text-muted">- Joe I included your contact info for the...</small></td>
+                                        <td><span class="badge">10:54 AM</span> <span class="pull-right glyphicon glyphicon-paperclip"></span></td>
+                                    </tr>
+                                    <!-- inbox item -->
+                                    <tr>
+                                        <td class="text-nowrap">
+                                            <label>
+                                                <input type="checkbox">
+                                            </label> <span class="name text-truncate">Mark Otto</span></td>
+                                        <td><span class="subject">FYI: New Release</span> <small class="text-muted">this message is high priority</small></td>
+                                        <td><span class="badge badge-dark">9:58 AM</span> <span class="float-right"></span></td>
+                                    </tr>
+                                </tbody>
+                              </table>
+                                
+                            </div>
+                        </div>
+                        <div class="row-md-12">
+                            <div class="card card-body text-right">
+                                <small>Última atualização: <label id="lastUpdatedEmail"></label></small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+              
             </div>
 
 
@@ -2220,7 +2395,9 @@
 
     <!-- Carregando arquivos da biblioteca driver.js. Créditos: https://github.com/kamranahmedse/driver.js -->
     <script defer src="../resources/driver/driver.min.js"></script>
-    <script defer src="../js/tour.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.13.3/js/standalone/selectize.js" integrity="sha512-pF+DNRwavWMukUv/LyzDyDMn8U2uvqYQdJN0Zvilr6DDo/56xPDZdDoyPDYZRSL4aOKO/FGKXTpzDyQJ8je8Qw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+ 
 
 
     <!-- Graphs 

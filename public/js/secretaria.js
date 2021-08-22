@@ -3512,6 +3512,347 @@ function gerarFichaAluno(matricula) {
     $('#matriculaModal').modal({backdrop: 'static'})
 }
 
+// Funções de enviar emails
+async function abaEmail() {
+    let abreEscreveEmail = document.getElementById('abreEscreveEmail')
+    let db = firebase.firestore()
+    let atualizaEmail = document.getElementById('atualizaEmail')
+    let sentTab = document.getElementById('sentTab')
+    let emailLengthPage = document.getElementById('emailLengthPage')
+    
+    abreEscreveEmail.addEventListener('click', handleEmailWriting)
+
+    carregaEmails()
+
+    atualizaEmail.addEventListener('click', (e) => {
+        carregaEmails();
+    })
+
+    async function lastUpdate() {
+        let lastUpdatedEmail = document.getElementById('lastUpdatedEmail')
+        let timestampNow = firebase.functions().httpsCallable('timestamp')
+        timestampNow().then(function(result) {
+            let timestamp = new Date(result.data.timestamp._seconds * 1000)
+            lastUpdatedEmail.innerText = timestamp.toLocaleTimeString()
+            console.log(timestamp.toLocaleTimeString())
+        }).catch(error => {
+            console.log(error)
+            AstNotif.dialog('Erro', error.message)
+        })
+    }
+
+    function emailButtons() {
+        document.querySelectorAll('.emailButton').forEach(item => {
+            item.addEventListener('click', (e) => {
+                openEmail(e.target.id)
+                
+            })
+        })
+    }
+
+    async function openEmail(id) {
+        let mailRef = db.collection('mail').doc(id)
+        console.log(id)
+        try {
+            let doc = await mailRef.get()
+            if (doc.exists) {
+                console.log("Document data:", doc.data());
+                let email = doc.data()
+                let endTimeTimestamp = new Date(email.delivery.endTime.seconds * 1000)
+                let endTime = `${endTimeTimestamp.toLocaleTimeString()} ${endTimeTimestamp.toLocaleDateString()}`
+                let startTimeTimestamp = new Date(email.delivery.startTime.seconds * 1000)
+                let startTime = `${startTimeTimestamp.toLocaleTimeString()} ${startTimeTimestamp.toLocaleDateString()}`
+
+                abrirModal('modal', `Email enviado: ${email.message.subject}`, ` 
+                <div class="form-group">
+                    <label for="toEmail">Para:</label>
+                    <input name="to" readonly type="email" value="${email.to}" id="toEmail" class="form-control demo-default selectized" placeholder="Para">
+            
+                </div>
+                
+                <div class="form-group">
+                    <label for="toEmail">Cc:</label>
+                    <input name="cc" readonly id="ccEmail" type="email" class="form-control demo-default selectized" placeholder="Cc" value="${email.cc}">
+                </div>
+                <div class="form-group">
+                    <label for="toEmail">Bcc:</label>
+                    <input name="bcc" readonly id="bccEmail" type="email" class="form-control demo-default selectized" placeholder="Bcc" value="${email.bcc}">
+                </div>
+                <div class="form-group">
+                    <label for="toEmail">Assunto:</label>
+                    <input name="subject" value="${email.message.subject}" readonly type="text" class="form-control" placeholder="Assunto">
+                </div>
+                <div class="form-group">
+                    <label for="toEmail">Mensagem:</label>
+                    <textarea name="message" readonly id="email_message" class="form-control" placeholder="Message" style="height: 120px;">${email.message.text}</textarea>
+                </div>
+                <div class="form-group">
+                    <input type="file" readonly name="attachment">
+                </div>
+                <div class="container">
+                    <h5>Relatório de entrega do e-mail</h5>
+                    <ul style="list-style-type:disc">
+                        <li>Data e Hora que entrou na fila de envio: ${startTime}</li>
+                        <li>Data e Hora que foi entregue: ${endTime}</li>
+                        <li>Tentativa(s) de envio: ${email.delivery.attempts}</li>
+                        <li>Status do Envio: ${email.delivery.state}</li>
+                        <li>ID da mensagem: ${email.delivery.info.messageId}</li>
+                    </ul>
+                </div>
+                `, `<button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>`)
+            } else {
+                // doc.data() will be undefined in this case
+                console.log("No such document!");
+            }
+        } catch (error) {
+            AstNotif.dialog('Erro', error.message)
+        }
+        
+
+    }
+
+    async function carregaEmails(limit = 20, listen=true) {
+        
+        let first = db.collection("mail").orderBy('delivery', 'desc').limit(limit)
+        first.get().then(async (querySnapshot) => {
+            let emails = [];
+            querySnapshot.forEach((doc) => {
+                emails.push({data: doc.data(), id: doc.id});
+            })
+
+            sentTab.innerHTML = `
+                <table class="table table-striped table-hover">
+                    <tbody id="sentEmailTable">
+                        <tr>
+                            <td>
+                                <btn class="btn btn-outline-primary">
+                                    <input type="checkbox" class="all" title="select all"> Tudo 
+                                </btn>
+                            </td>
+                            <td>
+                                <button class="btn btn-light"><i title="delete selected" data-feather="trash"></i></button>
+                                
+                            </td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>    
+                `
+            let sentEmailTable = document.getElementById('sentEmailTable')
+            emails.forEach(email => {
+                console.log(email)
+                let endTimeTimestamp = new Date(email.data.delivery.endTime.seconds * 1000)
+                let endTime = `${endTimeTimestamp.toLocaleTimeString()} ${endTimeTimestamp.toLocaleDateString()}`
+                sentEmailTable.innerHTML += `
+                <tr>
+                
+                    <td>
+                        <label>
+                            <input type="checkbox">
+                        </label> 
+                        <a class="name text-truncate emailButton" style="cursor:pointer;" id="${email.id}">${email.data.to}</a>
+                    </td>
+                     <td>
+                        <span class="subject">${email.data.message.subject}</span>
+                        <small class="text-muted d-block text-truncate" style="width: 400px;">${email.data.message.text}</small>
+                    </td>
+                    <td><span class="badge" data-toggle="tooltip" title="Horário que o servidor entregou a mensagem">${endTime}</span> <a style="cursor:pointer;"><span data-feather="eye" data-toggle="tooltip" title="Abrir e-mail"></span></a></td>
+                </tr>
+                `
+
+            })
+
+            if (emails.length == 0) {
+                sentTab.innerHTML = `
+                <div class="list-group">
+                    <div class="list-group-item">
+                        <span class="text-center">Esta caixa está vazia.</span>
+                    </div>
+                </div>
+                `
+                emaiLengthPage.innerText = '0'
+            }
+            
+            emailLengthPage.innerText = emails.length
+
+            console.log(console.log(emails))
+            feather.replace()
+            $(function () {
+                $('[data-toggle="tooltip"]').tooltip()
+            })
+
+            emailButtons()
+            lastUpdate()
+            listen ? listenEmails() : null;
+            
+        }).catch((error) => {
+            console.log(error)
+        });
+    }
+
+    async function listenEmails() {
+        db.collection("mail")
+            .onSnapshot((snapshot) => {
+                snapshot.docChanges().forEach((change) => {
+                    if (change.type === "added") {
+                        console.log("New city: ", change.doc.data());
+                    }
+                    if (change.type === "modified") {
+                        console.log("Modified city: ", change.doc.data());
+                    }
+                    if (change.type === "removed") {
+                        console.log("Removed city: ", change.doc.data());
+                    }
+                });
+            });
+    }
+
+    async function searchEmails(input) {
+        let emails = await alunosRef.orderByChild('emailAluno').startAt(input).limitToFirst(15).once('value')
+        console.log(emails.val())
+        let alunos = emails.val()
+        let lista = []
+        for (const matricula in alunos) {
+            if (Object.hasOwnProperty.call(alunos, matricula)) {
+                const email = alunos[matricula];
+                lista.push({name: email.nomeAluno, email: email.emailAluno})
+                lista.push({name: email.nomeResponsavelFinanceiroAluno, email: email.emailresponsavelFinanceiro})
+                lista.push({name: email.nomeResponsavelPedagogicoAluno, email: email.emailResponsavelPedagogico})
+            }
+        }
+        return lista;
+    }
+
+    async function handleEmailWriting(e) {
+        
+        let emailForm = document.getElementById('emailForm')
+        
+        
+
+        emailForm.addEventListener('submit', async (e) => {
+            e.preventDefault()
+            loaderRun(true, 'Enviando dados...')
+            
+            
+
+            let emailRaw = $("#emailForm").serializeArray()
+            let email = {}
+            emailRaw.forEach(elem => {
+                email[elem.name] = elem.value
+            })
+            console.log(email)
+            let emailContent = {
+                to: email.to,
+                cc: email.cc,
+                bcc: email.bcc,
+                message: {
+                    subject: email.subject,
+                    text: email.message,
+                    html: email.message
+                },
+            }
+
+            db.collection('mail').add(emailContent).then(() => {
+                AstNotif.notify('Sucesso', 'Seu email entrou na fila de envio de e-mails e logo será enviado.', 'agora',  {length: 5000})
+                $('#escreverEmail').modal('hide')
+                loaderRun()
+            }).catch(error => {
+                console.log(error)
+                AstNotif.dialog('Erro', error.message)
+                loaderRun()
+            })
+            
+            
+            
+        })
+
+
+        $("#toEmail").selectize({
+            plugins: ["remove_button"],
+            delimiter: ",",
+            persist: true,
+            load: function(query, callback) {
+                var selectize = this
+                if (!query.length) return callback();
+
+                searchEmails(query).then(emails => {
+                    callback(emails)
+                    emails.forEach(email => {
+                        selectize.addOption({text: `${email.name}: ${email.email}`, value: email.email})
+                    })
+                    
+                    console.log(emails)
+                });
+
+                
+            },
+            create: function (input) {
+                
+                return {
+                    value: input,
+                    text: input,
+                };
+            },
+        });
+
+        $("#ccEmail").selectize({
+            plugins: ["remove_button"],
+            delimiter: ",",
+            persist: true,
+            load: function(query, callback) {
+                var selectize = this
+                if (!query.length) return callback();
+
+                searchEmails(query).then(emails => {
+                    callback(emails)
+                    emails.forEach(email => {
+                        selectize.addOption({text: `${email.name}: ${email.email}`, value: email.email})
+                    })
+                    
+                    console.log(emails)
+                });
+
+                
+            },
+            create: function (input) {
+                
+                return {
+                    value: input,
+                    text: input,
+                };
+            },
+        });
+
+        $("#bccEmail").selectize({
+            plugins: ["remove_button"],
+            delimiter: ",",
+            persist: true,
+            load: function(query, callback) {
+                var selectize = this
+                if (!query.length) return callback();
+
+                searchEmails(query).then(emails => {
+                    callback(emails)
+                    emails.forEach(email => {
+                        selectize.addOption({text: `${email.name}: ${email.email}`, value: email.email})
+                    })
+                    
+                    console.log(emails)
+                });
+
+                
+            },
+            create: function (input) {
+                
+                return {
+                    value: input,
+                    text: input,
+                };
+            },
+        });
+    }
+}
+
 // Funções da aba Alunos Desativados
 var tipoDeBuscaDesativados = 'dadosAluno/nomeAluno'
 var alunosDesativados

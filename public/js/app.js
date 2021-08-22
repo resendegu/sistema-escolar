@@ -17,7 +17,7 @@ firebase.auth().onAuthStateChanged((usuario) => {
 })
 
 function update() {
-	let versao = 0.995
+	let versao = 0.996
 	updatesRef.on('value', (snapshot) => {
 		let dados = snapshot.val().lastUpdate
 
