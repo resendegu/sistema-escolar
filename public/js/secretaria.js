@@ -34,6 +34,7 @@ firebase.auth().onAuthStateChanged((user) => {
         
         abrirModal('modal', 'Login',
             `
+            <div class="container">
                 <h3>Seja bem-vindo!</h3>
                 <h6>Para acessar o sistema, digite seu e-mail e sua senha cadastradas.</h6>
                 <form id="areaLogin">
@@ -41,21 +42,42 @@ firebase.auth().onAuthStateChanged((user) => {
                     <div class="form-group col-md-6">
                         <label for="inputEmail4">Email</label>
                         <input type="email" name="usuario" class="form-control" id="usuario" placeholder="Email">
+                        <a style="cursor: pointer;" id="esqueceuSenha" class="text-center" data-toggle="tooltip" data-placement="right" title="Digite seu e-mail no campo, e clique aqui para que possamos te ajudar.">Esqueci minha senha</a>
                     </div>
                     <div class="form-group col-md-6">
                         <label for="inputPassword4">Senha</label>
                         <input type="password" name="senha" class="form-control" id="inputPassword4" placeholder="Senha">
                     </div>
                     <button type="submit" class="btn btn-primary btn-block" id="btnEntrar">Entrar no sistema</button>
+                    <br><br>
+                    
                 </form>
-                <br><br>
-                <a href="#" id="esqueceuSenha" class="text-center" data-toggle="tooltip" data-placement="right" title="Digite seu e-mail no campo, e clique aqui para que possamos te ajudar.">Esqueci minha senha</a>
-                <p class="text-muted">Caso tenha esquecido sua senha, informe seu e-mail no campo acima e clique em "Esqueci minha senha" para que possamos ajudá-lo.</p>
+            </div>
             `,
             `<button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>`
         )
         $(function () {
             $('[data-toggle="tooltip"]').tooltip()
+        })
+
+        document.getElementById('esqueceuSenha').addEventListener('click', (e) => {
+            let email = document.getElementById('usuario').value
+            if(email == "" || email.indexOf('@') == -1) {
+                AstNotif.dialog('Erro', 'Por favor, digite seu e-mail corretamente.')
+            } else {
+                loaderRun(true, 'Enviando email de verificação')
+                firebase.auth().sendPasswordResetEmail(email)
+                .then(() => {
+                   loaderRun()
+                   AstNotif.dialog('Sucesso', 'Acabamos de enviar um e-mail com um link para redefinição da sua senha. Confira sua Caixa de Entrada ou SPAM.')
+                })
+                .catch((error) => {
+                    let errorCode = error.code;
+                    let errorMessage = error.message;
+                    AstNotif.dialog('Erro', errorMessage)
+                    console.log(error)
+                });
+            }
         })
     
         document.querySelector('#areaLogin').addEventListener('submit', (e) => {
