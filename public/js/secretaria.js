@@ -2527,7 +2527,7 @@ function abreDadosDoAluno(matricula, desativado=false, notasDesativado=false) {
     document.getElementById('mostraCelularAluno').innerText = dados.celularAluno
     document.getElementById('mostraTelefoneAluno').innerText = dados.telefoneAluno
     document.getElementById('timestampDoAluno').innerText = 'Aluno cadastrado em: ' + new Date(dados.timestamp._seconds * 1000)
-    document.getElementById('mostraDataNascimentoAluno').innerText = dados.dataNascimentoAluno
+    document.getElementById('mostraDataNascimentoAluno').innerText = dados.dataNascimentoAluno.split('-').reverse().join('/');
 
     let nascimento = dados.dataNascimentoAluno
     
@@ -2537,7 +2537,7 @@ function abreDadosDoAluno(matricula, desativado=false, notasDesativado=false) {
         AstNotif.dialog('Erro', error.message)
         console.log(error)
     })
-    document.getElementById('mostraHoraEDiasAluno').innerText = dados.horaEDiasAluno
+    document.getElementById('mostraHoraEDiasAluno').innerText = `Horário atual de aula: ${dados.horaAluno}`
     document.getElementById('mostraTurmaAluno').innerHTML = dados.turmaAluno
     document.getElementById('mostraEmailAluno').innerText = dados.emailAluno
     document.getElementById('mostraMatriculaAluno').innerText = dados.matriculaAluno

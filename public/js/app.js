@@ -357,14 +357,16 @@ function verificaCPF(element) {
     return true;
 }
 
-window.addEventListener('DOMContentLoaded', (e) => {
+function lastTabUsed() {
 	try {
 		let ultimaAba = sessionStorage.getItem('ultimaAba')
 		document.getElementById(ultimaAba).click()
 	} catch (error) {
 		console.log(error)
 	}
-})
+}
+	
+
 
 document.getElementById('sidebar').addEventListener('click', (e) => {
 	sessionStorage.setItem('ultimaAba', e.target.id)

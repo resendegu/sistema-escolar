@@ -112,9 +112,12 @@ firebase.auth().onAuthStateChanged((user) => {
     } else {
         registroAcademico = user.uid
         alunosRef.child(user.uid).once('value').then(snapshot => {
+            console.log(snapshot.val())
             dadosAluno = snapshot.val()
+            console.log(dadosAluno.historicoEscolar)
+            lastTabUsed()
             try {
-                document.getElementById('cursosConcluidos').innerText = Object.keys(dadosAluno.historicoEscolar).length
+                document.getElementById('cursosConcluidos').innerText = dadosAluno.historicoEscolar == undefined ? null : Object.keys(dadosAluno.historicoEscolar).length
             } catch (error) {
                 console.log(error)
             } 
@@ -147,6 +150,7 @@ firebase.auth().onAuthStateChanged((user) => {
             }
             loaderRun()
         })
+        
     }
     
 })
@@ -206,6 +210,7 @@ function abreDadosDoAluno(desativado=false) {
     document.getElementById('infoDoAluno').style.display = 'block'
     document.getElementById('rolaTelaAbaixoAlunos').style.display = 'block'
     let dados = dadosAluno
+    console.log(dados)
     document.getElementById('alunoDesativado').style.display = 'none'
    
     carregaFrequenciaAluno(dados.matriculaAluno, dados.turmaAluno)
@@ -250,18 +255,15 @@ function abreDadosDoAluno(desativado=false) {
     document.getElementById('timestampDoAluno').innerText = 'Aluno cadastrado em: ' + new Date(dados.timestamp._seconds * 1000)
     document.getElementById('mostraDataNascimentoAluno').innerText = dados.dataNascimentoAluno.split('-').reverse().join('/');
 
-    let nascimento = dados.dataNascimentoAluno.split('-')
-    let nascimentoObj = new Date()
-    nascimentoObj.setDate(Number(nascimento[2]))
-    nascimentoObj.setFullYear(Number(nascimento[0]))
-    nascimentoObj.setMonth(Number(nascimento[1]) - 1)
-    calcularIdadePrecisa(nascimentoObj).then(function(idade){
+    let nascimento = dados.dataNascimentoAluno
+    
+    calcularIdadePrecisa(nascimento).then(function(idade){
         document.getElementById('mostraIdadeAluno').innerText = `${idade.years} anos, ${idade.months} mês(es), e ${idade.days} dias`
     }).catch(function(error){
         AstNotif.dialog('Erro', error.message)
         console.log(error)
     })
-    document.getElementById('mostraHoraEDiasAluno').innerText = dados.horaEDiasAluno
+    document.getElementById('mostraHoraEDiasAluno').innerText = `Horário de aula: ${dados.horaAluno}`
     document.getElementById('mostraTurmaAluno').innerHTML = dados.turmaAluno
     document.getElementById('mostraEmailAluno').innerText = dados.emailAluno
     document.getElementById('mostraMatriculaAluno').innerText = dados.matriculaAluno
@@ -419,6 +421,19 @@ function historicoAluno(matricula, turma) {
             `, `<button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>`
         )
         let listaHistorico = document.getElementById('listaHistorico')
+        listaHistorico.innerHTML = `
+        <tr>
+            <td>
+               
+            </td>
+            <td></td>
+            <td>Você ainda não possui nenhum histórico escolar disponível.</td>
+            <td><b></b></td>
+            <td>
+                
+            </td>
+        </tr>
+        `
         let c = 0
     alunosRef.child(matricula + '/historicoEscolar').on('child_added', (registro) => {
         
@@ -431,6 +446,10 @@ function historicoAluno(matricula, turma) {
                 const nota = notas[nomeNota];
                 somatorioNota += nota
             }
+        }
+
+        if (c == 1) {
+            listaHistorico.innerHTML = ``
         }
         listaHistorico.innerHTML += `
         <tr>

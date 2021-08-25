@@ -132,7 +132,8 @@ firebase.auth().onAuthStateChanged((user) => {
                                     if (Object.hasOwnProperty.call(listaAlunosMat, i)) {
                                         const aluno = listaAlunosMat[i];
                                         alunosRef.child(aluno).once('value').then(dadosAluno => {
-                                            alunos[aluno] = dadosAluno.val()
+
+                                            dadosAluno.val() != null ? alunos[aluno] = dadosAluno.val() : null
                                             
                                         }).catch(error => {
                                             AstNotif.dialog("Erro", error.message)
@@ -187,7 +188,7 @@ function carregaListaDeAlunos(filtro='') {
     loaderMsg.innerText = 'Carregando lista de alunos...'
     let listaAlunos = document.getElementById('listaAlunos')
     if (filtro == '') {
-        document.getElementById('listaAlunos').innerHTML = ''
+        listaAlunos.innerHTML = ''
         for (const matricula in alunos) {
             if (Object.hasOwnProperty.call(alunos, matricula)) {
                 const aluno = alunos[matricula];
@@ -1298,7 +1299,7 @@ function abreDadosDoAluno(matricula, desativado=false, notasDesativado=false) {
         AstNotif.dialog('Erro', error.message)
         console.log(error)
     })
-    document.getElementById('mostraHoraEDiasAluno').innerText = dados.horaEDiasAluno
+    document.getElementById('mostraHoraEDiasAluno').innerText = `Horário atual de aula: ${dados.horaAluno}`
     document.getElementById('mostraTurmaAluno').innerHTML = dados.turmaAluno
     document.getElementById('mostraEmailAluno').innerText = dados.emailAluno
     document.getElementById('mostraMatriculaAluno').innerText = dados.matriculaAluno
