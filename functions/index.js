@@ -473,6 +473,7 @@ exports.transfereAlunos = functions.https.onCall((data, context) => {
                     
                 }
             }
+            console.log(alunos)
             
             return admin.database().ref(`sistemaEscolar/turmas/${turmaParaTransferir}/alunos/`).update(alunos).then(() => {
                 async function removeAlunos() {
@@ -515,6 +516,7 @@ exports.transfereAlunos = functions.https.onCall((data, context) => {
                 return removeAlunos().then(() => {
                     return {answer: 'Os alunos foram transferidos para a outra turma com sucesso.'}
                 }).catch(error => {
+                    
                     throw new functions.https.HttpsError('unknown', error.message, error)
                 })
                 
