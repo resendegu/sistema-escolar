@@ -17,7 +17,7 @@ firebase.auth().onAuthStateChanged((usuario) => {
 })
 
 function update() {
-	let versao = 0.997
+	let versao = 0.998
 	updatesRef.on('value', (snapshot) => {
 		let dados = snapshot.val().lastUpdate
 
@@ -177,11 +177,12 @@ function ativaCheckboxes(){
 
 function ativaCheckboxes2(){
 	// Activate tooltip
+	let selectAll = '#selectAll2'
 	$('[data-toggle="tooltip"]').tooltip();
 	
 	// Select/Deselect checkboxes
 	var checkbox = $('table tbody input[type="checkbox"]');
-	$("#selectAll2").click(function(e){
+	$(selectAll).click(function(e){
 		console.log(e)
 		if(this.checked){
 			checkbox.each(function(){
@@ -195,7 +196,39 @@ function ativaCheckboxes2(){
 	});
 	checkbox.click(function(){
 		if(!this.checked){
-			$("#selectAll2").prop("checked", false);
+			$(selectAll).prop("checked", false);
+		}
+	});
+};
+
+function ativaCheckboxes3(){
+	// Activate tooltip
+	let selectAll = '#selectAll3'
+	$('[data-toggle="tooltip"]').tooltip();
+	
+	// Select/Deselect checkboxes
+	var checkbox = $('table tbody input[type="checkbox"]');
+	$(selectAll).click(function(e){
+		console.log(e)
+		if(this.checked){
+			checkbox.each(function(){
+				if (!this.checked) {
+					this.click() 
+				}
+				                       
+			});
+		} else{
+			checkbox.each(function(){
+				if (this.checked) {
+					this.click()
+				}
+				                    
+			});
+		} 
+	});
+	checkbox.click(function(){
+		if(!this.checked){
+			$(selectAll).prop("checked", false);
 		}
 	});
 };

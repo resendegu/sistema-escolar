@@ -395,379 +395,428 @@ function preparaCadastroTurma() {
 
 
 
+//Aba de turmas
+async function turmas() {
+    let turmas
+    let alunosSelecionados = []
+    let alunosTurma
+    let turmaAberta
+    carregaTurmas()
+
+    let selectTurmas = document.getElementById('selectTurmas')
+
+    selectTurmas.addEventListener('change', (e) => {
+        abreTurma(e.target.value)
+        
+    })
+
+    function carregaTurmas() {
+        loader.style.display = 'block'
+        loaderMsg.innerText = 'Carregando informações das turmas...'
+        turmasRef.once('value').then(snapshot => {
+            selectTurmas.innerHTML = '<option selected hidden>Escolha uma turma...</option>'
+            turmas = snapshot.val()
+            let selected = false
+            for (const cod in turmas) {
+                if (Object.hasOwnProperty.call(turmas, cod)) {
+                    const infoDaTurma = turmas[cod];
+                    if (infoDaTurma.professor == undefined) {
+                        var profReferencia = 'Não cadastrado'
+                    } else {
+                        var profReferencia = infoDaTurma.professor[0].nome
+                    }
+                    if (turmaAberta != undefined) {
+                        selected = 'selected'
+                    } else {
+                        selected = null
+                    }
+                    selectTurmas.innerHTML += `<option ${selected} value="${cod}">Turma ${cod} (Prof. ${profReferencia})</option>`
+                }
+            }
+            document.getElementById('selectTurmas').style.visibility = 'visible'
+            loaderRun()
+        }).catch(error => {
+            loaderRun()
+            console.error(error)
+            AstNotif.dialog('Erro', error.message)
+        })
 
 
+    }
 
+    document.getElementById('btnTransfereAlunosTurma').addEventListener('click', transfereAlunosConfirma)
+    function transfereAlunosConfirma() {
+        let nomes = ''
+        for (const i in alunosSelecionados) {
+            if (Object.hasOwnProperty.call(alunosSelecionados, i)) {
+                const matricula = alunosSelecionados[i];
+                console.log(matricula, alunosTurma)
+                try {
+                    const aluno = alunosTurma[matricula].nome
+                    nomes += formataNumMatricula(matricula) + ': ' + aluno + '<br>'
+                } catch (error) {
+                    alunosSelecionados.splice(i, 1)
+                }
+                
+                
+            }
+        }
+        abrirModal('modal', 'Confirmação', 
+            `Você selecionou os alunos listados abaixo da turma ${turmaAberta}. <br> ${nomes} <br><b>Você deseja transferi-los para qual turma?</b><br>(Aviso: As notas e todas as informações atuais do aluno nesta turma serão transferidas.)
+            <select class="custom-select" id="selectTurmasTransfere">
+                <option selected hidden>Escolha uma turma...</option>
+            </select>
+            `
+            , `<button type="button" data-toggle="tooltip" data-placement="top" title="A operação de transferência ficará gravada no sistema para futuras consultas." class="btn btn-info" id="btnTransfereDaTurma">Transferir</button><button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>`
+        )
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
+        let btnTransfereDaTurma = document.getElementById('btnTransfereDaTurma')
 
-var turmas
-// Funções da aba de turmas da secretaria
-function carregaTurmas() {
-    loader.style.display = 'block'
-    loaderMsg.innerText = 'Carregando informações das turmas...'
-    var selectTurmas = document.getElementById('selectTurmas')
-    turmasRef.once('value').then(snapshot => {
-        selectTurmas.innerHTML = '<option selected hidden>Escolha uma turma...</option>'
-        turmas = snapshot.val()
-        let selected = false
+        btnTransfereDaTurma.addEventListener('click', transfereDaTurma)
+
+        let selectTurmasTransfere = document.getElementById('selectTurmasTransfere')
         for (const cod in turmas) {
-            if (Object.hasOwnProperty.call(turmas, cod)) {
+            if (Object.hasOwnProperty.call(turmas, cod) && cod != turmaAberta) {
                 const infoDaTurma = turmas[cod];
                 if (infoDaTurma.professor == undefined) {
                     var profReferencia = 'Não cadastrado'
                 } else {
                     var profReferencia = infoDaTurma.professor[0].nome
                 }
-                if (alunosSelecionadosTurma.codTurma != undefined) {
-                    selected = 'selected'
-                } else {
-                    selected = false
-                }
-                selectTurmas.innerHTML += `<option ${selected} value="${cod}">Turma ${cod} (Prof. ${profReferencia})</option>`
+                selectTurmasTransfere.innerHTML += `<option value="${cod}">Turma ${cod} (Prof. ${profReferencia})</option>`
             }
         }
-        document.getElementById('selectTurmas').style.visibility = 'visible'
-        loaderRun()
-    }).catch(error => {
-        loaderRun()
-        console.error(error)
-        AstNotif.dialog('Erro', error.message)
-    })
-}
+    }
 
-var alunosSelecionadosTurma = {}
-document.getElementById('btnTransfereAlunosTurma').addEventListener('click', transfereAlunosConfirma)
-function transfereAlunosConfirma() {
-    let nomes = ''
-    let turma
-    for (const matricula in alunosSelecionadosTurma) {
-        if (Object.hasOwnProperty.call(alunosSelecionadosTurma, matricula)) {
-            const aluno = alunosSelecionadosTurma[matricula];
-            if (matricula == 'codTurma') {
-                turma = aluno
-            } else if(matricula == undefined || aluno == undefined) {
-
+    function selecionaTodos(source) {
+        let checkboxes = document.getElementsByName('alunosTurma');
+        for(var i=0, n=checkboxes.length;i<n;i++) {
+            if (source.checked) {
+                checkboxes[i].checked = false;
+                checkboxes[i].click()
             } else {
-                nomes += formataNumMatricula(matricula) + ': ' + aluno + '<br>'
+                checkboxes[i].checked = true;
+                checkboxes[i].click()
             }
             
         }
+        
     }
-    abrirModal('modal', 'Confirmação', 
-        `Você selecionou os alunos listados abaixo da turma ${turma}. <br> ${nomes} <br><b>Você deseja transferi-los para qual turma?</b><br>(Aviso: Caso o professor da turma que se quer transferir seja diferente, as notas e todas outras informações que foram feitas pelo professor atual serão transferidas também.)
-        <select class="custom-select" id="selectTurmasTransfere">
-            <option selected hidden>Escolha uma turma...</option>
-        </select>
-        `
-        , `<button type="button" data-toggle="tooltip" data-placement="top" title="A operação de transferência ficará gravada no sistema para futuras consultas." class="btn btn-info" onclick="transfereDaTurma()">Transferir</button><button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>`
-    )
-    $(function () {
-        $('[data-toggle="tooltip"]').tooltip()
-      })
-    let selectTurmasTransfere = document.getElementById('selectTurmasTransfere')
-    for (const cod in turmas) {
-        if (Object.hasOwnProperty.call(turmas, cod)) {
-            const infoDaTurma = turmas[cod];
-            if (infoDaTurma.professor == undefined) {
-                var profReferencia = 'Não cadastrado'
+
+
+
+    function excluirTurma(confirma=false) {
+        if (confirma) {
+            loader.style.display = 'block'
+            loaderMsg.innerText = 'Excluindo turma...'
+            let excluiTurma = firebase.functions().httpsCallable('excluiTurma')
+            excluiTurma({codTurma: alunosSelecionadosTurma.codTurma}).then(function(result) {
+                AstNotif.dialog('Sucesso', result.data.answer)
+                carregaTurmas()
+                loaderRun()
+            }).catch(function(error) {
+                AstNotif.dialog('Erro', error.message)
+                console.log(error)
+                loaderRun()
+            })
+        } else {
+            if (alunos == null) {
+                abrirModal('modal', 'Confirmação', 'Você está prestes à excluir uma turma. Ao excluir uma turma, todo o histórico gravado da turma será excluído! Depois de excluída, você poderá criar uma nova turma com o mesmo ID. Esta ação não pode ser revertida. <br><br> <b>Você têm certeza que deseja excluir esta turma?</b>', '<button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button><button type="button" class="btn btn-danger" data-dismiss="modal" onclick="excluirTurma(true)">Excluir</button>')
             } else {
-                var profReferencia = infoDaTurma.professor[0].nome
-            }
-            selectTurmasTransfere.innerHTML += `<option value="${cod}">Turma ${cod} (Prof. ${profReferencia})</option>`
+                abrirModal('modal', 'Calma aí', 'Você não pode excluir uma turma com alunos cadastrados nela. Antes de excluir a turma, transfira os alunos para outra turma, ou desative os alunos.', '<button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>')
+            } 
         }
     }
-}
-
-function selecionaTodos(source) {
-    let checkboxes = document.getElementsByName('alunosTurma');
-    for(var i=0, n=checkboxes.length;i<n;i++) {
-        if (source.checked) {
-            checkboxes[i].checked = false;
-            checkboxes[i].click()
+    function transfereDaTurma() {
+        loader.style.display = 'block'
+        loaderMsg.innerText = 'Transferindo alunos...'
+        let selectTurmasTransfere = document.getElementById('selectTurmasTransfere')
+        let turmaDestino = selectTurmasTransfere.value
+        if (turmaAberta == turmaDestino) {
+            AstNotif.dialog('Erro', 'Você deve escolher uma turma diferente da atual para transferência dos alunos.')
+            loaderRun()
         } else {
-            checkboxes[i].checked = true;
-            checkboxes[i].click()
+            let dados = {alunos: alunosSelecionados, turmaAtual: turmaAberta, turmaParaTransferir: turmaDestino}
+            transfereAlunos(dados).then(function(result){
+                AstNotif.dialog('Sucesso', result.data.answer)
+                loaderRun()
+                carregaTurmas()
+                $('#modal').modal('hide')
+                document.getElementById('listaAlunosDaTurma').innerHTML = ''
+                document.getElementById('ulProfCadastrados').innerHTML = ''
+            }).catch(function(error){
+                AstNotif.dialog('Erro', error.message)
+                console.error(error)
+                loaderRun()
+            })
+        }
+    }
+    var alunos
+
+    function somaNotas(notas) {
+        let somatorio = 0
+        for (const nomeNota in notas) {
+            if (Object.hasOwnProperty.call(notas, nomeNota)) {
+                const nota = notas[nomeNota];
+                somatorio = somatorio + nota
+            }
+        }
+        return somatorio;
+    }
+    function carregaListaDeAlunosDaTurma(alunos, filtro='') {
+        loaderRun(true, 'Carregando alunos...')
+        let listaAlunosTurma = document.getElementById('listaAlunosTurma')
+        listaAlunosTurma.innerHTML = ''
+        alunosTurma = alunos
+        let c = 0
+        for (const matricula in alunos) {
+            if (Object.hasOwnProperty.call(alunos, matricula)) {
+                const aluno = alunos[matricula];
+                listaAlunosTurma.innerHTML += `
+                <tr>
+                    <td>
+                    <span class="custom-checkbox">
+                        <input type="checkbox" id="checkbox${c}" name="options[]" value="${matricula}">
+                        <label for="checkbox${c}"></label>
+                    </span>
+                    </td>
+                    <td>${aluno.nome}</td>
+                    <td>${matricula}</td>
+                    <td>${aluno.notas == undefined ? null : somaNotas(aluno.notas)}</td>
+                    <td>
+                    <a href="#editEmployeeModal" class="action" data-toggle="modal"><i data-feather="truck" data-toggle="tooltip" title="Transferir aluno">&#xE254;</i></a>
+                    <a href="#deleteEmployeeModal" class="edit" data-toggle="modal"><i data-feather="user-x" data-toggle="tooltip" title="Desativar aluno">&#xE872;</i></a>
+                    </td>
+                </tr>
+                `
+            }
+            c++
+        }
+        loaderRun()
+        ativaCheckboxes3()
+        feather.replace()
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
+        escutaCheckboxesAlunosTurma()
+        escutaFormAlunosTurma()
+        
+    }
+
+    function escutaCheckboxesAlunosTurma() {
+        let checkboxes = document.getElementsByName('options[]')
+        checkboxes.forEach(elem => {
+            elem.addEventListener('click', (e) => {
+                console.log(e.target.value)
+                let matricula = e.target.value
+                let index = alunosSelecionados.indexOf(matricula)
+                if (index == -1) {
+                    alunosSelecionados.push(matricula)
+                } else {
+                    alunosSelecionados.splice(index, 1)
+                }
+                console.log(alunosSelecionados)
+            })
+            
+        })
+        
+    }
+
+    function escutaFormAlunosTurma() {
+        document.getElementById('btnTransfereAlunosTurma').addEventListener('submit', (e) => {
+            e.preventDefault()
+        })
+    }
+
+    function verificaAlunosSelecionados() {
+        let c = 0
+        for (const matricula in alunosSelecionadosTurma) {
+            if (Object.hasOwnProperty.call(alunosSelecionadosTurma, matricula)) {
+                const nome = alunosSelecionadosTurma[matricula];
+                
+                if (matricula == 'codTurma') {
+                    
+                } else if (nome != "") {
+                    c++
+                }
+                console.log(c)
+                if (c == 0) {
+                    document.getElementById('btnTransfereAlunosTurma').disabled = true
+                    document.getElementById('btnDesativaAlunos').disabled = true
+                    document.getElementById('selecTodos').checked = false
+                } else {
+                    document.getElementById('btnTransfereAlunosTurma').disabled = false
+                    document.getElementById('btnDesativaAlunos').disabled = false
+                }
+            }
         }
         
     }
-    
-}
 
-
-
-function excluirTurma(confirma=false) {
-    if (confirma) {
+    function abreTurma(cod) {
         loader.style.display = 'block'
-        loaderMsg.innerText = 'Excluindo turma...'
-        let excluiTurma = firebase.functions().httpsCallable('excluiTurma')
-        excluiTurma({codTurma: alunosSelecionadosTurma.codTurma}).then(function(result) {
+        loaderMsg.innerText = 'Abrindo turma...'
+        turmaAberta = cod
+        var codigoDaTurmaLabel = document.getElementById('codigoDaTurma')
+        var areaInfoTurma = document.getElementById('areaInfoTurma')
+        turmasRef.child(cod).on('value', (snapshot) => {
+            // TODO: Mostrar na tela as informações da turma
+            console.log(snapshot.val())
+            let dadosDaTurma = snapshot.val()
+            carregaListaDeAlunosDaTurma(dadosDaTurma.alunos)
+
+            codigoDaTurmaLabel.innerText = dadosDaTurma.codigoSala
+            areaInfoTurma.style.visibility = 'visible'
+            infoEscolaRef.once('value').then(infoEscola => {
+                let livros = infoEscola.val().livros
+                let codDiasSemana = infoEscola.val().codDiasSemana
+                document.getElementById('mostraDiasTurma').innerText = 'Dia(s) de Aula:'
+                for (const key in dadosDaTurma.diasDaSemana) {
+                    if (Object.hasOwnProperty.call(dadosDaTurma.diasDaSemana, key)) {
+                        const dia = dadosDaTurma.diasDaSemana[key];
+                        let diasemana
+                        switch(Number(dia)) {
+                            case 0:
+                                diasemana = 'Domingo'
+                                break
+                            case 1:
+                                diasemana = 'Segunda'
+                                break
+                            case 2: 
+                                diasemana = 'Terça'
+                                break
+                            case 3:
+                                diasemana = 'Quarta'
+                                break
+                            case 4:
+                                diasemana = 'Quinta'
+                                break
+                            case 5:
+                                diasemana = 'Sexta'
+                                break
+                            case 6:
+                                diasemana = 'Sábado'
+                                break
+                            default:
+                                diasemana = ''
+                                break
+                        }
+                        document.getElementById('mostraDiasTurma').innerText += ' | ' + diasemana + ' '
+                    }
+                    
+                }
+
+                document.getElementById('mostraLivrosTurma').innerText = 'Livros cadastrados: '
+                for (const key in dadosDaTurma.livros) {
+                    if (Object.hasOwnProperty.call(dadosDaTurma.livros, key)) {
+                        const numLivro = dadosDaTurma.livros[key];
+                        document.getElementById('mostraLivrosTurma').innerText += ` | ${livros[numLivro].idLivro} `
+                    }
+                }
+            }).catch(error => {
+                AstNotif.dialog('Erro', error.message)
+                console.log(error)
+            })
+            // Mostra dias de aula da turma
+            
+            document.getElementById('mostraHorarioTurma').innerText = 'Horário de aula: '+ dadosDaTurma.hora + 'h'
+            
+            
+
+            document.getElementById('timestampTurmaCadastrada').innerText = 'Turma cadastrada em:  ' + new Date(dadosDaTurma.timestamp._seconds * 1000)
+
+            document.getElementById('mostraProfessoresCadastrados').innerHTML = `<button class="btn btn-primary" onclick="modalAddProfTurma('${cod}')"><span data-feather="user-plus"></span> Adicionar professores</button><ul class="items" id="ulProfCadastrados"></ul>`
+            for (const key in dadosDaTurma.professor) {
+                if (Object.hasOwnProperty.call(dadosDaTurma.professor, key)) {
+                    const professor = dadosDaTurma.professor[key];
+                    document.getElementById('ulProfCadastrados').innerHTML += `
+                        <li class="item-dismissible">${professor.nome} (${professor.email})<span class="close" data-toggle="tooltip" data-placement="top" title="Retirar prof. desta turma?" onclick="retiraProf('${professor.email}', '${professor.nome}', '${dadosDaTurma.codigoSala}')">&times;</span></li>
+                    `
+                }
+            }
+            loaderRun()
+            
+        })
+    }
+
+    function retiraProf(email, nome, codSala, confirma=false) {
+        if (confirma) {
+            loader.style.display = 'block'
+            loaderMsg.innerText = 'Removendo professor da turma...'
+            document.getElementById('ast-dialog-bg').remove()
+            turmasRef.child(codSala).child('professor').once('value', (snapshot) => {
+                let listaProf = snapshot.val()
+                console.log(listaProf)
+                for (const key in listaProf) {
+                    if (Object.hasOwnProperty.call(listaProf, key)) {
+                        const professor = listaProf[key];
+                        if (professor.email == email) {
+                            listaProf.splice(key, 1)
+                            console.log(listaProf)
+                        }
+                    }
+                }
+                turmasRef.child(codSala).child('professor').set(listaProf).then(() => {
+                    loaderRun()
+                    AstNotif.notify('Sucesso', 'Professor deletado com sucesso')
+                })
+
+            })
+        } else {
+            AstNotif.dialog('Confirmação', `Você está prestes à retirar o acesso desta turma de ${nome} (${email}). Você confirma esta ação?<br><br> <button type="button" class="btn btn-danger" onclick="retiraProf('${email}', '${nome}', '${codSala}', true)">Sim, confirmo</button>`, {positive: 'Voltar', negative: ''})
+        }
+    }
+
+    function modalAddProfTurma(codSala) {
+        loader.style.display = 'block'
+        loaderMsg.innerText = 'Aguarde...'
+        AstNotif.dialog('Adicionar professores nesta turma', `
+        Por favor, tenha o cuidado de escolher um(a) professor(a) que ainda não está vinculado na turma atual.
+        <div class="input-group prepend">
+            <div class="input-group-prepend">
+            <label class="input-group-text" for="inputGroupSelect01">Prof.</label>
+            </div>
+            <select class="custom-select" id="selectAddProfessorTurma" onchange="novoProf(this.value, '${codSala}')">
+            <option selected hidden>Escolha o(a) professor(a)...</option>
+            
+            </select>
+        </div>
+        `, {positive: 'Voltar', negative: ''})
+        listaDeProfessores.once('value', (snapshot) => {
+            let listaProf = snapshot.val()
+            console.log(listaProf)
+            for (const key in listaProf) {
+                if (Object.hasOwnProperty.call(listaProf, key)) {
+                    const professor = listaProf[key];
+                    document.getElementById('selectAddProfessorTurma').innerHTML += `<option value="${professor.email}">${professor.nome} (${professor.email})</option>`
+                }
+            }
+            loaderRun()
+        })
+        
+    }
+
+    function novoProf(email, codSala) {
+        loader.style.display = 'block'
+        loaderMsg.innerText = 'Adicionando professor na turma...'
+        document.getElementById('ast-dialog-bg').remove()
+        var addNovoProfTurma = firebase.functions().httpsCallable('addNovoProfTurma')
+        addNovoProfTurma({emailProf: email, codSala: codSala})
+        .then(function(result) {
+            console.log(result)
             AstNotif.dialog('Sucesso', result.data.answer)
-            carregaTurmas()
             loaderRun()
         }).catch(function(error) {
             AstNotif.dialog('Erro', error.message)
             console.log(error)
             loaderRun()
         })
-    } else {
-        if (alunos == null) {
-            abrirModal('modal', 'Confirmação', 'Você está prestes à excluir uma turma. Ao excluir uma turma, todo o histórico gravado da turma será excluído! Depois de excluída, você poderá criar uma nova turma com o mesmo ID. Esta ação não pode ser revertida. <br><br> <b>Você têm certeza que deseja excluir esta turma?</b>', '<button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button><button type="button" class="btn btn-danger" data-dismiss="modal" onclick="excluirTurma(true)">Excluir</button>')
-        } else {
-            abrirModal('modal', 'Calma aí', 'Você não pode excluir uma turma com alunos cadastrados nela. Antes de excluir a turma, transfira os alunos para outra turma, ou desative os alunos.', '<button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>')
-        } 
     }
-}
-function transfereDaTurma() {
-    loader.style.display = 'block'
-    loaderMsg.innerText = 'Transferindo alunos...'
-    let selectTurmasTransfere = document.getElementById('selectTurmasTransfere')
-    alunosSelecionadosTurma.codTurmaParaTransferir = selectTurmasTransfere.value
-    if (alunosSelecionadosTurma.codTurma == alunosSelecionadosTurma.codTurmaParaTransferir) {
-        AstNotif.dialog('Erro', 'Você deve escolher uma turma diferente da atual para transferência dos alunos.')
-        loaderRun()
-    } else {
-        console.log(alunosSelecionadosTurma)
-        transfereAlunos(alunosSelecionadosTurma).then(function(result){
-            AstNotif.dialog('Sucesso', result.data.answer)
-            loaderRun()
-            alunosSelecionadosTurma = {}
-            carregaTurmas()
-            $('#modal').modal('hide')
-            document.getElementById('listaAlunosDaTurma').innerHTML = ''
-            document.getElementById('ulProfCadastrados').innerHTML = ''
-        }).catch(function(error){
-            AstNotif.dialog('Erro', error.message)
-            console.error(error)
-            loaderRun()
-        })
-    }
-}
-var alunos
-function carregaListaDeAlunosDaTurma(turma, filtro='') {
-    
-    tipoDeBusca = 'nome'
-    alunosSelecionadosTurma = {}
-    alunosSelecionadosTurma.codTurma = turma
-    console.log(filtro)
-    loader.style.display = 'block'
-    loaderMsg.innerText = 'Carregando lista de alunos...'
-    let listaAlunos = document.getElementById('listaAlunos')
-    if (filtro == '') {
-        document.getElementById('listaAlunosDaTurma').innerHTML = ''
-        turmasRef.child(turma + '/alunos').once('value').then(snapshot => {
-            alunos = snapshot.val()
-            for (const matricula in alunos) {
-                if (Object.hasOwnProperty.call(alunos, matricula)) {
-                    const aluno = alunos[matricula];
-                    document.getElementById('listaAlunosDaTurma').innerHTML += `<div class="row"><div class="col-1" ><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" name="alunosTurma" onclick="this.checked ? alunosSelecionadosTurma[${matricula}] = '${aluno.nome}' : delete alunosSelecionadosTurma[${matricula}], verificaAlunosSelecionados()"></div><div class="col-md"><button class="list-group-item list-group-item-action" onclick="document.getElementById('btnAbaAlunos').click(), document.getElementById('btnAbaAlunosResponsivo').click(), abreDadosDoAluno('${matricula}'), setTimeout( function() {document.getElementById('rolaTelaAbaixoAlunos').style.display = 'block', document.getElementById('rolaTelaAbaixoAlunos').focus(), document.getElementById('rolaTelaAbaixoAlunos').style.display = 'none'}, 300 ); "> ${matricula}: ${aluno.nome}</button></div></div>`
-                }
-                
-            }
-            loaderRun()
-        }).catch(error => {
-            console.log(error)
-            AstNotif.dialog('Erro', error.message)
-        })
-    } else {
-        document.getElementById('listaAlunosDaTurma').innerHTML = ''
-        turmasRef.child(turma + '/alunos').orderByChild('nome').equalTo(filtro).once('value').then(snapshot => {
-            alunos = snapshot.val()
-            for (const matricula in alunos) {
-                if (Object.hasOwnProperty.call(alunos, matricula)) {
-                    const aluno = alunos[matricula];
-                    document.getElementById('listaAlunosDaTurma').innerHTML += `<div class="row"><div class="col-sm-1"><input type="checkbox" name="alunosTurma" onclick="this.checked ? alunosSelecionadosTurma[${matricula}] = '${aluno.nome}' : delete alunosSelecionadosTurma[${matricula}], verificaAlunosSelecionados()"></div><div class="col-md"><button class="list-group-item list-group-item-action" onclick="document.getElementById('btnAbaAlunos').click(), document.getElementById('btnAbaAlunosResponsivo').click(), abreDadosDoAluno('${matricula}') "> ${matricula}: ${aluno.nome}</button></div></div>`
-                }
-            }
-            loaderRun()
-        }).catch(error => {
-            console.log(error)
-            AstNotif.dialog('Erro', error.message)
-        })
-    }
-    
+
 }
 
-function verificaAlunosSelecionados() {
-    let c = 0
-    for (const matricula in alunosSelecionadosTurma) {
-        if (Object.hasOwnProperty.call(alunosSelecionadosTurma, matricula)) {
-            const nome = alunosSelecionadosTurma[matricula];
-            
-            if (matricula == 'codTurma') {
-                
-            } else if (nome != "") {
-                c++
-            }
-            console.log(c)
-            if (c == 0) {
-                document.getElementById('btnTransfereAlunosTurma').disabled = true
-                document.getElementById('btnDesativaAlunos').disabled = true
-                document.getElementById('selecTodos').checked = false
-            } else {
-                document.getElementById('btnTransfereAlunosTurma').disabled = false
-                document.getElementById('btnDesativaAlunos').disabled = false
-            }
-        }
-    }
-    
-}
-
-function abreTurma(cod) {
-    loader.style.display = 'block'
-    loaderMsg.innerText = 'Abrindo turma...'
-    carregaListaDeAlunosDaTurma(cod)
-    var codigoDaTurmaLabel = document.getElementById('codigoDaTurma')
-    var areaInfoTurma = document.getElementById('areaInfoTurma')
-    turmasRef.child(cod).on('value', (snapshot) => {
-        // TODO: Mostrar na tela as informações da turma
-        console.log(snapshot.val())
-        let dadosDaTurma = snapshot.val()
-        codigoDaTurmaLabel.innerText = dadosDaTurma.codigoSala
-        areaInfoTurma.style.visibility = 'visible'
-        infoEscolaRef.once('value').then(infoEscola => {
-            let livros = infoEscola.val().livros
-            let codDiasSemana = infoEscola.val().codDiasSemana
-            document.getElementById('mostraDiasTurma').innerText = 'Dia(s) de Aula:'
-            for (const key in dadosDaTurma.diasDaSemana) {
-                if (Object.hasOwnProperty.call(dadosDaTurma.diasDaSemana, key)) {
-                    const dia = dadosDaTurma.diasDaSemana[key];
-                    let diasemana
-                    switch(Number(dia)) {
-                        case 0:
-                            diasemana = 'Domingo'
-                            break
-                        case 1:
-                            diasemana = 'Segunda'
-                            break
-                        case 2: 
-                            diasemana = 'Terça'
-                            break
-                        case 3:
-                            diasemana = 'Quarta'
-                            break
-                        case 4:
-                            diasemana = 'Quinta'
-                            break
-                        case 5:
-                            diasemana = 'Sexta'
-                            break
-                        case 6:
-                            diasemana = 'Sábado'
-                            break
-                        default:
-                            diasemana = ''
-                            break
-                    }
-                    document.getElementById('mostraDiasTurma').innerText += ' | ' + diasemana + ' '
-                }
-                
-            }
-
-            document.getElementById('mostraLivrosTurma').innerText = 'Livros cadastrados: '
-            for (const key in dadosDaTurma.livros) {
-                if (Object.hasOwnProperty.call(dadosDaTurma.livros, key)) {
-                    const numLivro = dadosDaTurma.livros[key];
-                    document.getElementById('mostraLivrosTurma').innerText += ` | ${livros[numLivro].idLivro} `
-                }
-            }
-        }).catch(error => {
-            AstNotif.dialog('Erro', error.message)
-            console.log(error)
-        })
-        // Mostra dias de aula da turma
-        
-        document.getElementById('mostraHorarioTurma').innerText = 'Horário de aula: '+ dadosDaTurma.hora + 'h'
-        
-        
-
-        document.getElementById('timestampTurmaCadastrada').innerText = 'Turma cadastrada em:  ' + new Date(dadosDaTurma.timestamp._seconds * 1000)
-
-        document.getElementById('mostraProfessoresCadastrados').innerHTML = `<button class="btn btn-primary" onclick="modalAddProfTurma('${cod}')"><span data-feather="user-plus"></span> Adicionar professores</button><ul class="items" id="ulProfCadastrados"></ul>`
-        for (const key in dadosDaTurma.professor) {
-            if (Object.hasOwnProperty.call(dadosDaTurma.professor, key)) {
-                const professor = dadosDaTurma.professor[key];
-                document.getElementById('ulProfCadastrados').innerHTML += `
-                    <li class="item-dismissible">${professor.nome} (${professor.email})<span class="close" data-toggle="tooltip" data-placement="top" title="Retirar prof. desta turma?" onclick="retiraProf('${professor.email}', '${professor.nome}', '${dadosDaTurma.codigoSala}')">&times;</span></li>
-                `
-            }
-        }
-        loaderRun()
-        
-    })
-}
-
-function retiraProf(email, nome, codSala, confirma=false) {
-    if (confirma) {
-        loader.style.display = 'block'
-        loaderMsg.innerText = 'Removendo professor da turma...'
-        document.getElementById('ast-dialog-bg').remove()
-        turmasRef.child(codSala).child('professor').once('value', (snapshot) => {
-            let listaProf = snapshot.val()
-            console.log(listaProf)
-            for (const key in listaProf) {
-                if (Object.hasOwnProperty.call(listaProf, key)) {
-                    const professor = listaProf[key];
-                    if (professor.email == email) {
-                        listaProf.splice(key, 1)
-                        console.log(listaProf)
-                    }
-                }
-            }
-            turmasRef.child(codSala).child('professor').set(listaProf).then(() => {
-                loaderRun()
-                AstNotif.notify('Sucesso', 'Professor deletado com sucesso')
-            })
-
-        })
-    } else {
-        AstNotif.dialog('Confirmação', `Você está prestes à retirar o acesso desta turma de ${nome} (${email}). Você confirma esta ação?<br><br> <button type="button" class="btn btn-danger" onclick="retiraProf('${email}', '${nome}', '${codSala}', true)">Sim, confirmo</button>`, {positive: 'Voltar', negative: ''})
-    }
-}
-
-function modalAddProfTurma(codSala) {
-    loader.style.display = 'block'
-    loaderMsg.innerText = 'Aguarde...'
-    AstNotif.dialog('Adicionar professores nesta turma', `
-    Por favor, tenha o cuidado de escolher um(a) professor(a) que ainda não está vinculado na turma atual.
-    <div class="input-group prepend">
-        <div class="input-group-prepend">
-        <label class="input-group-text" for="inputGroupSelect01">Prof.</label>
-        </div>
-        <select class="custom-select" id="selectAddProfessorTurma" onchange="novoProf(this.value, '${codSala}')">
-        <option selected hidden>Escolha o(a) professor(a)...</option>
-        
-        </select>
-    </div>
-    `, {positive: 'Voltar', negative: ''})
-    listaDeProfessores.once('value', (snapshot) => {
-        let listaProf = snapshot.val()
-        console.log(listaProf)
-        for (const key in listaProf) {
-            if (Object.hasOwnProperty.call(listaProf, key)) {
-                const professor = listaProf[key];
-                document.getElementById('selectAddProfessorTurma').innerHTML += `<option value="${professor.email}">${professor.nome} (${professor.email})</option>`
-            }
-        }
-        loaderRun()
-    })
-    
-}
-
-function novoProf(email, codSala) {
-    loader.style.display = 'block'
-    loaderMsg.innerText = 'Adicionando professor na turma...'
-    document.getElementById('ast-dialog-bg').remove()
-    var addNovoProfTurma = firebase.functions().httpsCallable('addNovoProfTurma')
-    addNovoProfTurma({emailProf: email, codSala: codSala})
-    .then(function(result) {
-        console.log(result)
-        AstNotif.dialog('Sucesso', result.data.answer)
-        loaderRun()
-    }).catch(function(error) {
-        AstNotif.dialog('Erro', error.message)
-        console.log(error)
-        loaderRun()
-    })
-}
 
 function preencheEndereco(numCep) {
     loader.style.display = 'block'

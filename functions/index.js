@@ -455,22 +455,18 @@ exports.transfereAlunos = functions.https.onCall((data, context) => {
     }
     if (context.auth.token.master == true || context.auth.token.secretaria == true) {
         let dados = data
-        let turmaAtual = dados.codTurma
-        let turmaParaTransferir = dados.codTurmaParaTransferir
+        let turmaAtual = dados.turmaAtual
+        let turmaParaTransferir = dados.turmaParaTransferir
+        let alunosSelecionados = dados.alunos
         let alunos = {} //Aqui onde será guardado os alunos e os dados dos mesmos, da turma para serem transferidos para outra turma
         var timestamp = admin.firestore.Timestamp.now()
         
         return admin.database().ref(`sistemaEscolar/turmas/${turmaAtual}/alunos/`).once('value').then(snapshot => {
             let alunosTurma = snapshot.val()
-            for (const matricula in dados) {
-                if (Object.hasOwnProperty.call(dados, matricula)) {
-                    const nomeAluno = dados[matricula];
-                    if (matricula == 'codTurma' || matricula == 'codTurmaParaTransferir') {
-
-                    } else {
-                        alunos[formataNumMatricula(matricula)] = alunosTurma[formataNumMatricula(matricula)]
-                    }
-                    
+            for (const i in alunosSelecionados) {
+                if (Object.hasOwnProperty.call(alunosSelecionados, i)) {
+                    const matricula = alunosSelecionados[i];
+                    alunos[formataNumMatricula(matricula)] = alunosTurma[formataNumMatricula(matricula)]
                 }
             }
             console.log(alunos)
