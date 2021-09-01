@@ -3064,14 +3064,14 @@ function visualizarDadosDoHistorico(info) {
     AstNotif.notify('Notas carregadas...', 'Agora você está visualizando as notas do período que você escolheu.', 'agora', {length: 15000})
 }
 
-function followUpAluno(matricula) {
+async function followUpAluno(matricula) {
     
     if (matricula == '00000' || matricula == '') {
         AstNotif.dialog('Atenção', 'Você deve clicar em um aluno para descrever um follow up.')
         loaderRun()
     } else {
-        followUpRef.on('value', (snapshot) => {
-            const aluno = alunos[matricula]
+        let snapshot = await followUpRef.once('value')
+            const aluno = alunos[matricula] != undefined ? alunos[matricula] : (await alunosDesativadosRef.child(matricula + '/dadosAluno').once('value')).val() 
             let id
             let followUpSalvos
             if (snapshot.exists() == false) {
@@ -3136,7 +3136,7 @@ function followUpAluno(matricula) {
                     loaderRun()
                 })
             })
-        })
+        
         
     }
 }
@@ -3144,33 +3144,36 @@ function followUpAluno(matricula) {
 function carregaFollowUps(matricula='') {
     loader.style.display = 'block'
     loaderMsg.innerText = 'Carregando Follow Up...'
-    followUpRef.orderByChild('matricula').equalTo(matricula).once('value').then(snapshot => {
-        abrirModal('modal', `FollowUp(s) cadastrado(s)`,
-            `
-            <label id="nomeAlunoDoFollowUp"></label>
-            <div class="overflow-auto" style="height: fit-content; max-height: 280px;">
-                <div class="list-group" id="listaFollowUpAluno">
-
+    setTimeout(() => {
+        followUpRef.orderByChild('matricula').equalTo(matricula).once('value').then(snapshot => {
+            abrirModal('modal', `FollowUp(s) cadastrado(s)`,
+                `
+                <label id="nomeAlunoDoFollowUp"></label>
+                <div class="overflow-auto" style="height: fit-content; max-height: 280px;">
+                    <div class="list-group" id="listaFollowUpAluno">
+    
+                    </div>
                 </div>
-            </div>
-            `
-            , `<button class="btn btn-secondary" data-dismiss="modal">Cancelar</button>`
-        )
-        let listaFollowUpAluno = document.getElementById('listaFollowUpAluno')
-        listaFollowUpAluno.innerHTML = ''
-        for (const id in snapshot.val()) {
-            if (Object.hasOwnProperty.call(snapshot.val(), id)) {
-                const followUp = snapshot.val()[id];
-                document.getElementById('nomeAlunoDoFollowUp').innerText = followUp.nome + ' | ' + followUp.matricula
-                listaFollowUpAluno.innerHTML += `<button class="list-group-item list-group-item-action" onclick="verFollowUp('${id}')"><b>Título:</b> ${followUp.titulo}</button>`
+                `
+                , `<button class="btn btn-secondary" data-dismiss="modal">Cancelar</button>`
+            )
+            let listaFollowUpAluno = document.getElementById('listaFollowUpAluno')
+            listaFollowUpAluno.innerHTML = ''
+            for (const id in snapshot.val()) {
+                if (Object.hasOwnProperty.call(snapshot.val(), id)) {
+                    const followUp = snapshot.val()[id];
+                    document.getElementById('nomeAlunoDoFollowUp').innerText = followUp.nome + ' | ' + followUp.matricula
+                    listaFollowUpAluno.innerHTML += `<button class="list-group-item list-group-item-action" onclick="verFollowUp('${id}')"><b>Título:</b> ${followUp.titulo}</button>`
+                }
             }
-        }
-        loaderRun()
-    }).catch((error) => {
-        console.log(error)
-        AstNotif.dialog('Erro', error.message)
-        loaderRun()
-    })
+            loaderRun()
+        }).catch((error) => {
+            console.log(error)
+            AstNotif.dialog('Erro', error.message)
+            loaderRun()
+        })
+    }, 1000)
+    
 }
 
 function verFollowUp(id) {
