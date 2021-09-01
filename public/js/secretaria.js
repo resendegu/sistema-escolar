@@ -2422,11 +2422,19 @@ async function carregaContratosAluno(matricula) {
      
 }
 
-async function carregaChecklistAluno(matricula) {
+async function carregaChecklistAluno(matricula, desativado) {
+    let checklistAlunoRef
+    let checklistAlunoAcompanhamentoRef
+    if (desativado) {
+        console.log(desativado)
+        checklistAlunoRef = alunosDesativadosRef.child(matricula + '/dadosAluno/checklist')
+        checklistAlunoAcompanhamentoRef = alunosDesativadosRef.child(matricula + '/dadosAluno/checklistAcompanhamento')
+    } else {
+        checklistAlunoRef = alunosRef.child(matricula + '/checklist')
+        checklistAlunoAcompanhamentoRef = alunosRef.child(matricula + '/checklistAcompanhamento')
+    }
     let checklistRef = firebase.database().ref('sistemaEscolar/infoEscola/checklist')
     let checklistAcompanhamentoRef = firebase.database().ref('sistemaEscolar/infoEscola/checklistAcompanhamento')
-    let checklistAlunoRef = alunosRef.child(matricula + '/checklist')
-    let checklistAlunoAcompanhamentoRef = alunosRef.child(matricula + '/checklistAcompanhamento')
     let checklistFire = await checklistRef.once('value')
     let checklistAcompanhamentoFire = await checklistAcompanhamentoRef.once('value')
     let checklistSistema = checklistFire.val()
@@ -2624,7 +2632,7 @@ function abreDadosDoAluno(matricula, desativado=false, notasDesativado=false) {
     document.getElementById('rolaTelaAbaixoAlunos').style.display = 'block'
     document.getElementById('secGeraFicha').innerHTML = `<button class="btn btn-outline-primary btn-block" id="btnGeraFicha" onclick="gerarFichaAluno('${matricula}')">Gerar ficha de matrícula em PDF</button>
     <button class="btn btn-outline-primary btn-block" id="btnBoletosAluno" data-toggle="modal" data-target="#contratosAluno" onclick="carregaContratosAluno('${matricula}')">Ver contratos/boletos do aluno</button>
-    <button class="btn btn-outline-primary btn-block" id="btnBoletosAluno" data-toggle="modal" data-target="#checklistAluno" onclick="carregaChecklistAluno('${matricula}')">Checklist do Aluno</button>`
+    <button class="btn btn-outline-primary btn-block" id="btnBoletosAluno" data-toggle="modal" data-target="#checklistAluno" onclick="carregaChecklistAluno('${matricula}', ${desativado == false ? false : true})">Checklist do Aluno</button>`
     
     carregaFrequenciaAluno(matricula, dados.turmaAluno)
     dadosResponsaveis = {
