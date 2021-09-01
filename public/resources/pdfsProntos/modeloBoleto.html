@@ -201,12 +201,14 @@
             async function geraBoletos(matricula, codContrato) {
                 loaderRun(true, 'Aguarde, processando...')
                 let alunoRef = firebase.database().ref('sistemaEscolar/alunos/' + matricula + '/')
+                let alunosDesativadosRef = firebase.database().ref('sistemaEscolar/alunosDesativados')
                 let contratoRef = firebase.database().ref('sistemaEscolar/infoEscola/contratos').child(codContrato)
                 let infoEscola = await firebase.database().ref('sistemaEscolar/infoEscola').once('value')
                 let docsSistemaVal = await firebase.database().ref('sistemaEscolar/docsBoletos').once('value')
                 let dadosEscola = infoEscola.val()
                 console.log(dadosEscola)
                 let dadosAluno = await alunoRef.once('value')
+                dadosAluno = dadosAluno.exists() ? dadosAluno : await alunosDesativadosRef.child(matricula + '/dadosAluno').once('value')
                 let aluno = dadosAluno.val()
                 let contratos = aluno.contratos
                 let contrato = contratos[contratos.indexOf(codContrato)]
@@ -657,12 +659,14 @@
             async function segundaViaBoletos(matricula, codContrato) {
                 loaderRun(true, 'Aguarde, buscando dados do boleto...')
                 let alunoRef = firebase.database().ref('sistemaEscolar/alunos/' + matricula + '/')
+                let alunosDesativadosRef = firebase.database().ref('sistemaEscolar/alunosDesativados')
                 let contratoRef = firebase.database().ref('sistemaEscolar/infoEscola/contratos').child(codContrato)
                 let docsBoletosRef = firebase.database().ref('sistemaEscolar/docsBoletos')
                 let infoEscola = await firebase.database().ref('sistemaEscolar/infoEscola').once('value')
                 let dadosEscola = infoEscola.val()
                 console.log(dadosEscola)
                 let dadosAluno = await alunoRef.once('value')
+                dadosAluno = dadosAluno.exists() ? dadosAluno : await alunosDesativadosRef.child(matricula + '/dadosAluno').once('value')
                 let aluno = dadosAluno.val()
                 let contratos = aluno.contratos
                 let contrato = contratos[contratos.indexOf(codContrato)]

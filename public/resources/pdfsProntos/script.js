@@ -2,6 +2,7 @@
 window.addEventListener('DOMContentLoaded', (e) => {
     let infoEscolaRef = firebase.database().ref('sistemaEscolar/infoEscola')
     let alunosRef = firebase.database().ref('sistemaEscolar/alunos')
+    let alunosDesativadosRef = firebase.database().ref('sistemaEscolar/alunosDesativados')
     let alunosStorageRef = firebase.storage().ref('sistemaEscolar/alunos')
     let timestamp = firebase.functions().httpsCallable('timestamp');
     timestamp().then(function(time) {
@@ -134,10 +135,12 @@ window.addEventListener('DOMContentLoaded', (e) => {
                 gerador(matriculas, ids)
             }
             
-            function gerador(matricula, id) {
+            async function gerador(matricula, id) {
                 loaderRun(true, 'Carregando dados da matrícula...')
                 dadosTabela.innerHTML = ''
-                alunosRef.child(matricula).once('value').then(async (alunoInfo) => {
+                let alunoInfo = await alunosRef.child(matricula).once('value')
+                alunoInfo = alunoInfo.exists() ? alunoInfo : await alunosDesativadosRef.child(matricula + '/dadosAluno').once('value')
+
                     let aluno = alunoInfo.val();
                     let historico = aluno.historicoEscolar[id]
                     
@@ -248,7 +251,7 @@ window.addEventListener('DOMContentLoaded', (e) => {
                     `
                     
                     loaderRun()
-                })
+                
             }
 
             nextMatricula.addEventListener('click', (e) => {
@@ -285,9 +288,11 @@ window.addEventListener('DOMContentLoaded', (e) => {
                 gerador(matriculas)
             }
             
-            function gerador(matricula) {
+            async function gerador(matricula) {
                 loaderRun(true, 'Carregando dados da matrícula...')
-                alunosRef.child(matricula).once('value').then(async (alunoInfo) => {
+                let alunoInfo = await alunosRef.child(matricula).once('value')
+                alunoInfo = alunoInfo.exists() ? alunoInfo : await alunosDesativadosRef.child(matricula + '/dadosAluno').once('value')
+                    
                     let aluno = alunoInfo.val();
                     let idade = await calcularIdadePrecisa(aluno.dataNascimentoAluno)
                     console.log(aluno);
@@ -349,7 +354,8 @@ window.addEventListener('DOMContentLoaded', (e) => {
                         adicionaDadosTabela(titulo, dado, i)
                     }
                     loaderRun()
-                })
+                
+                
             }
 
             nextMatricula.addEventListener('click', (e) => {

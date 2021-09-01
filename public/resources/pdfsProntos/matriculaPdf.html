@@ -308,6 +308,7 @@ a:visited {text-decoration:none;}
 					var matricula = window.prompt('Digite a matrícula de um aluno para gerar a ficha:')
 				}
 				alunosRef.child(matricula).once('value').then(snapshot => {
+					console.log(snapshot.exists())
 					let dadosAluno = snapshot.val()
 					fichaNome.innerText = dadosAluno.nomeAluno
 					fichaDataNascimento.innerText = dadosAluno.dataNascimentoAluno
