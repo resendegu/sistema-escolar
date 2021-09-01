@@ -247,8 +247,8 @@ function carregaTurmas(preSelecao='') {
 var alunosSelecionadosTurma = {}
 
 
-function carregaListaDeAlunosDaTurma(turma, filtro='') {
-    
+async function carregaListaDeAlunosDaTurma(turma, filtro='') {
+    let statusTurma = (await turmasRef.child(`${turma}/status/turma`).once('value')).val()
     tipoDeBusca = 'nome'
     alunosSelecionadosTurma = {}
     alunosSelecionadosTurma.codTurma = turma
@@ -285,9 +285,11 @@ function carregaListaDeAlunosDaTurma(turma, filtro='') {
                         <td><a href="#" onclick="document.getElementById('btnAbaAlunos').click(), document.getElementById('btnAbaAlunosResponsivo').click(), abreDadosDoAluno('${matricula}'), setTimeout( function() {document.getElementById('rolaTelaAbaixoAlunos').style.display = 'block', document.getElementById('rolaTelaAbaixoAlunos').focus(), document.getElementById('rolaTelaAbaixoAlunos').style.display = 'none'}, 300 ); ">${aluno.nome}</a></td>
                         <td>${matricula}</td>
                         <td><b>${somatorioNota}</b>/100</td>
-                        <td>
+                        <td>${statusTurma == 'aberta' ? `
                             <a href="#" class="action" id="lancaFrequencia${c}" onclick="lancaDesempenho('${matricula}', '${turma}')"><i data-feather="edit-2" data-toggle="tooltip" title="Lançar Desempenho"></i></a>
                             <a href="#" id="lançaNotas${c}" onclick="editaNotasAluno('${matricula}', '${turma}')" class="edit"><i data-feather="edit" data-toggle="tooltip" title="Lançar notas"></i></a>
+                        ` : ''}
+                            
                         </td>
                     </tr>
                     `
@@ -1438,110 +1440,117 @@ function lancaNotasDoAluno(turma, matricula) {
     })
 }
 
-function editaNotasAluno(matricula, turma) {
+async function editaNotasAluno(matricula, turma) {
     loader.style.display = 'block'
     loaderMsg.innerText = 'Buscando notas...'
-    turmasRef.child(`${turma}/alunos/${matricula}/notas`).once('value').then(notasAluno => {
-        turmasRef.child(`${turma}/notas`).once('value').then(notasReferencia => {
-            loaderRun()
-            let notasDoAluno = notasAluno.val()
-            let notasDeReferencia = notasReferencia.val()
-            let notasDistribuidas
-
-            abrirModal('modal', 'Lançando notas para matrícula ' + matricula, 
-                `
-                <div class="row" id="linha">
-                    <div class="col-2" >
-                        <b>Identificação da nota</b>
-                    </div>
-                    <div class="col-2">
-                        <b>Valor Total</b>
-                    </div>
-                    <div class="col-2">
-                        <b>Nota do aluno</b>
-                    </div>
-                </div>
-                <section id="camposLancaNotas"></section>
-                `
-                , `<button type="button" data-toggle="tooltip" data-placement="top" title="Lançar notas para o aluno" class="btn btn-primary" onclick="lancaNotasDoAluno('${turma}', '${matricula}')">Lançar</button><button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>`
-            )
-            if (notasDeReferencia != null) {
-                notasDistribuidas = notasDeReferencia
-            } else {
-                AstNotif.dialog('Espera aí', 'Você não distribuiu notas nesta turma. Volte na turma e clique em "Distribuir notas".')
-            }
-            
-            let c = 0
-            for (let nomeNota in notasDeReferencia) {
-                if (Object.hasOwnProperty.call(notasDeReferencia, nomeNota)) {
-                    const valor = notasDeReferencia[nomeNota];
-                    let readonly = ''
-                    let disabled = ''
-                    let tooltip = ''
-                    if (nomeNota == 'Desempenho') {
-                        readonly = 'readonly'
-                        disabled = 'disabled'
-                        tooltip = 'data-toggle="tooltip" data-placement="top" title="Esta nota deve ser alterada no Desempenho do Aluno."'
-                    }
-                    document.getElementById('camposLancaNotas').innerHTML += `
-                    <div class="row" id="linha${c}">
-                        <div class="col-2" >
-                            <input type="text" class="form-control" id="nomeNota${c}" placeholder="EX ${c + 1}" value="${nomeNota}" readonly>
-                        </div>
-                        <div class="col-2">
-                            Total: ${valor}
-                        </div>
-                        <div class="col-2">
-                            
-                            <input type="number" min="0" max="${valor}" id="valorNota${c}" value="0" class="form-control"  placeholder="Total: ${valor}" onkeyup='this.value > ${valor} || this.value == "" ? this.value = 0: console.log("ok")' ${readonly} ${tooltip}>
-                        </div>
-                        <button type="button" class="btn btn-light btn-sm ${disabled}" ${disabled} onclick="document.getElementById('valorNota${c}').value = ${valor}">Dar Total</button><br>
-                    </div>
+    let statusTurma = (await turmasRef.child(`${turma}/status/turma`).once('value')).val()
+    if (statusTurma != 'aberta') {
+        AstNotif.dialog('Opa', 'A turma está fechada. Abra a turma para poder lançar notas aos alunos.')
+        loaderRun()
+    } else {
+        turmasRef.child(`${turma}/alunos/${matricula}/notas`).once('value').then(notasAluno => {
+            turmasRef.child(`${turma}/notas`).once('value').then(notasReferencia => {
+                loaderRun()
+                let notasDoAluno = notasAluno.val()
+                let notasDeReferencia = notasReferencia.val()
+                let notasDistribuidas
+    
+                abrirModal('modal', 'Lançando notas para matrícula ' + matricula, 
                     `
-                    c++
+                    <div class="row" id="linha">
+                        <div class="col-2" >
+                            <b>Identificação da nota</b>
+                        </div>
+                        <div class="col-2">
+                            <b>Valor Total</b>
+                        </div>
+                        <div class="col-2">
+                            <b>Nota do aluno</b>
+                        </div>
+                    </div>
+                    <section id="camposLancaNotas"></section>
+                    `
+                    , `<button type="button" data-toggle="tooltip" data-placement="top" title="Lançar notas para o aluno" class="btn btn-primary" onclick="lancaNotasDoAluno('${turma}', '${matricula}')">Lançar</button><button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>`
+                )
+                if (notasDeReferencia != null) {
+                    notasDistribuidas = notasDeReferencia
+                } else {
+                    AstNotif.dialog('Espera aí', 'Você não distribuiu notas nesta turma. Volte na turma e clique em "Distribuir notas".')
                 }
-            }
-            $(function () {
-                $('[data-toggle="tooltip"]').tooltip()
-            })
-            contadorDeNotas = c
-            
-            let c4 = 0
-            for (const nomeNota in notasDoAluno) {
-                if (Object.hasOwnProperty.call(notasDoAluno, nomeNota)) {
-                    const valor = notasDoAluno[nomeNota];
-                    if (nomeNota != document.getElementById('nomeNota' + c4).value) {
-                        try {
-                            document.getElementById('valorNota' + (c4 + 1)).value = valor
-                        } catch (error) {
-                            console.log(error)
-                            AstNotif.dialog('Aviso', 'Existem notas divergentes para este aluno. Isso pode acontecer quando o aluno é transferido de uma turma para outra e o professor da turma anterior já tiver lançado alguma nota para o aluno. <b>É recomendado corrigir as notas do aluno o quanto antes para evitar problemas de lançamento no sistema.</b>')
+                
+                let c = 0
+                for (let nomeNota in notasDeReferencia) {
+                    if (Object.hasOwnProperty.call(notasDeReferencia, nomeNota)) {
+                        const valor = notasDeReferencia[nomeNota];
+                        let readonly = ''
+                        let disabled = ''
+                        let tooltip = ''
+                        if (nomeNota == 'Desempenho') {
+                            readonly = 'readonly'
+                            disabled = 'disabled'
+                            tooltip = 'data-toggle="tooltip" data-placement="top" title="Esta nota deve ser alterada no Desempenho do Aluno."'
                         }
-                        
-                        c4++
-                    } else {
-                        console.log(valor)
-                        console.log(c4)
-                        document.getElementById('valorNota' + c4).value = valor
-                        c4++
+                        document.getElementById('camposLancaNotas').innerHTML += `
+                        <div class="row" id="linha${c}">
+                            <div class="col-2" >
+                                <input type="text" class="form-control" id="nomeNota${c}" placeholder="EX ${c + 1}" value="${nomeNota}" readonly>
+                            </div>
+                            <div class="col-2">
+                                Total: ${valor}
+                            </div>
+                            <div class="col-2">
+                                
+                                <input type="number" min="0" max="${valor}" id="valorNota${c}" value="0" class="form-control"  placeholder="Total: ${valor}" onkeyup='this.value > ${valor} || this.value == "" ? this.value = 0: console.log("ok")' ${readonly} ${tooltip}>
+                            </div>
+                            <button type="button" class="btn btn-light btn-sm ${disabled}" ${disabled} onclick="document.getElementById('valorNota${c}').value = ${valor}">Dar Total</button><br>
+                        </div>
+                        `
+                        c++
                     }
                 }
-            }
-            
-
+                $(function () {
+                    $('[data-toggle="tooltip"]').tooltip()
+                })
+                contadorDeNotas = c
+                
+                let c4 = 0
+                for (const nomeNota in notasDoAluno) {
+                    if (Object.hasOwnProperty.call(notasDoAluno, nomeNota)) {
+                        const valor = notasDoAluno[nomeNota];
+                        if (nomeNota != document.getElementById('nomeNota' + c4).value) {
+                            try {
+                                document.getElementById('valorNota' + (c4 + 1)).value = valor
+                            } catch (error) {
+                                console.log(error)
+                                AstNotif.dialog('Aviso', 'Existem notas divergentes para este aluno. Isso pode acontecer quando o aluno é transferido de uma turma para outra e o professor da turma anterior já tiver lançado alguma nota para o aluno. <b>É recomendado corrigir as notas do aluno o quanto antes para evitar problemas de lançamento no sistema.</b>')
+                            }
+                            
+                            c4++
+                        } else {
+                            console.log(valor)
+                            console.log(c4)
+                            document.getElementById('valorNota' + c4).value = valor
+                            c4++
+                        }
+                    }
+                }
+                
+    
+            }).catch(error => {
+                AstNotif.dialog('Erro', error.message)
+                loaderRun()
+                console.log(error)
+            })
         }).catch(error => {
             AstNotif.dialog('Erro', error.message)
             loaderRun()
             console.log(error)
         })
-    }).catch(error => {
-        AstNotif.dialog('Erro', error.message)
-        loaderRun()
-        console.log(error)
-    })
+    }
+
 }
 
-function lancaDesempenho(matricula='', turma='', confirma=false, FALE={}) {
+async function lancaDesempenho(matricula='', turma='', confirma=false, FALE={}) {
     if (confirma) {
         loader.style.display = 'block'
         loaderMsg.innerText = 'Lançando notas dos alunos no sistema...'
@@ -1567,65 +1576,72 @@ function lancaDesempenho(matricula='', turma='', confirma=false, FALE={}) {
     } else {
         loader.style.display = 'block'
         loaderMsg.innerText = 'Buscando notas...'
-        turmasRef.child(`${turma}/alunos/${matricula}/desempenho`).once('value').then(notasAluno => {
-            desempenhoRef.once('value').then(referenciaDesempenho => {
-                loaderRun()
-                let notasDoAluno = notasAluno.val()
-                let notasDeReferencia = referenciaDesempenho.val()
-
-                abrirModal('modal', 'Lançar desempenho', `
-                <section id="camposLancaNotas"></section> 
-                `, `<button type="button" data-toggle="tooltip" data-placement="top" title="Lançar notas para os alunos selecionados" class="btn btn-primary" onclick="lancaDesempenho('${matricula}', '${turma}', true)">Lançar</button><button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>`)
-                
-                
-                let c = 0
-                for (const nomeNota in notasDeReferencia) {
-                    if (Object.hasOwnProperty.call(notasDeReferencia, nomeNota)) {
-                        const valor = notasDeReferencia[nomeNota];
-                        document.getElementById('camposLancaNotas').innerHTML += `
-                        <div class="row" id="linha${c}">
-                            <div class="col-2" >
-                                <input type="text" class="form-control" id="nomeNota${c}" placeholder="EX ${c + 1}" value="${nomeNota}" readonly>
-                            </div>
-                            <div class="col-2">
-                                Total: ${valor}
-                            </div>
-                            <div class="col-2">
-                                
-                                <input type="number" min="0" max="${valor}" id="valorNota${c}" value="0" class="form-control"  placeholder="Total: ${valor}" onkeyup='this.value > ${valor} || this.value == "" ? this.value = 0: console.log("ok")'>
-                            </div>
-                            <button type="button" class="btn btn-light btn-sm" onclick="document.getElementById('valorNota${c}').value = ${valor}">Dar Total</button><br>
-                        </div>
-                        `
-                        c++
-                    }
-                }
-                contadorDeNotas = c
-                
-                let c4 = 0
-                for (const nomeNota in notasDoAluno) {
-                    if (Object.hasOwnProperty.call(notasDoAluno, nomeNota)) {
-                        const valor = notasDoAluno[nomeNota];
-                        console.log(nomeNota)
-                        if (nomeNota != document.getElementById('nomeNota' + c4).value) {
-                            document.getElementById('valorNota' + (c4 + 1)).value = valor
-                            c4++
-                        } else {
-                            console.log(valor)
-                            console.log(c4)
-                            document.getElementById('valorNota' + c4).value = valor
-                            c4++
-                        }
-                        
-                    }
-                }
-            })
-            
-        }).catch(error => {
-            AstNotif.dialog('Erro', error.message)
+        let statusTurma = (await turmasRef.child(`${turma}/status/turma`).once('value')).val()
+        if (statusTurma != 'aberta') {
+            AstNotif.dialog('Opa', 'A turma está fechada. Abra a turma para poder lançar notas aos alunos.')
             loaderRun()
-            console.log(error)
-        })
+        } else {
+            turmasRef.child(`${turma}/alunos/${matricula}/desempenho`).once('value').then(notasAluno => {
+                desempenhoRef.once('value').then(referenciaDesempenho => {
+                    loaderRun()
+                    let notasDoAluno = notasAluno.val()
+                    let notasDeReferencia = referenciaDesempenho.val()
+    
+                    abrirModal('modal', 'Lançar desempenho', `
+                    <section id="camposLancaNotas"></section> 
+                    `, `<button type="button" data-toggle="tooltip" data-placement="top" title="Lançar notas para os alunos selecionados" class="btn btn-primary" onclick="lancaDesempenho('${matricula}', '${turma}', true)">Lançar</button><button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>`)
+                    
+                    
+                    let c = 0
+                    for (const nomeNota in notasDeReferencia) {
+                        if (Object.hasOwnProperty.call(notasDeReferencia, nomeNota)) {
+                            const valor = notasDeReferencia[nomeNota];
+                            document.getElementById('camposLancaNotas').innerHTML += `
+                            <div class="row" id="linha${c}">
+                                <div class="col-2" >
+                                    <input type="text" class="form-control" id="nomeNota${c}" placeholder="EX ${c + 1}" value="${nomeNota}" readonly>
+                                </div>
+                                <div class="col-2">
+                                    Total: ${valor}
+                                </div>
+                                <div class="col-2">
+                                    
+                                    <input type="number" min="0" max="${valor}" id="valorNota${c}" value="0" class="form-control"  placeholder="Total: ${valor}" onkeyup='this.value > ${valor} || this.value == "" ? this.value = 0: console.log("ok")'>
+                                </div>
+                                <button type="button" class="btn btn-light btn-sm" onclick="document.getElementById('valorNota${c}').value = ${valor}">Dar Total</button><br>
+                            </div>
+                            `
+                            c++
+                        }
+                    }
+                    contadorDeNotas = c
+                    
+                    let c4 = 0
+                    for (const nomeNota in notasDoAluno) {
+                        if (Object.hasOwnProperty.call(notasDoAluno, nomeNota)) {
+                            const valor = notasDoAluno[nomeNota];
+                            console.log(nomeNota)
+                            if (nomeNota != document.getElementById('nomeNota' + c4).value) {
+                                document.getElementById('valorNota' + (c4 + 1)).value = valor
+                                c4++
+                            } else {
+                                console.log(valor)
+                                console.log(c4)
+                                document.getElementById('valorNota' + c4).value = valor
+                                c4++
+                            }
+                            
+                        }
+                    }
+                })
+                
+            }).catch(error => {
+                AstNotif.dialog('Erro', error.message)
+                loaderRun()
+                console.log(error)
+            })
+        }
+
     }
 }
 
