@@ -119,7 +119,7 @@ firebase.auth().onAuthStateChanged((user) => {
                     if (Object.hasOwnProperty.call(turmasProf, turma)) {
                         const bool = turmasProf[turma];
                         if (bool) {
-                            document.getElementById('listaTurmasProf').innerHTML += `<button class="list-group-item list-group-item-action" id="btnTurma${c}" onclick="document.getElementById('btnAbaTurmas').click(), carregaTurmas('${turma}')">Turma ${turma}</button>`
+                            document.getElementById('listaTurmasProf').innerHTML += `<button class="list-group-item list-group-item-action" id="btnTurma${c}" onclick="document.getElementById('btnAbaTurmas').click(), abreTurma('${turma}')">Turma ${turma}</button>`
                             
                             turmasRef.child(turma + '/alunos').on('value', matAlunos => {
                                 for (const matricula in matAlunos.val()) {
@@ -207,6 +207,7 @@ var turmas
 function carregaTurmas(preSelecao='') {
     loader.style.display = 'block'
     loaderMsg.innerText = 'Carregando informações das turmas...'
+    
     var selectTurmas = document.getElementById('selectTurmas')
     selectTurmas.innerHTML = ''
     let selected = false
@@ -1052,7 +1053,7 @@ function carregaFrequenciaTurma(turma) {
     document.getElementById('totalFrequenciasTurma').innerText = c
     document.getElementById('porcentagemFrequenciaTurma').innerText = 0 + '%'
     let qtdeAulas
-    turmasRef.child(turma + '/status/qtdeAulas').on('value', (qtdeDeAulas) => {
+    turmasRef.child(turma + '/status/qtdeAulas').on('value', qtdeDeAulas => {
         qtdeAulasFrequencia.innerText = qtdeDeAulas.val()
         qtdeAulas = qtdeDeAulas.val()
         document.getElementById('qtdeAulasFrequenciaTurma').innerText = qtdeAulas
@@ -1080,8 +1081,6 @@ function carregaFrequenciaTurma(turma) {
             document.getElementById('totalFrequenciasTurma').innerText = c
             document.getElementById('porcentagemFrequenciaTurma').innerText = ((100*parseInt(c))/parseInt(qtdeAulas)).toFixed(2) + '%'
         })
-    }).catch(error => {
-        AstNotif.dialog('Erro', error.message)
     })
     
 }
