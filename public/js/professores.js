@@ -509,10 +509,12 @@ function fechaPeriodo() {
                 turmasRef.child(alunosSelecionadosTurma.codTurma + '/status').set({inicio: ini, fim: fim, qtdeAulas: qtdeAulas, turma: 'aberta', nomePeriodo: nomePeriodo}).then(() => {
                     var fechaTurma = firebase.functions().httpsCallable('fechaTurma')
                     fechaTurma(alunosSelecionadosTurma.codTurma).then(function(result){
-                        AstNotif.dialog('Sucesso', result.data.answer)
-                        loaderRun()
                         $('#modal').modal('hide')
-                        abreTurma(alunosSelecionadosTurma.codTurma)
+                        setTimeout(() => {
+                            loaderRun()
+                            AstNotif.dialog('Sucesso', result.data.answer)
+                            abreTurma(alunosSelecionadosTurma.codTurma)
+                        }, 1000)
                     }).catch(function(error){
                         AstNotif.dialog('Erro', error.message)
                         console.log(error)
@@ -1050,7 +1052,7 @@ function carregaFrequenciaTurma(turma) {
     document.getElementById('totalFrequenciasTurma').innerText = c
     document.getElementById('porcentagemFrequenciaTurma').innerText = 0 + '%'
     let qtdeAulas
-    turmasRef.child(turma + '/status/qtdeAulas').once('value').then(qtdeDeAulas => {
+    turmasRef.child(turma + '/status/qtdeAulas').on('value', (qtdeDeAulas) => {
         qtdeAulasFrequencia.innerText = qtdeDeAulas.val()
         qtdeAulas = qtdeDeAulas.val()
         document.getElementById('qtdeAulasFrequenciaTurma').innerText = qtdeAulas
