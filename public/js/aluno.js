@@ -7,6 +7,7 @@ var listaDeProfessores = firebase.database().ref('sistemaEscolar/listaDeProfesso
 var turmasRef = firebase.database().ref('sistemaEscolar/turmas')
 var ultimaMatriculaRef = firebase.database().ref('sistemaEscolar/ultimaMatricula')
 var alunosRef = firebase.database().ref('sistemaEscolar/alunos')
+var alunosDesativadosRef = firebase.database().ref('sistemaEscolar/alunosDesativados')
 var followUpRef = firebase.database().ref('sistemaEscolar/followUp')
 var transfereAlunos = firebase.functions().httpsCallable('transfereAlunos')
 var usuarioRef = firebase.database().ref('sistemaEscolar/usuarios')
@@ -25,7 +26,7 @@ $(function () {
 var turmasProf
 var dadosAluno
 var registroAcademico
-firebase.auth().onAuthStateChanged((user) => {
+firebase.auth().onAuthStateChanged(async (user) => {
     
     if (user == null) {
         loaderRun()
@@ -111,20 +112,19 @@ firebase.auth().onAuthStateChanged((user) => {
         
     } else {
         registroAcademico = user.uid
-        alunosRef.child(user.uid).once('value').then(snapshot => {
-            console.log(snapshot.val())
-            dadosAluno = snapshot.val()
-            console.log(dadosAluno.historicoEscolar)
-            lastTabUsed()
-            try {
-                document.getElementById('cursosConcluidos').innerText = dadosAluno.historicoEscolar == undefined ? null : Object.keys(dadosAluno.historicoEscolar).length
-            } catch (error) {
-                console.log(error)
-            } 
-        }).catch(error => {
-            AstNotif.dialog('Erro', error.message)
+
+        let snapshot = await alunosRef.child(user.uid).once('value')
+        snapshot = snapshot.exists() ? snapshot : (await alunosDesativadosRef.child(user.uid + '/dadosAluno').once('value'))
+        console.log(snapshot.val())
+        dadosAluno = snapshot.val()
+        console.log(dadosAluno.historicoEscolar)
+        lastTabUsed()
+        try {
+            document.getElementById('cursosConcluidos').innerText = dadosAluno.historicoEscolar == undefined ? null : Object.keys(dadosAluno.historicoEscolar).length
+        } catch (error) {
             console.log(error)
-        })
+        }
+        
         loaderRun(true, 'Buscando informações do usuário...')
         try {
             document.getElementById('username').innerHTML = "Olá,<br>" + user.displayName.split(' ')[0]
@@ -435,7 +435,7 @@ function historicoAluno(matricula, turma) {
         </tr>
         `
         let c = 0
-    alunosRef.child(matricula + '/historicoEscolar').on('child_added', (registro) => {
+    alunosRef.child(registroAcademico + '/historicoEscolar').on('child_added', (registro) => {
         
         c++
         let dataFechamento = new Date(registro.val().timestamp._seconds * 1000)
@@ -463,7 +463,7 @@ function historicoAluno(matricula, turma) {
             <td>${dataFechamento.getDate()}/${dataFechamento.getMonth() + 1}/${dataFechamento.getFullYear()}</td>
             <td><b>${somatorioNota}</b>/100</td>
             <td>
-                <a id="emiteBoletim${c}" onclick="emiteBoletim('${matricula}', '${registro.key}')" class="action" data-toggle="modal"><i data-feather="file-text" data-toggle="tooltip" title="Emitir boletim"></i></a>
+                <a id="emiteBoletim${c}" onclick="emiteBoletim('${registroAcademico}', '${registro.key}')" class="action" data-toggle="modal"><i data-feather="file-text" data-toggle="tooltip" title="Emitir boletim"></i></a>
                 <a href="#" id="verHistorico${c}" class="edit" data-toggle="modal"><i data-feather="eye" data-toggle="tooltip" title="Visualizar dados"></i></a>
             </td>
         </tr>
@@ -682,26 +682,26 @@ function carregaHistoricoAluno() {
             if (Object.hasOwnProperty.call(historico, key)) {
                 const infos = historico[key];
                 if (infos.operacao == 'Transferência de alunos') {
-                    listaHistoricoAluno.innerHTML += `<button class="list-group-item list-group-item-action" onclick="verOperacaoAluno('${matricula}', '${key}')"><b>Operação:</b> ${infos.operacao}: ${infos.dados.turmaAtual} --> ${infos.dados.turmaParaQualFoiTransferido}</button>`
+                    listaHistoricoAluno.innerHTML += `<button class="list-group-item list-group-item-action" onclick="verOperacaoAluno('${registroAcademico}', '${key}')"><b>Operação:</b> ${infos.operacao}: ${infos.dados.turmaAtual} --> ${infos.dados.turmaParaQualFoiTransferido}</button>`
                 } else if(infos.operacao == 'Desativação de aluno') {
-                    listaHistoricoAluno.innerHTML += `<button class="list-group-item list-group-item-action" onclick="verOperacaoAluno('${matricula}', '${key}')"><b>Operação:</b> ${infos.operacao}: ${infos.dados.turmaAtual} --> Desativado</button>`
+                    listaHistoricoAluno.innerHTML += `<button class="list-group-item list-group-item-action" onclick="verOperacaoAluno('${registroAcademico}', '${key}')"><b>Operação:</b> ${infos.operacao}: ${infos.dados.turmaAtual} --> Desativado</button>`
                 } else if (infos.operacao == 'Reativação de aluno') {
-                    listaHistoricoAluno.innerHTML += `<button class="list-group-item list-group-item-action" onclick="verOperacaoAluno('${matricula}', '${key}')"><b>Operação:</b> ${infos.operacao}: Aluno reativado na turma ${infos.dados.turmaAtivacao}</button>`
+                    listaHistoricoAluno.innerHTML += `<button class="list-group-item list-group-item-action" onclick="verOperacaoAluno('${registroAcademico}', '${key}')"><b>Operação:</b> ${infos.operacao}: Aluno reativado na turma ${infos.dados.turmaAtivacao}</button>`
                 }
             }
         }
     } catch (error) {
         console.log(error)
-        const historico = alunosDesativados[matricula].dadosAluno.historico
+        const historico = alunosDesativados[registroAcademico].dadosAluno.historico
         for (const key in historico) {
             if (Object.hasOwnProperty.call(historico, key)) {
                 const infos = historico[key];
                 if (infos.operacao == 'Transferência de alunos') {
-                    listaHistoricoAluno.innerHTML += `<button class="list-group-item list-group-item-action" onclick="verOperacaoAluno('${matricula}', '${key}')"><b>Operação:</b> ${infos.operacao}: ${infos.dados.turmaAtual} --> ${infos.dados.turmaParaQualFoiTransferido}</button>`
+                    listaHistoricoAluno.innerHTML += `<button class="list-group-item list-group-item-action" onclick="verOperacaoAluno('${registroAcademico}', '${key}')"><b>Operação:</b> ${infos.operacao}: ${infos.dados.turmaAtual} --> ${infos.dados.turmaParaQualFoiTransferido}</button>`
                 } else if(infos.operacao == 'Desativação de aluno') {
-                    listaHistoricoAluno.innerHTML += `<button class="list-group-item list-group-item-action" onclick="verOperacaoAluno('${matricula}', '${key}')"><b>Operação:</b> ${infos.operacao}: ${infos.dados.turma} --> Desativado</button>`
+                    listaHistoricoAluno.innerHTML += `<button class="list-group-item list-group-item-action" onclick="verOperacaoAluno('${registroAcademico}', '${key}')"><b>Operação:</b> ${infos.operacao}: ${infos.dados.turma} --> Desativado</button>`
                 } else if (infos.operacao == 'Reativação de aluno') {
-                    listaHistoricoAluno.innerHTML += `<button class="list-group-item list-group-item-action" onclick="verOperacaoAluno('${matricula}', '${key}')"><b>Operação:</b> ${infos.operacao}: Aluno reativado na turma ${infos.dados.turmaAtivacao}</button>`
+                    listaHistoricoAluno.innerHTML += `<button class="list-group-item list-group-item-action" onclick="verOperacaoAluno('${registroAcademico}', '${key}')"><b>Operação:</b> ${infos.operacao}: Aluno reativado na turma ${infos.dados.turmaAtivacao}</button>`
                 }
             }
         }
