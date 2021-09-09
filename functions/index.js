@@ -349,141 +349,177 @@ exports.desconectaProf = functions.database.ref('sistemaEscolar/turmas/{codTurma
 exports.cadastraAluno = functions.https.onCall(async (data, context) => {
     if (context.auth.token.master == true || context.auth.token.secretaria == true) {
         let dadosAluno = data.dados
-        let contratoConfigurado = data.contratoConfigurado
-        let planoOriginal = data.planoOriginal
-        let codContrato = admin.database().ref('/').push().key
-        let contratos = [codContrato]
-
-        let firestoreRef = admin.firestore().collection('mail');
-        let infoEscola = await admin.database().ref('sistemaEscolar/infoEscola/dadosBasicos').once('value')
-        let dadosEscola = infoEscola.val()
-        let emailContent = {
-            to: dadosAluno.emailAluno,
-            cc: dadosAluno.emailResponsavelPedagogico || null,
-            message: {
-                subject: `${dadosEscola.nomeEscola}`,
-                text: `Olá ${dadosAluno.nomeAluno.split(' ')[0]}, você foi corretamente cadastrado(a) em nosso sistema e está pronto(a) para iniciar essa jornada conosco. Sistemas ProjetoX.`,
-                html: `<h3>Olá ${dadosAluno.nomeAluno.split(' ')[0]}!</h3><p>Você está matriculado(a) no nº de matrícula <b>${dadosAluno.matriculaAluno}</b>, e está pronto(a) para iniciar os estudos conosco. Use seu e-mail e senha cadastrados para acessar o sistema. Só lembrando, sua senha é: <b>${dadosAluno.senhaAluno}</b>. Fique atento aos e-mails, pois sua escola pode utilizar este canal para comunicação com você.</p><p>Em caso de dificuldades <b>entre em contato com a escola para maiores informações</b>.</p><p><b>Dados de contato da escola:</b><br>Telefone: ${dadosEscola.telefoneEscola}<br>E-mail: ${dadosEscola.emailEscola}<br>Endereço: ${dadosEscola.enderecoEscola}</p><p>Sistemas ProjetoX.</p>`
+        if (dadosAluno.tipoMatricula == 'preMatricula') {
+            delete dadosAluno.tipoMatricula
+            let firestoreRef = admin.firestore().collection('mail');
+            let infoEscola = await admin.database().ref('sistemaEscolar/infoEscola/dadosBasicos').once('value')
+            let dadosEscola = infoEscola.val()
+            let emailContent = {
+                to: dadosAluno.emailAluno,
+                cc: dadosAluno.emailResponsavelPedagogico || null,
+                message: {
+                    subject: `${dadosEscola.nomeEscola}`,
+                    text: `Olá ${dadosAluno.nomeAluno.split(' ')[0]}, você foi pré-matriculado em nosso sistema. Sistemas ProjetoX.`,
+                    html: `<h3>Olá ${dadosAluno.nomeAluno.split(' ')[0]}!</h3><p>Você foi pré-matriculado(a) em nosso sistema. Viemos te dar as boas vindas, e esperamos que em breve você esteja com a gente.</p><p><b>Entre em contato com a escola para maiores informações</b>.</p><p><b>Dados de contato da escola:</b><br>Telefone: ${dadosEscola.telefoneEscola}<br>E-mail: ${dadosEscola.emailEscola}<br>Endereço: ${dadosEscola.enderecoEscola}</p><p>Sistemas ProXDigital.</p>`
+                }
             }
-        }
 
-        dadosAluno.contratos = contratos
-        dadosAluno.timestamp = admin.firestore.Timestamp.now()
+            return admin.database().ref('/sistemaEscolar/preMatriculas').push(dadosAluno).then(() => {
+                
+                return firestoreRef.add(emailContent).then(() => {
+                    console.log('Queued email for delivery to ' + dadosAluno.emailAluno)
+                    return {answer: 'Aluno cadastrado em pré-matrícula com sucesso! Um e-mail será enviado para o aluno e seu responsável pedagógico, informando-os sobre este cadastro.'}
+                    
+                }).catch(error => {
+                    console.error(error)
+                    throw new Error(error.message)
+                })
+            }).catch(error => {
+                throw new functions.https.HttpsError('unknown', error.message, error)
+            })
+
+        } else {
+            delete dadosAluno.tipoMatricula
+            let contratoConfigurado = data.contratoConfigurado
+            let planoOriginal = data.planoOriginal
+            let codContrato = admin.database().ref('/').push().key
+            let contratos = [codContrato]
+
+            let firestoreRef = admin.firestore().collection('mail');
+            let infoEscola = await admin.database().ref('sistemaEscolar/infoEscola/dadosBasicos').once('value')
+            let dadosEscola = infoEscola.val()
+            let emailContent = {
+                to: dadosAluno.emailAluno,
+                cc: dadosAluno.emailResponsavelPedagogico || null,
+                message: {
+                    subject: `${dadosEscola.nomeEscola}`,
+                    text: `Olá ${dadosAluno.nomeAluno.split(' ')[0]}, você foi corretamente cadastrado(a) em nosso sistema e está pronto(a) para iniciar essa jornada conosco. Sistemas ProjetoX.`,
+                    html: `<h3>Olá ${dadosAluno.nomeAluno.split(' ')[0]}!</h3><p>Você está matriculado(a) no nº de matrícula <b>${dadosAluno.matriculaAluno}</b>, e está pronto(a) para iniciar os estudos conosco. Use seu e-mail e senha cadastrados para acessar o sistema. Só lembrando, sua senha é: <b>${dadosAluno.senhaAluno}</b>. Fique atento aos e-mails, pois sua escola pode utilizar este canal para comunicação com você.</p><p>Em caso de dificuldades <b>entre em contato com a escola para maiores informações</b>.</p><p><b>Dados de contato da escola:</b><br>Telefone: ${dadosEscola.telefoneEscola}<br>E-mail: ${dadosEscola.emailEscola}<br>Endereço: ${dadosEscola.enderecoEscola}</p><p>Sistemas ProXDigital.</p>`
+                }
+            }
+
+            dadosAluno.contratos = contratos
+            dadosAluno.timestamp = admin.firestore.Timestamp.now()
             return admin.database().ref('sistemaEscolar/alunos').child(dadosAluno.matriculaAluno).once('value').then(alunoRecord => {
                 if (alunoRecord.exists()) {
                     throw new functions.https.HttpsError('already-exists', 'Este número de matrícula já consta no sistema. Por favor, clique no botão azul no início deste formulário para atualizar o número de matrícula, para gerar um novo número de matrícula.')
                 }
-                return admin.database().ref('sistemaEscolar/alunos/' + dadosAluno.matriculaAluno).set(dadosAluno).then(() => {
-                    return admin.database().ref('sistemaEscolar/infoEscola/contratos/' + codContrato).set({contratoConfigurado: contratoConfigurado, situacao: 'Vigente', planoOriginal: planoOriginal, matricula: dadosAluno.matriculaAluno, timestamp: admin.firestore.Timestamp.now(), codContrato: codContrato}).then(() => {
-                        return admin.database().ref('sistemaEscolar/turmas').child(dadosAluno.turmaAluno + '/alunos').child(dadosAluno.matriculaAluno).set({nome: dadosAluno.nomeAluno, prof: dadosAluno.emailProfAluno}).then(() => {
-                            return admin.database().ref('sistemaEscolar/ultimaMatricula').set(dadosAluno.matriculaAluno).then(() => {
-                                return admin.database().ref('sistemaEscolar/secretaria/responsaveisAutorizados').push({
-                                    addResponsavelNome: dadosAluno.nomeResponsavelPedagogicoAluno,
-                                    addResponsavelRelacao: dadosAluno.relacaoPedagogicoAluno,
-                                    addResponsavelNumeroCelular: dadosAluno.numeroCelularPedagogicoAluno,
-                                    addResponsavelEmail: dadosAluno.emailResponsavelPedagogico,
-                                    addResponsavelRg: dadosAluno.rgPedagogicoAluno,
-                                    addResponsavelCpf: dadosAluno.cpfPedagogicoAluno,
-                                    matriculaAluno: dadosAluno.matriculaAluno
-                                }).then(() => {
-                                    admin.database().ref('sistemaEscolar/numeros/alunosMatriculados').transaction(function (current_value) {
-                                        let numAtual = Number(current_value)
-                                        if (current_value == null) {
-                                            return 1
-                                        } else {
-                                            return numAtual++
-                                        }
-                                    }, function(error, comitted, snapshot){
-                                        if (error) {
-                                            throw new functions.https.HttpsError(error.code, error.message, error)
-                                        } else if(!comitted) {
-                                            throw new functions.https.HttpsError('already-exists', 'Já existe. isso pode ser um erro')
-                                        }
-                                        
-                                    })
+                    return admin.database().ref('sistemaEscolar/alunos/' + dadosAluno.matriculaAluno).set(dadosAluno).then(() => {
+                        return admin.database().ref('sistemaEscolar/infoEscola/contratos/' + codContrato).set({contratoConfigurado: contratoConfigurado, situacao: 'Vigente', planoOriginal: planoOriginal, matricula: dadosAluno.matriculaAluno, timestamp: admin.firestore.Timestamp.now(), codContrato: codContrato}).then(() => {
+                            return admin.database().ref('sistemaEscolar/turmas').child(dadosAluno.turmaAluno + '/alunos').child(dadosAluno.matriculaAluno).set({nome: dadosAluno.nomeAluno, prof: dadosAluno.emailProfAluno}).then(() => {
+                                return admin.database().ref('sistemaEscolar/ultimaMatricula').set(dadosAluno.matriculaAluno).then(() => {
+                                    return admin.database().ref('sistemaEscolar/secretaria/responsaveisAutorizados').push({
+                                        addResponsavelNome: dadosAluno.nomeResponsavelPedagogicoAluno,
+                                        addResponsavelRelacao: dadosAluno.relacaoPedagogicoAluno,
+                                        addResponsavelNumeroCelular: dadosAluno.numeroCelularPedagogicoAluno,
+                                        addResponsavelEmail: dadosAluno.emailResponsavelPedagogico,
+                                        addResponsavelRg: dadosAluno.rgPedagogicoAluno,
+                                        addResponsavelCpf: dadosAluno.cpfPedagogicoAluno,
+                                        matriculaAluno: dadosAluno.matriculaAluno
+                                    }).then(() => {
+                                        admin.database().ref('sistemaEscolar/numeros/alunosMatriculados').transaction(function (current_value) {
+                                            let numAtual = Number(current_value)
+                                            if (current_value == null) {
+                                                return 1
+                                            } else {
+                                                return numAtual++
+                                            }
+                                        }, function(error, comitted, snapshot){
+                                            if (error) {
+                                                throw new functions.https.HttpsError(error.code, error.message, error)
+                                            } else if(!comitted) {
+                                                throw new functions.https.HttpsError('already-exists', 'Já existe. isso pode ser um erro')
+                                            }
+                                            
+                                        })
 
-                                    return firestoreRef.add(emailContent).then(() => {
-                                        console.log('Queued email for delivery to ' + dadosAluno.emailAluno)
-                                        return {answer: 'Aluno cadastrado com sucesso! O aluno e, se houver, o seu responsável pedagógico, receberão em seu e-mail a senha do aluno para acesso ao portal.', codContrato: codContrato}
+                                        return firestoreRef.add(emailContent).then(() => {
+                                            console.log('Queued email for delivery to ' + dadosAluno.emailAluno)
+                                            return {answer: 'Aluno cadastrado com sucesso! O aluno e, se houver, o seu responsável pedagógico, receberão em seu e-mail a senha do aluno para acesso ao portal.', codContrato: codContrato}
+                                            
+                                        }).catch(error => {
+                                            console.error(error)
+                                            throw new Error(error.message)
+                                        })
+                                        
                                         
                                     }).catch(error => {
-                                        console.error(error)
-                                        throw new Error(error.message)
+                                        throw new functions.https.HttpsError('unknown', error.message, error)
                                     })
                                     
                                     
                                 }).catch(error => {
                                     throw new functions.https.HttpsError('unknown', error.message, error)
                                 })
-                                
-                                
                             }).catch(error => {
                                 throw new functions.https.HttpsError('unknown', error.message, error)
                             })
                         }).catch(error => {
                             throw new functions.https.HttpsError('unknown', error.message, error)
                         })
-                    }).catch(error => {
-                        throw new functions.https.HttpsError('unknown', error.message, error)
-                    })
-                    
-                    }).catch(error => {
-                        throw new functions.https.HttpsError('unknown', error.message, error)
-                    })
-            }).catch(error => {
-                throw new functions.https.HttpsError('unknown', error.message, error)
-            })
-    } else {
-        throw new functions.https.HttpsError('permission-denied', 'Você não possui permissão para fazer alterações nesta área.')
-    }
-})
-
-exports.timestamp = functions.https.onCall((data, context) => {
-    if (context.auth.token.master == true || context.auth.token.secretaria == true ||  context.auth.token.professores == true || context.auth.token.adm == true || context.auth.token.aluno == true) {
-        return {timestamp: admin.firestore.Timestamp.now()}
-    } else {
-        throw new functions.https.HttpsError('permission-denied', 'Você não tem permissão.')
-    }
-})
-
-exports.transfereAlunos = functions.https.onCall((data, context) => {
-    function formataNumMatricula(num) {
-        let numero = num
-        numero = "00000" + numero.replace(/\D/g, '');
-        numero = numero.slice(-5,-1) + numero.slice(-1);
-        return numero
-    }
-    if (context.auth.token.master == true || context.auth.token.secretaria == true) {
-        let dados = data
-        let turmaAtual = dados.turmaAtual
-        let turmaParaTransferir = dados.turmaParaTransferir
-        let alunosSelecionados = dados.alunos
-        let alunos = {} //Aqui onde será guardado os alunos e os dados dos mesmos, da turma para serem transferidos para outra turma
-        var timestamp = admin.firestore.Timestamp.now()
-        
-        return admin.database().ref(`sistemaEscolar/turmas/${turmaAtual}/alunos/`).once('value').then(snapshot => {
-            let alunosTurma = snapshot.val()
-            for (const i in alunosSelecionados) {
-                if (Object.hasOwnProperty.call(alunosSelecionados, i)) {
-                    const matricula = alunosSelecionados[i];
-                    alunos[formataNumMatricula(matricula)] = alunosTurma[formataNumMatricula(matricula)]
-                }
+                        
+                        }).catch(error => {
+                            throw new functions.https.HttpsError('unknown', error.message, error)
+                        })
+                }).catch(error => {
+                    throw new functions.https.HttpsError('unknown', error.message, error)
+                })
             }
-            console.log(alunos)
             
-            return admin.database().ref(`sistemaEscolar/turmas/${turmaParaTransferir}/alunos/`).update(alunos).then(() => {
-                async function removeAlunos() {
-                    for (const matricula in alunos) {
-                        if (Object.hasOwnProperty.call(alunos, matricula)) {
-                            const dadosAluno = alunos[matricula];
-                            await admin.database().ref(`sistemaEscolar/turmas/${turmaAtual}/historico`).push({dados: {matricula: matricula, dadosAluno: dadosAluno, turmaAtual: turmaAtual, turmaParaQualFoiTransferido: turmaParaTransferir}, timestamp: timestamp, operacao: 'Transferência de alunos'}).then(() => {
-                                admin.database().ref(`sistemaEscolar/turmas/${turmaAtual}/alunos/${matricula}`).remove().then(() => {
-                                    admin.database().ref(`sistemaEscolar/turmas/${turmaParaTransferir}/professor/0`).once('value').then(novoProfessor => {
-                                        admin.database().ref(`sistemaEscolar/turmas/${turmaParaTransferir}/alunos/${matricula}/prof/`).set(novoProfessor.val()).then(() =>{
-                                            admin.database().ref(`sistemaEscolar/alunos/${matricula}/profAluno/`).set(novoProfessor.val()).then(() =>{
-                                                admin.database().ref(`sistemaEscolar/alunos/${matricula}/turmaAluno/`).set(turmaParaTransferir).then(() =>{
-                                                    admin.database().ref(`sistemaEscolar/alunos/${matricula}/historico/`).push({dados: {matricula: matricula, dadosAluno: dadosAluno, turmaAtual: turmaAtual, turmaParaQualFoiTransferido: turmaParaTransferir}, timestamp: timestamp, operacao: 'Transferência de alunos'}).then(() =>{
+        } else {
+            throw new functions.https.HttpsError('permission-denied', 'Você não possui permissão para fazer alterações nesta área.')
+        }
+    })
 
+    exports.timestamp = functions.https.onCall((data, context) => {
+        if (context.auth.token.master == true || context.auth.token.secretaria == true ||  context.auth.token.professores == true || context.auth.token.adm == true || context.auth.token.aluno == true) {
+            return {timestamp: admin.firestore.Timestamp.now()}
+        } else {
+            throw new functions.https.HttpsError('permission-denied', 'Você não tem permissão.')
+        }
+    })
+
+    exports.transfereAlunos = functions.https.onCall((data, context) => {
+        function formataNumMatricula(num) {
+            let numero = num
+            numero = "00000" + numero.replace(/\D/g, '');
+            numero = numero.slice(-5,-1) + numero.slice(-1);
+            return numero
+        }
+        if (context.auth.token.master == true || context.auth.token.secretaria == true) {
+            let dados = data
+            let turmaAtual = dados.turmaAtual
+            let turmaParaTransferir = dados.turmaParaTransferir
+            let alunosSelecionados = dados.alunos
+            let alunos = {} //Aqui onde será guardado os alunos e os dados dos mesmos, da turma para serem transferidos para outra turma
+            var timestamp = admin.firestore.Timestamp.now()
+            
+            return admin.database().ref(`sistemaEscolar/turmas/${turmaAtual}/alunos/`).once('value').then(snapshot => {
+                let alunosTurma = snapshot.val()
+                for (const i in alunosSelecionados) {
+                    if (Object.hasOwnProperty.call(alunosSelecionados, i)) {
+                        const matricula = alunosSelecionados[i];
+                        alunos[formataNumMatricula(matricula)] = alunosTurma[formataNumMatricula(matricula)]
+                    }
+                }
+                console.log(alunos)
+                
+                return admin.database().ref(`sistemaEscolar/turmas/${turmaParaTransferir}/alunos/`).update(alunos).then(() => {
+                    async function removeAlunos() {
+                        for (const matricula in alunos) {
+                            if (Object.hasOwnProperty.call(alunos, matricula)) {
+                                const dadosAluno = alunos[matricula];
+                                await admin.database().ref(`sistemaEscolar/turmas/${turmaAtual}/historico`).push({dados: {matricula: matricula, dadosAluno: dadosAluno, turmaAtual: turmaAtual, turmaParaQualFoiTransferido: turmaParaTransferir}, timestamp: timestamp, operacao: 'Transferência de alunos'}).then(() => {
+                                    admin.database().ref(`sistemaEscolar/turmas/${turmaAtual}/alunos/${matricula}`).remove().then(() => {
+                                        admin.database().ref(`sistemaEscolar/turmas/${turmaParaTransferir}/professor/0`).once('value').then(novoProfessor => {
+                                            admin.database().ref(`sistemaEscolar/turmas/${turmaParaTransferir}/alunos/${matricula}/prof/`).set(novoProfessor.val()).then(() =>{
+                                                admin.database().ref(`sistemaEscolar/alunos/${matricula}/profAluno/`).set(novoProfessor.val()).then(() =>{
+                                                    admin.database().ref(`sistemaEscolar/alunos/${matricula}/turmaAluno/`).set(turmaParaTransferir).then(() =>{
+                                                        admin.database().ref(`sistemaEscolar/alunos/${matricula}/historico/`).push({dados: {matricula: matricula, dadosAluno: dadosAluno, turmaAtual: turmaAtual, turmaParaQualFoiTransferido: turmaParaTransferir}, timestamp: timestamp, operacao: 'Transferência de alunos'}).then(() =>{
+
+                                                        }).catch(error => {
+                                                            throw new functions.https.HttpsError('unknown', error.message, error)
+                                                        })
                                                     }).catch(error => {
                                                         throw new functions.https.HttpsError('unknown', error.message, error)
                                                     })
@@ -502,26 +538,23 @@ exports.transfereAlunos = functions.https.onCall((data, context) => {
                                 }).catch(error => {
                                     throw new functions.https.HttpsError('unknown', error.message, error)
                                 })
-                            }).catch(error => {
-                                throw new functions.https.HttpsError('unknown', error.message, error)
-                            })
-                            
+                                
+                            }
                         }
                     }
-                }
-                return removeAlunos().then(() => {
-                    return {answer: 'Os alunos foram transferidos para a outra turma com sucesso.'}
-                }).catch(error => {
+                    return removeAlunos().then(() => {
+                        return {answer: 'Os alunos foram transferidos para a outra turma com sucesso.'}
+                    }).catch(error => {
+                        
+                        throw new functions.https.HttpsError('unknown', error.message, error)
+                    })
                     
+                }).catch(error => {
                     throw new functions.https.HttpsError('unknown', error.message, error)
                 })
-                
             }).catch(error => {
                 throw new functions.https.HttpsError('unknown', error.message, error)
             })
-        }).catch(error => {
-            throw new functions.https.HttpsError('unknown', error.message, error)
-        })
 
         
     } else {
@@ -817,6 +850,7 @@ exports.fechaTurma = functions.https.onCall((data, context) => {
         throw new functions.https.HttpsError('permission-denied', 'Você não possui permissão para fazer alterações nesta área.')
     }
 })
+
 
 // exports.adicionaFotoAluno = functions.storage.object().onFinalize(async (object) => {
 //     const fileBucket = object.bucket; // The Storage bucket that contains the file.

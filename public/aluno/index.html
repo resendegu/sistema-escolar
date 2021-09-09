@@ -133,7 +133,7 @@
                 <li class="nav-item">
                   <a class="nav-link" data-toggle="list" href="#abaTurmas" role="tab" aria-controls="turmas" onclick="carregaTurmas()" id="btnAbaTurmasMobile">
                     <span data-feather="database"></span>
-                    Turmas
+                    Turma virtual
                   </a>
                 </li>
               </ul>
@@ -181,7 +181,7 @@
               <li class="nav-item">
                 <a class="nav-link" data-toggle="list" href="#abaTurmas" role="tab" aria-controls="turmas" id="btnAbaTurmas" onclick="carregaTurmas()">
                   <span data-feather="database"></span>
-                  Turmas
+                  Turma virtual
                 </a>
               </li>
             </ul>
@@ -246,7 +246,7 @@
             <div class="container tab-pane fade show active" id="abaInicio" role="tabpanel" aria-labelledby="Dashboard">
               <div class="row">
                 <div class="col-sm-auto">
-                  <h2>Minhas turmas</h2>
+                  <h2></h2>
                   <div class="overflow-auto" style="height: fit-content; max-height: 300px;">
                     <div class="list-group" id="listaTurmasProf">
                       
@@ -286,7 +286,7 @@
                                   <p class="text-muted font-size-sm" id="mostraHoraEDiasAluno">Horário e dia de aula</p>
                                   <button class="btn btn-outline-primary" onclick="mostraDadosResponsaveis()">Responsáveis</button>
                                   <br><br>
-                                  
+                                  <section id="secGeraFicha"></section>
                                   
                                 </div>
                               </div>
@@ -307,7 +307,7 @@
                                 <span class="text-secondary" id="mostraDataNascimentoAluno">Data do Aluno</span>
                               </li>
                               <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
-                                <a href="#turmasQueParticipa" id="turmasQueParticipa" onclick="historicoAluno(`${document.getElementById('mostraMatriculaAluno').innerText}`, `${document.getElementById('mostraTurmaAluno').innerText}`)" style="text-decoration: none;"><h6 class="mb-0"><span data-feather="file-text"></span> Histórico do aluno</h6></a>
+                                <a href="#turmasQueParticipa" id="turmasQueParticipa" onclick="historicoAluno()" style="text-decoration: none;"><h6 class="mb-0"><span data-feather="file-text"></span> Histórico do aluno</h6></a>
                                 <span class="text-secondary"></span>
                               </li>
                               <!--<li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
@@ -474,86 +474,8 @@
             </div>
 
             <div class="container tab-pane fade" id="abaTurmas" role="tabpanel" aria-labelledby="Turmas">
-              <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                  <label class="input-group-text" for="inputGroupSelect01">Turmas</label>
-                </div>
-                <select class="custom-select" id="selectTurmas" onchange="abreTurma(this.value)" style="visibility: hidden;">
-                  <option selected hidden>Escolha uma turma...</option>
-                </select>
-              </div>
-              <div class="container" id="areaInfoTurma" style="visibility: hidden;">
-                <label class="h3" id="infoTurma">Turma</label>
-                <label class="text-muted float-right h5" id="codigoDaTurma"></label>
-                <div class="row">
-                  <div class="col-md-auto">
-                    <h6>Faixa etária</h6>
-                    <div class="row">
-                      &nbsp;&nbsp;&nbsp;<div class="list-group" id="mostraFaixa" role="tablist">
-                        <a class="list-group-item list-group-item-action" data-toggle="list" id="nivelKIDS" href="#kids" role="tab" onclick="faixa('KIDS')">KIDS</a>
-                        <a class="list-group-item list-group-item-action" data-toggle="list" id="nivelT" href="#teens" role="tab" onclick="faixa('T')">TEENS</a>
-                        <a class="list-group-item list-group-item-action" data-toggle="list" id="nivelA" href="#adults" role="tab" onclick="faixa('A')">ADULTS</a>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-md-auto">
-                    <label id="mostraDiasTurma"></label>
-                    <br>
-                    <label id="mostraHorarioTurma"></label>
-                    <br>
-                    <label id="mostraLivrosTurma"></label>
-                  </div>
-                  <div class="col-lg">
-                    <div>
-                      <label>Professores cadastrados na turma:</label> <br>
-                      <div id="mostraProfessoresCadastrados" class="items-container"></div>
-                    </div>
-                  </div>
-                </div>
-                <div class="container">
-                  <div class="row">
-                    <div class="form-group col-auto">
-                      <label for="inputAddress">Campo de busca</label>
-                      <input class="form-control" type="search" placeholder="Digite a busca..." aria-label="Search" onchange="carregaListaDeAlunosDaTurma(`${document.getElementById('selectTurmas').value}`, maiusculo(this))">
-                    </div>
-                    <div class="form-group col-auto">
-                      <label for="inputAddress">Buscar por:</label>
-                      <select class="form-control" name="tipoDeBuscaDaTurma" id="tipoDeBuscaDaTurma" onchange="alteraTipoDeBusca(this.value)">
-                        <option selected value="nome">Nome do aluno</option>
-                      </select>
-                      
-                    </div>
-                  </div> 
-                </div>
-                <label>Alunos cadastrados na turma: (Selecione alunos para fazer lançamentos ou clique em um aluno para ver sua ficha)</label><br>
-                <input type="checkbox" id="selecTodos" onclick="selecionaTodos(this)">
-                <label for="selecTodos">Selecionar todos</label>
-                <div class="overflow-auto" style="height: fit-content; max-height: 280px;">
-                  <div class="list-group" id="listaAlunosDaTurma" style="width: 90%;">
-                    
-                  </div>
-                </div>
-                <br><br>
-                <button type="button" class="btn btn-primary" id="btnLancaFrequencia" onclick="lancaFrequencia()" disabled>Lançar frequência</button>
-                <button type="button" class="btn btn-info" id="btnLancaNotas" disabled onclick="lancaNotas()">Lançar Notas</button>
-                <button type="button" class="btn btn-secondary" id="btnDistribuiNotas" onclick="distribuiNotas()">Distribuir notas</button>
-                <button type="button" class="btn btn-success" id="btnIniciaPeriodo" onclick="iniciaPeriodo()">Iniciar turma</button>
-                <button type="button" class="btn btn-warning" id="btnFechaPeriodo" onclick="fechaPeriodo()">Fechar turma</button>
-                <hr>
-                <p class="text-muted justify-content-end" id="timestampTurmaCadastrada"></p>
-                <hr>
-                <label class="h5" id="tituloMapaFrequencias">Mapa de frequências da Turma</label>
-                <div id="divTotalFrequencias">Total de frequências lançadas: <label id="totalFrequenciasTurma"></label> de <label id="qtdeAulasFrequenciaTurma"></label><br> Percentual de frequência lançada em <label id="porcentagemFrequenciaTurma"></label></div>
-                <div id="divMapaFrequenciasTurma">
-                  <div class="row justify-content-start">
-                    <div class="col-3" style="background-color: rgba(86,61,124,.15);border: 1px solid rgba(86,61,124,.2);">Column</div>
-                    <div class="col" style="background-color: rgba(86,61,124,.15);border: 1px solid rgba(86,61,124,.2);">Column</div>
-                    
-                  </div>
-                </div>
-                
-                <hr>
-              </div>
+              Turma virtual
+              
             </div>
 
           </div>

@@ -165,7 +165,8 @@ window.addEventListener('DOMContentLoaded', (e) => {
                         c1++
                     }
                     adicionaEspacoCabeçalho('Nome: ', aluno.nomeAluno, 'Matrícula:', aluno.matriculaAluno)
-                    imagemAluno.src = aluno.fotoAluno
+                    console.log(aluno.fotoAluno)
+                    !aluno.fotoAluno ? null : imagemAluno.src = aluno.fotoAluno 
                     adicionaEspacoCabeçalho('Turma:', historico.turma, 'Curso:', infos.cursos[historico.infoAluno.curso].nomeCurso)
                     adicionaEspacoCabeçalho('Data Início:', historico.infoAluno.inicio.split('-').reverse().join('/'), 'Data término:', historico.infoAluno.fim.split('-').reverse().join('/'))
                     adicionaEspacoCabeçalho('Semestre - Livro:', semestreLivros, '', '', 'colspan=2')
@@ -210,20 +211,20 @@ window.addEventListener('DOMContentLoaded', (e) => {
                             aulasPresente++
                         }
                     }
-                    let porcentagemFrequencia = (100*aulasPresente)/Number(historico.infoAluno.qtdeAulas)
+                    let porcentagemFrequencia = ((100*aulasPresente)/Number(historico.infoAluno.qtdeAulas)).toFixed(2)
                     let faltas = Number(historico.infoAluno.qtdeAulas) - aulasPresente
                     adicionaDadosTabela(['Frequência (%)', 'Faltas'], [porcentagemFrequencia + '%', faltas == 0 ? 'Nenhuma falta' :`${faltas} de um total de ${historico.infoAluno.qtdeAulas} aulas ministradas`])
                     if (soma >= infos.dadosBasicos.pontosAprovacao) {
                         if (porcentagemFrequencia >= infos.dadosBasicos.frequenciaAprovacao) {
-                            adicionaDadosTabela([false, 'Situação final: APROVADO'])
+                            adicionaDadosTabela([false, 'Situação final: <label style="color: green;">APROVADO</label>'])
                         } else {
-                            adicionaDadosTabela([false, 'Situação final: REPROVADO POR FREQUÊNCIA'])
+                            adicionaDadosTabela([false, 'Situação final: <label style="color: red;">REPROVADO POR FREQUÊNCIA</label>'])
                         }  
                     } else {
                         if (porcentagemFrequencia < infos.dadosBasicos.frequenciaAprovacao) {
-                            adicionaDadosTabela([false, 'Situação final: REPROVADO POR NOTA E FREQUÊNCIA'])
+                            adicionaDadosTabela([false, 'Situação final: <label style="color: red;">REPROVADO POR NOTA E FREQUÊNCIA</label>'])
                         } else {
-                            adicionaDadosTabela([false, 'Situação final: REPROVADO POR NOTA'])
+                            adicionaDadosTabela([false, 'Situação final: <label style="color: red;">REPROVADO POR NOTA</label>'])
                         }
                         
                     }
@@ -346,7 +347,7 @@ window.addEventListener('DOMContentLoaded', (e) => {
 
                     
                     adicionaEspacoCabeçalho('Nome: ', aluno.nomeAluno, 'Matrícula:', aluno.matriculaAluno)
-                    imagemAluno.src = aluno.fotoAluno
+                    !aluno.fotoAluno ? null : imagemAluno.src = aluno.fotoAluno 
                     tituloSecao.innerText = ''
                     for (let i = 0; i < titulos.length; i++) {
                         const titulo = titulos[i];

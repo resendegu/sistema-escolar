@@ -1396,9 +1396,15 @@
               <label class="h3">Cadastro de alunos</label>
               <hr>
               <form id="formCadastroAluno" onkeydown="return event.key != 'Enter';">
+                
                 <input type='reset' class="btn btn-warning btn-sm" id="resetForm" value='Limpar todos os campos'/>
-                <a class="btn btn-info btn-sm" onclick="carregaProfsETurmas()"><span data-feather="refresh-cw"></span> Atualizar número de matrícula e turmas</a>
-                <br> <br>
+                <a class="btn btn-info btn-sm" onclick="carregaProfsETurmas()" id="atualizaMatricula"><span data-feather="refresh-cw"></span> Atualizar número de matrícula e turmas</a>
+                <br><br>
+                <input type="radio" name="tipoMatricula" id="tipoMatricula" checked onclick="document.getElementById('atualizaMatricula').style.visibility = 'visible', document.getElementById('atualizaMatricula').click(), document.getElementById('matriculaAluno').disabled = false, document.getElementById('geraDocsSection').style.visibility = 'visible'" value="matricula">
+                <label for="tipoMatricula">Matrícula</label>
+                <input type="radio" name="tipoMatricula" id="tipoPreMatricula" onclick="document.getElementById('matriculaAluno').value = '', document.getElementById('matriculaAluno').disabled = true, document.getElementById('atualizaMatricula').style.visibility = 'hidden', document.getElementById('geraDocsSection').style.visibility = 'hidden'" value="preMatricula">
+                <label for="tipoPreMatricula">Pré-Matrícula</label>
+                <br>
                 <label class="h6">Dados pessoais</label>
                 <div class="form-row">
                   <div class="form-group col-sm-2">
@@ -1711,23 +1717,25 @@
                     <small id="cpfHelp3" class="form-text text-muted">Digite um CPF válido, existe um algoritmo de validação neste campo.</small>
                   </div>
                 </div>
-
-                <div class="form-group">
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="geraPDFAluno" name="geraPDFAluno">
-                    <label class="form-check-label" for="geraPDFAluno">
-                      Gerar ficha de matrícula
-                    </label>
+                <section id="geraDocsSection">
+                  <div class="form-group">
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="geraPDFAluno" name="geraPDFAluno">
+                      <label class="form-check-label" for="geraPDFAluno">
+                        Gerar ficha de matrícula
+                      </label>
+                    </div>
                   </div>
-                </div>
-                <div class="form-group">
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="geraBoleto" name="geraBoleto">
-                    <label class="form-check-label" for="geraPDFAluno">
-                      Gerar boletos/carnê de pagamento
-                    </label>
+                  <div class="form-group">
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="geraBoleto" name="geraBoleto">
+                      <label class="form-check-label" for="geraPDFAluno">
+                        Gerar boletos/carnê de pagamento
+                      </label>
+                    </div>
                   </div>
-                </div>
+                </section>
+                
                 <button type="submit" class="btn btn-primary" id="cadastrarAluno">Cadastrar Aluno</button>
                 <br><br>
               </form>

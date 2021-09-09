@@ -1409,6 +1409,7 @@ formCadastroAluno.addEventListener('submit', async (e) => {
     
 
     console.log(dadosAluno)
+    
     if (dadosAluno.dataNascimentoAluno == '' || dadosAluno.nomeAluno == '') {
         AstNotif.dialog('Confira os campos', 'A data de nascimento do aluno e o nome do aluno são obrigatórios.')
         loaderRun()
@@ -1424,8 +1425,8 @@ formCadastroAluno.addEventListener('submit', async (e) => {
     } else if (dadosAluno.cpfAluno == '' || dadosAluno.rgAluno == '') {
         AstNotif.dialog('Confira os campos', 'Os dados de RG e CPF do aluno não podem estar em branco.')
         loaderRun()
-    } else if (dadosAluno.turmaAluno == 'Escolha uma turma...') {
-        AstNotif.dialog('Confira os campos', 'É obrigatório matricular o aluno em uma turma.')
+    } else if (dadosAluno.turmaAluno == 'Escolha uma turma...' && dadosAluno.tipoMatricula == 'matricula') {
+        AstNotif.dialog('Confira os campos', 'É obrigatório matricular o aluno em uma turma. Se você deseja fazer pré-matricula, vá até o início deste formulário e marque a opção de Pré-matricula.')
         loaderRun()
     } else {
         loaderMsg.innerText = 'Enviando dados para o servidor...'
@@ -1434,8 +1435,9 @@ formCadastroAluno.addEventListener('submit', async (e) => {
             sessionStorage.removeItem('contratoConfigurado')
             sessionStorage.removeItem('planoOriginal')
             loaderRun()
-            AstNotif.notify('Sucesso', result.data.answer)
             console.log(result.data)
+            AstNotif.notify('Sucesso', result.data.answer, 'agora', {length: 15000})
+            
             if (dadosAluno.geraBoleto == 'on') {
                 boleto('geraBoletos', dadosAluno.matriculaAluno, result.data.codContrato)
             }
@@ -1443,7 +1445,7 @@ formCadastroAluno.addEventListener('submit', async (e) => {
                 gerarFichaAluno(dadosAluno.matriculaAluno)
             }
             
-            
+            document.getElementById('resetForm').style.visibility = 'visible'
             document.getElementById('resetForm').click()
             carregaProfsETurmas()
         }).catch(function(error) {
