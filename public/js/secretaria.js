@@ -14,6 +14,7 @@ var infoEscolaRef = firebase.database().ref('sistemaEscolar/infoEscola')
 var alunosStorageRef = firebase.storage().ref('sistemaEscolar/alunos')
 var cursosRef = firebase.database().ref('sistemaEscolar/infoEscola/cursos')
 var contratosRef = firebase.database().ref('sistemaEscolar/infoEscola/contratos')
+var preMatriculasRef = firebase.database().ref('sistemaEscolar/preMatriculas')
 
 var loader = document.getElementById('loader')
 var loaderMsg = document.getElementById('loaderMsg')
@@ -4642,3 +4643,43 @@ alteraLogoEscola.addEventListener('input', (e) => {
         uploadFile(files[0], {tipo: 'logoEscola'}, 'infoEscola', 'sistemaEscolar/infoEscola/logoEscola')
     }
 })
+
+// Aba Pré matriculas
+
+async function abaPreMatriculas() {
+    let listaPreMatriculas = document.getElementById('listaPreMatriculas')
+    let preMatriculas
+    carregaMatriculas()
+
+    async function carregaMatriculas() {
+        preMatriculas = (await preMatriculasRef.once('value')).val()
+        let c = 0
+        listaPreMatriculas.innerHTML = ''
+        for (const key in preMatriculas) {
+            if (Object.hasOwnProperty.call(preMatriculas, key)) {
+                const preMatricula = preMatriculas[key];
+                c++
+                    listaPreMatriculas.innerHTML += `
+                    <tr>
+                        <td>
+                            <span class="custom-checkbox">
+                            <input type="checkbox" id="checkbox${c}" name="options[]" value="1">
+                            <label for="checkbox${c}"></label>
+                            </span>
+                        </td>
+                        <td><a href="#rolaTelaAbaixoAlunos" onclick="abreDadosPreMatricula('${key}')">${preMatricula.nomeAluno}</a></td>
+                        <td>${preMatricula.emailAluno}</td>
+                        <td>${preMatricula.celularAluno}</td>
+                        <td>
+                            <a href="#" class="edit" onclick="editarDadosPreMatricula('${key}')"><i data-feather="edit" data-toggle="tooltip" title="Editar dados"></i></a>
+                            <a href="#checkbox${c}" class="delete"><i data-feather="user-x" data-toggle="tooltip" title="Apagar matrícula"></i></a>
+                        </td>
+                    </tr>`
+            }
+        }
+        feather.replace()
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
+    }
+}

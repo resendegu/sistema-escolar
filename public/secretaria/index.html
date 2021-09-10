@@ -513,6 +513,12 @@
                   </a>
                 </li>
                 <li class="nav-item">
+                  <a class="nav-link" data-toggle="list" href="#abaPreMatriculas" role="tab" aria-controls="preMatriculas" id="btnAbaPreMatriculasResponsivo" onclick="abaPreMatriculas()">
+                    <span data-feather="archive" ></span>
+                    Pré-matrículas
+                  </a>
+                </li>
+                <li class="nav-item">
                   <a class="nav-link" data-toggle="list" href="#abaTurmas" role="tab" aria-controls="turmas" onclick="turmas()">
                     <span data-feather="database"></span>
                     Turmas
@@ -655,6 +661,12 @@
                 <a class="nav-link" data-toggle="list" href="#abaAlunos" role="tab" aria-controls="alunos" id="btnAbaAlunos" onclick="carregaListaDeAlunos(), dragDropJaCadastrado()">
                   <span data-feather="users" ></span>
                   Alunos
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" data-toggle="list" href="#abaPreMatriculas" role="tab" aria-controls="alunos" id="btnAbaPreMatriculas"  onclick="abaPreMatriculas()">
+                  <span data-feather="users" ></span>
+                  Pré-matrículas
                 </a>
               </li>
               <li class="nav-item">
@@ -894,6 +906,330 @@
                           </tr>
                         </thead>
                         <tbody id="listaAlunos">
+                          <tr>
+                            <td>
+                              <span class="custom-checkbox">
+                                <input type="checkbox" id="checkbox1" name="options[]" value="1">
+                                <label for="checkbox1"></label>
+                              </span>
+                            </td>
+                            <td>Gustavo Resende</td>
+                            <td>teste@resende.app</td>
+                            <td>KIDS</td>
+                            <td>
+                              <a href="#editEmployeeModal" class="action" data-toggle="modal"><i data-feather="edit" data-toggle="tooltip" title="Reativar aluno">&#xE254;</i></a>
+                              <a href="#deleteEmployeeModal" class="delete" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Deletar">&#xE872;</i></a>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                      
+                    </div>
+                  </div>
+                </div>
+
+                
+              </div>
+              <div class="container" id="infoDoAluno" style="display: none;">
+                <div class="main-body">
+                      <div class="row gutters-sm">
+                        <div class="col-md-4 mb-3">
+                          <div class="card">
+                            <div class="card-body">
+                              <div class="d-flex flex-column align-items-center text-center">
+                                <img src="../images/profile_placeholder.png" alt="Imagem do aluno" class="" width="150" id="mostraFotoAluno">
+                                
+                                <div class="mt-3">
+                                  <label id="alunoDesativado" style="color: red; display: none">Desativado</label>
+                                  <h4 id="mostraNomeAluno">Nome</h4>
+                                  <p class="text-secondary mb-1" id="mostraIdadeAluno">Idade</p>
+                                  <input type="text" id="rolaTelaAbaixoAlunos" style="display: none;">
+                                  <label class="text-secondary mb-1" id="mostraTurmaAluno">Turma</label>
+                                  <p class="text-muted font-size-sm" id="mostraHoraEDiasAluno">Horário e dia de aula</p>
+                                  <button class="btn btn-primary" onclick="followUpAluno(`${document.getElementById('mostraMatriculaAluno').innerText}`)">Follow Up</button>
+                                  <button class="btn btn-outline-primary" onclick="mostraDadosResponsaveis()">Responsáveis</button><br><br>
+                                  <button class="btn btn-block btn-outline-primary" onclick="addResponsavelAutorizado(document.getElementById('mostraMatriculaAluno').innerText)"><span data-feather="plus"></span> Add responsável autorizado</button>
+                                  <br>
+                                  <section id="secGeraFicha"></section>
+                                  
+                                  
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="card mt-3">
+                            <ul class="list-group list-group-flush">
+                              <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                                <h6 class="mb-0"><span data-feather="file-text"></span> CPF</h6>
+                                <span class="text-secondary" id="mostraCpfAluno">CPF do Aluno</span>
+                              </li>
+                              <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                                <h6 class="mb-0"><span data-feather="clipboard"></span> RG</h6>
+                                <span class="text-secondary" id="mostraRgAluno">RG do Aluno</span>
+                              </li>
+                              <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                                <h6 class="mb-0"><span data-feather="calendar"></span> Data de Nasc.</h6>
+                                <span class="text-secondary" id="mostraDataNascimentoAluno">Data do Aluno</span>
+                              </li>
+                              <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                                <a href="#turmasQueParticipa" id="turmasQueParticipa" onclick="historicoAluno(`${document.getElementById('mostraMatriculaAluno').innerText}`, `${document.getElementById('mostraTurmaAluno').innerText}`)" style="text-decoration: none;"><h6 class="mb-0"><span data-feather="file-text"></span> Histórico do aluno</h6></a>
+                                <span class="text-secondary"></span>
+                              </li>
+                              <!--<li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                                <h6 class="mb-0"><span data-feather="file-text"></span>...</h6>
+                                <span class="text-secondary">...</span>-->
+                              </li>
+                            </ul>
+                          </div>
+                        </div>
+                        <div class="col-md-8">
+                          <div class="card mb-3">
+                            <div class="card-body">
+                              <div class="row">
+                                <div class="col-sm-3">
+                                  <h6 class="mb-0">Matrícula</h6>
+                                </div>
+                                <div class="col-sm-9 text-secondary" id="mostraMatriculaAluno">
+                                  00000
+                                </div>
+                              </div>
+                              <hr>
+                              <div class="row">
+                                <div class="col-sm-3">
+                                  <h6 class="mb-0">E-mail</h6>
+                                </div>
+                                <div class="col-sm-9 text-secondary" id="mostraEmailAluno">
+                                  exemplo@email.com
+                                </div>
+                              </div>
+                              <hr>
+                              <div class="row">
+                                <div class="col-sm-3">
+                                  <h6 class="mb-0">Telefone</h6>
+                                </div>
+                                <div class="col-sm-9 text-secondary" id="mostraTelefoneAluno">
+                                  XXXXXXXXXXX
+                                </div>
+                              </div>
+                              <hr>
+                              <div class="row">
+                                <div class="col-sm-3">
+                                  <h6 class="mb-0">Mobile</h6>
+                                </div>
+                                <div class="col-sm-9 text-secondary" id="mostraCelularAluno">
+                                  XXXXXXXXXXX
+                                </div>
+                              </div>
+                              <hr>
+                              <div class="row">
+                                <div class="col-sm-3">
+                                  <h6 class="mb-0">Endereço</h6>
+                                </div>
+                                <div class="col-sm-9 text-secondary" id="mostraEnderecoAluno">
+                                  Rua, Bairro, Cidade, Estado, Número
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="row gutters-sm">
+                            <div class="col-sm-6 mb-3">
+                              <div class="card h-100">
+                                <div class="card-body">
+                                  <h6 class="d-flex align-items-center mb-3"><i class="material-icons text-info mr-2">Desempenho</i>do aluno</h6>
+                                  <div id="desempenhoAluno"></div>
+                                  
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col-sm-6 mb-3">
+                              <div class="card h-100">
+                                <div class="card-body">
+                                  <h6 class="d-flex align-items-center mb-3"><i class="material-icons text-info mr-2">Notas</i>do aluno </h6> 
+                                  <div id="somatorioNotas"></div>
+                                  <div id="notasDoAluno">
+                                    <small id="nomeNota">...</small><small id="notaReferencia">/100</small>
+                                    <div class="progress mb-3" style="height: 5px">
+                                      <div class="progress-bar bg-primary" role="progressbar" style="width: 80%" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <hr>
+                    <p class="text-muted float-md-right" id="timestampDoAluno"></p>
+                    <br>
+                    <hr>
+                    <label class="h5">Mapa de frequências da turma atual</label>
+                    <div class="row">
+                      <div class="col">
+                        <div id="divFrequencias">
+                          <div class="row justify-content-start">
+                            <div class="col-3" style="background-color: rgba(86,61,124,.15);border: 1px solid rgba(86,61,124,.2);">Column</div>
+                            <div class="col-3" style="background-color: rgba(86,61,124,.15);border: 1px solid rgba(86,61,124,.2);">Column</div>
+                            
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col">
+                        <div id="divTotalFrequencias">Total de presenças: <label id="totalFrequencias"></label> de <label id="qtdeAulasFrequencia"></label><br> Percentual de frequência atual em <label id="porcentagemFrequencia"></label></div>
+                      </div>
+                    </div>
+                    <hr>
+                      <!-- Mostra Arquivos -->
+                      <label class="h6">Envio de documentos pessoais</label>
+                      <p>Aqui podem ser enviados os documentos como Identidade, CPF, Comprovante de Residência e outros que achar pertinente.
+                      <div id="drop-area-ja-cadastrado" class="drop-area">
+                        <section class="my-form">
+                          <p><b>Arraste e solte</b> os arquivos para enviar </p> ou
+                          <input type="file" id="fileElemJaCadastrado" class="fileElem" multiple>
+                          
+                          <label class="button" for="fileElemJaCadastrado">Escolher arquivos...</label>
+                        </section>
+                        <div class="progress" style="position: relative;">
+                          <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" id="progress">0%</div>
+                        </div>
+                      </div>
+                      <div class="content">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="card-box">
+                                        <div class="row">
+                                            <div class="col-lg-6 col-xl-6">
+                                                <h4 class="header-title m-b-30">Arquivos do Aluno</h4>
+                                            </div>
+                                            <div class="col">
+                                              <button onclick="carregaArquivosAluno(document.getElementById('mostraMatriculaAluno').innerText)" class="btn btn-sm btn-info float-md-right"><span data-feather="refresh-cw"></span> Atualizar arquivos</button>
+                                            </div>
+                                        </div>
+                    
+                                        <div class="row" id="listaArquivosAluno">
+                                            <div class="col-lg-3 col-xl-2">
+                                              <div class="file-man-box">
+                                                <a class="file-close"><i data-feather="x"></i></a>
+                                                <div class="file-img-box">
+                                                  <img src="../images/cpf-icon.png" alt="icon">
+                                                </div>
+                                                <a class="file-download"><i data-feather="download"></i></a>
+                                                <div class="file-man-title">
+                                                    <h6 class="mb-0 text-overflow">invoice_project.pdf</h5>
+                                                    <p class="mb-0"><small>568.8 kb</small></p>
+                                                </div>
+                                              </div>
+                                            </div>
+                                            
+                                            <div class="col-lg-3 col-xl-2">
+                                              <div class="file-man-box"><a href="" class="file-close"><i class="fa fa-times-circle"></i></a>
+                                                <div class="file-img-box"><img src="https://coderthemes.com/highdmin/layouts/assets/images/file_icons/png.svg" alt="icon">
+                                                
+                                                </div><a href="#" class="file-download"><i class="fa fa-download"></i></a>
+                                                  <div class="file-man-title">
+                                                    <h5 class="mb-0 text-overflow">invoice_project.pdf</h5>
+                                                    <p class="mb-0"><small>568.8 kb</small></p>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                          </div>
+                                    </div>
+                                </div>
+                                <!-- end col -->
+                            </div>
+                            <!-- end row -->
+                        </div>
+                        <!-- container -->
+                    </div>
+                    <hr>
+                    <label class="h5">Histórico de operações</label>
+                    <br>
+                    <div class="col">
+                      <div class="container">
+                        <div class="row">
+                          <div class="form-group col-auto">
+                            <label for="inputAddress">Campo de busca</label>
+                            <input class="form-control" type="search" placeholder="Digite a busca..." aria-label="Search" onchange="carregaListaDeAlunos(maiusculo(this))">
+                          </div>
+                          <div class="form-group col-auto">
+                            <label for="inputAddress">Buscar por:</label>
+                            <select class="form-control" name="tipoDeBusca" id="tipoDeBuscaHistoricoAluno" onchange="alteraTipoDeBusca(this.value)">
+                              <option selected value="nomeAluno">Nome do aluno</option>
+                              <option value="matriculaAluno">Número de matrícula</option>
+                              <option value="cpfAluno">CPF do aluno</option>
+                              <option value="rgAluno">RG do aluno</option>
+                              <option value="emailAluno">E-mail do aluno</option>
+                              <option value="celularAluno">Celular do aluno</option>
+                              <option value="telefoneAluno">Telefone do aluno</option>
+                            </select>
+                            
+                          </div>
+                        </div> 
+                      </div>
+                      <div class="overflow-auto" style="height: fit-content; max-height: 280px;">
+                        <div class="list-group" id="listaHistoricoAluno">
+                          
+                        </div>
+                      </div>
+                  </div>
+              </div>
+            </div>
+
+            <div class="container tab-pane fade" id="abaPreMatriculas" role="tabpanel" aria-labelledby="Alunos">
+              <label class="h3">Pré-matrículas</label>
+              <br>
+              <div>
+                <div class="container">
+                  <div class="row">
+                    <div class="form-group col-auto">
+                      <label for="inputAddress">Campo de busca</label>
+                      <input class="form-control" type="search" placeholder="Digite a busca..." aria-label="Search" onchange="carregaListaDeAlunos(maiusculo(this))">
+                    </div>
+                    <div class="form-group col-auto">
+                      <label for="inputAddress">Buscar por:</label>
+                      <select class="form-control" name="tipoDeBusca" id="tipoDeBusca" onchange="alteraTipoDeBusca(this.value)">
+                        <option selected value="nomeAluno">Nome do aluno</option>
+                        <option value="cpfAluno">CPF do aluno</option>
+                        <option value="rgAluno">RG do aluno</option>
+                        <option value="emailAluno">E-mail do aluno</option>
+                        <option value="celularAluno">Celular do aluno</option>
+                        <option value="telefoneAluno">Telefone do aluno</option>
+                      </select>
+                      
+                    </div>
+                  </div> 
+                </div>
+                <div class="container-xl" id="tabelaAlunos">
+                  <div class="table-responsive">
+                    <div class="table-wrapper">
+                      <div class="table-title">
+                        <div class="row">
+                          <div class="col-sm-6">
+                            <h2>Alunos <b>Pré-Matriculados</b></h2>
+                          </div>
+                          <div class="col-sm-6">
+                            <a class="btn btn-success" onclick="carregaListaDeAlunos(), AstNotif.toast('Lista atualizada')">&nbsp; <span class="feather-24" data-feather="refresh-cw"></span><span>Atualizar lista</span></a>
+                            					
+                          </div>
+                        </div>
+                      </div>
+                      <table class="table table-striped table-hover">
+                        <thead>
+                          <tr>
+                            <th>
+                              <span class="custom-checkbox">
+                                <input type="checkbox" id="selectAll">
+                                <label for="selectAll"></label>
+                              </span>
+                            </th>
+                            <th><a href="#" id="ordenaNome">Nome</a></th>
+                            <th><a href="#" id="ordenaMatricula">E-mail</a></th>
+                            <th><a href="#" id="ordenaUltimaTurma">Celular</a></th>
+                            <th>Ações</th>
+                          </tr>
+                        </thead>
+                        <tbody id="listaPreMatriculas">
                           <tr>
                             <td>
                               <span class="custom-checkbox">
