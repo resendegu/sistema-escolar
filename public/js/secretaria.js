@@ -936,7 +936,7 @@ function preencheEndereco(numCep) {
 
 // Funções do cadastro de alunos
 let turmasLocal = {}
-function carregaProfsETurmas() {
+function carregaProfsETurmas(preMatricula=false) {
     turmasLocal = {}
     loader.style.display = 'block'
     loaderMsg.innerText = 'Carregando dados de matrícula, de turmas e professores...'
@@ -978,6 +978,21 @@ function carregaProfsETurmas() {
         console.log(error)
         AstNotif.dialog('Erro', error.message)
     })
+
+    if(preMatricula) {
+        for (const name in preMatricula) {
+            if (Object.hasOwnProperty.call(preMatricula, name)) {
+                const value = preMatricula[name];
+                try {
+                    document.getElementById(name).value = value
+                } catch (error) {
+                    console.log(error)
+                }
+                
+            }
+        }
+        AstNotif.notify('Matricular aluno', 'Dados da pré-matrícula foram copiados. Escolha uma turma para o aluno e cadastre-o normalmente.', 'agora', {length: 10000})
+    }
 
 }
 
@@ -5095,17 +5110,10 @@ async function abaPreMatriculas() {
     let btnMatricularAluno = document.getElementById('btnMatricularAluno')
     btnMatricularAluno.addEventListener('click', async (e) => {
         
-        const confirm = await ui.confirm('Tem certeza que deseja efetivar a pré-matrícula de ' + dados.nomeAluno + '? O sistema criará um número de matrícula para o mesmo e moverá os dados deles para a aba de Alunos.');
-  
-        if(confirm){
-            AstNotif.dialog('E ai!?? :-)', 'Está função está em desenvolvimento ainda. Em breve estará funcionando! Att. Gustavo Resende')
-            // preMatriculasRef.child(key).remove().then(() => {
-            //     AstNotif.notify('Sucesso', 'Aluno matrículado.', 'agora')
-            //     carregaMatriculas();
-            // }).catch(error => {
-            //     AstNotif.dialog('Erro', error.message)
-            //     console.log(error)
-            // })
-        }
+        let btnCadastrarAlunos = document.getElementById('btnCadastrarAlunos');
+        btnCadastrarAlunos.click();
+        setTimeout(() => {
+            carregaProfsETurmas(dados);
+        }, 500);
     })
 }
