@@ -4667,12 +4667,12 @@ async function abaPreMatriculas() {
                             <label for="checkbox${c}"></label>
                             </span>
                         </td>
-                        <td><a href="#rolaTelaAbaixoAlunos" onclick="abreDadosPreMatricula('${key}')">${preMatricula.nomeAluno}</a></td>
+                        <td><a name="nomesAlunos" id="${key}" style="cursor: pointer;" >${preMatricula.nomeAluno}</a></td>
                         <td>${preMatricula.emailAluno}</td>
                         <td>${preMatricula.celularAluno}</td>
                         <td>
                             <a href="#" class="edit" onclick="editarDadosPreMatricula('${key}')"><i data-feather="edit" data-toggle="tooltip" title="Editar dados"></i></a>
-                            <a href="#checkbox${c}" class="delete"><i data-feather="user-x" data-toggle="tooltip" title="Apagar matrícula"></i></a>
+                            <a id="${key}" name="deletaPreMatricula" class="delete"><i data-feather="user-x" data-toggle="tooltip" title="Apagar matrícula"></i></a>
                         </td>
                     </tr>`
             }
@@ -4681,5 +4681,112 @@ async function abaPreMatriculas() {
         $(function () {
             $('[data-toggle="tooltip"]').tooltip()
         })
+        escutaNomesAlunos();
+        escutaBotoesDelete();
     }
+
+    async function deletaPreMatricula(key) {
+        let preMatricula = preMatriculas[key];
+        const confirm = await ui.confirm('Tem certeza que deseja apagar a pré-matrícula de ' + preMatricula.nomeAluno + '? Esta ação não pode ser revertida.');
+  
+        if(confirm){
+            preMatriculasRef.child(key).remove().then(() => {
+                AstNotif.notify('Sucesso', 'Pré-matrícula removida.', 'agora')
+                carregaMatriculas();
+            }).catch(error => {
+                AstNotif.dialog('Erro', error.message)
+                console.log(error)
+            })
+        }
+    }
+
+    async function abreDadosPreMatricula(key) {
+        let dados = preMatriculas[key];
+        document.getElementById('infoDoAluno').style.display = 'block'
+        document.getElementById('rolaTelaAbaixoAlunos').style.display = 'block'
+        document.getElementById('secGeraFicha').innerHTML = `<button class="btn btn-outline-primary btn-block" id="btnGeraFicha" onclick="gerarFichaAluno('${key}')">Gerar ficha de pré-matrícula em PDF</button>
+        `
+        
+        dadosResponsaveis = {
+            nomeResponsavelAluno1: dados.nomeResponsavelAluno1,
+            relacaoAluno1: dados.relacaoAluno1,
+            numeroComercialResponsavel1: dados.numeroComercialResponsavel1,
+            numeroCelularResponsavel1: dados.numeroCelularResponsavel1,
+            rgResponsavel1: dados.rgResponsavel1,
+            cpfResponsavel1: dados.cpfResponsavel1,
+            // Dados de Filiação responsável 2
+            nomeResponsavelAluno2: dados.nomeResponsavelAluno2,
+            relacaoAluno2: dados.relacaoAluno2,
+            numeroComercialResponsavel2: dados.numeroComercialResponsavel2,
+            numeroCelularResponsavel2: dados.numeroCelularResponsavel2,
+            rgResponsavel2: dados.rgResponsavel2,
+            cpfResponsavel2: dados.cpfResponsavel2,
+            // Dados de Filiação Responsável financeiro
+            nomeResponsavelFinanceiroAluno: dados.nomeResponsavelFinanceiroAluno,
+            relacaoFinanceiroAluno: dados.relacaoFinanceiroAluno,
+            numeroComercialFinanceiroAluno: dados.numeroComercialFinanceiroAluno,
+            numeroCelularFinanceiroAluno: dados.numeroCelularFinanceiroAluno,
+            rgFinanceiroAluno: dados.rgFinanceiroAluno,
+            cpfFinanceiroAluno: dados.cpfFinanceiroAluno,
+            // Dados de Filiação responsável pedagógico/didático
+            nomeResponsavelPedagogicoAluno: dados.nomeResponsavelPedagogicoAluno,
+            relacaoPedagogicoAluno: dados.relacaoPedagogicoAluno,
+            numeroComercialPedagogicoAluno: dados.numeroComercialPedagogicoAluno,
+            numeroCelularPedagogicoAluno: dados.numeroCelularPedagogicoAluno,
+            rgPedagogicoAluno: dados.rgPedagogicoAluno,
+            cpfPedagogicoAluno: dados.cpfPedagogicoAluno
+        }
+
+        
+        dados.fotoAluno != undefined ? document.getElementById('mostraFotoAluno').setAttribute('src', dados.fotoAluno) : document.getElementById('mostraFotoAluno').setAttribute('src', '../images/profile_placeholder.png')
+        document.getElementById('mostraNomeAluno').innerText = dados.nomeAluno
+        document.getElementById('mostraCpfAluno').innerText = dados.cpfAluno
+        document.getElementById('mostraRgAluno').innerText = dados.rgAluno
+        document.getElementById('mostraCelularAluno').innerText = dados.celularAluno
+        document.getElementById('mostraTelefoneAluno').innerText = dados.telefoneAluno
+        document.getElementById('timestampDoAluno').innerText = 'Aluno cadastrado em: ' + new Date(dados.timestamp._seconds * 1000)
+        document.getElementById('mostraDataNascimentoAluno').innerText = dados.dataNascimentoAluno.split('-').reverse().join('/');
+
+        let nascimento = dados.dataNascimentoAluno
+        
+        calcularIdadePrecisa(nascimento).then(function(idade){
+            document.getElementById('mostraIdadeAluno').innerText = `${idade.years} anos, ${idade.months} mês(es), e ${idade.days} dias`
+        }).catch(function(error){
+            AstNotif.dialog('Erro', error.message)
+            console.log(error)
+        })
+        document.getElementById('mostraHoraEDiasAluno').innerText = `Horário atual de aula: ${dados.horaAluno}`
+        document.getElementById('mostraTurmaAluno').innerHTML = dados.turmaAluno
+        document.getElementById('mostraEmailAluno').innerText = dados.emailAluno
+        document.getElementById('mostraMatriculaAluno').innerText = key + ' (Código de pré-matricula)'
+        document.getElementById('mostraEnderecoAluno').innerText = `${dados.enderecoAluno}, ${dados.numeroAluno}, ${dados.bairroAluno}, ${dados.cidadeAluno}, ${dados.estadoAluno}. CEP ${dados.cepAluno}.`
+        document.getElementById('rolaTelaAbaixoAlunos').focus()
+        document.getElementById('rolaTelaAbaixoAlunos').style.display = 'none'
+        
+    }
+
+    function escutaBotoesDelete() {
+        document.getElementsByName('deletaPreMatricula').forEach(elem => {
+            elem.addEventListener('click', (e) => {
+                e.preventDefault()
+                let key = e.target.id
+                deletaPreMatricula(key)
+            })
+        })
+    }
+    function escutaNomesAlunos() {
+        document.getElementsByName('nomesAlunos').forEach(elem => {
+            elem.addEventListener('click', (e) => {
+                e.preventDefault()
+                let key = e.target.id
+                abreDadosPreMatricula(key)
+            })
+        })
+    }
+
+    let atualizaPreMatriculas = document.getElementById('atualizaPreMatriculas')
+    atualizaPreMatriculas.addEventListener('click', (e) => {
+        carregaMatriculas()
+        AstNotif.toast('Lista Atualizada')
+    })
 }

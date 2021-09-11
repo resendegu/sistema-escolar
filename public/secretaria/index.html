@@ -30,6 +30,16 @@
   </head>
 
   <body>
+    <div class="confirm">
+      <div></div>
+      <div>
+        <div id="confirmMessage"></div>
+        <div>
+          <input id="confirmYes" type="button" value="Sim" />
+          <input id="confirmNo" type="button" value="Não" />
+        </div>
+      </div>
+    </div>
 
     <div class="modal fade bd-example-modal-xl" tabindex="-1" role="dialog" id="modal">
       <div class="modal-dialog modal-lg" role="document">
@@ -1200,7 +1210,7 @@
                     </div>
                   </div> 
                 </div>
-                <div class="container-xl" id="tabelaAlunos">
+                <div class="container-xl" id="tabelaPreMatriculas">
                   <div class="table-responsive">
                     <div class="table-wrapper">
                       <div class="table-title">
@@ -1209,7 +1219,7 @@
                             <h2>Alunos <b>Pré-Matriculados</b></h2>
                           </div>
                           <div class="col-sm-6">
-                            <a class="btn btn-success" onclick="carregaListaDeAlunos(), AstNotif.toast('Lista atualizada')">&nbsp; <span class="feather-24" data-feather="refresh-cw"></span><span>Atualizar lista</span></a>
+                            <a class="btn btn-success" id="atualizaPreMatriculas">&nbsp; <span class="feather-24" data-feather="refresh-cw"></span><span>Atualizar lista</span></a>
                             					
                           </div>
                         </div>

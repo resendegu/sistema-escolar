@@ -364,6 +364,9 @@ exports.cadastraAluno = functions.https.onCall(async (data, context) => {
                 }
             }
 
+            dadosAluno.timestamp = admin.firestore.Timestamp.now()
+            dadosAluno.userCreator = context.auth.uid
+
             return admin.database().ref('/sistemaEscolar/preMatriculas').push(dadosAluno).then(() => {
                 
                 return firestoreRef.add(emailContent).then(() => {
@@ -397,7 +400,7 @@ exports.cadastraAluno = functions.https.onCall(async (data, context) => {
                     html: `<h3>Olá ${dadosAluno.nomeAluno.split(' ')[0]}!</h3><p>Você está matriculado(a) no nº de matrícula <b>${dadosAluno.matriculaAluno}</b>, e está pronto(a) para iniciar os estudos conosco. Use seu e-mail e senha cadastrados para acessar o sistema. Só lembrando, sua senha é: <b>${dadosAluno.senhaAluno}</b>. Fique atento aos e-mails, pois sua escola pode utilizar este canal para comunicação com você.</p><p>Em caso de dificuldades <b>entre em contato com a escola para maiores informações</b>.</p><p><b>Dados de contato da escola:</b><br>Telefone: ${dadosEscola.telefoneEscola}<br>E-mail: ${dadosEscola.emailEscola}<br>Endereço: ${dadosEscola.enderecoEscola}</p><p>Sistemas ProXDigital.</p>`
                 }
             }
-
+            dadosAluno.userCreator = context.auth.uid
             dadosAluno.contratos = contratos
             dadosAluno.timestamp = admin.firestore.Timestamp.now()
             return admin.database().ref('sistemaEscolar/alunos').child(dadosAluno.matriculaAluno).once('value').then(alunoRecord => {
