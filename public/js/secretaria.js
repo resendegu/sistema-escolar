@@ -1341,6 +1341,69 @@ function criaPDFAluno() {
     doc.save("a4.pdf");
 }
 
+function cadastrarResponsavel() {
+    abrirModal('modal', 'Cadastrar responsável', `
+    <form id="formCadastraResponsavel">
+        <label class="h6">Dados do responsável autorizado</label>
+        <div class="form-row border border-success rounded">
+        
+        <div class="form-group col-md-4">
+            <label for="inputAddress">Responsável</label>
+            <input type="text" class="form-control" id="nome" name="nome" placeholder="Nome" onblur="maiusculo(this)">
+        </div>
+        <div class="form-group col-md-2">
+            <label for="inputAddress">Relação</label>
+            <br>
+            <select class="form-control form-control-md" name="relacao" id="relacao" >
+            <option hidden selected>Escolha...</option>
+            <option value="Mãe">Mãe</option>
+            <option value="Pai">Pai</option>
+            <option value="Tia">Tia</option>
+            <option value="Tio">Tio</option>
+            <option value="Avó">Avó</option>
+            <option value="Avô">Avô</option>
+            <option value="Responsável">Responsável</option>
+            </select>
+        </div>
+        <div class="form-group col-md-3">
+            <label for="inputAddress">Número Celular</label>
+            <input type="text" class="form-control" id="celular" name="celular" placeholder="Celular">
+        </div>
+        <div class="form-group col-md-5">
+            <label for="inputPassword4">Email</label>
+            <input type="email" class="form-control" id="email" name="email" placeholder="Email">
+        </div>
+        <div class="form-group col-auto">
+            <label for="inputEmail4">RG</label>
+            <input type="text" class="form-control" id="rg" name="rg" placeholder="RG">
+        </div>
+        <div class="form-group col-auto">
+            <label for="inputPassword4">CPF</label>
+            <input type="text" class="form-control" id="cpf" name="cpf" placeholder="CPF" onchange="verificaCPF(this)">
+            <small id="cpfHelp3" class="form-text text-muted">Digite um CPF válido, existe um algoritmo de validação neste campo.</small>
+        </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Cadastrar</button>
+    </form>
+    `, `<button class="btn btn-secondary data-dismiss="modal">Fechar</button>"`)
+
+    let formCadastraResponsavel = document.getElementById('formCadastraResponsavel')
+    formCadastraResponsavel.addEventListener('submit', (e) => {
+        let dadosResponsavel = {}
+        e.preventDefault();
+        let formData = new FormData(formCadastroAluno)
+        let dadosForm = $('#formCadastraResponsavel').serializeArray();
+        dadosForm.forEach(field => {
+            let values = formData.getAll(field.name)
+            values.length == 1 ? dadosResponsavel[field.name] = values[0] : dadosResponsavel[field.name] = values
+        })
+        let responsaveis = JSON.parse(sessionStorage.getItem('responsaveis'));
+        responsaveis.push(dadosResponsavel);
+        sessionStorage.setItem('responsaveis', JSON.stringify(responsaveis));
+        
+    })
+}
+
 // Esperando o submit para o cadastro efetivo
 var idadeAluno
 var matriculaPDF = ''
@@ -1349,8 +1412,6 @@ formCadastroAluno.addEventListener('submit', async (e) => {
     e.preventDefault()
     loader.style.display = 'block'
     loaderMsg.innerText = 'Processando dados...'
-    $('#formCadastroAluno').serializeArray()
-    const dados = new FormData(e.target);
     var dadosAluno = {}
     let dadosForm = $("#formCadastroAluno").serializeArray()
     let formData = new FormData(formCadastroAluno)
@@ -1361,60 +1422,7 @@ formCadastroAluno.addEventListener('submit', async (e) => {
     })
     dadosAluno.codCurso = dadosAluno.turmaAluno.split(',')[1]
     dadosAluno.turmaAluno = dadosAluno.turmaAluno.split(',')[0]
-    // // Dados pessoais
-    // dadosAluno.matriculaAluno = dados.get('matriculaAluno')
-    // dadosAluno.nomeAluno = dados.get('nomeAluno')
-    // dadosAluno.dataNascimentoAluno = dados.get('dataNascimentoAluno')
-    // dadosAluno.telefoneAluno = dados.get('telefoneAluno')
-    // dadosAluno.celularAluno = dados.get('celularAluno')
-    // dadosAluno.emailAluno = dados.get('emailAluno')
-    // dadosAluno.rgAluno = dados.get('rgAluno')
-    // dadosAluno.cpfAluno = dados.get('cpfAluno')
-    // dadosAluno.senhaAluno = dados.get('senhaAluno')
-    // // Dados para o curso
-    // dadosAluno.turmaAluno = dados.get('turmaAluno')
-    // dadosAluno.horaEDiasAluno = dados.get('horaAluno')
-    // dadosAluno.profAluno = dados.get('emailProfAluno')
-    // // Dados de endereço
-    // dadosAluno.cepAluno = dados.get('cepAluno')
-    // dadosAluno.enderecoAluno = dados.get('enderecoAluno')
-    // dadosAluno.numeroAluno = dados.get('numeroAluno')
-    // dadosAluno.bairroAluno = dados.get('bairroAluno')
-    // dadosAluno.cidadeAluno = dados.get('cidadeAluno')
-    // dadosAluno.estadoAluno = dados.get('estadoAluno')
-    // // Dados de Filiação Responsavel 1
-    // dadosAluno.nomeResponsavelAluno1 = dados.get('nomeResponsavelAluno1')
-    // dadosAluno.relacaoAluno1 = dados.get('relacaoAluno1')
-    // dadosAluno.numeroComercialResponsavel1 = dados.get('numeroComercialResponsavel1')
-    // dadosAluno.numeroCelularResponsavel1 = dados.get('numeroCelularResponsavel1')
-    // dadosAluno.rgResponsavel1 = dados.get('rgResponsavel1')
-    // dadosAluno.cpfResponsavel1 = dados.get('cpfResponsavel1')
-    // // Dados de Filiação responsável 2
-    // dadosAluno.nomeResponsavelAluno2 = dados.get('nomeResponsavelAluno2')
-    // dadosAluno.relacaoAluno2 = dados.get('relacaoAluno2')
-    // dadosAluno.numeroComercialResponsavel2 = dados.get('numeroComercialResponsavel2')
-    // dadosAluno.numeroCelularResponsavel2 = dados.get('numeroCelularResponsavel2')
-    // dadosAluno.rgResponsavel2 = dados.get('rgResponsavel2')
-    // dadosAluno.cpfResponsavel2 = dados.get('cpfResponsavel2')
-    // // Dados de Filiação Responsável financeiro
-    // dadosAluno.nomeResponsavelFinanceiroAluno = dados.get('nomeResponsavelFinanceiroAluno')
-    // dadosAluno.relacaoFinanceiroAluno = dados.get('relacaoFinanceiroAluno')
-    // dadosAluno.numeroComercialFinanceiroAluno = dados.get('numeroComercialFinanceiroAluno')
-    // dadosAluno.numeroCelularFinanceiroAluno = dados.get('numeroCelularFinanceiroAluno')
-    // dadosAluno.rgFinanceiroAluno = dados.get('rgFinanceiroAluno')
-    // dadosAluno.cpfFinanceiroAluno = dados.get('cpfFinanceiroAluno')
-    // dadosAluno.emailResponsavelFinanceiro = dados.get('emailResponsavelFinanceiro')
-    // // Dados de Filiação responsável pedagógico/didático
-    // dadosAluno.nomeResponsavelPedagogicoAluno = dados.get('nomeResponsavelPedagogicoAluno')
-    // dadosAluno.relacaoPedagogicoAluno = dados.get('relacaoPedagogicoAluno')
-    // dadosAluno.numeroComercialPedagogicoAluno = dados.get('numeroComercialPedagogicoAluno')
-    // dadosAluno.numeroCelularPedagogicoAluno = dados.get('numeroCelularPedagogicoAluno')
-    // dadosAluno.rgPedagogicoAluno = dados.get('rgPedagogicoAluno')
-    // dadosAluno.cpfPedagogicoAluno = dados.get('cpfPedagogicoAluno')
-    // dadosAluno.emailResponsavelPedagogico = dados.get('emailResponsavelPedagogico')
-    // Gera ou não o PDF do aluno
-    // dadosAluno.geraPDFAluno = document.getElementById('geraPDFAluno')
-    // dadosAluno.geraBoleto = document.getElementById('geraBoleto')
+    
     function emailRegularExpression(email) {
         var re = /\S+@\S+\.\S+/
         return re.test(email)
@@ -3280,8 +3288,9 @@ document.getElementById('formBuscaResponsavel').addEventListener('submit', (e) =
     e.preventDefault();
     let respAutorizadosRef = firebase.database().ref('sistemaEscolar/secretaria/responsaveisAutorizados')
     let dados = new FormData(e.target);
-    let cpf = dados.get('cpfBuscaResponsavel');
-    respAutorizadosRef.orderByChild('addResponsavelCpf').equalTo(cpf).once('value', (resp) => {
+    let nome = dados.get('nomeBuscaResponsavel');
+    nome = maiusculo(document.getElementById('nomeBuscaResponsavel'))
+    respAutorizadosRef.orderByChild('addResponsavelNome').equalTo(nome).once('value', (resp) => {
         let dadosResp = resp.val()
         let dadosResponsavel = []
         for (const key in dadosResp) {
@@ -3364,6 +3373,7 @@ document.getElementById('formBuscaResponsavel').addEventListener('submit', (e) =
                     document.getElementById(key).value = field;
                     if (key == 'matriculaAluno'){
                         matricula = field
+                        console.log(matricula)
                         retornaDadosAluno(matricula).then(dadosAluno => {
                             console.log(dadosAluno)
                             document.getElementById('nomeAlunoRespAutorizado').value = dadosAluno.nomeAluno

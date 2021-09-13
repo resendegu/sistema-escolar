@@ -347,6 +347,12 @@ exports.desconectaProf = functions.database.ref('sistemaEscolar/turmas/{codTurma
 }) 
 
 exports.cadastraAluno = functions.https.onCall(async (data, context) => {
+    function formataNumMatricula(num) {
+        let numero = num
+        numero = "00000" + numero.replace(/\D/g, '');
+        numero = numero.slice(-5,-1) + numero.slice(-1);
+        return numero
+    }
     if (context.auth.token.master == true || context.auth.token.secretaria == true) {
         let dadosAluno = data.dados
         if (dadosAluno.tipoMatricula == 'preMatricula') {
@@ -385,9 +391,10 @@ exports.cadastraAluno = functions.https.onCall(async (data, context) => {
             delete dadosAluno.tipoMatricula
             let contratoConfigurado = data.contratoConfigurado
             let planoOriginal = data.planoOriginal
-            let codContrato = admin.database().ref('/').push().key
+            let codContrato = !data.codContrato ? admin.database().ref('/').push().key : data.codContrato;
             let contratos = [codContrato]
-
+            let ultimaMatricula = (await admin.database().ref('sistemaEscolar/ultimaMatricula').once('value')).val()
+            dadosAluno.matriculaAluno = !dadosAluno.matriculaAluno ? formataNumMatricula(String(Number(ultimaMatricula) + 1)) : dadosAluno.matriculaAluno
             let firestoreRef = admin.firestore().collection('mail');
             let infoEscola = await admin.database().ref('sistemaEscolar/infoEscola/dadosBasicos').once('value')
             let dadosEscola = infoEscola.val()
@@ -409,15 +416,15 @@ exports.cadastraAluno = functions.https.onCall(async (data, context) => {
                 }
                     return admin.database().ref('sistemaEscolar/alunos/' + dadosAluno.matriculaAluno).set(dadosAluno).then(() => {
                         return admin.database().ref('sistemaEscolar/infoEscola/contratos/' + codContrato).set({contratoConfigurado: contratoConfigurado, situacao: 'Vigente', planoOriginal: planoOriginal, matricula: dadosAluno.matriculaAluno, timestamp: admin.firestore.Timestamp.now(), codContrato: codContrato}).then(() => {
-                            return admin.database().ref('sistemaEscolar/turmas').child(dadosAluno.turmaAluno + '/alunos').child(dadosAluno.matriculaAluno).set({nome: dadosAluno.nomeAluno, prof: dadosAluno.emailProfAluno}).then(() => {
+                            return admin.database().ref('sistemaEscolar/turmas').child(dadosAluno.turmaAluno + '/alunos').child(dadosAluno.matriculaAluno).set({nome: dadosAluno.nomeAluno, prof: (dadosAluno.emailProfAluno != '' ? dadosAluno.emailProfAluno : dadosAluno.profAluno.email)}).then(() => {
                                 return admin.database().ref('sistemaEscolar/ultimaMatricula').set(dadosAluno.matriculaAluno).then(() => {
                                     return admin.database().ref('sistemaEscolar/secretaria/responsaveisAutorizados').push({
-                                        addResponsavelNome: dadosAluno.nomeResponsavelPedagogicoAluno,
-                                        addResponsavelRelacao: dadosAluno.relacaoPedagogicoAluno,
-                                        addResponsavelNumeroCelular: dadosAluno.numeroCelularPedagogicoAluno,
-                                        addResponsavelEmail: dadosAluno.emailResponsavelPedagogico,
-                                        addResponsavelRg: dadosAluno.rgPedagogicoAluno,
-                                        addResponsavelCpf: dadosAluno.cpfPedagogicoAluno,
+                                        addResponsavelNome: dadosAluno.nomeResponsavelAluno1,
+                                        addResponsavelRelacao: dadosAluno.relacaoAluno1,
+                                        addResponsavelNumeroCelular: dadosAluno.numeroCelularResponsavel1,
+                                        addResponsavelEmail: dadosAluno.numeroCelularResponsavel1,
+                                        addResponsavelRg: dadosAluno.rgResponsavel1,
+                                        addResponsavelCpf: dadosAluno.cpfResponsavel1,
                                         matriculaAluno: dadosAluno.matriculaAluno
                                     }).then(() => {
                                         admin.database().ref('sistemaEscolar/numeros/alunosMatriculados').transaction(function (current_value) {
@@ -438,7 +445,7 @@ exports.cadastraAluno = functions.https.onCall(async (data, context) => {
 
                                         return firestoreRef.add(emailContent).then(() => {
                                             console.log('Queued email for delivery to ' + dadosAluno.emailAluno)
-                                            return {answer: 'Aluno cadastrado com sucesso! O aluno e, se houver, o seu responsável pedagógico, receberão em seu e-mail a senha do aluno para acesso ao portal.', codContrato: codContrato}
+                                            return {answer: 'Aluno cadastrado na matrícula '+ dadosAluno.matriculaAluno + ' com sucesso! Os e-mails foram disparados.', codContrato: codContrato}
                                             
                                         }).catch(error => {
                                             console.error(error)
