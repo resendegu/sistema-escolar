@@ -1341,67 +1341,277 @@ function criaPDFAluno() {
     doc.save("a4.pdf");
 }
 
-function cadastrarResponsavel() {
-    abrirModal('modal', 'Cadastrar responsável', `
-    <form id="formCadastraResponsavel">
-        <label class="h6">Dados do responsável autorizado</label>
-        <div class="form-row border border-success rounded">
-        
-        <div class="form-group col-md-4">
-            <label for="inputAddress">Responsável</label>
-            <input type="text" class="form-control" id="nome" name="nome" placeholder="Nome" onblur="maiusculo(this)">
-        </div>
-        <div class="form-group col-md-2">
-            <label for="inputAddress">Relação</label>
+function cadastrarResponsavel(onlyList=true) {
+    
+    if (!onlyList) {
+        abrirModal('modal', 'Cadastrar responsável', `
+        <form id="formCadastraResponsavel">
+            <label class="h6">Dados do responsável autorizado</label>
+            <div class="form-row border border-success rounded">
+            
+            <div class="form-group col-md-4">
+                <label for="inputAddress">Responsável</label>
+                <input type="text" class="form-control" id="nome" name="nome" placeholder="Nome" onblur="maiusculo(this)">
+            </div>
+            <div class="form-group col-md-2">
+                <label for="inputAddress">Relação</label>
+                <br>
+                <select class="form-control form-control-md" name="relacao" id="relacao" >
+                <option hidden selected>Escolha...</option>
+                <option value="Mãe">Mãe</option>
+                <option value="Pai">Pai</option>
+                <option value="Tia">Tia</option>
+                <option value="Tio">Tio</option>
+                <option value="Avó">Avó</option>
+                <option value="Avô">Avô</option>
+                <option value="Responsável">Responsável</option>
+                </select>
+            </div>
+            <div class="form-group col-md-3">
+                <label for="inputAddress">Número Celular</label>
+                <input type="text" class="form-control" id="celular" name="celular" placeholder="Celular">
+            </div>
+            <div class="form-group col-md-5">
+                <label for="inputPassword4">Email</label>
+                <input type="email" class="form-control" id="email" name="email" placeholder="Email">
+            </div>
+            <div class="form-group col-auto">
+                <label for="inputEmail4">RG</label>
+                <input type="text" class="form-control" id="rg" name="rg" placeholder="RG">
+            </div>
+            <div class="form-group col-auto">
+                <label for="inputPassword4">CPF</label>
+                <input type="text" class="form-control" id="cpf" name="cpf" placeholder="CPF" onchange="verificaCPF(this)">
+                <small id="cpfHelp3" class="form-text text-muted">Digite um CPF válido, existe um algoritmo de validação neste campo.</small>
+            </div>
+            
+                <div class="custom-control custom-checkbox">
+                &nbsp;&nbsp;
+                    <input type="checkbox" class="custom-control-input" id="pedagogico" name="pedagogico">
+                    <label class="custom-control-label" for="pedagogico">Responsável pedagógico</label>
+                </div>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="financeiro" name="financeiro">
+                    <label class="custom-control-label" for="financeiro">Responsável financeiro</label>
+                </div>
+            </div>
             <br>
-            <select class="form-control form-control-md" name="relacao" id="relacao" >
-            <option hidden selected>Escolha...</option>
-            <option value="Mãe">Mãe</option>
-            <option value="Pai">Pai</option>
-            <option value="Tia">Tia</option>
-            <option value="Tio">Tio</option>
-            <option value="Avó">Avó</option>
-            <option value="Avô">Avô</option>
-            <option value="Responsável">Responsável</option>
-            </select>
-        </div>
-        <div class="form-group col-md-3">
-            <label for="inputAddress">Número Celular</label>
-            <input type="text" class="form-control" id="celular" name="celular" placeholder="Celular">
-        </div>
-        <div class="form-group col-md-5">
-            <label for="inputPassword4">Email</label>
-            <input type="email" class="form-control" id="email" name="email" placeholder="Email">
-        </div>
-        <div class="form-group col-auto">
-            <label for="inputEmail4">RG</label>
-            <input type="text" class="form-control" id="rg" name="rg" placeholder="RG">
-        </div>
-        <div class="form-group col-auto">
-            <label for="inputPassword4">CPF</label>
-            <input type="text" class="form-control" id="cpf" name="cpf" placeholder="CPF" onchange="verificaCPF(this)">
-            <small id="cpfHelp3" class="form-text text-muted">Digite um CPF válido, existe um algoritmo de validação neste campo.</small>
-        </div>
-        </div>
-        <button type="submit" class="btn btn-primary btn-block">Cadastrar</button>
-    </form>
-    `, `<button class="btn btn-secondary data-dismiss="modal">Fechar</button>"`)
+            <button type="submit" class="btn btn-primary btn-block">Cadastrar</button>
+        </form>
+        `, `<button class="btn btn-secondary" data-dismiss="modal">Fechar</button>`) 
 
-    let formCadastraResponsavel = document.getElementById('formCadastraResponsavel')
-    formCadastraResponsavel.addEventListener('submit', (e) => {
-        let dadosResponsavel = {}
-        e.preventDefault();
-        let formData = new FormData(formCadastroAluno)
-        let dadosForm = $('#formCadastraResponsavel').serializeArray();
-        dadosForm.forEach(field => {
-            let values = formData.getAll(field.name)
-            values.length == 1 ? dadosResponsavel[field.name] = values[0] : dadosResponsavel[field.name] = values
+        let formCadastraResponsavel = document.getElementById('formCadastraResponsavel')
+        formCadastraResponsavel.addEventListener('submit', (e) => {
+            let dadosResponsavel = {}
+            e.preventDefault();
+            let formData = new FormData(formCadastraResponsavel)
+            let dadosForm = $('#formCadastraResponsavel').serializeArray();
+            dadosForm.forEach(field => {
+                let values = formData.getAll(field.name)
+                values.length == 1 ? dadosResponsavel[field.name] = values[0] : dadosResponsavel[field.name] = values
+                if (field.name == 'pedagogico' || field.name == 'financeiro') {
+                    dadosResponsavel[field.name] = true
+                }
+            })
+            console.log(dadosResponsavel)
+            let responsaveis = JSON.parse(sessionStorage.getItem('responsaveis'));
+            console.log(responsaveis)
+            !responsaveis ? responsaveis = [dadosResponsavel] : responsaveis.push(dadosResponsavel);
+            sessionStorage.setItem('responsaveis', JSON.stringify(responsaveis));
+            $('#modal').modal('hide');
+            mostraResponsaveisCadastrados()
         })
+    }
+    
+
+    
+
+    mostraResponsaveisCadastrados()
+
+    function mostraResponsaveisCadastrados() {
         let responsaveis = JSON.parse(sessionStorage.getItem('responsaveis'));
-        responsaveis.push(dadosResponsavel);
-        sessionStorage.setItem('responsaveis', JSON.stringify(responsaveis));
-        
-    })
+        let sectionResponsaveis = document.getElementById('responsaveis')
+        console.log(responsaveis)
+        sectionResponsaveis.innerHTML = ''
+        for (const i in responsaveis) {
+            if (Object.hasOwnProperty.call(responsaveis, i)) {
+                const responsavel = responsaveis[i];
+                sectionResponsaveis.innerHTML += `
+                <div class="form-row border border-success rounded">
+                
+                <div class="form-group col-md-4">
+                    <label for="inputAddress">Responsável</label>
+                    <input type="text" class="form-control" id="nome${i}" name="nome" placeholder="Nome" onblur="maiusculo(this)" disabled>
+                </div>
+                <div class="form-group col-md-2">
+                    <label for="inputAddress">Relação</label>
+                    <br>
+                    <select class="form-control form-control-md" name="relacao" id="relacao${i}" disabled>
+                    <option hidden selected>Escolha...</option>
+                    <option value="Mãe">Mãe</option>
+                    <option value="Pai">Pai</option>
+                    <option value="Tia">Tia</option>
+                    <option value="Tio">Tio</option>
+                    <option value="Avó">Avó</option>
+                    <option value="Avô">Avô</option>
+                    <option value="Responsável">Responsável</option>
+                    </select>
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="inputAddress">Número Celular</label>
+                    <input type="text" class="form-control" id="celular${i}" name="celular" placeholder="Celular" disabled>
+                </div>
+                <div class="form-group col-auto">
+                    <label for="inputAddress">Editar/Apagar</label>
+                    <button class="btn btn-primary form-control" name="editaResp" id="editaResp${i}">Editar</button>
+                </div>
+                <div class="form-group col-md-5">
+                    <label for="inputPassword4">Email</label>
+                    <input type="email" class="form-control" id="email${i}" name="email" placeholder="Email" disabled>
+                </div>
+                
+                <div class="form-group col-auto">
+                    <label for="inputEmail4">RG</label>
+                    <input type="text" class="form-control" id="rg${i}" name="rg" placeholder="RG" disabled>
+                </div>
+                
+                <div class="form-group col-auto">
+                    <label for="inputPassword4">CPF</label>
+                    <input type="text" class="form-control" id="cpf${i}" name="cpf" placeholder="CPF" onchange="verificaCPF(this)" disabled>
+                    <small id="cpfHelp3" class="form-text text-muted">Digite um CPF válido, existe um algoritmo de validação neste campo.</small>
+                </div>
+                <div class="custom-control custom-checkbox">
+                    &nbsp;&nbsp;
+                        <input type="checkbox" class="custom-control-input" disabled id="pedagogico${i}" name="pedagogico">
+                        <label class="custom-control-label" for="pedagogico${i}">Responsável pedagógico</label>
+                    </div>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" disabled id="financeiro${i}" name="financeiro">
+                        <label class="custom-control-label" for="financeiro${i}">Responsável financeiro</label>
+                    </div>
+                </div>
+                <br>
+                `
+
+                for (const id in responsavel) {
+                    if (Object.hasOwnProperty.call(responsavel, id)) {
+                        const value = responsavel[id];
+                        console.log(value)
+                        document.getElementById(id + i).value = value
+                        if (id == 'pedagogico' || id == 'financeiro') {
+                            document.getElementById(id + i).checked = value
+                        }
+                    }
+                }
+            }
+        }
+        escutaEditaResp()
+    }
+
+    function escutaEditaResp() {
+        document.getElementsByName('editaResp').forEach(elem => {
+            elem.addEventListener('click', (e) => {
+                let index = e.target.id.split('editaResp')[1];
+                editaResp(index);
+            })
+        })
+    }
+
+    function editaResp(i) {
+        let responsaveis = JSON.parse(sessionStorage.getItem('responsaveis'));
+        let sectionResponsaveis = document.getElementById('responsaveis')
+        let responsavel = responsaveis[i]
+        abrirModal('modal', 'Editar dados do responsável', `
+        <form id="formEditaResp">
+            <label class="h6">Dados do responsável autorizado</label>
+            <div class="form-row border border-success rounded">
+            
+            <div class="form-group col-md-4">
+                <label for="inputAddress">Responsável</label>
+                <input type="text" class="form-control" id="nome" name="nome" placeholder="Nome" onblur="maiusculo(this)">
+            </div>
+            <div class="form-group col-md-2">
+                <label for="inputAddress">Relação</label>
+                <br>
+                <select class="form-control form-control-md" name="relacao" id="relacao" >
+                <option hidden selected>Escolha...</option>
+                <option value="Mãe">Mãe</option>
+                <option value="Pai">Pai</option>
+                <option value="Tia">Tia</option>
+                <option value="Tio">Tio</option>
+                <option value="Avó">Avó</option>
+                <option value="Avô">Avô</option>
+                <option value="Responsável">Responsável</option>
+                </select>
+            </div>
+            <div class="form-group col-md-3">
+                <label for="inputAddress">Número Celular</label>
+                <input type="text" class="form-control" id="celular" name="celular" placeholder="Celular">
+            </div>
+            <div class="form-group col-md-5">
+                <label for="inputPassword4">Email</label>
+                <input type="email" class="form-control" id="email" name="email" placeholder="Email">
+            </div>
+            <div class="form-group col-auto">
+                <label for="inputEmail4">RG</label>
+                <input type="text" class="form-control" id="rg" name="rg" placeholder="RG">
+            </div>
+            <div class="form-group col-auto">
+                <label for="inputPassword4">CPF</label>
+                <input type="text" class="form-control" id="cpf" name="cpf" placeholder="CPF" onchange="verificaCPF(this)">
+                <small id="cpfHelp3" class="form-text text-muted">Digite um CPF válido, existe um algoritmo de validação neste campo.</small>
+            </div>
+            
+                <div class="custom-control custom-checkbox">
+                &nbsp;&nbsp;
+                    <input type="checkbox" class="custom-control-input" id="pedagogico" name="pedagogico">
+                    <label class="custom-control-label" for="pedagogico">Responsável pedagógico</label>
+                </div>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="financeiro" name="financeiro">
+                    <label class="custom-control-label" for="financeiro">Responsável financeiro</label>
+                </div>
+            </div>
+            <br>
+            <button type="submit" class="btn btn-primary btn-block">Salvar</button>
+        </form>
+        `, `<button class="btn btn-secondary" data-dismiss="modal">Fechar</button>`)
+
+        for (const field in responsavel) {
+            if (Object.hasOwnProperty.call(responsavel, field)) {
+                const value = responsavel[field];
+                document.getElementById(field).value = value;
+                if (field == 'pedagogico' || field == 'financeiro') {
+                    document.getElementById(field).checked = true
+                }
+                
+            }
+        }
+
+        let formEditaResp = document.getElementById('formEditaResp')
+        formEditaResp.addEventListener('submit', (e) => {
+            e.preventDefault();
+            let dadosResponsavel = {}
+            
+            let formData = new FormData(formEditaResp)
+            let dadosForm = $('#formEditaResp').serializeArray();
+            dadosForm.forEach(field => {
+                let values = formData.getAll(field.name)
+                values.length == 1 ? dadosResponsavel[field.name] = values[0] : dadosResponsavel[field.name] = values
+                if (field.name == 'pedagogico' || field.name == 'financeiro') {
+                    dadosResponsavel[field.name] = true
+                }
+            })
+            responsaveis[i] = dadosResponsavel
+            
+            sessionStorage.setItem('responsaveis', JSON.stringify(responsaveis));
+            $('#modal').modal('hide');
+            mostraResponsaveisCadastrados()
+        })
+    }
 }
 
 // Esperando o submit para o cadastro efetivo
@@ -1410,6 +1620,7 @@ var matriculaPDF = ''
 let formCadastroAluno = document.querySelector('#formCadastroAluno')
 formCadastroAluno.addEventListener('submit', async (e) => {
     e.preventDefault()
+    e.stopPropagation();
     loader.style.display = 'block'
     loaderMsg.innerText = 'Processando dados...'
     var dadosAluno = {}
@@ -1430,6 +1641,9 @@ formCadastroAluno.addEventListener('submit', async (e) => {
 
     let contratoConfigurado = JSON.parse(sessionStorage.getItem('contratoConfigurado'))
     let planoOriginal = JSON.parse(sessionStorage.getItem('planoOriginal'))
+    let responsaveis = JSON.parse(sessionStorage.getItem('responsaveis'))
+    console.log(responsaveis)
+    dadosAluno.responsaveis = responsaveis
     
 
     console.log(dadosAluno)
@@ -1437,14 +1651,11 @@ formCadastroAluno.addEventListener('submit', async (e) => {
     if (dadosAluno.dataNascimentoAluno == '' || dadosAluno.nomeAluno == '') {
         AstNotif.dialog('Confira os campos', 'A data de nascimento do aluno e o nome do aluno são obrigatórios.')
         loaderRun()
-    } else if((dadosAluno.cpfResponsavel1 == '' || dadosAluno.rgResponsavel1 == '' || dadosAluno.numeroCelularResponsavel1 == '' || dadosAluno.nomeResponsavelAluno1 == '')&& idadeAluno != undefined && idadeAluno.years < 18) {
-        AstNotif.dialog('Confira os campos', 'O aluno é menor de idade. É obrigatório o preenchimento dos dados do responsável número 1 do aluno.')
+    } else if((!responsaveis || responsaveis.length == 0)&& idadeAluno != undefined && idadeAluno.years < 18) {
+        AstNotif.dialog('Confira os campos', 'O aluno é menor de idade. É obrigatório adicionar pelo menos um responsável para o aluno.')
         loaderRun()
     } else if (dadosAluno.emailAluno == '' || emailRegularExpression(dadosAluno.emailAluno) == false) {
         AstNotif.dialog('Confira o email do aluno', 'O email do aluno é obrigatório. Confira se foi escrito corretamente.')
-        loaderRun()
-    } else if (((dadosAluno.cpfFinanceiroAluno == '' || dadosAluno.numeroCelularFinanceiroAluno == '' || dadosAluno.nomeResponsavelFinanceiroAluno == '') || (dadosAluno.cpfPedgogicoAluno == '' || dadosAluno.numeroCelularPedagogicoAluno == '' || dadosAluno.nomeResponsavelPedagogicoAluno == '')) && idadeAluno.years < 18) {
-        AstNotif.dialog('Confira os campos', 'O aluno é menor de idade. Cofira os campos de responsáveis financeiro e pedagógico do aluno, eles são obrigatórios quando o aluno é menor de idade.')
         loaderRun()
     } else if (dadosAluno.cpfAluno == '' || dadosAluno.rgAluno == '') {
         AstNotif.dialog('Confira os campos', 'Os dados de RG e CPF do aluno não podem estar em branco.')

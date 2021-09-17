@@ -541,7 +541,7 @@
                   </a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" data-toggle="list" href="#abaCadastrarAlunos" role="tab" aria-controls="CadastrarAlunos" onclick="carregaProfsETurmas(), dragDropCadastroAluno()">
+                  <a class="nav-link" data-toggle="list" href="#abaCadastrarAlunos" role="tab" aria-controls="CadastrarAlunos" onclick="carregaProfsETurmas(), dragDropCadastroAluno(), cadastrarResponsavel()">
                     <span data-feather="user-plus"></span>
                     Cadastrar alunos
                   </a>
@@ -675,7 +675,7 @@
               </li>
               <li class="nav-item">
                 <a class="nav-link" data-toggle="list" href="#abaPreMatriculas" role="tab" aria-controls="alunos" id="btnAbaPreMatriculas"  onclick="abaPreMatriculas()">
-                  <span data-feather="users" ></span>
+                  <span data-feather="archive" ></span>
                   Pré-matrículas
                 </a>
               </li>
@@ -692,7 +692,7 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" data-toggle="list" href="#abaCadastrarAlunos" role="tab" aria-controls="CadastrarAlunos" onclick="carregaProfsETurmas(), dragDropCadastroAluno()" id="btnCadastrarAlunos">
+                <a class="nav-link" data-toggle="list" href="#abaCadastrarAlunos" role="tab" aria-controls="CadastrarAlunos" onclick="carregaProfsETurmas(), dragDropCadastroAluno(), cadastrarResponsavel()" id="btnCadastrarAlunos">
                   <span data-feather="user-plus"></span>
                   Cadastrar alunos
                 </a>
@@ -1781,181 +1781,7 @@
                   </div>
                 </div>
                 <hr>
-                <label class="h6">Dados de filiação</label>
-                <div class="form-row border border-secondary rounded">
-                  <div class="form-group col-md-4">
-                    <label for="inputAddress">Filiação ou Responsável legal 1</label>
-                    <input type="text" class="form-control" id="nomeResponsavelAluno1" name="nomeResponsavelAluno1" placeholder="Nome" onblur="maiusculo(this)">
-                  </div>
-                  <div class="form-group col-md-2">
-                    <label for="inputAddress">Relação</label>
-                    <br>
-                    <select class="form-control form-control-md" name="relacaoAluno1" id="relacaoAluno1">
-                      <option hidden selected>Escolha...</option>
-                      <option value="Mãe">Mãe</option>
-                      <option value="Pai">Pai</option>
-                      <option value="Tio/Tia">Tio/Tia</option>
-                      <option value="Avô/Avó">Avô/Avó</option>
-                      <option value="Outros">Outros</option>
-                    </select>
-                  </div>
-                  <div class="form-group col-md-2">
-                    <label for="inputAddress">Número comercial</label>
-                    <input type="text" class="form-control" id="numeroComercialResponsavel1" name="numeroComercialResponsavel1" placeholder="Comercial" onkeypress="$(this).mask('(00) 0000-00009')">
-                  </div>
-                  <div class="form-group col-md-2">
-                    <label for="inputAddress">Número Celular</label>
-                    <input type="text" class="form-control" id="numeroCelularResponsavel1" name="numeroCelularResponsavel1" placeholder="Celular" onkeypress="$(this).mask('(00) 0000-00009')">
-                  </div>
-                  <div class="form-group col-auto">
-                    <label for="inputEmail4">RG</label>
-                    <input type="text" class="form-control" id="rgResponsavel1" name="rgResponsavel1" placeholder="RG">
-                  </div>
-                  <div class="form-group col-auto">
-                    <label for="inputPassword4">CPF</label>
-                    <input type="text" class="form-control" id="cpfResponsavel1" name="cpfResponsavel1" placeholder="CPF" onchange="verificaCPF(this)">
-                    <small id="cpfHelp" class="form-text text-muted">Digite um CPF válido, existe um algoritmo de validação neste campo.</small>
-                  </div>
-                  
-                  <div class="form-group col-md-auto">
-                    <br>
-                    <div class="form-group col-md-auto">
-                      <a class="btn btn-outline-primary btn-sm" name="responsavelFinanceiro" id="responsavelFinanceiro1" onclick="setaRespFinan('1')">Copiar dados p/ Resp. Financeiro</a>
-                      <br>
-                      <a class="btn btn-outline-success btn-sm" name="responsavelPedagogico" id="responsavelPedagogico1" onclick="setaRespPedag('1')">Copiar dados p/ Resp. Pedagógico</a>
-                      
-                    </div>
-                  </div>
-                </div>
-                <br>
                 
-                <div class="form-row border border-secondary rounded">
-                  <div class="form-group col-md-4">
-                    <label for="inputAddress">Filiação ou Responsável legal 2</label>
-                    <input type="text" class="form-control" id="nomeResponsavelAluno2" name="nomeResponsavelAluno2" placeholder="Nome" onblur="maiusculo(this)">
-                  </div>
-                  <div class="form-group col-md-2">
-                    <label for="inputAddress">Relação</label>
-                    <br>
-                    <select class="form-control form-control-md" name="relacaoAluno2" id="relacaoAluno2">
-                      <option hidden selected>Escolha...</option>
-                      <option value="Mãe">Mãe</option>
-                      <option value="Pai">Pai</option>
-                      <option value="Tio/Tia">Tio/Tia</option>
-                      <option value="Avô/Avó">Avô/Avó</option>
-                      <option value="Outros">Outros</option>
-                    </select>
-                  </div>
-                  <div class="form-group col-md-2">
-                    <label for="inputAddress">Número comercial</label>
-                    <input type="text" class="form-control" id="numeroComercialResponsavel2" name="numeroComercialResponsavel2" placeholder="Comercial">
-                  </div>
-                  <div class="form-group col-md-2">
-                    <label for="inputAddress">Número Celular</label>
-                    <input type="text" class="form-control" id="numeroCelularResponsavel2" name="numeroCelularResponsavel2" placeholder="Celular">
-                  </div>
-                  <div class="form-group col-auto">
-                    <label for="inputEmail4">RG</label>
-                    <input type="text" class="form-control" id="rgResponsavel2" name="rgResponsavel2" placeholder="RG">
-                  </div>
-                  <div class="form-group col-auto">
-                    <label for="inputPassword4">CPF</label>
-                    <input type="text" class="form-control" id="cpfResponsavel2" name="cpfResponsavel2" placeholder="CPF" onchange="verificaCPF(this)">
-                    <small id="cpfHelp" class="form-text text-muted">Digite um CPF válido, existe um algoritmo de validação neste campo.</small>
-                  </div>
-                  &nbsp;&nbsp;&nbsp;
-                  <div class="form-group col-md-auto">
-                    <br>
-                    <a class="btn btn-outline-primary btn-sm" name="responsavelFinanceiro" id="responsavelFinanceiro2" onclick="setaRespFinan('2')">Copiar dados p/ Resp. Financeiro</a>
-                    <br>
-                    <a class="btn btn-outline-success btn-sm" name="responsavelPedagogico" id="responsavelPedagogico2" onclick="setaRespPedag('2')">Copiar dados p/ Resp. Pedagogico</a>
-                    
-                  </div>
-                </div>
-                <br>
-                <hr>
-                <label class="h6">Dados do responsável Financeiro</label>
-                <div class="form-row border border-primary rounded">
-                  <div class="form-group col-md-4">
-                    <label for="inputAddress">Responsável financeiro</label>
-                    <input type="text" class="form-control" id="nomeResponsavelFinanceiroAluno" name="nomeResponsavelFinanceiroAluno" placeholder="Nome" onblur="maiusculo(this)">
-                  </div>
-                  <div class="form-group col-md-2">
-                    <label for="inputAddress">Relação</label>
-                    <br>
-                    <select class="form-control form-control-md" name="relacaoFinanceiroAluno" id="relacaoFinanceiroAluno">
-                      <option hidden selected>Escolha...</option>
-                      <option value="Mãe">Mãe</option>
-                      <option value="Pai">Pai</option>
-                      <option value="Tio/Tia">Tio/Tia</option>
-                      <option value="Avô/Avó">Avô/Avó</option>
-                      <option value="Outros">Outros</option>
-                    </select>
-                  </div>
-                  <div class="form-group col-md-2">
-                    <label for="inputAddress">Número comercial</label>
-                    <input type="text" class="form-control" id="numeroComercialFinanceiroAluno" name="numeroComercialFinanceiroAluno" placeholder="Comercial" onkeypress="$(this).mask('(00) 0000-00009')">
-                  </div>
-                  <div class="form-group col-md-2">
-                    <label for="inputAddress">Número Celular</label>
-                    <input type="text" class="form-control" id="numeroCelularFinanceiroAluno" name="numeroCelularFinanceiroAluno" placeholder="Celular" onkeypress="$(this).mask('(00) 0000-00009')">
-                  </div>
-                  <div class="form-group col-md-5">
-                    <label for="inputPassword4">Email</label>
-                    <input type="email" class="form-control" id="emailResponsavelFinanceiro" name="emailresponsavelFinanceiro" placeholder="Email">
-                  </div>
-                  <div class="form-group col-auto">
-                    <label for="inputEmail4">RG</label>
-                    <input type="text" class="form-control" id="rgFinanceiroAluno" name="rgFinanceiroAluno" placeholder="RG">
-                  </div>
-                  <div class="form-group col-auto">
-                    <label for="inputPassword4">CPF</label>
-                    <input type="text" class="form-control" id="cpfFinanceiroAluno" name="cpfFinanceiroAluno"  placeholder="CPF" onchange="verificaCPF(this)">
-                    <small id="cpfHelp4" class="form-text text-muted">Digite um CPF válido, existe um algoritmo de validação neste campo.</small>
-                  </div>
-                </div>
-                <br>
-                <label class="h6">Dados do responsável Pedagógico</label>
-                <div class="form-row border border-success rounded">
-                  
-                  <div class="form-group col-md-4">
-                    <label for="inputAddress">Responsável pedagógico/didático</label>
-                    <input type="text" class="form-control" id="nomeResponsavelPedagogicoAluno" name="nomeResponsavelPedagogicoAluno" placeholder="Nome" onblur="maiusculo(this)">
-                  </div>
-                  <div class="form-group col-md-2">
-                    <label for="inputAddress">Relação</label>
-                    <br>
-                    <select class="form-control form-control-md" name="relacaoPedagogicoAluno" id="relacaoPedagogicoAluno">
-                      <option hidden selected>Escolha...</option>
-                      <option value="Mãe">Mãe</option>
-                      <option value="Pai">Pai</option>
-                      <option value="Tio/Tia">Tio/Tia</option>
-                      <option value="Avô/Avó">Avô/Avó</option>
-                      <option value="Outros">Outros</option>
-                    </select>
-                  </div>
-                  <div class="form-group col-md-2">
-                    <label for="inputAddress">Número comercial</label>
-                    <input type="text" class="form-control" id="numeroComercialPedagogicoAluno" name="numeroComercialPedagogicoAluno" placeholder="Comercial">
-                  </div>
-                  <div class="form-group col-md-2">
-                    <label for="inputAddress">Número Celular</label>
-                    <input type="text" class="form-control" id="numeroCelularPedagogicoAluno" name="numeroCelularPedagogicoAluno" placeholder="Celular">
-                  </div>
-                  <div class="form-group col-md-5">
-                    <label for="inputPassword4">Email</label>
-                    <input type="email" class="form-control" id="emailResponsavelPedagogico" name="emailResponsavelPedagogico" placeholder="Email">
-                  </div>
-                  <div class="form-group col-auto">
-                    <label for="inputEmail4">RG</label>
-                    <input type="text" class="form-control" id="rgPedagogicoAluno" name="rgPedagogicoAluno" placeholder="RG">
-                  </div>
-                  <div class="form-group col-auto">
-                    <label for="inputPassword4">CPF</label>
-                    <input type="text" class="form-control" id="cpfPedagogicoAluno" name="cpfPedagogicoAluno" placeholder="CPF" onchange="verificaCPF(this)">
-                    <small id="cpfHelp3" class="form-text text-muted">Digite um CPF válido, existe um algoritmo de validação neste campo.</small>
-                  </div>
-                </div>
                 <section id="geraDocsSection">
                   <div class="form-group">
                     <div class="form-check">
@@ -1974,10 +1800,21 @@
                     </div>
                   </div>
                 </section>
+                <section class="fixed-bottom" style="position:fixed; width: 97%; align-content: center; bottom:40px; right:40px; margin-top:70px;">
+                  <button type="submit" class="btn btn-primary" style="float: right;" id="cadastrarAluno">Cadastrar Aluno</button>
+                </section>
                 
-                <button type="submit" class="btn btn-primary" id="cadastrarAluno">Cadastrar Aluno</button>
                 <br><br>
               </form>
+              <label class="h6">Dados dos Responsáveis</label>
+              <br>
+              <button class="btn btn-primary" id="cadastraResponsavel" onclick="cadastrarResponsavel()"><span data-feather="plus"></span>Adicionar responsável</button>
+              <br><br>
+              <section id="responsaveis">
+
+              </section>
+              <hr>
+              <br><br><br><br><br>
             </div>
 
             <div class="container tab-pane fade" id="abaAlunosDesativados" role="tabpanel" aria-labelledby="Alunos Desativados">

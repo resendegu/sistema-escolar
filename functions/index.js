@@ -360,9 +360,10 @@ exports.cadastraAluno = functions.https.onCall(async (data, context) => {
             let firestoreRef = admin.firestore().collection('mail');
             let infoEscola = await admin.database().ref('sistemaEscolar/infoEscola/dadosBasicos').once('value')
             let dadosEscola = infoEscola.val()
+            const responsavelPedagogico = dadosAluno.responsaveis.find(responsavel => responsavel.pedagogico == true) || dadosAluno.responsaveis[0]
             let emailContent = {
                 to: dadosAluno.emailAluno,
-                cc: dadosAluno.emailResponsavelPedagogico || null,
+                cc: responsavelPedagogico.email || null,
                 message: {
                     subject: `${dadosEscola.nomeEscola}`,
                     text: `Olá ${dadosAluno.nomeAluno.split(' ')[0]}, você foi pré-matriculado em nosso sistema. Sistemas ProjetoX.`,
@@ -418,46 +419,32 @@ exports.cadastraAluno = functions.https.onCall(async (data, context) => {
                         return admin.database().ref('sistemaEscolar/infoEscola/contratos/' + codContrato).set({contratoConfigurado: contratoConfigurado, situacao: 'Vigente', planoOriginal: planoOriginal, matricula: dadosAluno.matriculaAluno, timestamp: admin.firestore.Timestamp.now(), codContrato: codContrato}).then(() => {
                             return admin.database().ref('sistemaEscolar/turmas').child(dadosAluno.turmaAluno + '/alunos').child(dadosAluno.matriculaAluno).set({nome: dadosAluno.nomeAluno, prof: (dadosAluno.emailProfAluno != '' ? dadosAluno.emailProfAluno : dadosAluno.profAluno.email)}).then(() => {
                                 return admin.database().ref('sistemaEscolar/ultimaMatricula').set(dadosAluno.matriculaAluno).then(() => {
-                                    return admin.database().ref('sistemaEscolar/secretaria/responsaveisAutorizados').push({
-                                        addResponsavelNome: dadosAluno.nomeResponsavelAluno1,
-                                        addResponsavelRelacao: dadosAluno.relacaoAluno1,
-                                        addResponsavelNumeroCelular: dadosAluno.numeroCelularResponsavel1,
-                                        addResponsavelEmail: dadosAluno.numeroCelularResponsavel1,
-                                        addResponsavelRg: dadosAluno.rgResponsavel1,
-                                        addResponsavelCpf: dadosAluno.cpfResponsavel1,
-                                        matriculaAluno: dadosAluno.matriculaAluno
-                                    }).then(() => {
-                                        admin.database().ref('sistemaEscolar/numeros/alunosMatriculados').transaction(function (current_value) {
-                                            let numAtual = Number(current_value)
-                                            if (current_value == null) {
-                                                return 1
-                                            } else {
-                                                return numAtual++
-                                            }
-                                        }, function(error, comitted, snapshot){
-                                            if (error) {
-                                                throw new functions.https.HttpsError(error.code, error.message, error)
-                                            } else if(!comitted) {
-                                                throw new functions.https.HttpsError('already-exists', 'Já existe. isso pode ser um erro')
-                                            }
-                                            
-                                        })
-
-                                        return firestoreRef.add(emailContent).then(() => {
-                                            console.log('Queued email for delivery to ' + dadosAluno.emailAluno)
-                                            return {answer: 'Aluno cadastrado na matrícula '+ dadosAluno.matriculaAluno + ' com sucesso! Os e-mails foram disparados.', codContrato: codContrato}
-                                            
-                                        }).catch(error => {
-                                            console.error(error)
-                                            throw new Error(error.message)
-                                        })
+                                    
+                                    admin.database().ref('sistemaEscolar/numeros/alunosMatriculados').transaction(function (current_value) {
+                                        let numAtual = Number(current_value)
+                                        if (current_value == null) {
+                                            return 1
+                                        } else {
+                                            return numAtual++
+                                        }
+                                    }, function(error, comitted, snapshot){
+                                        if (error) {
+                                            throw new functions.https.HttpsError(error.code, error.message, error)
+                                        } else if(!comitted) {
+                                            throw new functions.https.HttpsError('already-exists', 'Já existe. Isso pode ser um erro. Tente novamente.')
+                                        }
                                         
+                                    })
+
+                                    return firestoreRef.add(emailContent).then(() => {
+                                        console.log('Queued email for delivery to ' + dadosAluno.emailAluno)
+                                        return {answer: 'Aluno cadastrado na matrícula '+ dadosAluno.matriculaAluno + ' com sucesso! Os e-mails foram disparados.', codContrato: codContrato}
                                         
                                     }).catch(error => {
-                                        throw new functions.https.HttpsError('unknown', error.message, error)
+                                        console.error(error)
+                                        throw new Error(error.message)
                                     })
-                                    
-                                    
+                                
                                 }).catch(error => {
                                     throw new functions.https.HttpsError('unknown', error.message, error)
                                 })
