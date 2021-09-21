@@ -126,33 +126,7 @@
       </div>
     </div>
 
-    <div class="modal fade bd-example-modal-xl" tabindex="-1" role="dialog" id="modalConsultaResponsaveis">
-      <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="titulo">Consultar responsável autorizado</h5>
-            <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button> -->
-          </div>
-          <div class="modal-body" id="corpo">
-            <form id="formBuscaResponsavel">
-              <div class="form-row">
-                <div class="form-group col-md-6">
-                  <label for="nomeBuscaResponsavel">Digite o nome do responsável cadastrado</label>
-                    <input type="text" class="form-control" id="nomeBuscaResponsavel" name="nomeBuscaResponsavel" placeholder="Nome do Responsável">
-                </div>
-              </div>
-              <button type="submit" class="btn btn-primary btn-block">Procurar</button>
-            </form>
-          </div>
-          <div class="modal-footer" id="botoes">
-            
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
-          </div>
-        </div>
-      </div>
-    </div>
+   
 
     <div class="modal fade bd-example-modal-xl" tabindex="-1" role="dialog" id="modalAdicionaCurso">
       <div class="modal-dialog modal-lg" role="document">
@@ -769,7 +743,7 @@
             <button type="button" class="btn btn-light btn-sm" onclick="document.getElementById('btnAbaTurmas').click()">
               Turmas Cadastradas <span class="badge badge-success" id="turmasCadastradasNum">0</span>
             </button>
-            <button class="btn btn-sm btn-light float-md-right" data-toggle="modal" data-target="#modalConsultaResponsaveis">Consultar responsáveis</button>
+            
           </div>
           <hr>
           <!-- Gráfico -->
@@ -1781,20 +1755,189 @@
                   </div>
                 </div>
                 <hr>
+                <label class="h6">Dados opcionais</label>
+                <div class="form-row col-auto">
+                  <label for="inputZip">"Qual o seu objetivo ao adquirir o curso?"</label>
+                  <input type="text" class="form-control" id="objetivoAluno" name="objetivoAluno" placeholder="Descreva...">
+                </div>
+                <br>
+                <div class="form-row col-auto">
+                  <label for="inputZip">"Toma remédios controlados? Se sim, qual e com que frequência?"</label>
+                  <input type="text" class="form-control" id="remedioAluno" name="remedioAluno" placeholder="Descreva...">
+                </div>
+                <br>
+                <div class="form-row col-auto">
+                  <label for="inputZip">"Possui alguma alergia? Se sim qual?"</label>
+                  <input type="text" class="form-control" id="alergiaAluno" name="alergiaAluno" placeholder="Descreva...">
+                </div>
+                <br>
+                <div class="form-row col-auto">
+                  <label for="inputZip">"Possui intolerância a algum alimento? Se sim qual?"</label>
+                  <input type="text" class="form-control" id="intoleranciaAluno" name="intoleranciaAluno" placeholder="Descreva...">
+                </div>
+                <br>
+                
+                <div class="form-row col-auto">
+                  <label for="marketing">"Como conheceu a escola?"</label>
+                  <select class="form-control" name="marketing" id="marketing">
+                    <option selected hidden>Escolha...</option>
+                    <option value="Jornal">Jornal</option>
+                    <option value="Internet">Internet</option>
+                    <option value="Redes Sociais">Redes Sociais</option>
+                    <option value="Eventos">Eventos</option>
+                    <option value="Indicação">Indicação</option>
+                    <option value="Outdoors/Panfletos">Outdoors/Panfletos</option>
+                    <option value="Outros">Outros</option>
+                  </select>
+                </div>
+                <br>
+                <div class="form-row col-auto">
+                  <label for="inputZip">Outras observações...</label>
+                  <input type="text" class="form-control" id="observacoesAluno" name="observacoesAluno" placeholder="Descreva...">
+                </div>
+                <br>
+                <label><b>Dias e horários disponíveis:</b></label>
+                <div class="form-row">
+                  <div class=" col-md-2">
+                    <div class="custom-control custom-checkbox">
+                      <input type="checkbox" class="custom-control-input" id="segunda" name="segunda">
+                      <label class="custom-control-label" for="segunda">Segunda-feira</label>
+                    </div>
+                  </div>
+                  <div class="col-md-2">
+                    
+                    <input type="time" class="form-control" id="segundaHora1" name="segundaHora1" placeholder="Horário">
+                  </div>
+                  <div class="col-md-2">
+                    
+                    <input type="time" class="form-control" id="segundaHora2" name="segundaHora2" placeholder="Horário">
+                  </div>
+                </div>
+                <hr>
+                <div class="form-row">
+                  <div class=" col-md-2">
+                    <div class="custom-control custom-checkbox">
+                      <input type="checkbox" class="custom-control-input" id="terca" name="terca">
+                      <label class="custom-control-label" for="terca">Terça-feira</label>
+                    </div>
+                  </div>
+                  <div class="col-md-2">
+                    
+                    <input type="time" class="form-control" id="tercaHora1" name="tercaHora1" placeholder="Horário">
+                  </div>
+                  <div class="col-md-2">
+                    
+                    <input type="time" class="form-control" id="tercaHora2" name="tercaHora2" placeholder="Horário">
+                  </div>
+                </div>
+                <hr>
+                <div class="form-row">
+                  <div class=" col-md-2">
+                    <div class="custom-control custom-checkbox">
+                      <input type="checkbox" class="custom-control-input" id="quarta" name="quarta">
+                      <label class="custom-control-label" for="quarta">Quarta-feira</label>
+                    </div>
+                  </div>
+                  <div class="col-md-2">
+                    
+                    <input type="time" class="form-control" id="quartaHora1" name="quartaHora1" placeholder="Horário">
+                  </div>
+                  <div class="col-md-2">
+                    
+                    <input type="time" class="form-control" id="quartaHora2" name="quartaHora2" placeholder="Horário">
+                  </div>
+                </div>
+                <hr>
+                <div class="form-row">
+                  <div class=" col-md-2">
+                    <div class="custom-control custom-checkbox">
+                      <input type="checkbox" class="custom-control-input" id="quinta" name="quinta">
+                      <label class="custom-control-label" for="quinta">Quinta-feira</label>
+                    </div>
+                  </div>
+                  <div class="col-md-2">
+                    
+                    <input type="time" class="form-control" id="quintaHora1" name="quintaHora1" placeholder="Horário">
+                  </div>
+                  <div class="col-md-2">
+                    
+                    <input type="time" class="form-control" id="quintaHora2" name="quintaHora2" placeholder="Horário">
+                  </div>
+                </div>
+                <hr>
+                <div class="form-row">
+                  <div class=" col-md-2">
+                    <div class="custom-control custom-checkbox">
+                      <input type="checkbox" class="custom-control-input" id="sexta" name="sexta">
+                      <label class="custom-control-label" for="sexta">Sexta-feira</label>
+                    </div>
+                  </div>
+                  <div class="col-md-2">
+                    
+                    <input type="time" class="form-control" id="sextaHora1" name="sextaHora1" placeholder="Horário">
+                  </div>
+                  <div class="col-md-2">
+                    
+                    <input type="time" class="form-control" id="sextaHora2" name="sextaHora2" placeholder="Horário">
+                  </div>
+                </div>
+                <hr>
+                <div class="form-row">
+                  <div class=" col-md-2">
+                    <div class="custom-control custom-checkbox">
+                      <input type="checkbox" class="custom-control-input" id="sabado" name="sabado">
+                      <label class="custom-control-label" for="sabado">Sábado</label>
+                    </div>
+                  </div>
+                  <div class="col-md-2">
+                    
+                    <input type="time" class="form-control" id="sabadoHora1" name="sabadoHora1" placeholder="Horário">
+                  </div>
+                  <div class="col-md-2">
+                    
+                    <input type="time" class="form-control" id="sabadoHora2" name="sabadoHora2" placeholder="Horário">
+                  </div>
+                </div>
+                <hr>
+                <div class="form-row">
+                  <div class=" col-md-2">
+                    <div class="custom-control custom-checkbox">
+                      <input type="checkbox" class="custom-control-input" id="domingo" name="domingo">
+                      <label class="custom-control-label" for="domingo">Domingo</label>
+                    </div>
+                  </div>
+                  <div class="col-md-2">
+                    
+                    <input type="time" class="form-control" id="domingoHora1" name="domingoHora1" placeholder="Horário">
+                  </div>
+                  <div class="col-md-2">
+                    
+                    <input type="time" class="form-control" id="domingoHora2" name="domingoHora2" placeholder="Horário">
+                  </div>
+                </div>
+                
+                  <br>
+                  <div class="custom-control custom-checkbox">
+                      <input type="checkbox" class="custom-control-input" id="autorizaImagemAluno" name="autorizaImagemAluno">
+                      <label class="custom-control-label" for="autorizaImagemAluno">O aluno autoriza o uso de sua imagem e dados para divulgação. (Marque esta caixa apenas mediante autorização do aluno ou responsável)</label>
+                  </div>
+                
+                  <hr>
                 
                 <section id="geraDocsSection">
+                  <label class="h6">Gerar de documentos no ato do cadastro?</label>
                   <div class="form-group">
-                    <div class="form-check">
-                      <input class="form-check-input" type="checkbox" id="geraPDFAluno" name="geraPDFAluno">
-                      <label class="form-check-label" for="geraPDFAluno">
+                    <div class="custom-control custom-checkbox">
+                      <input class="custom-control-input" type="checkbox" id="geraPDFAluno" name="geraPDFAluno">
+                      <label class="custom-control-label" for="geraPDFAluno">
                         Gerar ficha de matrícula
                       </label>
                     </div>
                   </div>
                   <div class="form-group">
-                    <div class="form-check">
-                      <input class="form-check-input" type="checkbox" id="geraBoleto" name="geraBoleto">
-                      <label class="form-check-label" for="geraPDFAluno">
+                    <div class="custom-control custom-checkbox">
+                      <input class="custom-control-input" type="checkbox" id="geraBoleto" name="geraBoleto">
+                      <label class="custom-control-label" for="geraBoleto">
                         Gerar boletos/carnê de pagamento
                       </label>
                     </div>
