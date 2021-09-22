@@ -964,6 +964,13 @@ function carregaProfsETurmas(preMatricula=false) {
             console.error(error)
             AstNotif.dialog('Erro', error.message)
         })
+        document.getElementById('vencimento').innerHTML = '<option selected hidden>Escolha...</option>'
+        for (let i = 0; i < 28; i++) {
+            let opt = document.createElement('option')
+            opt.value = i + 1
+            opt.innerHTML = i + 1
+            document.getElementById('vencimento').appendChild(opt)                 
+        }
     }).catch(error => {
         loaderRun()
         console.error(error)
@@ -2066,7 +2073,7 @@ function desativarAlunos(confirma=false, codTurma, matricula, nome) {
 function editarDadosAluno(matricula) {
     let aluno = alunos[matricula]
 
-    abrirModal('modal', 'Editar dados de ' + aluno.nomeAluno, `
+    abrirModal('modal', 'Ver e Editar dados de ' + aluno.nomeAluno, `
     <form id="formEditaAluno" onkeydown="return event.key != 'Enter';">
         <label class="h6">Dados pessoais</label>
         <div class="form-row">
@@ -2179,6 +2186,11 @@ function editarDadosAluno(matricula) {
                   <input type="text" class="form-control" id="intoleranciaAluno" name="intoleranciaAluno" placeholder="Descreva...">
                 </div>
                 <br>
+                <div class="form-row col-auto">
+                  <label for="inputZip">"Qual curso está fazendo atualmente?"</label>
+                  <input type="text" class="form-control" id="cursoAtualmenteAluno" name="cursoAtualmenteAluno" placeholder="Descreva...">
+                </div>
+                <br>
                 
                 <div class="form-row col-auto">
                   <label for="marketing">"Como conheceu a escola?"</label>
@@ -2193,6 +2205,15 @@ function editarDadosAluno(matricula) {
                     <option value="Outros">Outros</option>
                   </select>
                 </div>
+                <br>
+                <div class="form-row col-auto">
+                  <label for="vencimento">Data preferencial para vencimento</label>
+                  <select class="form-control" name="vencimento" id="vencimento">
+                    <option selected hidden>Escolha...</option>
+                    
+                  </select>
+                </div>
+                
                 <br>
                 <div class="form-row col-auto">
                   <label for="inputZip">Outras observações...</label>
@@ -2320,11 +2341,21 @@ function editarDadosAluno(matricula) {
                 </div>
                 
                   <br>
-                  <div class="custom-control custom-checkbox">
-                      <input type="checkbox" checked class="custom-control-input" id="autorizaImagemAluno" name="autorizaImagemAluno">
-                      <label class="custom-control-label" for="autorizaImagemAluno">O aluno autoriza o uso de sua imagem e dados para divulgação. (Marque esta caixa apenas mediante autorização do aluno ou responsável)</label>
+                  <hr>
+                  <div class="form-row col-auto">
+                      
+                      <label for="autorizaImagemAluno">O aluno autoriza o uso de sua imagem e dados para divulgação? (Marque esta caixa apenas mediante autorização do aluno ou responsável)</label>
                   </div>
-                
+                  <div class="form-row col-auto">
+                    <div class="custom-control custom-radio custom-control-inline">
+                      <input type="radio" id="autorizaImagem" name="imagemAluno" value="autorizaImagem" class="custom-control-input">
+                      <label class="custom-control-label" for="autorizaImagem">Autoriza</label>
+                    </div>
+                    <div class="custom-control custom-radio custom-control-inline">
+                      <input type="radio" id="naoAutorizaImagem" checked name="imagemAluno" value="naoAutorizaImagem" class="custom-control-input">
+                      <label class="custom-control-label" for="naoAutorizaImagem">Não autoriza</label>
+                    </div>
+                  </div>
                   
         <button type="submit" class="btn btn-primary btn-block">Salvar dados</button>
         <hr>
@@ -2335,6 +2366,13 @@ function editarDadosAluno(matricula) {
         </section>
     </form>
     `, '<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>');
+    
+    for (let i = 0; i < 28; i++) {
+        let opt = document.createElement('option')
+        opt.value = i + 1
+        opt.innerHTML = i + 1
+        document.getElementById('vencimento').appendChild(opt)                 
+    }
 
     let formEditaAluno = document.getElementById('formEditaAluno');
     let campos = $('#formEditaAluno').serializeArray();
@@ -2411,10 +2449,21 @@ function editarDadosAluno(matricula) {
         if (Object.hasOwnProperty.call(campos, key)) {
             const element = campos[key];
             console.log(element)
-            document.getElementById(element.name).value = aluno[element.name] == undefined ? null : aluno[element.name] ;
-            if (alunos[element.name] != 'on') {
-                document.getElementById(element.name).checked = false
+            console.log(aluno[element.name])
+            try {
+                if (element.name == 'imagemAluno') {
+                    document.getElementById(aluno[element.name]).checked = true;
+                } else if (alunos[element.name] != 'on') {
+                    document.getElementById(element.name).checked = false
+                }
+                document.getElementById(element.name).value = aluno[element.name] == undefined ? null : aluno[element.name] ;
+                
+            } catch (error) {
+                console.log(error)
             }
+           
+            
+            
                 
         }
     }
@@ -2935,7 +2984,7 @@ function abreDadosDoAluno(matricula, desativado=false, notasDesativado=false) {
     }
     document.getElementById('infoDoAluno').style.display = 'block'
     document.getElementById('rolaTelaAbaixoAlunos').style.display = 'block'
-    document.getElementById('secGeraFicha').innerHTML = `<button class="btn btn-outline-primary btn-block" id="btnGeraFicha" onclick="gerarFichaAluno('${matricula}')">Gerar ficha de matrícula em PDF</button>
+    document.getElementById('secGeraFicha').innerHTML = `<button class="btn btn-outline-primary btn-block" id="btnGeraFicha" onclick="editarDadosAluno('${matricula}')">Ver/Editar dados do aluno</button><button class="btn btn-outline-primary btn-block" id="btnGeraFicha" onclick="gerarFichaAluno('${matricula}')">Gerar ficha de matrícula em PDF</button>
     <button class="btn btn-outline-primary btn-block" id="btnBoletosAluno" data-toggle="modal" data-target="#contratosAluno" onclick="carregaContratosAluno('${matricula}')">Ver contratos/boletos do aluno</button>
     <button class="btn btn-outline-primary btn-block" id="btnBoletosAluno" data-toggle="modal" data-target="#checklistAluno" onclick="carregaChecklistAluno('${matricula}', ${desativado == false ? false : true})">Checklist do Aluno</button>`
     

@@ -1776,6 +1776,11 @@
                   <input type="text" class="form-control" id="intoleranciaAluno" name="intoleranciaAluno" placeholder="Descreva...">
                 </div>
                 <br>
+                <div class="form-row col-auto">
+                  <label for="inputZip">"Qual curso está fazendo atualmente?"</label>
+                  <input type="text" class="form-control" id="cursoAtualmenteAluno" name="cursoAtualmenteAluno" placeholder="Descreva...">
+                </div>
+                <br>
                 
                 <div class="form-row col-auto">
                   <label for="marketing">"Como conheceu a escola?"</label>
@@ -1788,6 +1793,14 @@
                     <option value="Indicação">Indicação</option>
                     <option value="Outdoors/Panfletos">Outdoors/Panfletos</option>
                     <option value="Outros">Outros</option>
+                  </select>
+                </div>
+                <br>
+                <div class="form-row col-auto">
+                  <label for="vencimento">Data preferencial para vencimento</label>
+                  <select class="form-control" name="vencimento" id="vencimento">
+                    <option selected hidden>Escolha...</option>
+                    
                   </select>
                 </div>
                 <br>
@@ -1916,11 +1929,24 @@
                   </div>
                 </div>
                 
+                
                   <br>
-                  <div class="custom-control custom-checkbox">
-                      <input type="checkbox" class="custom-control-input" id="autorizaImagemAluno" name="autorizaImagemAluno">
-                      <label class="custom-control-label" for="autorizaImagemAluno">O aluno autoriza o uso de sua imagem e dados para divulgação. (Marque esta caixa apenas mediante autorização do aluno ou responsável)</label>
+                  <hr>
+                  <div class="form-row col-auto">
+                      
+                      <label for="autorizaImagemAluno">O aluno autoriza o uso de sua imagem e dados para divulgação? (Marque esta caixa apenas mediante autorização do aluno ou responsável)</label>
                   </div>
+                  <div class="form-row col-auto">
+                    <div class="custom-control custom-radio custom-control-inline">
+                      <input type="radio" id="autorizaImagem" name="imagemAluno" value="autorizaImagem" class="custom-control-input">
+                      <label class="custom-control-label" for="autorizaImagem">Autoriza</label>
+                    </div>
+                    <div class="custom-control custom-radio custom-control-inline">
+                      <input type="radio" id="naoAutorizaImagem" checked name="imagemAluno" value="naoAutorizaImagem" class="custom-control-input">
+                      <label class="custom-control-label" for="naoAutorizaImagem">Não autoriza</label>
+                    </div>
+                  </div>
+                  
                 
                   <hr>
                 
