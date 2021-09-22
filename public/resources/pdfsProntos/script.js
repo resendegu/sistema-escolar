@@ -2,6 +2,7 @@
 window.addEventListener('DOMContentLoaded', (e) => {
     let infoEscolaRef = firebase.database().ref('sistemaEscolar/infoEscola')
     let alunosRef = firebase.database().ref('sistemaEscolar/alunos')
+    let preMatriculasRef = firebase.database().ref('sistemaEscolar/preMatriculas')
     let alunosDesativadosRef = firebase.database().ref('sistemaEscolar/alunosDesativados')
     let alunosStorageRef = firebase.storage().ref('sistemaEscolar/alunos')
     let timestamp = firebase.functions().httpsCallable('timestamp');
@@ -51,6 +52,12 @@ window.addEventListener('DOMContentLoaded', (e) => {
             if (type === 'fichaCadastral') {
                 geraFichaCadastral(matriculas);
                 tipoDocumento.innerText = 'Ficha Cadastral'
+            }
+            if (type === 'preMatricula') {
+                // Neste caso os parametros recebidos no lugar da matrícula serão um código de pré-matricula
+                geraFichaCadastral(matriculas, 'preMatricula')
+                console.log('foi')
+                tipoDocumento.innerText = 'Ficha de Pré-matrícula'
             }
             if (type === 'boletim') {
                 geraBoletim(matriculas, ids); 
@@ -271,7 +278,7 @@ window.addEventListener('DOMContentLoaded', (e) => {
 
         }
 
-        async function geraFichaCadastral(matriculas) {
+        async function geraFichaCadastral(matriculas, tipo='matricula') {
             let c = 0
             if (matriculas.indexOf(',') !== -1) {
                 matriculas = matriculas.split(',');
@@ -291,11 +298,32 @@ window.addEventListener('DOMContentLoaded', (e) => {
             
             async function gerador(matricula) {
                 loaderRun(true, 'Carregando dados da matrícula...')
-                let alunoInfo = await alunosRef.child(matricula).once('value')
+                let alunoInfo
+                if (tipo === 'matricula') {
+                    alunoInfo = await alunosRef.child(matricula).once('value')
+                } else {
+                    alunoInfo = await preMatriculasRef.child(matricula).once('value')
+                }
+                
                 alunoInfo = alunoInfo.exists() ? alunoInfo : await alunosDesativadosRef.child(matricula + '/dadosAluno').once('value')
                     
                     let aluno = alunoInfo.val();
                     let idade = await calcularIdadePrecisa(aluno.dataNascimentoAluno)
+                    let responsaveis = aluno.responsaveis
+                    console.log(responsaveis)
+                    let responsavel
+                    let keyResp
+                    for (const key in responsaveis) {
+                        if (Object.hasOwnProperty.call(responsaveis, key)) {
+                            const resp = responsaveis[key];
+                            keyResp = key
+                            if (resp.pedagogico) {
+                                responsavel = resp
+                            
+                            }
+                        }
+                    }
+                    responsavel = responsavel === undefined ? responsaveis[keyResp] : responsavel
                     console.log(aluno);
                     let titulos = [
                         [true, 'Dados do Aluno'],
@@ -310,15 +338,12 @@ window.addEventListener('DOMContentLoaded', (e) => {
                             'Cidade - Estado',
                         ],
                         
-                        idade.years < 18 ? [true, `${aluno.relacaoAluno1} do aluno`] : null,
+                        idade.years < 18 ? [true, `${responsavel.relacao} do aluno`] : null,
                         idade.years < 18 ? [
-                            'Nome', 'RG', 'CPF', 'Celular', 'Telefone comercial', 
+                            'Nome', 'RG', 'CPF', 'Celular', 'E-mail', 
                         ] : null,
 
-                        idade.years < 18 && aluno.nomeResponsavelAluno2 != '' ? [true, `${aluno.relacaoAluno2 == 'Outros' ? 'Responsável' : aluno.relacaoAluno2} do aluno`] : null,
-                        idade.years < 18 && aluno.nomeResponsavelAluno2 != '' ? [
-                            'Nome', 'RG', 'CPF', 'Celular', 'Telefone comercial', 
-                        ] : null,
+                        
                     ]
                     let dados = [
                         '',
@@ -335,13 +360,10 @@ window.addEventListener('DOMContentLoaded', (e) => {
 
                         idade.years < 18 ? [''] : null,
                         idade.years < 18 ? [
-                            aluno.nomeResponsavelAluno1, aluno.rgResponsavel1, aluno.cpfResponsavel1, aluno.numeroCelularResponsavel1, aluno.numeroComercialResponsavel1
+                            responsavel.nome, responsavel.rg, responsavel.cpf, responsavel.celular, responsavel.email
                         ] : null,
 
-                        idade.years < 18 && aluno.nomeResponsavelAluno2 != '' ? [''] : null,
-                        idade.years < 18 && aluno.nomeResponsavelAluno2 != '' ? [
-                            aluno.nomeResponsavelAluno2, aluno.rgResponsavel2, aluno.cpfResponsavel2, aluno.numeroCelularResponsavel2, aluno.numeroComercialResponsavel2
-                        ] : null,
+                        
 
                     ]
 

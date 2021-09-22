@@ -4954,6 +4954,11 @@ alteraLogoEscola.addEventListener('input', (e) => {
 
 // Aba Pré matriculas
 
+function gerarFichaPreMatricula(key) {
+    document.getElementById('corpoMatricula').innerHTML = `<iframe src="../resources/pdfsProntos/documento.html#preMatricula?${key}" frameborder="0" width="100%" height="400px" id="fichaPdf" name="fichaPdf"></iframe>`
+    $('#matriculaModal').modal({backdrop: 'static'})
+}
+
 async function abaPreMatriculas() {
     let listaPreMatriculas = document.getElementById('listaPreMatriculas')
     let preMatriculas
@@ -5018,7 +5023,7 @@ async function abaPreMatriculas() {
         dados = preMatriculas[key];
         document.getElementById('infoPreMatricula').style.display = 'block'
         document.getElementById('rolaTelaAbaixoPre').style.display = 'block'
-        document.getElementById('secGeraFichaPre').innerHTML = `<button class="btn btn-outline-primary btn-block" id="btnGeraFicha" onclick="gerarFichaAluno('${key}')">Gerar ficha de pré-matrícula em PDF</button>
+        document.getElementById('secGeraFichaPre').innerHTML = `<button class="btn btn-outline-primary btn-block" id="btnGeraFicha" onclick="gerarFichaPreMatricula('${key}')">Gerar ficha de pré-matrícula em PDF</button>
         `
         
         dadosResponsaveis = {

@@ -417,7 +417,7 @@ exports.cadastraAluno = functions.https.onCall(async (data, context) => {
                 }
                     return admin.database().ref('sistemaEscolar/alunos/' + dadosAluno.matriculaAluno).set(dadosAluno).then(() => {
                         return admin.database().ref('sistemaEscolar/infoEscola/contratos/' + codContrato).set({contratoConfigurado: contratoConfigurado, situacao: 'Vigente', planoOriginal: planoOriginal, matricula: dadosAluno.matriculaAluno, timestamp: admin.firestore.Timestamp.now(), codContrato: codContrato}).then(() => {
-                            return admin.database().ref('sistemaEscolar/turmas').child(dadosAluno.turmaAluno + '/alunos').child(dadosAluno.matriculaAluno).set({nome: dadosAluno.nomeAluno, prof: (dadosAluno.emailProfAluno != '' ? dadosAluno.emailProfAluno : dadosAluno.profAluno.email)}).then(() => {
+                            return admin.database().ref('sistemaEscolar/turmas').child(dadosAluno.turmaAluno + '/alunos').child(dadosAluno.matriculaAluno).set({nome: dadosAluno.nomeAluno, prof: (dadosAluno.emailProfAluno || dadosAluno.profAluno.email)}).then(() => {
                                 return admin.database().ref('sistemaEscolar/ultimaMatricula').set(dadosAluno.matriculaAluno).then(() => {
                                     
                                     admin.database().ref('sistemaEscolar/numeros/alunosMatriculados').transaction(function (current_value) {
