@@ -2967,6 +2967,60 @@ async function carregaChecklistAluno(matricula, desativado) {
     }
 }
 
+async function transferirAluno(matricula, turmaAtual, turmaParaTransferir='') {
+
+    async function transfere(dados) {
+        try {
+            loaderRun(true, 'Transferindo aluno')
+            let result = await transfereAlunos(dados)
+            loaderRun()
+            AstNotif.notify('Sucesso', result.data.answer)
+            $('#modal').modal('hide')
+        } catch (error) {
+            loaderRun()
+            console.log(error)
+            AstNotif.dialog(error.message)
+        }
+        
+    }
+
+    if (turmaParaTransferir == '') {
+        abrirModal('modal', 'Confirmação', 
+            `Você irá transferir o aluno da turma ${turmaAtual}. <b>Você deseja transferi-lo para qual turma?</b><br>(Aviso: As notas e todas as informações atuais do aluno nesta turma serão transferidas.)
+            <select class="custom-select" id="selectTurmasTransfere">
+                <option selected hidden>Escolha uma turma...</option>
+            </select>
+            `
+            , `<button type="button" data-toggle="tooltip" data-placement="top" title="A operação de transferência ficará gravada no sistema para futuras consultas." class="btn btn-info" id="btnTransfereDaTurma">Transferir</button><button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>`
+            )
+            $(function () {
+                $('[data-toggle="tooltip"]').tooltip()
+            })
+            let btnTransfereDaTurma = document.getElementById('btnTransfereDaTurma')
+
+            btnTransfereDaTurma.addEventListener('click', (e) => {
+                e.preventDefault()
+                let dados = {turmaAtual: turmaAtual, turmaParaTransferir: selectTurmasTransfere.value, alunos: {0: matricula}}
+                transfere(dados)
+            })
+            let turmas = (await turmasRef.once('value')).val()
+            let selectTurmasTransfere = document.getElementById('selectTurmasTransfere')
+            for (const cod in turmas) {
+                if (Object.hasOwnProperty.call(turmas, cod) && cod != turmaAtual) {
+                    const infoDaTurma = turmas[cod];
+                    if (infoDaTurma.professor == undefined) {
+                        var profReferencia = 'Não cadastrado'
+                    } else {
+                        var profReferencia = infoDaTurma.professor[0].nome
+                    }
+                    selectTurmasTransfere.innerHTML += `<option value="${cod}">Turma ${cod} (Prof. ${profReferencia})</option>`
+                }
+            }
+    }
+
+
+}
+
 var dadosResponsaveis = {}
 function abreDadosDoAluno(matricula, desativado=false, notasDesativado=false) {
 
@@ -2984,7 +3038,9 @@ function abreDadosDoAluno(matricula, desativado=false, notasDesativado=false) {
     }
     document.getElementById('infoDoAluno').style.display = 'block'
     document.getElementById('rolaTelaAbaixoAlunos').style.display = 'block'
-    document.getElementById('secGeraFicha').innerHTML = `<button class="btn btn-outline-primary btn-block" id="btnGeraFicha" onclick="editarDadosAluno('${matricula}')">Ver/Editar dados do aluno</button><button class="btn btn-outline-primary btn-block" id="btnGeraFicha" onclick="gerarFichaAluno('${matricula}')">Gerar ficha de matrícula em PDF</button>
+    document.getElementById('secGeraFicha').innerHTML = `<button class="btn btn-outline-primary btn-block" id="btnGeraFicha" onclick="editarDadosAluno('${matricula}')">Ver/Editar dados do aluno</button>
+    <button class="btn btn-outline-primary btn-block" id="btnGeraFicha" onclick="gerarFichaAluno('${matricula}')">Gerar ficha de matrícula em PDF</button>
+    <button class="btn btn-outline-primary btn-block" id="btnTransfereAluno" onclick="transferirAluno('${matricula}', '${dados.turmaAluno}')">Transferir Aluno</button>
     <button class="btn btn-outline-primary btn-block" id="btnBoletosAluno" data-toggle="modal" data-target="#contratosAluno" onclick="carregaContratosAluno('${matricula}')">Ver contratos/boletos do aluno</button>
     <button class="btn btn-outline-primary btn-block" id="btnBoletosAluno" data-toggle="modal" data-target="#checklistAluno" onclick="carregaChecklistAluno('${matricula}', ${desativado == false ? false : true})">Checklist do Aluno</button>`
     
