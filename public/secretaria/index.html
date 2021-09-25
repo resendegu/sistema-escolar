@@ -1387,7 +1387,7 @@
                 </select>
               </div>
               <div id="areaInfoTurma" style="visibility: hidden;">
-                <label class="h3">Turma</label>
+                <label class="h3" id="infoTurma">Turma</label>
                 <label class="text-muted float-right h5" id="codigoDaTurma"></label>
                 <div class="row">
                   <div class="col-md-auto">
@@ -1473,6 +1473,9 @@
                 <br><br>
                 
                 <button type="button" class="btn btn-danger" id="btnExcluirTurma">Excluir turma</button>
+                <button type="button" class="btn btn-secondary" id="btnDistribuiNotas">Distribuir notas</button>
+                <button type="button" class="btn btn-success" id="btnIniciaPeriodo" onclick="iniciaPeriodo()">Abrir turma</button>
+                <button type="button" class="btn btn-warning" id="btnFechaPeriodo" onclick="fechaPeriodo()">Fechar turma</button>
                 
                 <hr>
                 <p class="text-muted float-md-right" id="timestampTurmaCadastrada"></p>
@@ -2367,8 +2370,12 @@
                     </div>
                   </div>
                 </div>
-                
-                
+
+                <div class="custom-control custom-switch">
+                  <input type="checkbox" class="custom-control-input" id="permitirDistribuiNotas" name="permitirDistribuiNotas">
+                  <label class="custom-control-label" for="permitirDistribuiNotas">Permitir os professores distribuírem as notas nas turmas <span data-feather="help-circle" data-toggle="tooltip" data-placement="top" title="Caso você não permita, a secretaria será a responsável por definir as pontuações máximas de atividades da turma, ou seja, será responsável por distribuir as notas. O professor, por sua vez, só poderá lançar as notas no sistema."></span></label>
+                </div>
+                <br>
                 
                 <button type="submit" class="btn btn-primary btn-block">Aplicar dados básicos</button>
               </form>

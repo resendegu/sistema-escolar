@@ -398,11 +398,12 @@ function preparaCadastroTurma() {
 
 
 //Aba de turmas
+let turmaAberta
 async function turmas() {
     let turmas
     let alunosSelecionados = []
     let alunosTurma
-    let turmaAberta
+    
     carregaTurmas()
 
     let selectTurmas = document.getElementById('selectTurmas')
@@ -594,7 +595,7 @@ async function turmas() {
                     </td>
                     <td>${aluno.nome}</td>
                     <td>${matricula}</td>
-                    <td>${aluno.notas == undefined ? null : somaNotas(aluno.notas)}</td>
+                    <td>${aluno.notas == undefined ? '' : somaNotas(aluno.notas)}</td>
                 </tr>
                 `
             }
@@ -609,8 +610,121 @@ async function turmas() {
         escutaCheckboxesAlunosTurma()
         escutaFormAlunosTurma()
         escutaTransfereUmAluno()
+
+        
+
+        turmasRef.child(turmaAberta + '/status').once('value').then(snapshot => {
+            let status = snapshot.val()
+            let infoTurma = document.getElementById('infoTurma')
+            let btnIniciaPeriodo = document.getElementById('btnIniciaPeriodo')
+            let btnFechaPeriodo = document.getElementById('btnFechaPeriodo')
+            if (snapshot.exists()) {
+                if (status.turma == 'aberta') {
+                    infoTurma.style.color = 'green'
+                    infoTurma.innerText = 'Turma Aberta'
+                    btnIniciaPeriodo.style.visibility = 'visible'
+                    btnFechaPeriodo.style.visibility = 'visible'
+                    btnIniciaPeriodo.disabled = true
+                    btnFechaPeriodo.disabled = false
+                } else {
+                    btnIniciaPeriodo.style.visibility = 'hidden'
+                    infoTurma.style.color = 'gold'
+                    infoTurma.innerText = 'Turma Fechada'
+                    btnIniciaPeriodo.style.visibility = 'visible'
+                    btnFechaPeriodo.style.visibility = 'visible'
+                    btnIniciaPeriodo.disabled = false
+                    btnFechaPeriodo.disabled = true
+                }
+            } else {
+                btnFechaPeriodo.style.visibility = 'hidden'
+                btnIniciaPeriodo.disabled = false
+                infoTurma.innerText = 'Turma'
+                infoTurma.style.color = 'black'
+            }
+        })
         
     }
+
+    let btnDistribuiNotas = document.getElementById('btnDistribuiNotas')
+    btnDistribuiNotas.addEventListener('click', distribuiNotas)
+
+    function distribuiNotas() {
+        loader.style.display = 'block'
+        loaderMsg.innerText = 'Buscando notas...'
+        abrirModal('modal', 'Distribuição de notas da turma ' + turmaAberta, 
+                `Distribua os tipos de notas que você aplicará em sala de aula<br>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <div class="input-group-text">
+                        <input type="checkbox" id="checkboxIncluiDesempenho" aria-label="Incluir Pontos do desempenho" onclick="incluirNotasDesempenho('${turmaAberta}', this)">
+                         &nbsp;Incluir pontos do desempenho no somatório da distribuição &nbsp;<span data-feather="help-circle" data-toggle="tooltip" data-placement="right" title="Ao marcar esta caixa, o somatório das notas de desempenho (que são definidas pela secretaria) será adicionado automaticamente ao somatório da distribuição de notas desta turma."></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="button" data-toggle="tooltip" data-placement="top" title="Adicionar nota" class="btn btn-light btn-sm" onclick="addCampoNotaTurma()"><span data-feather="plus-square"></span></button><br>
+                <div class="row"><div class="col-2"><label>Nota</label></div><div class="col-2"><label>Valor</label></div></div>
+                <section id="camposNotas"></section>
+                <br>
+                Total: <label id="somaNotasDistribuidas"></label>/100.0
+                `
+                , `<button type="button" data-toggle="tooltip" data-placement="top" title="Essas serão as notas que você deverá distribuir durante o período. Você pode alterar as distribuição de notas depois." class="btn btn-primary" onclick="defineNotas()">Definir notas</button><button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>`
+            )
+            feather.replace()
+            contadorNotas = 0
+            contadorNotasExtras = 0
+            notasDistribuidas = {}
+            somatorioDistribuidas = 0
+            turmasRef.child(turmaAberta + '/notas').once('value').then(snapshot => {
+                
+                let notas = snapshot.val()
+                if (notas != null) {
+                    notasDistribuidas = notas
+                }
+                
+                console.log(notas)
+                let c = 0
+                for (const nomeNota in notas) {
+                    if (Object.hasOwnProperty.call(notas, nomeNota)) {
+                        const valor = notas[nomeNota];
+                        document.getElementById('camposNotas').innerHTML += `
+                        <div class="row" id="linha${c}">
+                            <div class="col-2" >
+                                <input type="text" class="form-control" id="nomeNota${c}" placeholder="EX ${c + 1}" value="${nomeNota}" ${nomeNota == 'Desempenho' ? ('readonly') : ''}>
+                            </div>
+                            <div class="col-2">
+                                <input type="number" id="valorNota${c}" class="form-control" value="${valor}" onkeyup="somaNotasDistribuidas('${c}')" placeholder="15.5" ${nomeNota == 'Desempenho' ? ('readonly') : ''}>
+                            </div>
+                            <button type="button" id="removedor${c}" class="btn btn-light btn-sm" onclick="somaNotasDistribuidas('${c}', true), document.getElementById('linha${c}').remove(), contadorNotas--"><span data-feather="x-square"></span></button><br>
+                        </div>
+                        `
+                        if (nomeNota == 'Desempenho') {
+                            document.getElementById('removedor' + c).remove()
+                            document.getElementById('checkboxIncluiDesempenho').checked = true
+                        }
+                        somaNotasDistribuidas(c)
+                        c++
+                    }
+                }
+                contadorNotas = c
+                feather.replace()
+               
+    
+                loaderRun()
+            }).catch(error => {
+                loaderRun()
+                AstNotif.dialog('Erro', error.message)
+                console.log(error)
+            })
+            $(function () {
+                $('[data-toggle="tooltip"]').tooltip()
+            })
+            
+    }
+
+    
+
+
 
     function escutaTransfereUmAluno() {
         document.getElementsByName('transfereUmAluno').forEach(btn => {
@@ -752,7 +866,7 @@ async function turmas() {
                 }
             }
             loaderRun()
-            
+            feather.replace()
         })
     }
 
@@ -829,80 +943,82 @@ async function turmas() {
         }
     }
 
-    function retiraProf(email, nome, codSala, confirma=false) {
-        if (confirma) {
-            loader.style.display = 'block'
-            loaderMsg.innerText = 'Removendo professor da turma...'
-            document.getElementById('ast-dialog-bg').remove()
-            turmasRef.child(codSala).child('professor').once('value', (snapshot) => {
-                let listaProf = snapshot.val()
-                console.log(listaProf)
-                for (const key in listaProf) {
-                    if (Object.hasOwnProperty.call(listaProf, key)) {
-                        const professor = listaProf[key];
-                        if (professor.email == email) {
-                            listaProf.splice(key, 1)
-                            console.log(listaProf)
-                        }
-                    }
-                }
-                turmasRef.child(codSala).child('professor').set(listaProf).then(() => {
-                    loaderRun()
-                    AstNotif.notify('Sucesso', 'Professor deletado com sucesso')
-                })
+    
 
-            })
-        } else {
-            AstNotif.dialog('Confirmação', `Você está prestes à retirar o acesso desta turma de ${nome} (${email}). Você confirma esta ação?<br><br> <button type="button" class="btn btn-danger" onclick="retiraProf('${email}', '${nome}', '${codSala}', true)">Sim, confirmo</button>`, {positive: 'Voltar', negative: ''})
-        }
-    }
+}
 
-    function modalAddProfTurma(codSala) {
+function retiraProf(email, nome, codSala, confirma=false) {
+    if (confirma) {
         loader.style.display = 'block'
-        loaderMsg.innerText = 'Aguarde...'
-        AstNotif.dialog('Adicionar professores nesta turma', `
-        Por favor, tenha o cuidado de escolher um(a) professor(a) que ainda não está vinculado na turma atual.
-        <div class="input-group prepend">
-            <div class="input-group-prepend">
-            <label class="input-group-text" for="inputGroupSelect01">Prof.</label>
-            </div>
-            <select class="custom-select" id="selectAddProfessorTurma" onchange="novoProf(this.value, '${codSala}')">
-            <option selected hidden>Escolha o(a) professor(a)...</option>
-            
-            </select>
-        </div>
-        `, {positive: 'Voltar', negative: ''})
-        listaDeProfessores.once('value', (snapshot) => {
+        loaderMsg.innerText = 'Removendo professor da turma...'
+        document.getElementById('ast-dialog-bg').remove()
+        turmasRef.child(codSala).child('professor').once('value', (snapshot) => {
             let listaProf = snapshot.val()
             console.log(listaProf)
             for (const key in listaProf) {
                 if (Object.hasOwnProperty.call(listaProf, key)) {
                     const professor = listaProf[key];
-                    document.getElementById('selectAddProfessorTurma').innerHTML += `<option value="${professor.email}">${professor.nome} (${professor.email})</option>`
+                    if (professor.email == email) {
+                        listaProf.splice(key, 1)
+                        console.log(listaProf)
+                    }
                 }
             }
-            loaderRun()
+            turmasRef.child(codSala).child('professor').set(listaProf).then(() => {
+                loaderRun()
+                AstNotif.notify('Sucesso', 'Professor deletado com sucesso')
+            })
+
         })
+    } else {
+        AstNotif.dialog('Confirmação', `Você está prestes à retirar o acesso desta turma de ${nome} (${email}). Você confirma esta ação?<br><br> <button type="button" class="btn btn-danger" onclick="retiraProf('${email}', '${nome}', '${codSala}', true)">Sim, confirmo</button>`, {positive: 'Voltar', negative: ''})
+    }
+}
+
+function modalAddProfTurma(codSala) {
+    loader.style.display = 'block'
+    loaderMsg.innerText = 'Aguarde...'
+    AstNotif.dialog('Adicionar professores nesta turma', `
+    Por favor, tenha o cuidado de escolher um(a) professor(a) que ainda não está vinculado na turma atual.
+    <div class="input-group prepend">
+        <div class="input-group-prepend">
+        <label class="input-group-text" for="inputGroupSelect01">Prof.</label>
+        </div>
+        <select class="custom-select" id="selectAddProfessorTurma" onchange="novoProf(this.value, '${codSala}')">
+        <option selected hidden>Escolha o(a) professor(a)...</option>
         
-    }
+        </select>
+    </div>
+    `, {positive: 'Voltar', negative: ''})
+    listaDeProfessores.once('value', (snapshot) => {
+        let listaProf = snapshot.val()
+        console.log(listaProf)
+        for (const key in listaProf) {
+            if (Object.hasOwnProperty.call(listaProf, key)) {
+                const professor = listaProf[key];
+                document.getElementById('selectAddProfessorTurma').innerHTML += `<option value="${professor.email}">${professor.nome} (${professor.email})</option>`
+            }
+        }
+        loaderRun()
+    })
+    
+}
 
-    function novoProf(email, codSala) {
-        loader.style.display = 'block'
-        loaderMsg.innerText = 'Adicionando professor na turma...'
-        document.getElementById('ast-dialog-bg').remove()
-        var addNovoProfTurma = firebase.functions().httpsCallable('addNovoProfTurma')
-        addNovoProfTurma({emailProf: email, codSala: codSala})
-        .then(function(result) {
-            console.log(result)
-            AstNotif.dialog('Sucesso', result.data.answer)
-            loaderRun()
-        }).catch(function(error) {
-            AstNotif.dialog('Erro', error.message)
-            console.log(error)
-            loaderRun()
-        })
-    }
-
+function novoProf(email, codSala) {
+    loader.style.display = 'block'
+    loaderMsg.innerText = 'Adicionando professor na turma...'
+    document.getElementById('ast-dialog-bg').remove()
+    var addNovoProfTurma = firebase.functions().httpsCallable('addNovoProfTurma')
+    addNovoProfTurma({emailProf: email, codSala: codSala})
+    .then(function(result) {
+        console.log(result)
+        AstNotif.dialog('Sucesso', result.data.answer)
+        loaderRun()
+    }).catch(function(error) {
+        AstNotif.dialog('Erro', error.message)
+        console.log(error)
+        loaderRun()
+    })
 }
 
 
@@ -932,6 +1048,127 @@ function preencheEndereco(numCep) {
         console.log(error)
         loaderRun()
     })
+}
+
+function defineNotas() {
+    if (somatorioDistribuidas >  100) {
+        AstNotif.dialog('Atenção', 'O somatório das notas ultrapassou 100 pontos. Por favor, faça ajustes na distribuição para que não passe de 100 pontos.')
+    } else {
+        loader.style.display = 'block'
+    loaderMsg.innerText = 'Distribuindo notas...'
+    turmasRef.child(turmaAberta + '/notas').set(notasDistribuidas).then(() => {
+        loaderRun()
+        $('#modal').modal('hide')
+        AstNotif.notify('Sucesso', 'Notas distribuídas!')
+    }).catch(error => {
+        loaderRun()
+        AstNotif.dialog('Erro', error.message)
+        console.log(error)
+    })
+    }
+    
+}
+
+function incluirNotasDesempenho(turma=undefined, elementoCheckbox) {
+    console.log(elementoCheckbox)
+    if (elementoCheckbox.checked) {
+        desempenhoRef.once('value').then(snapshot => {
+            let notasDesemp = snapshot.val()
+            let somatorioDesemp = 0
+            for (const nomeNota in notasDesemp) {
+                if (Object.hasOwnProperty.call(notasDesemp, nomeNota)) {
+                    const valor = notasDesemp[nomeNota];
+                    somatorioDesemp += Number(valor)
+                }
+            }
+            addCampoNotaTurma(somatorioDesemp, 'readonly', true) 
+        }).catch(error => {
+            AstNotif.dialog('Erro', error.message)
+            console.log(error)
+        })
+        
+    } else {
+        let c = 0
+        while (c < contadorNotas) {
+            if (document.getElementById('nomeNota' + c).value == 'Desempenho') {
+                somaNotasDistribuidas(c, true) 
+                document.getElementById('linha' + c).remove() 
+                contadorNotas--
+                break
+            }
+            c++
+        }
+    }
+    
+    
+}
+
+var contadorNotas = 0
+var contadorNotasExtras = 0
+function addCampoNotaTurma(valorInicial=0, readonly=false, desempenho=false) {
+    let camposNotas = document.getElementById('camposNotas')
+    document.getElementById('somaNotasDistribuidas').innerText = 0
+    
+    if (desempenho) {
+        camposNotas.innerHTML += 
+        `
+        <div class="row" id="linha${contadorNotas}">
+            <div class="col-2" >
+                <input type="text" class="form-control" id="nomeNota${contadorNotas}" placeholder="EX ${contadorNotas + 1}" value="Desempenho" readonly>
+            </div>
+            <div class="col-2">
+                <input type="number" id="valorNota${contadorNotas}" class="form-control" onkeyup="somaNotasDistribuidas('${contadorNotas}')" value="${valorInicial}" placeholder="15.5" readonly>
+            </div>
+        </div>
+        `
+        somaNotasDistribuidas(contadorNotas)
+        feather.replace()
+        contadorNotas++
+        
+    } else {
+        camposNotas.innerHTML += 
+        `
+        <div class="row" id="linha${contadorNotas}">
+            <div class="col-2" >
+                <input type="text" class="form-control" id="nomeNota${contadorNotas}" placeholder="EX ${contadorNotas + 1}" value="EX ${contadorNotas + 1}" ${readonly}>
+            </div>
+            <div class="col-2">
+                <input type="number" id="valorNota${contadorNotas}" class="form-control" onkeyup="somaNotasDistribuidas('${contadorNotas}')" value="${valorInicial}" placeholder="15.5" ${readonly}>
+            </div>
+            <button type="button" class="btn btn-light btn-sm" onclick="somaNotasDistribuidas('${contadorNotas}', true), document.getElementById('linha${contadorNotas}').remove(), contadorNotas--"><span data-feather="x-square"></span></button><br>
+        </div>
+        `
+        feather.replace()
+        contadorNotas++
+    }
+}
+
+function somaNotasDistribuidas(id, subtrai=false) {
+    let somaNotasDist = document.getElementById('somaNotasDistribuidas')
+    if (subtrai) {
+        try {
+            notasDistribuidas[document.getElementById('nomeNota' + id).value] = null
+        } catch (error) {
+            console.log(error)
+        }
+        
+    } else {
+        notasDistribuidas[document.getElementById('nomeNota' + id).value] = Number(document.getElementById('valorNota' + id).value)
+    }
+    somaNotasDist.innerText = 0
+    somatorioDistribuidas = 0
+    for (const idValor in notasDistribuidas) {
+        if (Object.hasOwnProperty.call(notasDistribuidas, idValor)) {
+            const valor = notasDistribuidas[idValor];
+            somatorioDistribuidas += Number(valor)
+            if (somatorioDistribuidas > 100) {
+                somaNotasDist.style.color = 'red'
+            } else {
+                somaNotasDist.style.color = 'black'
+            }
+        }
+    }
+    somaNotasDist.innerText = somatorioDistribuidas
 }
 
 // Funções do cadastro de alunos
@@ -3651,119 +3888,119 @@ function addResponsavelAutorizado(matricula) {
     })
 }
 
-document.getElementById('formBuscaResponsavel').addEventListener('submit', (e) => {
-    e.preventDefault();
-    let respAutorizadosRef = firebase.database().ref('sistemaEscolar/secretaria/responsaveisAutorizados')
-    let dados = new FormData(e.target);
-    let nome = dados.get('nomeBuscaResponsavel');
-    nome = maiusculo(document.getElementById('nomeBuscaResponsavel'))
-    respAutorizadosRef.orderByChild('addResponsavelNome').equalTo(nome).once('value', (resp) => {
-        let dadosResp = resp.val()
-        let dadosResponsavel = []
-        for (const key in dadosResp) {
-            if (Object.hasOwnProperty.call(dadosResp, key)) {
-                dadosResponsavel.push(dadosResp[key])
-            }
-        }
+// document.getElementById('formBuscaResponsavel').addEventListener('submit', (e) => {
+//     e.preventDefault();
+//     let respAutorizadosRef = firebase.database().ref('sistemaEscolar/secretaria/responsaveisAutorizados')
+//     let dados = new FormData(e.target);
+//     let nome = dados.get('nomeBuscaResponsavel');
+//     nome = maiusculo(document.getElementById('nomeBuscaResponsavel'))
+//     respAutorizadosRef.orderByChild('addResponsavelNome').equalTo(nome).once('value', (resp) => {
+//         let dadosResp = resp.val()
+//         let dadosResponsavel = []
+//         for (const key in dadosResp) {
+//             if (Object.hasOwnProperty.call(dadosResp, key)) {
+//                 dadosResponsavel.push(dadosResp[key])
+//             }
+//         }
 
-        if (dadosResponsaveis.length > 1) {
+//         if (dadosResponsaveis.length > 1) {
             
-        } else {
+//         } else {
             
-            $('#modalConsultaResponsaveis').modal('hide');
-            abrirModal('modal', 'Responsável', `
-                <form id="formVerResponsavel">
-                    <label class="h6">Dados do responsável autorizado</label>
-                    <div class="form-row border border-success rounded">
+//             $('#modalConsultaResponsaveis').modal('hide');
+//             abrirModal('modal', 'Responsável', `
+//                 <form id="formVerResponsavel">
+//                     <label class="h6">Dados do responsável autorizado</label>
+//                     <div class="form-row border border-success rounded">
                     
-                    <div class="form-group col-md-4">
-                        <label for="inputAddress">Responsável</label>
-                        <input type="text" class="form-control" id="addResponsavelNome" name="addResponsavelNome" placeholder="Nome" onblur="maiusculo(this)" readonly>
-                    </div>
-                    <div class="form-group col-md-2">
-                        <label for="inputAddress">Relação</label>
-                        <br>
-                        <select class="form-control form-control-md" name="addResponsavelRelacao" id="addResponsavelRelacao" readonly>
-                        <option hidden selected>Escolha...</option>
-                        <option value="Mãe">Mãe</option>
-                        <option value="Pai">Pai</option>
-                        <option value="Tio/Tia">Tio/Tia</option>
-                        <option value="Avô/Avó">Avô/Avó</option>
-                        <option value="Outros">Outros</option>
-                        </select>
-                    </div>
-                    <div class="form-group col-md-3">
-                        <label for="inputAddress">Número Celular</label>
-                        <input type="text" class="form-control" id="addResponsavelNumeroCelular" name="addResponsavelNumeroCelular" placeholder="Celular" readonly>
-                    </div>
-                    <div class="form-group col-md-5">
-                        <label for="inputPassword4">Email</label>
-                        <input type="email" class="form-control" id="addResponsavelEmail" name="addResponsavelEmail" placeholder="Email" readonly>
-                    </div>
-                    <div class="form-group col-auto">
-                        <label for="inputEmail4">RG</label>
-                        <input type="text" class="form-control" id="addResponsavelRg" name="addResponsavelRg" placeholder="RG" readonly>
-                    </div>
-                    <div class="form-group col-auto">
-                        <label for="inputPassword4">CPF</label>
-                        <input type="text" class="form-control" id="addResponsavelCpf" name="addResponsavelCpf" placeholder="CPF" onchange="verificaCPF(this)" readonly>
-                        <small id="cpfHelp3" class="form-text text-muted">Digite um CPF válido, existe um algoritmo de validação neste campo.</small>
-                    </div>
-                    </div>
-                </form>
-                <section>
-                    <label class="h6">Dados do aluno</label>
+//                     <div class="form-group col-md-4">
+//                         <label for="inputAddress">Responsável</label>
+//                         <input type="text" class="form-control" id="addResponsavelNome" name="addResponsavelNome" placeholder="Nome" onblur="maiusculo(this)" readonly>
+//                     </div>
+//                     <div class="form-group col-md-2">
+//                         <label for="inputAddress">Relação</label>
+//                         <br>
+//                         <select class="form-control form-control-md" name="addResponsavelRelacao" id="addResponsavelRelacao" readonly>
+//                         <option hidden selected>Escolha...</option>
+//                         <option value="Mãe">Mãe</option>
+//                         <option value="Pai">Pai</option>
+//                         <option value="Tio/Tia">Tio/Tia</option>
+//                         <option value="Avô/Avó">Avô/Avó</option>
+//                         <option value="Outros">Outros</option>
+//                         </select>
+//                     </div>
+//                     <div class="form-group col-md-3">
+//                         <label for="inputAddress">Número Celular</label>
+//                         <input type="text" class="form-control" id="addResponsavelNumeroCelular" name="addResponsavelNumeroCelular" placeholder="Celular" readonly>
+//                     </div>
+//                     <div class="form-group col-md-5">
+//                         <label for="inputPassword4">Email</label>
+//                         <input type="email" class="form-control" id="addResponsavelEmail" name="addResponsavelEmail" placeholder="Email" readonly>
+//                     </div>
+//                     <div class="form-group col-auto">
+//                         <label for="inputEmail4">RG</label>
+//                         <input type="text" class="form-control" id="addResponsavelRg" name="addResponsavelRg" placeholder="RG" readonly>
+//                     </div>
+//                     <div class="form-group col-auto">
+//                         <label for="inputPassword4">CPF</label>
+//                         <input type="text" class="form-control" id="addResponsavelCpf" name="addResponsavelCpf" placeholder="CPF" onchange="verificaCPF(this)" readonly>
+//                         <small id="cpfHelp3" class="form-text text-muted">Digite um CPF válido, existe um algoritmo de validação neste campo.</small>
+//                     </div>
+//                     </div>
+//                 </form>
+//                 <section>
+//                     <label class="h6">Dados do aluno</label>
                     
-                    <div class="row form-row">
-                        <div class="form-group col-md-4">
-                            <label for="inputAddress">Nome</label>
-                            <input type="text" class="form-control" id="nomeAlunoRespAutorizado" placeholder="Nome" onblur="maiusculo(this)" readonly>
-                        </div>
-                        <div class="form-group col-md-4">
-                            <label for="inputAddress">Turma</label>
-                            <input type="text" class="form-control" id="turmaAlunoRespAutorizado" placeholder="Turma" readonly>
-                        </div>
+//                     <div class="row form-row">
+//                         <div class="form-group col-md-4">
+//                             <label for="inputAddress">Nome</label>
+//                             <input type="text" class="form-control" id="nomeAlunoRespAutorizado" placeholder="Nome" onblur="maiusculo(this)" readonly>
+//                         </div>
+//                         <div class="form-group col-md-4">
+//                             <label for="inputAddress">Turma</label>
+//                             <input type="text" class="form-control" id="turmaAlunoRespAutorizado" placeholder="Turma" readonly>
+//                         </div>
 
-                        <div class="form-group col-md-4">
-                            <br>
-                            <button class="btn btn-primary mt-2" id="abreDadosAlunoRespAutorizado">Abrir dados do aluno</button>
-                        </div>
-                    </div>
-                </section>
-                `, `<button class="btn btn-secondary" data-dismiss="modal">Fechar</button>`);
-                let formElement = document.getElementById('formVerResponsavel');
-                // let dados = new FormData(formElement);
-                let matricula
-                for(let key in dadosResponsavel[0]) {
-                    let field = dadosResponsavel[0][key];
-                    console.log(key, field);
-                    document.getElementById(key).value = field;
-                    if (key == 'matriculaAluno'){
-                        matricula = field
-                        console.log(matricula)
-                        retornaDadosAluno(matricula).then(dadosAluno => {
-                            console.log(dadosAluno)
-                            document.getElementById('nomeAlunoRespAutorizado').value = dadosAluno.nomeAluno
-                            document.getElementById('turmaAlunoRespAutorizado').value = dadosAluno.turmaAluno
-                        }).catch(error => {
-                            AstNotif.dialog('Erro', error.message)
-                        })
-                    } 
-                }
+//                         <div class="form-group col-md-4">
+//                             <br>
+//                             <button class="btn btn-primary mt-2" id="abreDadosAlunoRespAutorizado">Abrir dados do aluno</button>
+//                         </div>
+//                     </div>
+//                 </section>
+//                 `, `<button class="btn btn-secondary" data-dismiss="modal">Fechar</button>`);
+//                 let formElement = document.getElementById('formVerResponsavel');
+//                 // let dados = new FormData(formElement);
+//                 let matricula
+//                 for(let key in dadosResponsavel[0]) {
+//                     let field = dadosResponsavel[0][key];
+//                     console.log(key, field);
+//                     document.getElementById(key).value = field;
+//                     if (key == 'matriculaAluno'){
+//                         matricula = field
+//                         console.log(matricula)
+//                         retornaDadosAluno(matricula).then(dadosAluno => {
+//                             console.log(dadosAluno)
+//                             document.getElementById('nomeAlunoRespAutorizado').value = dadosAluno.nomeAluno
+//                             document.getElementById('turmaAlunoRespAutorizado').value = dadosAluno.turmaAluno
+//                         }).catch(error => {
+//                             AstNotif.dialog('Erro', error.message)
+//                         })
+//                     } 
+//                 }
 
-                document.getElementById('abreDadosAlunoRespAutorizado').addEventListener('click', (e) => {
-                    e.preventDefault()
-                    $('#modal').modal('hide')
-                    document.getElementById('btnAbaAlunos').click()
-                    abreDadosDoAluno(matricula)
+//                 document.getElementById('abreDadosAlunoRespAutorizado').addEventListener('click', (e) => {
+//                     e.preventDefault()
+//                     $('#modal').modal('hide')
+//                     document.getElementById('btnAbaAlunos').click()
+//                     abreDadosDoAluno(matricula)
                     
-                })
+//                 })
 
                 
                 
-        }
-    })
-})
+//         }
+//     })
+// })
 
 function mostraDadosResponsaveis() {
     
@@ -4534,6 +4771,10 @@ function dadosInfoEscola() {
                 if (Object.hasOwnProperty.call(dados.dadosBasicos, key)) {
                     const campo = dados.dadosBasicos[key];
                     document.getElementById(key).value = campo
+                    
+                    if (key == 'permitirDistribuiNotas') {
+                       document.getElementById(key).checked = campo 
+                    }
                 }
             }
         }  
@@ -4704,6 +4945,8 @@ document.getElementById('infoEscolaForm').addEventListener('submit', (e) => {
     infoEscola.emailEscola = dados.get('emailEscola')
     infoEscola.corPrimariaEscola = dados.get('corPrimariaEscola')
     infoEscola.corSecundariaEscola = dados.get('corSecundariaEscola')
+    infoEscola.permitirDistribuiNotas = dados.get('permitirDistribuiNotas') == null ? false : true
+    console.log($('#infoEscolaForm').serializeArray()) 
     loaderRun(true, 'Enviando dados básicos...')
     infoEscolaRef.child('dadosBasicos').set(infoEscola).then(() => {
         AstNotif.dialog('Sucesso', 'Os dados básicos foram atualizados e aplicados com sucesso.')

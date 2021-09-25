@@ -9,6 +9,7 @@ var ultimaMatriculaRef = firebase.database().ref('sistemaEscolar/ultimaMatricula
 var alunosRef = firebase.database().ref('sistemaEscolar/alunos')
 var followUpRef = firebase.database().ref('sistemaEscolar/followUp')
 var transfereAlunos = firebase.functions().httpsCallable('transfereAlunos')
+var infoEscolaRef = firebase.database().ref('sistemaEscolar/infoEscola')
 var usuarioRef = firebase.database().ref('sistemaEscolar/usuarios')
 var desempenhoRef = firebase.database().ref('sistemaEscolar/notasDesempenho/referencia')
 
@@ -1085,9 +1086,15 @@ function carregaFrequenciaTurma(turma) {
     
 }
 
-function abreTurma(cod) {
+async function abreTurma(cod) {
     loader.style.display = 'block'
     loaderMsg.innerText = 'Abrindo turma...'
+    let permitirDistribuiNotas = (await infoEscolaRef.child('dadosBasicos/permitirDistribuiNotas').once('value')).val()
+    if (!permitirDistribuiNotas) {
+        document.getElementById('btnDistribuiNotas').style.display = 'none'
+    } else {
+        document.getElementById('btnDistribuiNotas').style.display = 'inline'
+    }
     carregaListaDeAlunosDaTurma(cod)
     carregaFrequenciaTurma(cod)
     var codigoDaTurmaLabel = document.getElementById('codigoDaTurma')
