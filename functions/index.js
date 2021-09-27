@@ -31,7 +31,7 @@ exports.liberaERemoveAcessos = functions.https.onCall((data, context) => {
                 return admin.database().ref(`sistemaEscolar/listaDeUsuarios/${data.uid}/acessos/`).once('value').then((snapshot) => {
                     return admin.auth().setCustomUserClaims(data.uid, snapshot.val())
                     .then(() => {
-                        return admin.database().ref(`sistemaEscolar/registroGeral`).push({operacao: 'Concessão e remoção de acessos aos usuários', timestamp: this.timestamp, userCreator: context.auth.uid, dados: data}).then(() => {
+                        return admin.database().ref(`sistemaEscolar/registroGeral`).push({operacao: 'Concessão e remoção de acessos aos usuários', timestamp: admin.firestore.Timestamp.now(), userCreator: context.auth.uid, dados: data}).then(() => {
                             if (data.checked) {
                                 console.log(admin.firestore.Timestamp.now().toDate())
                                 if (data.acesso == 'professores') {
@@ -83,7 +83,7 @@ exports.liberaERemoveAcessos = functions.https.onCall((data, context) => {
 exports.apagaContas = functions.https.onCall((data, context) => {
     if (context.auth.token.master == true) {
         return admin.auth().deleteUser(data.uid).then(function() {
-            return admin.database().ref(`sistemaEscolar/registroGeral`).push({operacao: 'Conta deletada', timestamp: this.timestamp, userCreator: context.auth.uid, dados: data}).then(() => {
+            return admin.database().ref(`sistemaEscolar/registroGeral`).push({operacao: 'Conta deletada', timestamp: admin.firestore.Timestamp.now(), userCreator: context.auth.uid, dados: data}).then(() => {
                 return {answer: 'Usuário deletado com sucesso.'}
             }).catch(error => {
                 throw new functions.https.HttpsError('unknown', error.message, error)
@@ -270,7 +270,7 @@ exports.cadastraTurma = functions.https.onCall((data, context) => {
                             }).catch(function (error) {
                                 throw new functions.https.HttpsError('unknown', error.message, error)
                             })
-                            return admin.database().ref(`sistemaEscolar/registroGeral`).push({operacao: 'Cadastro de Turma', timestamp: this.timestamp, userCreator: context.auth.uid, dados: dados}).then(() => {
+                            return admin.database().ref(`sistemaEscolar/registroGeral`).push({operacao: 'Cadastro de Turma', timestamp: admin.firestore.Timestamp.now(), userCreator: context.auth.uid, dados: dados}).then(() => {
                                 return {answer: 'Turma cadastrada com sucesso.'}
                             }).catch(error => {
                                 throw new functions.https.HttpsError('unknown', error.message, error)
@@ -326,7 +326,7 @@ exports.addNovoProfTurma = functions.https.onCall((data, context) => {
                     }
                     listaProf.push({email: data.emailProf, nome: user.displayName})
                     return admin.database().ref('sistemaEscolar/turmas').child(data.codSala).child('professor').set(listaProf).then(() => {
-                        return admin.database().ref(`sistemaEscolar/registroGeral`).push({operacao: 'Professor conectado em uma turma', timestamp: this.timestamp, userCreator: context.auth.uid, dados: data}).then(() => {
+                        return admin.database().ref(`sistemaEscolar/registroGeral`).push({operacao: 'Professor conectado em uma turma', timestamp: admin.firestore.Timestamp.now(), userCreator: context.auth.uid, dados: data}).then(() => {
                             return {answer: 'Professor adicionado com sucesso'}
                         }).catch(error => {
                             throw new functions.https.HttpsError('unknown', error.message, error)
@@ -590,7 +590,7 @@ exports.excluiTurma = functions.https.onCall((data, context) => {
                 throw new HttpsError('cancelled', 'Operação cancelada! Desconecte todos os professores desta turma antes de excluir a turma', )
             }
             return admin.database().ref(`sistemaEscolar/turmas/${turma}`).remove().then(() => {
-                return admin.database().ref(`sistemaEscolar/registroGeral`).push({operacao: 'Exclusão de turma do sistema', timestamp: this.timestamp, userCreator: context.auth.uid, dados: {codTurma: turma}}).then(() => {
+                return admin.database().ref(`sistemaEscolar/registroGeral`).push({operacao: 'Exclusão de turma do sistema', timestamp: admin.firestore.Timestamp.now(), userCreator: context.auth.uid, dados: {codTurma: turma}}).then(() => {
                     return {answer: 'A turma e todos os seus registros foram excluídos com sucesso.'}
                 }).catch(error => {
                     throw new functions.https.HttpsError('unknown', error.message, error)
@@ -754,7 +754,7 @@ exports.lancarNotas = functions.https.onCall((data, context) => {
                 if (Object.hasOwnProperty.call(alunos, matricula)) {
                     const nomeAluno = alunos[matricula];
                     alunosTurmaRef.child(formataNumMatricula(matricula) + '/notas').set(notas).then(() => {
-                        return admin.database().ref(`sistemaEscolar/registroGeral`).push({operacao: 'Lançamento de notas', timestamp: this.timestamp, userCreator: context.auth.uid, dados: dados}).then(() => {
+                        return admin.database().ref(`sistemaEscolar/registroGeral`).push({operacao: 'Lançamento de notas', timestamp: admin.firestore.Timestamp.now(), userCreator: context.auth.uid, dados: dados}).then(() => {
                             
                         }).catch(error => {
                             throw new functions.https.HttpsError('unknown', error.message, error)
@@ -865,7 +865,7 @@ exports.fechaTurma = functions.https.onCall((data, context) => {
                         })
                     }
                 }
-                admin.database().ref(`sistemaEscolar/registroGeral`).push({operacao: 'Fechamento de Turma', timestamp: this.timestamp, userCreator: context.auth.uid, dados: {codTurma: dadosDaTurma.codSala}}).then(() => {
+                admin.database().ref(`sistemaEscolar/registroGeral`).push({operacao: 'Fechamento de Turma',  timestamp: admin.firestore.Timestamp.now(), userCreator: context.auth.uid, dados: {codTurma: dadosDaTurma.codigoSala}}).then(() => {
                             
                 }).catch(error => {
                     throw new functions.https.HttpsError('unknown', error.message, error)

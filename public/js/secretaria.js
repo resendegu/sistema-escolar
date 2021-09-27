@@ -736,14 +736,14 @@ async function turmas() {
                     let fim = document.getElementById('dataFimPeriodo').value
                     let qtdeAulas = document.getElementById('qtdeAulasConfirma').value
     
-                    turmasRef.child(alunosSelecionadosTurma.codTurma + '/status').set({inicio: ini, fim: fim, qtdeAulas: qtdeAulas, turma: 'aberta', nomePeriodo: nomePeriodo}).then(() => {
+                    turmasRef.child(turmaAberta + '/status').set({inicio: ini, fim: fim, qtdeAulas: qtdeAulas, turma: 'aberta', nomePeriodo: nomePeriodo}).then(() => {
                         var fechaTurma = firebase.functions().httpsCallable('fechaTurma')
-                        fechaTurma(alunosSelecionadosTurma.codTurma).then(function(result){
+                        fechaTurma(turmaAberta).then(function(result){
                             $('#modal').modal('hide')
                             setTimeout(() => {
                                 loaderRun()
                                 AstNotif.dialog('Sucesso', result.data.answer)
-                                abreTurma(alunosSelecionadosTurma.codTurma)
+                                abreTurma(turmaAberta)
                             }, 1000)
                         }).catch(function(error){
                             AstNotif.dialog('Erro', error.message)
