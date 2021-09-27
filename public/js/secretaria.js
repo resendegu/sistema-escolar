@@ -626,6 +626,7 @@ async function turmas() {
                     btnFechaPeriodo.style.visibility = 'visible'
                     btnIniciaPeriodo.disabled = true
                     btnFechaPeriodo.disabled = false
+                    btnFechaPeriodo.addEventListener('click', () => fechaPeriodo())
                 } else {
                     btnIniciaPeriodo.style.visibility = 'hidden'
                     infoTurma.style.color = 'gold'
@@ -634,15 +635,137 @@ async function turmas() {
                     btnFechaPeriodo.style.visibility = 'visible'
                     btnIniciaPeriodo.disabled = false
                     btnFechaPeriodo.disabled = true
+                    btnIniciaPeriodo.addEventListener('click', () => iniciaPeriodo())
                 }
             } else {
                 btnFechaPeriodo.style.visibility = 'hidden'
                 btnIniciaPeriodo.disabled = false
+                btnIniciaPeriodo.style.visibility = 'visible'
                 infoTurma.innerText = 'Turma'
                 infoTurma.style.color = 'black'
+                btnIniciaPeriodo.addEventListener('click', () => iniciaPeriodo())
             }
         })
         
+    }
+
+    
+
+    function iniciaPeriodo(confirma=false, inicio='', fim='', qtdeAulas='', nomePeriodo='') {
+        if (confirma) {
+            loader.style.display = 'block'
+            loaderMsg.innerText = 'Iniciando turma...'
+            if (inicio == '' || fim == '' || qtdeAulas == '' || nomePeriodo == '') {
+                AstNotif.dialog('Você esqueceu alguns dados...', 'Por favor preencha todos os dados pedidos para iniciar a turma')
+                loaderRun()
+            } else {
+                turmasRef.child(turmaAberta + '/status').set({turma: 'aberta', inicio: inicio, fim: fim, qtdeAulas: qtdeAulas, nomePeriodo: nomePeriodo}).then(()=>{
+                    $('#modal').modal('hide')
+                    AstNotif.notify('Sucesso', 'Turma aberta')
+                    carregaListaDeAlunosDaTurma(turmaAberta)
+                    loaderRun()
+                }).catch(error => {
+                    loaderRun()
+                    console.log(error)
+                    AstNotif.dialog('Erro', error.message)
+                })
+            }
+        } else {
+            abrirModal('modal', 'Confirmação de abertura da turma ' + turmaAberta, `
+                Atenção. Você está prestes a iniciar as atividades da turma ${turmaAberta}. Ao iniciar a turma, os professores nela cadastrados poderão lançar notas e frequências para os alunos que estão cadastrados na turma.<br>
+                <br>
+                <b>Escolha uma data de início e um data com o fim previsto deste semestre, bimestre, ano...</b> (Essas datas não farão com que o sistema abra ou feche as turmas automaticamente.)<br><br>
+                Nome do período:
+                <input type="text" class="form-control" name="nomePeriodo" id="nomePeriodo">
+                <small id="cadastrarEntrar" class="form-text text-muted">
+                    O nome do período pode ser por exemplo: 1º Semestre, ou 2º Bimestre ...
+                </small>
+                <br>Início previsto:
+                <input type="date" class="form-control" name="dataInicioPeriodo" id="dataInicioPeriodo">
+                <br> Fim previsto:
+                <input type="date" class="form-control" name="dataFimPeriodo" id="dataFimPeriodo">
+                <br> Previsão de quantidade de aulas ministradas:
+                <input type="number" class="form-control" name="qtdeAulas" id="qtdeAulas">
+                <small id="cadastrarEntrar" class="form-text text-muted">
+                    A quantidade de aulas serve como referência para você e para os alunos para acompanhar o andamento do curso e também poderá ser modificada antes do fechamento desta turma.
+                </small>
+    
+            `, 
+            `<button type="button" data-toggle="tooltip" data-placement="top" title="Iniciar atividades da turma no sistema" class="btn btn-primary" id="modalIniciaPeriodo">Iniciar turma</button><button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>`)
+        }
+        document.getElementById('modalIniciaPeriodo').addEventListener('click', () => {
+            iniciaPeriodo(true, document.getElementById('dataInicioPeriodo').value, document.getElementById('dataFimPeriodo').value, document.getElementById('qtdeAulas').value, document.getElementById('nomePeriodo').value)
+        })
+    }
+    
+    function fechaPeriodo() {
+            loader.style.display = 'block'
+            loaderMsg.innerText = 'Recuperando status da turma...'
+            turmasRef.child(turmaAberta + '/status').once('value').then(status => {
+                console.log(status)
+                console.log(status.val())
+                abrirModal('modal', 'Confirmação de fechamento da turma ' + turmaAberta, `
+                Atenção. Você está prestes a fechar as atividades da turma ${turmaAberta}. <b>Automaticamente, ao fechar a turma, o sistema irá iniciar uma sequência de processos para a geração de boletins, notas, somatórios finais, frequência, desempenho, entre outros processos parecidos.</b> (Esses processos são realizados nos servidores remotos do sistema para maior segurança e integridade dos dados.)<br>
+                Confirme os dados de início, fim, e quantidade de aulas dadas do semestre que foram definidos no processo de abertura desse semestre da turma nos campos abaixo:<br><br>
+                Nome do período:
+                <input type="text" class="form-control" name="nomePeriodo" id="nomePeriodo" value="${status.val().nomePeriodo}">
+                <small id="cadastrarEntrar" class="form-text text-muted">
+                    O nome do período pode ser por exemplo: 1º Semestre, ou 2º Bimestre ...
+                </small>
+                <br>
+                <b>Altere as datas de início, fim e quantidade de aulas dadas, se necessário:</b><br>
+                Início do período:
+                <input type="date" class="form-control" name="dataInicioPeriodo" id="dataInicioPeriodo" value="${status.val().inicio}">
+                <br> Fim do período:
+                <input type="date" class="form-control" name="dataFimPeriodo" id="dataFimPeriodo" value="${status.val().fim}">
+                <br> Quantidade de aulas dadas:
+                <input type="number" class="form-control" name="qtdeAulasConfirma" id="qtdeAulasConfirma" value="${status.val().qtdeAulas}">
+    
+                `, 
+                `<button type="button" id="btnFechaTurma" class='btn btn-warning'>Fechar Turma</button><button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>`)
+                $(function () {
+                    $('[data-toggle="popover"]').popover()
+                })
+    
+                document.querySelector('#btnFechaTurma').addEventListener('click', (e) => {
+                    e.preventDefault()
+                    loaderRun(true, 'Enviando pedido de fechamento de turma ao servidor...')
+                    // Aqui começará o fechamento de turmas
+                    let nomePeriodo = document.getElementById('nomePeriodo').value
+                    let ini = document.getElementById('dataInicioPeriodo').value
+                    let fim = document.getElementById('dataFimPeriodo').value
+                    let qtdeAulas = document.getElementById('qtdeAulasConfirma').value
+    
+                    turmasRef.child(alunosSelecionadosTurma.codTurma + '/status').set({inicio: ini, fim: fim, qtdeAulas: qtdeAulas, turma: 'aberta', nomePeriodo: nomePeriodo}).then(() => {
+                        var fechaTurma = firebase.functions().httpsCallable('fechaTurma')
+                        fechaTurma(alunosSelecionadosTurma.codTurma).then(function(result){
+                            $('#modal').modal('hide')
+                            setTimeout(() => {
+                                loaderRun()
+                                AstNotif.dialog('Sucesso', result.data.answer)
+                                abreTurma(alunosSelecionadosTurma.codTurma)
+                            }, 1000)
+                        }).catch(function(error){
+                            AstNotif.dialog('Erro', error.message)
+                            console.log(error)
+                            loaderRun()
+                        })
+                    }).catch(error => {
+                        AstNotif.dialog('Erro', error.message)
+                        loaderRun()
+                    })
+                    
+                })
+    
+                loaderRun()
+            }).catch(error => {
+                AstNotif.dialog('Erro', error.message)
+                console.log(error)
+                loaderRun()
+            })
+    
+    
+            
     }
 
     let btnDistribuiNotas = document.getElementById('btnDistribuiNotas')
