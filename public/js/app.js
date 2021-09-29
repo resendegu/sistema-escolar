@@ -424,3 +424,27 @@ document.getElementById('sidebar').addEventListener('click', (e) => {
 	console.log(e.target.id)
 	
 })
+
+try {
+	let formAddChamados = document.getElementById('formAddChamados');
+	let user;
+	setTimeout(() => {
+		user = usuarioAtual()
+		console.log(user)
+	
+		document.getElementById('nome').value = user.displayName;
+		document.getElementById('email').value = user.email;
+	}, 1000);
+	
+	formAddChamados.addEventListener('submit', async (e) => {
+		e.preventDefault()
+		const confirm = await ui.confirm('Depois de aberto o chamado, a equipe de suporte receberá um e-mail com todas as informações cadastradas e dará uma resposta dentro do tempo de resposta aproximadamente. Você confirma a abertura do chamado?');
+  
+        if(confirm){
+            let data = $('#formAddChamados').serializeArray()
+			console.log(data)
+        }
+	})
+} catch (error) {
+	
+}
