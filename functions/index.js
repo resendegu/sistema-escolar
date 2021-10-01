@@ -885,6 +885,75 @@ exports.fechaTurma = functions.https.onCall((data, context) => {
     }
 })
 
+exports.aberturaChamados = functions.database.ref('sistemaEscolar/chamados/{key}').onCreate(async (snapshot, context) => {
+
+    function convertTimestamp(timestamp) {
+        let time = new Date(timestamp._seconds * 1000)
+    
+        return time;
+    }
+
+    const priorities = ['Baixa', 'Média', 'Alta', 'Crítica'];
+    const emailSuporte = 'suporte@agenciaprojetox.com'
+    const key = context.params.key
+    let chamado = snapshot.val()
+    chamado.timestamp = admin.firestore.Timestamp.now()
+    chamado.situacao = 0
+
+    await admin.database().ref('sistemaEscolar/chamados').child(key).set(chamado)
+
+    let imagens = ''
+    try {
+        if (!chamado.imagens) {
+            imagens = 'O solicitante não anexou imagens ao chamado.'
+        }
+        for (const i in chamado.imagens) {
+            if (Object.hasOwnProperty.call(chamado.imagens, i)) {
+                const url = chamado.imagens[i];
+                imagens += `<a href="${url}" target="_blank">Imagem ${Number(i) + 1}</a><br>`
+            }
+        }
+    } catch (error) {
+        console.log(error)
+    }
+
+    let firestoreRef = admin.firestore().collection('mail');
+    let emailContent = {
+        to: emailSuporte,
+        cc: chamado.email,
+        replyTo: emailSuporte,
+        message: {
+            subject: `Abertura de chamado: ${chamado.assunto}`,
+            text: `Notificação de abertura de chamado no sistema escolar.`,
+            html: `
+            <h5>Abertura de chamado no sistema escolar</h5>
+            <p> 
+                <b>Assunto: </b> ${chamado.assunto}
+            </p>
+            <p> 
+                <b>Descrição: </b> ${chamado.descricao}
+            </p>
+            <p> 
+                <b>Usuário solicitante: </b> ${chamado.nome}
+            </p>
+            <p> 
+                <b>Contato do solicitante: </b> ${chamado.email}
+            </p>
+            <p> 
+                <b>Nível de prioridade: </b> ${priorities[chamado.prioridade]}
+            </p>
+            <p> 
+                <b>Data e Hora de Abertura: </b> ${convertTimestamp(chamado.timestamp).toLocaleDateString('pt-br', {timeZone: 'America/Sao_Paulo'})} ás ${convertTimestamp(chamado.timestamp).toLocaleTimeString('pt-BR', {timeZone: 'America/Sao_Paulo'})}
+            </p>
+            <p><b>Imagens anexadas à solicitação: </b><br>${imagens}</p>
+            <br>
+            <p>Este é um e-mail gerado automaticamente pelo sistema. <b>O e-mail é direcionado para a equipe de suporte que fará a análise do chamado, sendo que, o solicitante está em cópia (Cc) nesta mensagem</b>.</p><p>Todo o contato para análise e resolução da solicitação será preferencialmente via e-mail para fins de resguardo legal, tanto por parte do solicitante, quanto por parte da empresa administradora do sistema escolar.</p><br><br><p>Sistemas GrupoProX.</p>`
+        }
+    }
+
+    await firestoreRef.add(emailContent)
+    console.log('Email queued for delivery.')
+})
 
 // exports.adicionaFotoAluno = functions.storage.object().onFinalize(async (object) => {
 //     const fileBucket = object.bucket; // The Storage bucket that contains the file.

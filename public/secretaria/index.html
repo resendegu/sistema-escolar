@@ -438,7 +438,7 @@
                       </div>
                     </div>
                   </div>
-                  <table class="table table-striped table-hover">
+                  <table class="table table-striped table-hover" style="max-height: 250px;">
                     <thead>
                       <tr>
                         <th>
@@ -451,19 +451,13 @@
                         <th>Ações</th>
                       </tr>
                     </thead>
-                    <tbody id="listaChecklistAcompanhamento">
+                    <tbody id="listaChamados">
                       <tr>
                         <td>
                           
                         </td>
-                        <td>Problemas no lançamento de notas</td>
-                        <td><span class="badge badge-pill badge-danger">Alta</span></td>
-                        <td>28/09/2021 18:46</td>
-                        <td><span class="badge badge-pill badge-warning">Pendente</span></td>
-                        <td>
-                          <a href="#editEmployeeModal" class="action" data-toggle="modal" data-toggle="tooltip" data-placement="top" title="Editar"><i data-feather="edit" >&#xE254;</i></a>
-                          
-                        </td>
+                        <td>Nenhum chamado encontrado.</td>
+                        
                       </tr>
                     </tbody>
                   </table>
@@ -493,10 +487,10 @@
                     Descreva com detalhes a sua solicitação. O suporte poderá, se necessário, entrar em contato para pedir mais informações sobre a solicitação.
                   </small>
                 </div>
-                <div class="custom-file mb-3">
-                  <label for="imagens">Imagens/Prints</label>
-                  <input type="file" class="custom-file-input" id="imagens" name="imagens">
-                  <label class="custom-file-label" for="imagens">Envie uma imagem para complementar sua solicitação com mais detalhes. (Opcional)</label>
+                <div class="mb-3">
+                  <label for="imagens">Imagens/Prints</label><br>
+                  <input type="file" id="imagens" name="imagens" accept="image/*" multiple>
+                  
                 </div>
 
                 <label class="h5">Prioridade</label>
