@@ -2346,13 +2346,13 @@ async function carregaContratos(filtro=null) {
                     </div>
                     <div class="form-group col-md-3">
                         <label for="inputEmail4">Desconto (%)</label>
-                        <input type="number" class="form-control" id="descontoPlano" name="descontoPlano" placeholder="Desconto em % (Ex.: 50)">
-                        <small id="idPlano" class="form-text text-muted">Desconto nesse plano do curso em porcentagem com base no valor integral do curso. (Digite apenas números)</small>
+                        <input type="text" class="form-control" id="descontoPlano" readonly name="descontoPlano" placeholder="Desconto em % (Ex.: 50)">
+                        <small id="idPlano" class="form-text text-muted">Desconto nesse plano do curso em porcentagem com base no valor integral do curso.</small>
                     </div>
                     <div class="form-group col-md-3">
                         <label for="exampleInputEmail1">Valor do desconto</label>
-                        <input type="text" required class="form-control" id="valorDesconto" name="valorDesconto" aria-describedby="nomeEscola" placeholder="Valor do desconto" readonly>
-                        <small id="nomeEscolaHElp" class="form-text text-muted">O valor calculado do desconto aplicado.</small>  
+                        <input type="text" required class="form-control" id="valorDesconto" name="valorDesconto" aria-describedby="nomeEscola" placeholder="Valor do desconto.">
+                        <small id="nomeEscolaHElp" class="form-text text-muted">Digite o valor do desconto.</small>  
                     </div>
                 </div>
                 <div class="form-row">
@@ -2387,7 +2387,7 @@ async function carregaContratos(filtro=null) {
                         </div>
                     </div>
                     <div class="form-group col-md-2">
-                        <label for="inputEmail4">Aplicar apartir da:</label>
+                        <label for="inputEmail4">Aplicar a partir da:</label>
                         <select class="form-control" id="quandoAplicar" name="quandoAplicar" disabled>
                             
                         </select>
@@ -2507,7 +2507,12 @@ async function carregaContratos(filtro=null) {
                 })
                 console.log(data)
                 try {
-                    data.valorDesconto = (Number(data.valorCurso) * (data.descontoPlano/100)).toFixed(2)
+
+                    
+                    
+                    //data.valorDesconto = (Number(data.valorCurso) * (data.descontoPlano/100)).toFixed(2)
+                    data.descontoPlano = ((100 * data.valorDesconto)/data.valorCurso)
+                    
                     data.valorAcrescimo = (Number(data.valorCurso) * (data.acrescimoPlano/100)).toFixed(2)
                     data.valorFinal = (Number(data.valorCurso) + (data.valorAcrescimo - data.valorDesconto)).toFixed(2)
                     addParcela()

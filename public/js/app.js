@@ -431,112 +431,147 @@ function convertTimestamp(timestamp) {
 	return time;
 }
 
-try {
-	let chamadosRef = firebase.database().ref('sistemaEscolar/chamados')
-	let chamadosImg = firebase.storage().ref('sistemaEscolar/chamados')
-	let formAddChamados = document.getElementById('formAddChamados');
-	let user;
-	setTimeout(() => {
-		user = usuarioAtual()
-		console.log(user)
+function chamados() {
+	try {
+		let areaEditaChamados = document.getElementById('areaEditaChamados');
+		let chamadosRef = firebase.database().ref('sistemaEscolar/chamados');
+		let chamadosImg = firebase.storage().ref('sistemaEscolar/chamados');
+		let formAddChamados = document.getElementById('formAddChamados');
+		let camposAddChamados = document.getElementById('camposAddChamados');
+		let btnAddChamado = document.getElementById('btnAddChamado');
+
+		btnAddChamado.addEventListener('click', chamados);
+
+		areaEditaChamados.style.display = 'none';
+		camposAddChamados.style.display = 'block';
+		let user;
+		setTimeout(() => {
+			user = usuarioAtual();
+			console.log(user);
+		
+			document.getElementById('nome').value = user.displayName;
+			document.getElementById('email').value = user.email;
 	
-		document.getElementById('nome').value = user.displayName;
-		document.getElementById('email').value = user.email;
-
-		carregaChamados()
-	}, 1000);
+			carregaChamados()
+		}, 1000);
+		
+		formAddChamados.addEventListener('submit', async (e) => {
+			e.preventDefault();
+			const confirm = await ui.confirm('Depois de aberto o chamado, a equipe de suporte receberá um e-mail com todas as informações cadastradas e dará uma resposta dentro do tempo de resposta aproximadamente. Você confirma a abertura do chamado?');
+	  
+			if(confirm){
+				loaderRun(true, 'Abrindo chamado e enviando arquivos')
+				let firebaseKey = await chamadosRef.push().key
+				let formData = new FormData(formAddChamados)
+				let imagens = formData.getAll('imagens')
+				console.log(imagens)
+				let data = $('#formAddChamados').serializeArray();
+				console.log(data);
 	
-	formAddChamados.addEventListener('submit', async (e) => {
-		e.preventDefault();
-		const confirm = await ui.confirm('Depois de aberto o chamado, a equipe de suporte receberá um e-mail com todas as informações cadastradas e dará uma resposta dentro do tempo de resposta aproximadamente. Você confirma a abertura do chamado?');
-  
-        if(confirm){
-			loaderRun(true, 'Abrindo chamado e enviando arquivos')
-			let firebaseKey = await chamadosRef.push().key
-			let formData = new FormData(formAddChamados)
-			let imagens = formData.getAll('imagens')
-			console.log(imagens)
-            let data = $('#formAddChamados').serializeArray();
-			console.log(data);
-
-			let dataObj = {};
-			data.forEach(element => {
-				dataObj[element.name] = element.value;
-			});
-			console.log(dataObj);
-
-			let imagesUrl = []
-			let c = 0
-			
-			
-
-			if (imagens[0].name == '') {
-				await chamadosRef.child(firebaseKey).set(dataObj)
-				loaderRun()
-				AstNotif.dialog('Sucesso', 'Seu chamado foi aberto, e os servidores já estão processando sua abertura. Em instantes será enviado um e-mail para nossa equipe de suporte, tendo seu endereço de e-mail em cópia para que possa acompanhar a solicitação. Verifique sua caixa de entrada, e em alguns casos, sua caixa de SPAM também.')
-			} else {
-				imagens.forEach(async (img) => {
-					let uploadTask = await chamadosImg.child(firebaseKey).child(img.name).put(img)
-					let url = await uploadTask.ref.getDownloadURL()
-					imagesUrl.push(url)
-					dataObj.imagens = imagesUrl
-					if (c == (imagens.length - 1)) {
-						await chamadosRef.child(firebaseKey).set(dataObj)
-						loaderRun()
+				let dataObj = {};
+				data.forEach(element => {
+					dataObj[element.name] = element.value;
+				});
+				console.log(dataObj);
 	
-						AstNotif.dialog('Sucesso', 'Seu chamado foi aberto, e os servidores já estão processando sua abertura. Em instantes será enviado um e-mail para nossa equipe de suporte, tendo seu endereço de e-mail em cópia para que possa acompanhar a solicitação. Verifique sua caixa de entrada, e em alguns casos, sua caixa de SPAM também.')
-					}
-					
-					c++
-				})
-			}
+				let imagesUrl = []
+				let c = 0
+				
+				
 	
-        }
-	})
-
-	const badges = ['success', 'info', 'warning', 'danger'];
-	const priorities = ['Baixa', 'Média', 'Alta', 'Crítica'];
-
-	const situationsBadges = ['warning', 'primary', 'success']
-	const situations = ['Pendente', 'Em análise', 'Finalizado']
-
-	const carregaChamados = async () => {
-		let listaChamados = document.getElementById('listaChamados')
-
-		chamadosRef.on('value', (snapshot) => {
-			let chamados = snapshot.val()
-			if (snapshot.exists()) {
-				listaChamados.innerHTML = ''
-			} else {
-				listaChamados.innerHTML = '<tr><td></td> <td>Nenhum chamado encontrado</td></tr>'
-			}
-			
-			for (const key in chamados) {
-				if (Object.hasOwnProperty.call(chamados, key)) {
-					const chamado = chamados[key];
-					const priority = chamado.prioridade
-					let timestamp = !chamado.timestamp ? null : convertTimestamp(chamado.timestamp)
-					listaChamados.innerHTML += `
-					<tr>
-					<td>
-					  
-					</td>
-					<td>${chamado.assunto}</td>
-					<td><span class="badge badge-pill badge-${badges[priority]}">${priorities[priority]}</span></td>
-					<td>${timestamp ? timestamp.toLocaleDateString() + ' ás ' +  timestamp.toLocaleTimeString() : 'Aguardando servidor...'}</td>
-					<td><span class="badge badge-pill badge-${chamado.situacao == undefined ? 'light' : situationsBadges[chamado.situacao]}">${chamado.situacao == undefined ? 'Processando...' : situations[chamado.situacao]}</span></td>
-					<td>
-					  <a href="#editEmployeeModal" class="action" data-toggle="modal" data-toggle="tooltip" data-placement="top" title="Editar"><i data-feather="edit" >&#xE254;</i></a>
-					  
-					</td>
-				  </tr>
-					`
+				if (imagens[0].name == '') {
+					await chamadosRef.child(firebaseKey).set(dataObj)
+					loaderRun()
+					AstNotif.dialog('Sucesso', 'Seu chamado foi aberto, e os servidores já estão processando sua abertura. Em instantes será enviado um e-mail para nossa equipe de suporte, tendo seu endereço de e-mail em cópia para que possa acompanhar a solicitação. Verifique sua caixa de entrada, e em alguns casos, sua caixa de SPAM também.')
+				} else {
+					imagens.forEach(async (img) => {
+						let uploadTask = await chamadosImg.child(firebaseKey).child(img.name).put(img)
+						let url = await uploadTask.ref.getDownloadURL()
+						imagesUrl.push(url)
+						dataObj.imagens = imagesUrl
+						if (c == (imagens.length - 1)) {
+							await chamadosRef.child(firebaseKey).set(dataObj)
+							loaderRun()
+		
+							AstNotif.dialog('Sucesso', 'Seu chamado foi aberto, e os servidores já estão processando sua abertura. Em instantes será enviado um e-mail para nossa equipe de suporte, tendo seu endereço de e-mail em cópia para que possa acompanhar a solicitação. Verifique sua caixa de entrada, e em alguns casos, sua caixa de SPAM também.')
+						}
+						
+						c++
+					})
 				}
+		
 			}
 		})
+	
+		const badges = ['success', 'info', 'warning', 'danger'];
+		const priorities = ['Baixa', 'Média', 'Alta', 'Crítica'];
+	
+		const situationsBadges = ['warning', 'primary', 'success']
+		const situations = ['Pendente', 'Em análise', 'Finalizado']
+	
+		const carregaChamados = async () => {
+			let listaChamados = document.getElementById('listaChamados')
+	
+			chamadosRef.on('value', (snapshot) => {
+				let chamados = snapshot.val()
+				if (snapshot.exists()) {
+					listaChamados.innerHTML = ''
+				} else {
+					listaChamados.innerHTML = '<tr><td></td> <td>Nenhum chamado encontrado</td></tr>'
+				}
+				
+				for (const key in chamados) {
+					if (Object.hasOwnProperty.call(chamados, key)) {
+						const chamado = chamados[key];
+						const priority = chamado.prioridade
+						let timestamp = !chamado.timestamp ? null : convertTimestamp(chamado.timestamp)
+						listaChamados.innerHTML += `
+						<tr>
+						<td>
+						  
+						</td>
+						<td>${chamado.assunto}</td>
+						<td><span class="badge badge-pill badge-${badges[priority]}">${priorities[priority]}</span></td>
+						<td>${timestamp ? timestamp.toLocaleDateString() + ' ás ' +  timestamp.toLocaleTimeString() : 'Aguardando servidor...'}</td>
+						<td><span class="badge badge-pill badge-${chamado.situacao == undefined ? 'light' : situationsBadges[chamado.situacao]}">${chamado.situacao == undefined ? 'Processando...' : situations[chamado.situacao]}</span></td>
+						<td>
+						  <a style="cursor: pointer;" name="editaChamado" id="chamado|${key}" class="action" data-toggle="modal" data-toggle="tooltip" data-placement="top" title="Editar"><i data-feather="edit" >&#xE254;</i></a>
+						  
+						</td>
+					  </tr>
+						`
+					}
+				}
+				feather.replace()
+				escutaEditaChamados()
+			})
+		}
+
+		function escutaEditaChamados() {
+			document.getElementsByName('editaChamado').forEach(elem => {
+				elem.addEventListener('click', (e) => {
+					editaChamados(e.target.id.split('|')[1])
+				})
+			})
+		}
+
+		async function editaChamados(key) {
+			areaEditaChamados.style.display = 'block';
+			camposAddChamados.style.display = 'none';
+
+			console.log(key)
+			let formEditaChamados = document.getElementById('formEditaChamados');
+			let formData = new FormData(formEditaChamados);
+			let chamado = (await chamadosRef.child(key).once('value')).val();
+			for (const name in chamado) {
+				if (Object.hasOwnProperty.call(chamado, name)) {
+					const value = chamado[name];
+					document.getElementById(name).value = value
+				}
+			}
+		}
+	} catch (error) {
+		console.log(error)
+		loaderRun()
 	}
-} catch (error) {
-	console.log(error)
-	AstNotif.dialog('Erro', error.message)
-	loaderRun()
 }

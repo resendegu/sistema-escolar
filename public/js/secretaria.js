@@ -115,6 +115,8 @@ firebase.auth().onAuthStateChanged((user) => {
     } else {
         loader.style.display = 'block'
         loaderMsg.innerText = 'Buscando informações do usuário...'
+
+        chamados()
         try {
             document.getElementById('username').innerHTML = "Olá,<br>" + user.displayName.split(' ')[0]
             if (user.photoURL != null) {
