@@ -556,19 +556,7 @@ function chamados() {
 		}
 
 		async function editaChamados(key) {
-			areaEditaChamados.style.display = 'block';
-			camposAddChamados.style.display = 'none';
-
-			console.log(key)
-			let formEditaChamados = document.getElementById('formEditaChamados');
-			let formData = new FormData(formEditaChamados);
-			let chamado = (await chamadosRef.child(key).once('value')).val();
-			for (const name in chamado) {
-				if (Object.hasOwnProperty.call(chamado, name)) {
-					const value = chamado[name];
-					document.getElementById(name).value = value
-				}
-			}
+			AstNotif.dialog('E ai', 'Aqui quem fala é o programador. Ainda estamos desenvolvendo a edição de chamados. Caso queira editar algum chamado, entre em contato com o suporte via e-mail. Pedimos desculpas por qualquer transtorno.')
 		}
 	} catch (error) {
 		console.log(error)
