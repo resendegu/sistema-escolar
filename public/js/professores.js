@@ -988,8 +988,8 @@ function lancaFrequencia(alunos={}, turma="", data='', confirma=false) {
                 matriculas[matricula] = aluno
             }
         }
-        abrirModal('modal', 'Lançamento de frequência', 
-            `Você selecionou os alunos listados abaixo da turma ${turma}. <br> ${nomes} <br><b>Escolha o dia e a hora que deseja lançar frequência.</b> (Por favor, lançe todos os dados corretamente)<br>
+        abrirModal('modal', 'Lançamento de faltas', 
+            `Você selecionou os alunos listados abaixo da turma ${turma}. <br> ${nomes} <br><b>Escolha o dia e a hora que deseja lançar falta.</b> (Por favor, lance todos os dados corretamente)<br>
             <input type="datetime-local" class="form-control" name="dataFrequencia" id="dataFrequencia">
             `
             , `<button type="button" data-toggle="tooltip" data-placement="top" title="Lançar frequência para os alunos selecionados" class="btn btn-primary" onclick="lancaFrequencia(matriculas,'${turma}', document.getElementById('dataFrequencia').value, true)">Lançar</button><button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>`
@@ -1049,15 +1049,12 @@ function deletaFrequencia(chave, turma) {
 
 function carregaFrequenciaTurma(turma) {
     let divMapaFrequenciasTurma = document.getElementById('divMapaFrequenciasTurma')
-    divMapaFrequenciasTurma.innerHTML = 'Nenhuma frequência foi lançada nesta turma'
+    divMapaFrequenciasTurma.innerHTML = 'Nenhuma falta foi lançada nesta turma'
     let c = 0
-    document.getElementById('totalFrequenciasTurma').innerText = c
-    document.getElementById('porcentagemFrequenciaTurma').innerText = 0 + '%'
+  
     let qtdeAulas
     turmasRef.child(turma + '/status/qtdeAulas').on('value', qtdeDeAulas => {
-        qtdeAulasFrequencia.innerText = qtdeDeAulas.val()
         qtdeAulas = qtdeDeAulas.val()
-        document.getElementById('qtdeAulasFrequenciaTurma').innerText = qtdeAulas
         turmasRef.child(turma + '/frequencia').on('child_added', frequencia => {
             if (c == 0) {
                 divMapaFrequenciasTurma.innerHTML = ''
@@ -1069,23 +1066,23 @@ function carregaFrequenciaTurma(turma) {
                     alunosPresentes += formataNumMatricula(matricula) + ': ' + nome.split(' ')[0] + " | "
                 }
             }
-            let diaFrequencia = frequencia.key.split('T')[0]
-            let horaFrequencia = frequencia.key.split('T')[1]
+            console.log(frequencia.key)
+            let dataEHoraFrequencia = new Date(frequencia.key)
+            
             divMapaFrequenciasTurma.innerHTML += `
             <div class="row justify-content-start">
-                <div class="col-auto" style="background-color: rgba(86,61,124,.15);border: 1px solid rgba(86,61,124,.2);"><a href="#tituloMapaFrequencias" onclick="deletaFrequencia('${frequencia.key}', '${alunosSelecionadosTurma.codTurma}')"><span data-feather="trash"></span></a>&nbsp;${diaFrequencia.split('-').reverse().join('/')} ás ${horaFrequencia}</div>
+                <div class="col-auto" style="background-color: rgba(86,61,124,.15);border: 1px solid rgba(86,61,124,.2);"><a href="#tituloMapaFrequencias" onclick="deletaFrequencia('${frequencia.key}', '${alunosSelecionadosTurma.codTurma}')"><span data-feather="trash"></span></a>&nbsp;${dataEHoraFrequencia.toLocaleDateString()} ás ${dataEHoraFrequencia.toLocaleTimeString()}</div>
                 <div class="col" style="background-color: rgba(86,61,124,.15);border: 1px solid rgba(86,61,124,.2);">${alunosPresentes}</div>
             </div>
             `
             feather.replace()
             c++
-            document.getElementById('totalFrequenciasTurma').innerText = c
-            document.getElementById('porcentagemFrequenciaTurma').innerText = ((100*parseInt(c))/parseInt(qtdeAulas)).toFixed(2) + '%'
+            
         })
     })
     
 }
-
+let turmaObj
 async function abreTurma(cod) {
     loader.style.display = 'block'
     loaderMsg.innerText = 'Abrindo turma...'
@@ -1103,6 +1100,7 @@ async function abreTurma(cod) {
         // TODO: Mostrar na tela as informações da turma
         console.log(snapshot.val())
         let dadosDaTurma = snapshot.val()
+        turmaObj = dadosDaTurma
         codigoDaTurmaLabel.innerText = dadosDaTurma.codigoSala
         areaInfoTurma.style.visibility = 'visible'
         
@@ -1164,8 +1162,131 @@ async function abreTurma(cod) {
             }
         }
         loaderRun()
-        
+        carregaCalendario(cod)
     })
+}
+
+async function carregaCalendario(turmaAberta) {
+    let calendarioRef = turmasRef.child(turmaAberta).child('aulaEvento');
+    let horarioComercial = (await infoEscolaRef.child('dadosBasicos/horarioComercial').once('value')).val()
+    console.log(horarioComercial)
+    let calendarEl = document.getElementById('calendarioTurma');
+    let calendar
+    function calendarRender(eventSources) {
+        calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            height: '450px',
+            locale: 'pt-br',
+            weekNumbers: true,
+            dateClick: function(info) {
+              console.log(info)
+            },
+            eventClick: function (eventClickInfo) {
+                acoesEventoAula(eventClickInfo)
+            },
+            selectable: true,
+            select: function(info) {
+              console.log(info)
+            },
+            unselectAuto: false,
+            businessHours: horarioComercial,
+            
+            // businessHours: [ // specify an array instead
+            //   {
+            //     daysOfWeek: [ 1, 2, 3, 4, 5  ], // Monday, Tuesday, Wednesday
+            //     startTime: '08:00', // 8am
+            //     endTime: '18:00' // 6pm
+            //   },
+            //   {
+            //     daysOfWeek: [ 6 ], // Saturday
+            //     startTime: '10:00', // 10am
+            //     endTime: '16:00' // 4pm
+            //   }
+            // ],
+            nowIndicator: true,
+            eventSources: eventSources,
+  
+            // customButtons: {
+            //   myCustomButton: {
+            //       text: 'custom!',
+            //       click: function() {
+            //         alert('clicked the custom button!');
+            //       }
+            //     }
+            //   },
+              headerToolbar: {
+                left: 'prevYear prev today next nextYear',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay,listYear'
+              }
+          });
+          calendar.render();
+        //   lastEventSource = calendar.getEventSourceById(turmaAberta).internalEventSource._raw
+          return calendar.getEventSourceById(turmaAberta);
+    }
+
+    calendarioRef.on('value', (snapshot) => {
+        let eventSources = snapshot.val()
+
+        calendarRender(eventSources);
+    })
+
+    function acoesEventoAula(eventSource) {
+        console.log(eventSource)
+        let dataFalta = eventSource.event.startStr
+
+        abrirModal('modal', 'Ações para o dia ' + eventSource.event.start.toLocaleDateString(), `
+            <h5>Selecione os alunos para lançar faltas: </h5>
+            <form id="formLancaFaltas">
+                <section id="listaAlunosParaFalta"></section>
+                <button class="btn btn-primary btn-block" type="submit" id="lancaFaltaAlunos">Lançar faltas</button>
+            </form>
+            
+        `, `<button class="btn btn-secondary" data-dismiss="modal">Fechar</button>`)
+        let listaAlunosParaFalta = document.getElementById('listaAlunosParaFalta')
+        let alunos = turmaObj.alunos
+
+        for (const matricula in alunos) {
+            if (Object.hasOwnProperty.call(alunos, matricula)) {
+                const aluno = alunos[matricula];
+                listaAlunosParaFalta.innerHTML += `
+                    <input type="checkbox" name="alunos" value="${matricula}|${aluno.nome}">
+                    <label>${matricula}: ${aluno.nome}</label><br>
+                `
+            }
+        }
+
+        let formLancaFaltas = document.getElementById('formLancaFaltas')
+        formLancaFaltas.addEventListener('submit', (e) => {
+            e.preventDefault()
+            loaderRun(true, 'Lançando faltas...')
+            let formData = new FormData(formLancaFaltas)
+            let data = $('#formLancaFaltas').serializeArray()
+
+            console.log(data)
+            let faltas = {}
+            faltas[dataFalta] = {}
+
+            data.map(async (checkbox, i) => {
+                let matricula = checkbox.value.split('|')[0]
+                let nome = checkbox.value.split('|')[1]
+                let localObj = {}
+                localObj[matricula] = nome
+                await turmasRef.child(turmaAberta + '/alunos').child(matricula + '/frequencia/' + dataFalta).set({turma: turmaAberta})
+                await turmasRef.child(turmaAberta + '/frequencia/' + dataFalta).child(matricula).set(nome)
+                faltas[dataFalta][matricula] = nome
+            })
+            console.log(faltas)
+            
+            
+
+            loaderRun()
+            AstNotif.notify('Sucesso', 'Faltas lançadas', 'agora')
+        })
+        
+        
+
+    }
 }
 
 function preencheEndereco(numCep) {

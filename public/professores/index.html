@@ -20,6 +20,14 @@
     <link rel="stylesheet" href="../css/filedrop.css">
     <link rel="stylesheet" href="../css/tabela.css">
 
+    <link href='../resources/fullcalendar/lib/main.css' rel='stylesheet' />
+    <!-- rrule lib -->
+    <script src='https://cdn.jsdelivr.net/npm/rrule@2.6.4/dist/es5/rrule.min.js'></script>
+    <script src='../resources/fullcalendar/lib/main.js'></script>
+    <script src="../resources/fullcalendar/lib/locales/pt-br.js"></script>
+    <!-- the rrule-to-fullcalendar connector. must go AFTER the rrule lib -->
+    <script src='https://cdn.jsdelivr.net/npm/@fullcalendar/rrule@5.5.0/main.global.min.js'></script>
+
       <!-- Carregando arquivos da biblioteca AST-Notif. Créditos: https://github.com/anandastoon/AST-Notif -->
     <link rel="stylesheet" href="../resources/AST-Notif/css/ast-notif.min.css">
     <!-- Carregando arquivos da biblioteca driver.js. Créditos: https://github.com/kamranahmedse/driver.js -->
@@ -627,7 +635,7 @@
                             </div>
                             <div class="col-sm-6">
                               <button type="submit" class="btn btn-info" id="btnLancaNotas">&nbsp; <span class="feather-24" data-feather="edit"></span>Lançar Notas<span></span></button>
-                              <button type="submit" class="btn btn-primary" id="btnLancaFrequencia">&nbsp; <span class="feather-24" data-feather="calendar"></span><span>Lançar Frequência</span></button>						
+                              <button type="submit" style="display: none;" class="btn btn-primary" id="btnLancaFrequencia">&nbsp; <span class="feather-24" data-feather="calendar"></span><span>Lançar Frequência</span></button>						
                             </div>
                           </div>
                         </div>
@@ -684,8 +692,8 @@
                 <hr>
                 <p class="text-muted justify-content-end" id="timestampTurmaCadastrada"></p>
                 <hr>
-                <label class="h5" id="tituloMapaFrequencias">Mapa de frequências da Turma</label>
-                <div id="divTotalFrequencias">Total de frequências lançadas: <label id="totalFrequenciasTurma"></label> de <label id="qtdeAulasFrequenciaTurma"></label><br> Percentual de frequência lançada em <label id="porcentagemFrequenciaTurma"></label></div>
+                <label class="h5" id="tituloMapaFrequencias">Faltas lançadas</label>
+               
                 <div id="divMapaFrequenciasTurma">
                   <div class="row justify-content-start">
                     <div class="col-3" style="background-color: rgba(86,61,124,.15);border: 1px solid rgba(86,61,124,.2);">Column</div>
@@ -695,6 +703,7 @@
                 </div>
                 
                 <hr>
+                <div id="calendarioTurma"></div>
               </div>
             </div>
 

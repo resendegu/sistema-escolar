@@ -955,6 +955,17 @@ exports.aberturaChamados = functions.database.ref('sistemaEscolar/chamados/{key}
     console.log('Email queued for delivery.')
 })
 
+exports.montaCalendarioGeral = functions.database.ref('sistemaEscolar/turmas/{turma}/aulaEvento').onCreate(async (snapshot, context) => {
+    let turma = context.params.turma
+    let aulaEvento = snapshot.val()
+    let source = aulaEvento[0]
+    let calendarioSnapshot = await admin.database().ref('sistemaEscolar/infoEscola/calendarioGeral').once('value')
+    let calendario = calendarioSnapshot.exists() ? calendario.push(source) : [source]
+
+    await admin.database().ref('sistemaEscolar/infoEscola/calendarioGeral').set(calendario)
+    
+})
+
 // exports.adicionaFotoAluno = functions.storage.object().onFinalize(async (object) => {
 //     const fileBucket = object.bucket; // The Storage bucket that contains the file.
 //     const filePath = object.name; // File path in the bucket.

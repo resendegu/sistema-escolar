@@ -1,11 +1,9 @@
 
+
 var perf = firebase.performance()
 firebase.analytics();
 // Código padrão para todas as páginas do site
 var updatesRef = firebase.database().ref('sistemaEscolar/updates')
-var loader = document.getElementById('loader')
-var loaderMsg = document.getElementById('loaderMsg')
-
 var loader = document.getElementById('loader')
 var loaderMsg = document.getElementById('loaderMsg')
 
@@ -562,4 +560,11 @@ function chamados() {
 		console.log(error)
 		loaderRun()
 	}
+}
+
+
+function handleCalendar() {
+	// calendar.on('dateClick', function(info) {
+	// 	console.log(info)
+	// })
 }

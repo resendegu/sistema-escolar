@@ -163,67 +163,68 @@ firebase.auth().onAuthStateChanged((user) => {
             }
             alunosDesativadosNum.innerText = c
         })
-        numerosRef.on('value', (snapshot) => {
-            loaderMsg.innerText = 'Buscando informações da dashboard'
-            var numeros = snapshot.val()
-            var tabelaSemanal = numeros.tabelaSemanal
+        // numerosRef.on('value', (snapshot) => {
+        //     loaderMsg.innerText = 'Buscando informações da dashboard'
+        //     var numeros = snapshot.val()
+        //     var tabelaSemanal = numeros.tabelaSemanal
             
-            //alunosCadastradosNum.innerText = numeros.alunosCadastrados != undefined ? numeros.alunosCadastrados : 0
+        //     //alunosCadastradosNum.innerText = numeros.alunosCadastrados != undefined ? numeros.alunosCadastrados : 0
             
-            //alunosDesativadosNum.innerText = numeros.alunosDesativados != undefined ? numeros.alunosDesativados : 0
-            //turmasCadastradasNum.innerText = numeros.turmasCadastradas != undefined ? numeros.turmasCadastradas : 0
+        //     //alunosDesativadosNum.innerText = numeros.alunosDesativados != undefined ? numeros.alunosDesativados : 0
+        //     //turmasCadastradasNum.innerText = numeros.turmasCadastradas != undefined ? numeros.turmasCadastradas : 0
 
-            // Alimenta tabela com os números de alunos em cada semana
-            var idCelulaTabela = ''
-            var totalManha = document.getElementById('totalManha').innerText = 0
-            var totalTarde = document.getElementById('totalTarde').innerText = 0
-            var totalNoite = document.getElementById('totalNoite').innerText = 0
-            var totalMON = document.getElementById('totalMON').innerText = 0
-            var totalTUE = document.getElementById('totalTUE').innerText = 0
-            var totalWED = document.getElementById('totalWED').innerText = 0
-            var totalTHU = document.getElementById('totalTHU').innerText = 0
-            var totalFRI = document.getElementById('totalFRI').innerText = 0
-            var totalSAT = document.getElementById('totalSAT').innerText = 0
-            var totalSUN = document.getElementById('totalSUN').innerText = 0
-            for (const dia in tabelaSemanal) {
-                if (tabelaSemanal.hasOwnProperty(dia)) {
-                    const horarios = tabelaSemanal[dia];
-                    idCelulaTabela += dia
-                    for (const horario in horarios) {
-                        if (horarios.hasOwnProperty(horario)) {
-                            const numeroDeAlunos = horarios[horario]
-                            idCelulaTabela += horario
-                            console.log(idCelulaTabela)
-                            document.getElementById(idCelulaTabela).innerText = numeroDeAlunos
-                            var numNaTabela = Number(document.getElementById('total' + horario).innerText)
-                            numNaTabela += numeroDeAlunos
-                            var numNaTabelaDiario = Number(document.getElementById('total' + dia).innerText)
-                            numNaTabelaDiario += numeroDeAlunos
-                            document.getElementById('total' + horario).innerText = numNaTabela
-                            document.getElementById('total' + dia).innerText = numNaTabelaDiario
-                            idCelulaTabela = dia
-                        }
-                    }
-                    idCelulaTabela = ''
-                }
-            }
-            loaderRun()
-        })
+        //     // Alimenta tabela com os números de alunos em cada semana
+        //     var idCelulaTabela = ''
+        //     var totalManha = document.getElementById('totalManha').innerText = 0
+        //     var totalTarde = document.getElementById('totalTarde').innerText = 0
+        //     var totalNoite = document.getElementById('totalNoite').innerText = 0
+        //     var totalMON = document.getElementById('totalMON').innerText = 0
+        //     var totalTUE = document.getElementById('totalTUE').innerText = 0
+        //     var totalWED = document.getElementById('totalWED').innerText = 0
+        //     var totalTHU = document.getElementById('totalTHU').innerText = 0
+        //     var totalFRI = document.getElementById('totalFRI').innerText = 0
+        //     var totalSAT = document.getElementById('totalSAT').innerText = 0
+        //     var totalSUN = document.getElementById('totalSUN').innerText = 0
+        //     for (const dia in tabelaSemanal) {
+        //         if (tabelaSemanal.hasOwnProperty(dia)) {
+        //             const horarios = tabelaSemanal[dia];
+        //             idCelulaTabela += dia
+        //             for (const horario in horarios) {
+        //                 if (horarios.hasOwnProperty(horario)) {
+        //                     const numeroDeAlunos = horarios[horario]
+        //                     idCelulaTabela += horario
+        //                     console.log(idCelulaTabela)
+        //                     document.getElementById(idCelulaTabela).innerText = numeroDeAlunos
+        //                     var numNaTabela = Number(document.getElementById('total' + horario).innerText)
+        //                     numNaTabela += numeroDeAlunos
+        //                     var numNaTabelaDiario = Number(document.getElementById('total' + dia).innerText)
+        //                     numNaTabelaDiario += numeroDeAlunos
+        //                     document.getElementById('total' + horario).innerText = numNaTabela
+        //                     document.getElementById('total' + dia).innerText = numNaTabelaDiario
+        //                     idCelulaTabela = dia
+        //                 }
+        //             }
+        //             idCelulaTabela = ''
+        //         }
+        //     }
+        //     loaderRun()
+        // })
 
-        aniversariosRef.on('value', snapshot => {
-            loader.style.display = 'block'
-            var meses = snapshot.val()
-            var dataLocal = new Date()
-            var mesAtual = dataLocal.getMonth()
-            document.getElementById('listaAniversarios').innerHTML = ''
-            for (const key in meses[mesAtual]) {
-                if (meses[mesAtual].hasOwnProperty(key)) {
-                    const aniversario = meses[mesAtual][key];
-                    document.getElementById('listaAniversarios').innerHTML += `<button class="list-group-item list-group-item-action">${aniversario.nome} no dia ${aniversario.dataNascimento.dia}</button>`
-                }
-            }
-            loaderRun()
-        })
+        // aniversariosRef.on('value', snapshot => {
+        //     loader.style.display = 'block'
+        //     var meses = snapshot.val()
+        //     var dataLocal = new Date()
+        //     var mesAtual = dataLocal.getMonth()
+        //     document.getElementById('listaAniversarios').innerHTML = ''
+        //     for (const key in meses[mesAtual]) {
+        //         if (meses[mesAtual].hasOwnProperty(key)) {
+        //             const aniversario = meses[mesAtual][key];
+        //             document.getElementById('listaAniversarios').innerHTML += `<button class="list-group-item list-group-item-action">${aniversario.nome} no dia ${aniversario.dataNascimento.dia}</button>`
+        //         }
+        //     }
+        //     loaderRun()
+        // })
+        loaderRun()
     }
     
 })
@@ -651,17 +652,21 @@ async function turmas() {
         
     }
 
-    
-
-    function iniciaPeriodo(confirma=false, inicio='', fim='', qtdeAulas='', nomePeriodo='') {
+    let turma
+    let aulaEvento 
+    async function iniciaPeriodo(confirma=false, inicio='', fim='', horarioTermino='', nomePeriodo='', qtdeAulas='', eventSource) {
+        
+        console.log(turmas)
         if (confirma) {
             loader.style.display = 'block'
             loaderMsg.innerText = 'Iniciando turma...'
-            if (inicio == '' || fim == '' || qtdeAulas == '' || nomePeriodo == '') {
+            if (inicio == '' || fim == '' || nomePeriodo == '') {
                 AstNotif.dialog('Você esqueceu alguns dados...', 'Por favor preencha todos os dados pedidos para iniciar a turma')
                 loaderRun()
             } else {
-                turmasRef.child(turmaAberta + '/status').set({turma: 'aberta', inicio: inicio, fim: fim, qtdeAulas: qtdeAulas, nomePeriodo: nomePeriodo}).then(()=>{
+                turmasRef.child(turmaAberta + '/status').set({turma: 'aberta', qtdeAulas: qtdeAulas, inicio: inicio, fim: fim, nomePeriodo: nomePeriodo, horarioTermino: horarioTermino}).then( async ()=>{
+                    console.log(eventSource)
+                    await turmasRef.child(turmaAberta + '/aulaEvento').set(eventSource)
                     $('#modal').modal('hide')
                     AstNotif.notify('Sucesso', 'Turma aberta')
                     carregaListaDeAlunosDaTurma(turmaAberta)
@@ -682,22 +687,154 @@ async function turmas() {
                 <small id="cadastrarEntrar" class="form-text text-muted">
                     O nome do período pode ser por exemplo: 1º Semestre, ou 2º Bimestre ...
                 </small>
-                <br>Início previsto:
+                <br>Data de início das aulas:
                 <input type="date" class="form-control" name="dataInicioPeriodo" id="dataInicioPeriodo">
-                <br> Fim previsto:
+                <br> Data do fim das aulas (coloque 1 dia a mais do fim previsto):
                 <input type="date" class="form-control" name="dataFimPeriodo" id="dataFimPeriodo">
-                <br> Previsão de quantidade de aulas ministradas:
+                <br> Horário de término da aula:
+                <input type="time" class="form-control" name="terminoAula" id="terminoAula">
+                <br> Quantidade de aulas ministradas:
                 <input type="number" class="form-control" name="qtdeAulas" id="qtdeAulas">
-                <small id="cadastrarEntrar" class="form-text text-muted">
-                    A quantidade de aulas serve como referência para você e para os alunos para acompanhar o andamento do curso e também poderá ser modificada antes do fechamento desta turma.
-                </small>
+                <br> Cor do evento:
+                <input type="color" class="form-control" name="corEvento" id="corEvento" value="#0008FF">
+                
+                <br> Cor do texto do evento:
+                <input type="color" class="form-control" name="corTexto" id="corTexto" value="#FFFFFF">
+                
+                <br>
+                <h4>Calendário da turma</h4>
+                <div id="confCalendar"></div>
     
             `, 
             `<button type="button" data-toggle="tooltip" data-placement="top" title="Iniciar atividades da turma no sistema" class="btn btn-primary" id="modalIniciaPeriodo">Iniciar turma</button><button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>`)
         }
+        let lastEventSource
         document.getElementById('modalIniciaPeriodo').addEventListener('click', () => {
-            iniciaPeriodo(true, document.getElementById('dataInicioPeriodo').value, document.getElementById('dataFimPeriodo').value, document.getElementById('qtdeAulas').value, document.getElementById('nomePeriodo').value)
+            iniciaPeriodo(true, document.getElementById('dataInicioPeriodo').value, document.getElementById('dataFimPeriodo').value, document.getElementById('terminoAula').value, document.getElementById('nomePeriodo').value, document.getElementById('qtdeAulas').value, lastEventSource)
         })
+
+        aulaEvento = [
+
+            // your event source
+            {
+              events: [ // put the array in the `events` property
+                
+                {
+                  title  : `Aula ${turmaAberta}`,
+                  startRecur  : '',
+                  endRecur    : '',
+                  daysOfWeek: turma.diasDaSemana,
+                  startTime: `${turma.hora.indexOf(':') == -1 ? turma.hora + ':00' : turma.hora}`,
+                  endTime: `${turma.hora.indexOf(':') == -1 ? Number(turma.hora) + 1 + ':00' : Number(turma.hora) + 1}`,
+                  groupId: '',
+                  
+                },
+               
+              ],
+              color: '#0008FF',     // an option!
+              textColor: '#FFFFFF',
+              id: turmaAberta,
+               // an option!
+            }
+    
+            // any other event sources...
+    
+          ]
+          
+          
+        let horarioComercial = (await infoEscolaRef.child('dadosBasicos/horarioComercial').once('value')).val()
+        console.log(horarioComercial)
+        let calendarEl = document.getElementById('confCalendar');
+        let calendar
+        function calendarRender() {
+            calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                height: '450px',
+                locale: 'pt-br',
+                weekNumbers: true,
+                dateClick: function(info) {
+                  console.log(info)
+                },
+                selectable: true,
+                select: function(info) {
+                  console.log(info)
+                },
+                unselectAuto: false,
+                businessHours: horarioComercial,
+                
+                // businessHours: [ // specify an array instead
+                //   {
+                //     daysOfWeek: [ 1, 2, 3, 4, 5  ], // Monday, Tuesday, Wednesday
+                //     startTime: '08:00', // 8am
+                //     endTime: '18:00' // 6pm
+                //   },
+                //   {
+                //     daysOfWeek: [ 6 ], // Saturday
+                //     startTime: '10:00', // 10am
+                //     endTime: '16:00' // 4pm
+                //   }
+                // ],
+                nowIndicator: true,
+                eventSources: aulaEvento,
+      
+                // customButtons: {
+                //   myCustomButton: {
+                //       text: 'custom!',
+                //       click: function() {
+                //         alert('clicked the custom button!');
+                //       }
+                //     }
+                //   },
+                  headerToolbar: {
+                    left: 'prevYear prev today next nextYear',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay,listYear'
+                  }
+              });
+              calendar.render();
+              lastEventSource = calendar.getEventSourceById(turmaAberta).internalEventSource._raw
+              return calendar.getEventSourceById(turmaAberta);
+        }
+        
+
+        document.getElementById('dataInicioPeriodo').addEventListener('change', (e) => {
+            let dataInicio = e.target.value
+            aulaEvento[0]['events'][0]['startRecur'] = dataInicio
+            let aulas = calendarRender()
+            calculaQtdeDeAulas(aulas)
+        })
+        document.getElementById('dataFimPeriodo').addEventListener('change', (e) => {
+            let dataFim = e.target.value
+            aulaEvento[0]['events'][0]['endRecur'] = dataFim
+            let aulas = calendarRender()
+            calculaQtdeDeAulas(aulas)
+        })
+        document.getElementById('terminoAula').addEventListener('change', (e) => {
+            let horario = e.target.value.indexOf(':') == -1 ? e.target.value + ':00' : e.target.value
+
+            aulaEvento[0]['events'][0]['endTime'] = horario
+            let aulas = calendarRender()
+        })
+
+        document.getElementById('corEvento').addEventListener('change', (e) => {
+            let cor = e.target.value
+            aulaEvento[0]['color'] = cor
+            let aulas = calendarRender()
+        })
+
+        document.getElementById('corTexto').addEventListener('change', (e) => {
+            let cor = e.target.value
+            aulaEvento[0]['textColor'] = cor
+            let aulas = calendarRender()
+        })
+
+        function calculaQtdeDeAulas(aulas) {
+            console.log(aulas)
+            let qtdeAulas
+
+            let fieldQtdeAulas = document.getElementById('qtdeAulas')
+            fieldQtdeAulas.value = qtdeAulas
+        }
     }
     
     function fechaPeriodo() {
@@ -913,6 +1050,7 @@ async function turmas() {
         loader.style.display = 'block'
         loaderMsg.innerText = 'Abrindo turma...'
         turmaAberta = cod
+        turma = turmas[turmaAberta]
         var codigoDaTurmaLabel = document.getElementById('codigoDaTurma')
         var areaInfoTurma = document.getElementById('areaInfoTurma')
         turmasRef.child(cod).on('value', (snapshot) => {
@@ -992,6 +1130,8 @@ async function turmas() {
             }
             loaderRun()
             feather.replace()
+
+            carregaCalendario()
         })
     }
 
@@ -1068,8 +1208,68 @@ async function turmas() {
         }
     }
 
-    
+    async function carregaCalendario() {
+        let calendarioRef = turmasRef.child(turmaAberta).child('aulaEvento');
+        let horarioComercial = (await infoEscolaRef.child('dadosBasicos/horarioComercial').once('value')).val()
+        console.log(horarioComercial)
+        let calendarEl = document.getElementById('calendarioTurma');
+        let calendar
+        function calendarRender(eventSources) {
+            calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                height: '450px',
+                locale: 'pt-br',
+                weekNumbers: true,
+                dateClick: function(info) {
+                  console.log(info)
+                },
+                selectable: true,
+                select: function(info) {
+                  console.log(info)
+                },
+                unselectAuto: false,
+                businessHours: horarioComercial,
+                
+                // businessHours: [ // specify an array instead
+                //   {
+                //     daysOfWeek: [ 1, 2, 3, 4, 5  ], // Monday, Tuesday, Wednesday
+                //     startTime: '08:00', // 8am
+                //     endTime: '18:00' // 6pm
+                //   },
+                //   {
+                //     daysOfWeek: [ 6 ], // Saturday
+                //     startTime: '10:00', // 10am
+                //     endTime: '16:00' // 4pm
+                //   }
+                // ],
+                nowIndicator: true,
+                eventSources: eventSources,
+      
+                // customButtons: {
+                //   myCustomButton: {
+                //       text: 'custom!',
+                //       click: function() {
+                //         alert('clicked the custom button!');
+                //       }
+                //     }
+                //   },
+                  headerToolbar: {
+                    left: 'prevYear prev today next nextYear',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay,listYear'
+                  }
+              });
+              calendar.render();
+            //   lastEventSource = calendar.getEventSourceById(turmaAberta).internalEventSource._raw
+              return calendar.getEventSourceById(turmaAberta);
+        }
 
+        calendarioRef.on('value', (snapshot) => {
+            let eventSources = snapshot.val()
+
+            calendarRender(eventSources);
+        })
+    }
 }
 
 function retiraProf(email, nome, codSala, confirma=false) {
@@ -4889,6 +5089,7 @@ function dadosInfoEscola() {
     let listaCursos = document.getElementById('listaCursos')
     let listaChecklist = document.getElementById('listaChecklist')
     let listaChecklistAcompanhamento = document.getElementById('listaChecklistAcompanhamento')
+    let horarioComercial
     infoEscolaRef.once('value').then(snapshot => {
         let dados = snapshot.val()
         if (dados != null) {
@@ -4902,6 +5103,115 @@ function dadosInfoEscola() {
                     }
                 }
             }
+            horarioComercial = dados.dadosBasicos.horarioComercial
+            let divHorarioComercial = document.getElementById('horarioComercial');
+            divHorarioComercial.innerHTML = ''
+            let c = horarioComercial.length
+            horarioComercial.map((horario, i) => {
+                divHorarioComercial.innerHTML += `
+                <div class="row" id="horarioComercialRow${i}">
+                    <div class="col-auto">
+                        <div class="form-group">
+                            <label for="exampleInputPassword1">Dias da semana:</label>
+                            <br>
+                            <input type="checkbox" id="dom|${i}" value="0" ${horario.daysOfWeek.indexOf('0') != -1 && 'checked'} name="dias|${i}">
+                            <label for="dom|${i}">Domingo</label>
+
+                            <input type="checkbox" id="seg|${i}" value="1" ${horario.daysOfWeek.indexOf('1') != -1 && 'checked'} name="dias|${i}">
+                            <label for="seg|${i}">Segunda</label>
+
+                            <input type="checkbox" id="ter|${i}" value="2" ${horario.daysOfWeek.indexOf('2') != -1 && 'checked'} name="dias|${i}">
+                            <label for="ter|${i}">Terça</label>
+
+                            <input type="checkbox" id="qua|${i}" value="3" ${horario.daysOfWeek.indexOf('3') != -1 && 'checked'} name="dias|${i}">
+                            <label for="qua|${i}">Quarta</label>
+
+                            <input type="checkbox" id="qui|${i}" value="4" ${horario.daysOfWeek.indexOf('4') != -1 && 'checked'} name="dias|${i}">
+                            <label for="qui|${i}">Quinta</label>
+
+                            <input type="checkbox" id="sex|${i}" value="5" ${horario.daysOfWeek.indexOf('5') != -1 && 'checked'} name="dias|${i}">
+                            <label for="sex|${i}">Sexta</label>
+
+                            <input type="checkbox" id="sab|${i}" value="6" ${horario.daysOfWeek.indexOf('6') != -1 && 'checked'} name="dias|${i}">
+                            <label for="sab|${i}">Sábado</label>
+                        </div>
+                    
+                    </div>
+                    <div class="col-auto">
+                    <div class="form-group">
+                        <label for="exampleInputPassword1">Horário do expediente:</label>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">Início</span>
+                            </div>
+                            <input type="time" id="startTime|${i}" required name="startTime|${i}" class="form-control" value="${horario.startTime}">
+                            &nbsp;&nbsp;
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">Fim</span>
+                            </div>
+                            <input type="time" id="endTime|${i}" required name="endTime|${i}" class="form-control" value="${horario.endTime}">
+                            &nbsp;&nbsp;
+                            <a class="btn btn-warning" id="removeHorario|${i}" onclick="$('#horarioComercialRow${i}').remove()">Excluir horário</a>
+                        </div>
+                        
+                    </div>
+                    </div>
+                </div>
+                `
+            })
+            document.getElementById('addHorarioComercial').addEventListener('click', (e) => {
+                divHorarioComercial.innerHTML += `
+                <div class="row" id="horarioComercialRow${c}">
+                    <div class="col-auto">
+                        <div class="form-group">
+                            <label for="exampleInputPassword1">Dias da semana:</label>
+                            <br>
+                            <input type="checkbox" id="dom|${c}" value="0" name="dias|${c}">
+                            <label for="dom|${c}">Domingo</label>
+
+                            <input type="checkbox" id="seg|${c}" value="1" name="dias|${c}">
+                            <label for="seg|${c}">Segunda</label>
+
+                            <input type="checkbox" id="ter|${c}" value="2" name="dias|${c}">
+                            <label for="ter|${c}">Terça</label>
+
+                            <input type="checkbox" id="qua|${c}" value="3" name="dias|${c}">
+                            <label for="qua|${c}">Quarta</label>
+
+                            <input type="checkbox" id="qui|${c}" value="4" name="dias|${c}">
+                            <label for="qui|${c}">Quinta</label>
+
+                            <input type="checkbox" id="sex|${c}" value="5" name="dias|${c}">
+                            <label for="sex|${c}">Sexta</label>
+
+                            <input type="checkbox" id="sab|${c}" value="6" name="dias|${c}">
+                            <label for="sab|${c}">Sábado</label>
+                        </div>
+                    
+                    </div>
+                    <div class="col-auto">
+                    <div class="form-group">
+                        <label for="exampleInputPassword1">Horário do expediente:</label>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">Início</span>
+                            </div>
+                            <input type="time" id="startTime|${c}" required name="startTime|${c}" class="form-control">
+                            &nbsp;&nbsp;
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">Fim</span>
+                            </div>
+                            <input type="time" id="endTime|${c}" required name="endTime|${c}" class="form-control">
+                            &nbsp;&nbsp;
+                            <a class="btn btn-warning" id="removeHorario|${c}" onclick="$('#horarioComercialRow${c}').remove()">Excluir horário</a>
+                        </div>
+                        
+                    </div>
+                    </div>
+                </div>
+                `
+                c++
+            })
         }  
     }).catch(error => {
         AstNotif.dialog('Erro', error.message)
@@ -5036,6 +5346,8 @@ function dadosInfoEscola() {
             i++
         });
     })
+
+
     
 }
 
@@ -5071,7 +5383,38 @@ document.getElementById('infoEscolaForm').addEventListener('submit', (e) => {
     infoEscola.corPrimariaEscola = dados.get('corPrimariaEscola')
     infoEscola.corSecundariaEscola = dados.get('corSecundariaEscola')
     infoEscola.permitirDistribuiNotas = dados.get('permitirDistribuiNotas') == null ? false : true
-    console.log($('#infoEscolaForm').serializeArray()) 
+
+    let data = $('#infoEscolaForm').serializeArray();
+    console.log(data)
+    let horarioComercial = []
+    let diasSemana = data.filter(field => field.name.split('|')[0] == 'dias');
+    let horario = data.filter(field => field.name.split('|')[0] == 'startTime' || field.name.split('|')[0] == 'endTime')
+    let diasSemanaArray = []
+    for (const key in diasSemana) {
+        if (Object.hasOwnProperty.call(diasSemana, key)) {
+            const field = diasSemana[key];
+            const i = field.name.split('|')[1]
+            const value = field.value
+            diasSemanaArray[i] = diasSemanaArray[i] == undefined ? [] : diasSemanaArray[i]
+            diasSemanaArray[i].push(value);
+            horarioComercial[i] = {daysOfWeek: diasSemanaArray[i]}
+        }
+    }
+
+    for (const key in horario) {
+        if (Object.hasOwnProperty.call(horario, key)) {
+            const field = horario[key];
+            const i = field.name.split('|')[1]
+            const name = field.name.split('|')[0]
+            const value = field.value
+            horarioComercial[i][name] = value
+        }
+    }
+    infoEscola.horarioComercial = horarioComercial
+    console.log(diasSemanaArray)
+    console.log(diasSemana)
+    console.log(horario)
+    console.log(horarioComercial)
     loaderRun(true, 'Enviando dados básicos...')
     infoEscolaRef.child('dadosBasicos').set(infoEscola).then(() => {
         AstNotif.dialog('Sucesso', 'Os dados básicos foram atualizados e aplicados com sucesso.')

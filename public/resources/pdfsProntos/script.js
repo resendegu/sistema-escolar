@@ -210,16 +210,17 @@ window.addEventListener('DOMContentLoaded', (e) => {
                     adicionaDadosTabela([false, `Nota Final: ${soma}`])
 
                     adicionaDadosTabela([true, 'Frequência'])
-                    let aulasPresente = 0
+                    let faltas = 0
                     let frequencia = historico.infoAluno.frequencia
                     for (const time in frequencia) {
                         if (Object.hasOwnProperty.call(frequencia, time)) {
                             const turma = frequencia[time];
-                            aulasPresente++
+                            faltas++
                         }
                     }
+                    let aulasPresente = Number(historico.infoAluno.qtdeAulas) - faltas
                     let porcentagemFrequencia = ((100*aulasPresente)/Number(historico.infoAluno.qtdeAulas)).toFixed(2)
-                    let faltas = Number(historico.infoAluno.qtdeAulas) - aulasPresente
+                    
                     adicionaDadosTabela(['Frequência (%)', 'Faltas'], [porcentagemFrequencia + '%', faltas == 0 ? 'Nenhuma falta' :`${faltas} de um total de ${historico.infoAluno.qtdeAulas} aulas ministradas`])
                     if (soma >= infos.dadosBasicos.pontosAprovacao) {
                         if (porcentagemFrequencia >= infos.dadosBasicos.frequenciaAprovacao) {

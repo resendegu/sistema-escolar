@@ -21,6 +21,94 @@
     <link rel="stylesheet" href="../css/tabela.css">
     <link rel="stylesheet" href="../css/grid-list.css">
     <link rel="stylesheet" href="../css/file-manager.css">
+
+    
+    <link href='../resources/fullcalendar/lib/main.css' rel='stylesheet' />
+    <!-- rrule lib -->
+    <script src='https://cdn.jsdelivr.net/npm/rrule@2.6.4/dist/es5/rrule.min.js'></script>
+    <script src='../resources/fullcalendar/lib/main.js'></script>
+    <script src="../resources/fullcalendar/lib/locales/pt-br.js"></script>
+    <!-- the rrule-to-fullcalendar connector. must go AFTER the rrule lib -->
+    <script src='https://cdn.jsdelivr.net/npm/@fullcalendar/rrule@5.5.0/main.global.min.js'></script>
+    <script>
+
+      document.addEventListener('DOMContentLoaded', function() {
+        let calendarEl = document.getElementById('calendar');
+        let calendar = new FullCalendar.Calendar(calendarEl, {
+          initialView: 'timeGridWeek',
+          height: '450px',
+          locale: 'pt-br',
+          weekNumbers: true,
+          dateClick: function(info) {
+            console.log(info)
+          },
+          selectable: true,
+          select: function(info) {
+            console.log(info)
+          },
+          hiddenDays: [ 0 ],
+          unselectAuto: false,
+          // businessHours: [ // specify an array instead
+          //   {
+          //     daysOfWeek: [ 1, 2, 3, 4, 5  ], // Monday, Tuesday, Wednesday
+          //     startTime: '08:00', // 8am
+          //     endTime: '18:00' // 6pm
+          //   },
+          //   {
+          //     daysOfWeek: [ 6 ], // Saturday
+          //     startTime: '10:00', // 10am
+          //     endTime: '16:00' // 4pm
+          //   }
+          // ],
+          nowIndicator: true,
+          eventSources: [
+
+            // your event source
+            {
+              events: [ // put the array in the `events` property
+                
+                {
+                  title  : 'event2',
+                  startRecur  : '2021-01-04',
+                  endRecur    : '2021-10-23',
+                  daysOfWeek: [ 1, 2 ],
+                  startTime: '08:00:00',
+                  endTime: '09:00:00',
+                  groupId: ''
+                },
+                {
+                  title  : 'event3',
+                  start  : '2021-10-07T12:30:00',
+                }
+              ],
+              color: 'black',     // an option!
+              textColor: 'yellow' // an option!
+            }
+
+            // any other event sources...
+
+          ],
+
+          // customButtons: {
+          //   myCustomButton: {
+          //       text: 'custom!',
+          //       click: function() {
+          //         alert('clicked the custom button!');
+          //       }
+          //     }
+          //   },
+            headerToolbar: {
+              left: 'prevYear prev today next nextYear',
+              center: 'title',
+              right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            }
+        });
+        calendar.render();
+        handleCalendar()
+      });
+
+    </script>
+
       <!-- Carregando arquivos da biblioteca AST-Notif. Créditos: https://github.com/anandastoon/AST-Notif -->
     <link rel="stylesheet" href="../resources/AST-Notif/css/ast-notif.min.css">
     <!-- Carregando arquivos da biblioteca driver.js. Créditos: https://github.com/kamranahmedse/driver.js -->
@@ -922,7 +1010,7 @@
 
         <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4" id="telaPrincipalSecretaria">
           <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
-            <h1 class="h2" id="tituloSecretaria">Secretaria</h1>
+            <label class="h2" id="tituloSecretaria">Secretaria</label>
             <div class="btn-toolbar mb-2 mb-md-0">
               <!--<div class="btn-group mr-2">
                 <button class="btn btn-sm btn-outline-secondary">Share</button>
@@ -932,7 +1020,17 @@
                 <span data-feather="calendar"></span>
                 This week
               </button>-->
-              <label for="profilePic" class="text-muted float-right" id="username"></label>
+
+              <button type="button" class="btn btn-light btn-sm" onclick="document.getElementById('btnAbaAlunos').click()">
+                Alunos matriculados <span class="badge badge-success" id="alunosMatriculadosNum">0</span>
+              </button>
+              <button type="button" class="btn btn-light btn-sm" onclick="document.getElementById('btnAbaAlunosDesativados').click()">
+                Alunos Desativados <span class="badge badge-danger" id="alunosDesativadosNum">0</span>
+              </button>
+              <button type="button" class="btn btn-light btn-sm" onclick="document.getElementById('btnAbaTurmas').click()">
+                Turmas Cadastradas <span class="badge badge-success" id="turmasCadastradasNum">0</span>
+              </button>
+              <label for="profilePic" class="text-muted float-right" id="username" style="margin-left: 10px;"></label>
               <a class="btn" href="../login.html"><img src="../images/profile_placeholder.png" class="rounded float-right" width="40px" id="profilePic"></a>
             </div>
           </div>
@@ -941,105 +1039,15 @@
             <!--<button type="button" class="btn btn-light btn-sm">
               Alunos cadastrados <span class="badge badge-primary" id="alunosCadastradosNum">0</span>
             </button>-->
-            <button type="button" class="btn btn-light btn-sm" onclick="document.getElementById('btnAbaAlunos').click()">
-              Alunos matriculados <span class="badge badge-success" id="alunosMatriculadosNum">0</span>
-            </button>
-            <button type="button" class="btn btn-light btn-sm" onclick="document.getElementById('btnAbaAlunosDesativados').click()">
-              Alunos Desativados <span class="badge badge-danger" id="alunosDesativadosNum">0</span>
-            </button>
-            <button type="button" class="btn btn-light btn-sm" onclick="document.getElementById('btnAbaTurmas').click()">
-              Turmas Cadastradas <span class="badge badge-success" id="turmasCadastradasNum">0</span>
-            </button>
+            
             
           </div>
-          <hr>
           <!-- Gráfico -->
           <!-- <canvas class="my-4" id="myChart" width="900" height="380"></canvas> -->
           <div class="tab-content" id="nav-tabContent">
-            <div class="container tab-pane fade show active" id="abaDashboard" role="tabpanel" aria-labelledby="Dashboard">
-              <div class="row">
-                <div class="col-sm-auto">
-                  <h2>Tabela semanal de alunos</h2>
-                  <div class="table-responsive">
-                    <table class="table table-striped table-sm">
-                      <thead>
-                        <tr>
-                          <th>Dia da semana</th>
-                          <th>Manhã</th>
-                          <th>Tarde</th>
-                          <th>Noite</th>
-                          <th>Total</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td>Segunda - feira</td>
-                          <td id="MONManha">0</td>
-                          <td id="MONTarde">0</td>
-                          <td id="MONNoite">0</td>
-                          <td id="totalMON">0</td>
-                        </tr>
-                        <tr>
-                          <td>Terça - feira</td>
-                          <td id="TUEManha">0</td>
-                          <td id="TUETarde">0</td>
-                          <td id="TUENoite">0</td>
-                          <td id="totalTUE">0</td>
-                        </tr>
-                        <tr>
-                          <td>Quarta - feira</td>
-                          <td id="WEDManha">0</td>
-                          <td id="WEDTarde">0</td>
-                          <td id="WEDNoite">0</td>
-                          <td id="totalWED">0</td>
-                        </tr>
-                        <tr>
-                          <td>Quinta - feira</td>
-                          <td id="THUManha">0</td>
-                          <td id="THUTarde">0</td>
-                          <td id="THUNoite">0</td>
-                          <td id="totalTHU">0</td>
-                        </tr>
-                        <tr>
-                          <td>Sexta - feira</td>
-                          <td id="FRIManha">0</td>
-                          <td id="FRITarde">0</td>
-                          <td id="FRINoite">0</td>
-                          <td id="totalFRI">0</td>
-                        </tr>
-                        <tr>
-                          <td>Sábado</td>
-                          <td id="SATManha">0</td>
-                          <td id="SATTarde">0</td>
-                          <td id="SATNoite">0</td>
-                          <td id="totalSAT">0</td>
-                        </tr>
-                        <tr>
-                          <td>Domingo</td>
-                          <td id="SUNManha">0</td>
-                          <td id="SUNTarde">0</td>
-                          <td id="SUNNoite">0</td>
-                          <td id="totalSUN">0</td>
-                        </tr>
-                        <tr>
-                          <td><b>Total</b></td>
-                          <td id="totalManha">0</td>
-                          <td id="totalTarde">0</td>
-                          <td id="totalNoite">0</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-                <div class="col">
-                  <h2>Aniversariantes do mês</h2>
-                  <div class="overflow-auto" style="height: fit-content; max-height: 300px;">
-                    <div class="list-group" id="listaAniversarios">
-                      
-                    </div>
-                  </div>
-                </div>
-              </div>
+            <div class="container tab-pane fade show active" id="abaDashboard" role="tabpanel" aria-labelledby="Dashboard" style="width: 100%;">
+             
+              <div id="calendar"></div>
             </div>
 
             <div class="container tab-pane fade" id="abaAlunos" role="tabpanel" aria-labelledby="Alunos">
@@ -1254,7 +1262,7 @@
                     <p class="text-muted float-md-right" id="timestampDoAluno"></p>
                     <br>
                     <hr>
-                    <label class="h5">Mapa de frequências da turma atual</label>
+                    <label class="h5">Faltas lançadas</label>
                     <div class="row">
                       <div class="col">
                         <div id="divFrequencias">
@@ -1265,8 +1273,8 @@
                           </div>
                         </div>
                       </div>
-                      <div class="col">
-                        <div id="divTotalFrequencias">Total de presenças: <label id="totalFrequencias"></label> de <label id="qtdeAulasFrequencia"></label><br> Percentual de frequência atual em <label id="porcentagemFrequencia"></label></div>
+                      <div class="col" style="display: none;">
+                        <div id="divTotalFrequencias" >Total de presenças: <label id="totalFrequencias"></label> de <label id="qtdeAulasFrequencia"></label><br> Percentual de frequência atual em <label id="porcentagemFrequencia"></label></div>
                       </div>
                     </div>
                     <hr>
@@ -1685,8 +1693,12 @@
                 <button type="button" class="btn btn-warning" id="btnFechaPeriodo">Fechar turma</button>
                 
                 <hr>
-                <p class="text-muted float-md-right" id="timestampTurmaCadastrada"></p>
                 
+    
+                <div id="calendarioTurma"></div>
+
+                <hr>
+                <p class="text-muted float-md-right" id="timestampTurmaCadastrada"></p>
               </div>
             </div>
 
@@ -2578,6 +2590,60 @@
                   </div>
                 </div>
 
+                <label class="h6">Horário comercial da escola</label>
+                <br>
+                <a class="btn btn-sm btn-info" id="addHorarioComercial"><span data-feather="plus"></span> Adicionar horário comercial</a>
+                <div id="horarioComercial">
+                  <div class="row">
+                    <div class="col-auto">
+                      <div class="form-group">
+                        <label for="exampleInputPassword1">Dias da semana:</label>
+                        <br>
+                        <input type="checkbox" id="dom|0" value="0" name="dias|0">
+                        <label for="dom0">Domingo</label>
+
+                        <input type="checkbox" id="seg|0" value="1" name="dias|0">
+                        <label for="seg0">Segunda</label>
+
+                        <input type="checkbox" id="ter|0" value="2" name="dias|0">
+                        <label for="ter0">Terça</label>
+
+                        <input type="checkbox" id="qua|0" value="3" name="dias|0">
+                        <label for="qua0">Quarta</label>
+
+                        <input type="checkbox" id="qui|0" value="4" name="dias|0">
+                        <label for="qui0">Quinta</label>
+
+                        <input type="checkbox" id="sex|0" value="5" name="dias|0">
+                        <label for="sex0">Sexta</label>
+
+                        <input type="checkbox" id="sab|0" value="6" name="dias|0">
+                        <label for="sab0">Sábado</label>
+                      </div>
+                      
+                    </div>
+                    <div class="col-auto">
+                      <div class="form-group">
+                        <label for="exampleInputPassword1">Horário do expediente:</label>
+                        <div class="input-group mb-3">
+                          <div class="input-group-prepend">
+                            <span class="input-group-text">Início</span>
+                          </div>
+                          <input type="time" id="startTime|0" required name="startTime|0" class="form-control">
+                          &nbsp;&nbsp;
+                          <div class="input-group-prepend">
+                            <span class="input-group-text">Fim</span>
+                          </div>
+                          <input type="time" id="endTime|0" required name="endTime|0" class="form-control">
+                          
+                        </div>
+                        
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <br>
                 <div class="custom-control custom-switch">
                   <input type="checkbox" class="custom-control-input" id="permitirDistribuiNotas" name="permitirDistribuiNotas">
                   <label class="custom-control-label" for="permitirDistribuiNotas">Permitir os professores distribuírem as notas nas turmas <span data-feather="help-circle" data-toggle="tooltip" data-placement="top" title="Caso você não permita, a secretaria será a responsável por definir as pontuações máximas de atividades da turma, ou seja, será responsável por distribuir as notas. O professor, por sua vez, só poderá lançar as notas no sistema."></span></label>
@@ -2897,16 +2963,28 @@
     <script>
       feather.replace()
     </script>
+
+<script defer src="https://uicdn.toast.com/tui.code-snippet/v1.5.2/tui-code-snippet.min.js"></script>
+
+<script defer src="https://uicdn.toast.com/tui.time-picker/latest/tui-time-picker.min.js"></script>
+
+<script defer src="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.min.js"></script>
+
+<script defer src="https://uicdn.toast.com/tui-calendar/latest/tui-calendar.js"></script>
+    
     <script defer src="../js/secretaria.js"></script>
     <script defer src="../js/app.js"></script>
     <script defer src="../js/chat.js"></script>
     <!-- Carregando outros arquivos da biblioteca AST-Notif. Créditos: https://github.com/anandastoon/AST-Notif -->
     <script defer src="../resources/AST-Notif/js/ast-notif.min.js"></script>
+    
 
     <!-- Carregando arquivos da biblioteca driver.js. Créditos: https://github.com/kamranahmedse/driver.js -->
     <script defer src="../resources/driver/driver.min.js"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.13.3/js/standalone/selectize.js" integrity="sha512-pF+DNRwavWMukUv/LyzDyDMn8U2uvqYQdJN0Zvilr6DDo/56xPDZdDoyPDYZRSL4aOKO/FGKXTpzDyQJ8je8Qw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    
  
 
 
