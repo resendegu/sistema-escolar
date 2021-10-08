@@ -955,7 +955,7 @@ exports.aberturaChamados = functions.database.ref('sistemaEscolar/chamados/{key}
     console.log('Email queued for delivery.')
 })
 
-exports.montaCalendarioGeral = functions.database.ref('sistemaEscolar/turmas/{turma}/aulaEvento').onCreate(async (snapshot, context) => {
+exports.montaCalendarioGeral = functions.database.ref('sistemaEscolar/turmas/{turma}/aulaEvento/').onWrite(async (snapshot, context) => {
     let turma = context.params.turma
     let aulaEvento = snapshot.val()
     let source = aulaEvento[0]
