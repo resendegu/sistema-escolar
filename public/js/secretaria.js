@@ -163,6 +163,59 @@ firebase.auth().onAuthStateChanged((user) => {
             }
             alunosDesativadosNum.innerText = c
         })
+
+        firebase.database().ref('sistemaEscolar/infoEscola/calendarioGeral').on('value', (snapshot) => {
+            let eventSources = snapshot.val()
+            let calendarEl = document.getElementById('calendar');
+            let calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'timeGridWeek',
+            height: '450px',
+            locale: 'pt-br',
+            weekNumbers: true,
+            dateClick: function(info) {
+                console.log(info)
+            },
+            selectable: true,
+            select: function(info) {
+                console.log(info)
+            },
+            hiddenDays: [ 0 ],
+            unselectAuto: false,
+            // businessHours: [ // specify an array instead
+            //   {
+            //     daysOfWeek: [ 1, 2, 3, 4, 5  ], // Monday, Tuesday, Wednesday
+            //     startTime: '08:00', // 8am
+            //     endTime: '18:00' // 6pm
+            //   },
+            //   {
+            //     daysOfWeek: [ 6 ], // Saturday
+            //     startTime: '10:00', // 10am
+            //     endTime: '16:00' // 4pm
+            //   }
+            // ],
+            nowIndicator: true,
+            eventSources: eventSources,
+
+            // customButtons: {
+            //   myCustomButton: {
+            //       text: 'custom!',
+            //       click: function() {
+            //         alert('clicked the custom button!');
+            //       }
+            //     }
+            //   },
+                headerToolbar: {
+                left: 'prevYear prev today next nextYear',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                }
+            });
+            calendar.render();
+            handleCalendar()
+        })
+
+        
+
         // numerosRef.on('value', (snapshot) => {
         //     loaderMsg.innerText = 'Buscando informações da dashboard'
         //     var numeros = snapshot.val()

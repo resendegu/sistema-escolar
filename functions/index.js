@@ -828,14 +828,16 @@ exports.fechaTurma = functions.https.onCall((data, context) => {
                     throw new Error(error.message)
                 })
 
-                turmaRef.child('historicoEscolar/' + chave).set({dadosDaTurma: dadosDaTurma, timestamp: admin.firestore.Timestamp.now(), codTurma: dadosDaTurma.codigoSala}).then(() => {
+                let aulaEvento = (await turmaRef.child('aulaEvento').once('value')).val()
+
+                turmaRef.child('historicoEscolar/' + chave).set({dadosDaTurma: dadosDaTurma, timestamp: admin.firestore.Timestamp.now(), codTurma: dadosDaTurma.codigoSala, aulaEvento: aulaEvento}).then(() => {
 
                 }).catch(error => {
                     throw new Error(error.message)
                 })
 
                 turmaRef.child('frequencia').remove().then(() => {
-                    turmaRef.child()
+                    
                 }).catch(error => {
                     throw new Error(error.message)
                 })
@@ -853,7 +855,7 @@ exports.fechaTurma = functions.https.onCall((data, context) => {
                         infoAluno.curso = dadosDaTurma.curso
                         infoAluno.nomePeriodo = dadosDaTurma.status.nomePeriodo
                         infoAluno.professor = dadosDaTurma.professor
-                        alunosRef.child(formataNumMatricula(matricula) + '/historicoEscolar/' + chave).set({infoAluno: infoAluno, timestamp: admin.firestore.Timestamp.now(), turma: dadosDaTurma.codigoSala}).then(() => {
+                        alunosRef.child(formataNumMatricula(matricula) + '/historicoEscolar/' + chave).set({infoAluno: infoAluno, timestamp: admin.firestore.Timestamp.now(), turma: dadosDaTurma.codigoSala, aulaEvento: aulaEvento}).then(() => {
 
                         }).catch(error => {
                             throw new Error(error.message)
@@ -870,6 +872,7 @@ exports.fechaTurma = functions.https.onCall((data, context) => {
                 }).catch(error => {
                     throw new functions.https.HttpsError('unknown', error.message, error)
                 })
+                await turmaRef.child('aulaEvento').remove()
             }
 
             return sequenciaDeFechamento(dadosTurma.val()).then(callback => {
@@ -957,15 +960,29 @@ exports.aberturaChamados = functions.database.ref('sistemaEscolar/chamados/{key}
 
 exports.montaCalendarioGeral = functions.database.ref('sistemaEscolar/turmas/{turma}/aulaEvento/').onWrite(async (snapshot, context) => {
     let turma = context.params.turma
-    let aulaEvento = snapshot.val()
-    let source = aulaEvento[0]
+    let aulaEvento = snapshot.after.val()
+    let source = aulaEvento
     let calendarioSnapshot = await admin.database().ref('sistemaEscolar/infoEscola/calendarioGeral').once('value')
-    let calendario = calendarioSnapshot.exists() ? calendario.push(source) : [source]
+    let calendario = calendarioSnapshot.exists() ? calendarioSnapshot.val() : [source]
+    if (calendarioSnapshot.exists()) {
+        calendario.push(source);
+    }
+
 
     await admin.database().ref('sistemaEscolar/infoEscola/calendarioGeral').set(calendario)
     
 })
 
+exports.removeCalendarios = functions.database.ref('sistemaEscolar/turmas/{turma}/aulaEvento/').onDelete(async (snapshot, context) => {
+    let turma = context.params.turma
+    let aulaEvento = snapshot.val()
+    let calendarioSnapshot = await admin.database().ref('sistemaEscolar/infoEscola/calendarioGeral').once('value')
+    let calendarioGeral = calendarioSnapshot.val()
+    let calendario = calendarioGeral.filter(source => source.id !== turma)
+    
+    await admin.database().ref('sistemaEscolar/infoEscola/calendarioGeral').set(calendario)
+    
+})
 // exports.adicionaFotoAluno = functions.storage.object().onFinalize(async (object) => {
 //     const fileBucket = object.bucket; // The Storage bucket that contains the file.
 //     const filePath = object.name; // File path in the bucket.
