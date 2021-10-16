@@ -5436,6 +5436,10 @@ document.getElementById('infoEscolaForm').addEventListener('submit', (e) => {
     infoEscola.corPrimariaEscola = dados.get('corPrimariaEscola')
     infoEscola.corSecundariaEscola = dados.get('corSecundariaEscola')
     infoEscola.permitirDistribuiNotas = dados.get('permitirDistribuiNotas') == null ? false : true
+    infoEscola.tipoChavePix = dados.get('tipoChavePix')
+    infoEscola.chavePix = dados.get('chavePix')
+    infoEscola.nomePix = dados.get('nomePix')
+    infoEscola.cidadePix = dados.get('cidadePix')
 
     let data = $('#infoEscolaForm').serializeArray();
     console.log(data)

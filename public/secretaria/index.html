@@ -2579,6 +2579,68 @@
                   <label class="custom-control-label" for="permitirDistribuiNotas">Permitir os professores distribuírem as notas nas turmas <span data-feather="help-circle" data-toggle="tooltip" data-placement="top" title="Caso você não permita, a secretaria será a responsável por definir as pontuações máximas de atividades da turma, ou seja, será responsável por distribuir as notas. O professor, por sua vez, só poderá lançar as notas no sistema."></span></label>
                 </div>
                 <br>
+
+                <label class="h6">Dados para geração de códigos PIX para boletos</label>
+                <div class="row">
+                  <div class="col">
+                    <div class="form-group">
+                      <label for="exampleInputPassword1">Selecione o tipo de chave PIX que será usado:</label>
+                      <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <label class="input-group-text" for="inputGroupSelect01">Tipo de chave</label>
+                        </div>
+                        <select class="custom-select" id="tipoChavePix" name="tipoChavePix">
+                          <option selected>Escolha...</option>
+                          <option value="cpf">CPF</option>
+                          <option value="cnpj">CNPJ</option>
+                          <option value="celular">Celular</option>
+                          <option value="email">E-mail</option>
+                          <option value="aleatoria">Chave aleatória</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col">
+                    <div class="form-group">
+                      <label for="exampleInputPassword1">Digite a chave PIX corretamente:</label>
+                      <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text">Chave PIX</span>
+                        </div>
+                        <input type="text" id="chavePix" name="chavePix" class="form-control" placeholder="Digite a chave PIX..." aria-label="CHave PIX">
+                        
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col">
+                    <div class="form-group">
+                      <label for="exampleInputPassword1">Nome ou Razão Social do Beneficiário:</label>
+                      <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text">Nome ou Razão Social</span>
+                        </div>
+                        <input type="text" id="nomePix" name="nomePix" class="form-control" placeholder="Digite o nome ou a Razão Social da chave PIX associada..." aria-label="Nome ou Razão Social">
+                        
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col">
+                    <div class="form-group">
+                      <label for="exampleInputPassword1">Nome da cidade do beneficiário da chave PIX associada:</label>
+                      <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text">Cidade</span>
+                        </div>
+                        <input type="text" id="cidadePix" required name="cidadePix" class="form-control" placeholder="Digite o nome da cidade onde reside a entidade que receberá pagamentos via PIX..." aria-label="Cidade">
+                        
+                      </div>
+                    </div>
+                  </div>
+                </div>
                 
                 <button type="submit" class="btn btn-primary btn-block">Aplicar dados básicos</button>
               </form>

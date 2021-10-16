@@ -310,7 +310,7 @@
                             
                             
                             
-                            addParcela(parcela + 1, data.numeroParcelas, `${data.vencimentoEscolhido <= 9 ? '0' + data.vencimentoEscolhido : data.vencimentoEscolhido}/${mesParcela <= 9 ? '0' + mesParcela : mesParcela}/${anoInicio}`, numDoc, valorParcela, descontoParcela, acrescimoParcela, valorCobrado, dataProcessamento, )
+                            await addParcela(parcela + 1, data.numeroParcelas, `${data.vencimentoEscolhido <= 9 ? '0' + data.vencimentoEscolhido : data.vencimentoEscolhido}/${mesParcela <= 9 ? '0' + mesParcela : mesParcela}/${anoInicio}`, numDoc, valorParcela, descontoParcela, acrescimoParcela, valorCobrado, dataProcessamento, )
                             // addParcela(`Saldo: R$${saldo}`)
                             contadorParcelas--
                             numDoc++
@@ -320,6 +320,7 @@
                         contratoRef.child('docsBoletos').set(numerosDeDoc).then(() => {
                             console.log('Docs Cadastrados')
                             loaderRun()
+                            setQrCode()
                         }).catch(error => {
                             console.log('Erro', error.message)
                         })
@@ -401,8 +402,17 @@
                     }).catch(error => {
                         console.log(error)
                     })
-                    boletos.innerHTML += `
-                    <table style="height: 241px; width: 100%; border-collapse: collapse; border-style: solid; margin-top: 18px;" border="1" >
+                    
+                    let gera = firebase.functions().httpsCallable('geraPix')
+                    return gera({valor: totalCobrado, descricao: `DOC${numeroDoc}`}).then(function(lineCode) {
+                    
+                        
+                        //divQr.src = lineCode.data;
+                        console.log(lineCode)
+                        //const code = new QRCode(divQr, { text: lineCode.data, width: 100, height: 100 });
+                        //qrCodesArray.push({qrcode: lineCode.data, numeroDoc: numeroDoc})
+                        boletos.innerHTML += `
+                        <table style="height: 241px; width: 100%; border-collapse: collapse; border-style: solid; margin-top: 18px;" border="1" >
                         <tbody>
                             <tr style="height: 10px; border-style: none;">
                                 <td style="width: 4.97079%; height: 179px;" rowspan="9">&nbsp;</td>
@@ -531,7 +541,7 @@
                                     R$${valorDoc}
                                 </section>          
                             </td>
-                            <td style="width: 51.4498%; height: 88px; border-left: dotted;" colspan="4" rowspan="4">
+                            <td style="width: 51.4498%; height: 88px; border-left: dotted;" colspan="3" rowspan="4">
                                 <section style="font-size: 8pt;">
                                     &nbsp;Informações
                                 </section>
@@ -539,13 +549,19 @@
                                 <section style="font-size: x-small;">
                                     &nbsp;${data.nomeCursoAdd}
                                 </section>
-                                <section style="font-size: x-small;">
-                                    &nbsp;Pagamento realizado por:
-                                    <p>&nbsp;</p>
-                                    
-                                </section>
-                            <hr />
+                                
+                                
                             <p style="font-size: x-small; width: 100%; text-align: start;">&nbsp;${data.descricaoPlano}</p>
+                            </td>
+                            <td style="width: 17.9337%; height: 88px;" rowspan="4" colspan="1">
+                                <section style="font-size: 8pt; text-align: center;">
+                                    Pague via PIX
+                                </section>
+                                <section style="font-size: 8pt; text-align: center;">
+                                    <img id="qrcode${numeroDoc}" style="width: 80px;" src="${lineCode.data}">
+                                </section>
+                                
+                                   
                             </td>
                             <td style="width: 64.5223%; height: 24px;">
                                 <section style="font-size: 8pt; text-align: center;">
@@ -648,8 +664,11 @@
                                 </td>
                             </tr>
                         </tbody>
-                    </table>
-                    `
+                        </table>
+                        ` 
+                        return ;
+                    })
+                    
                 }
 
                 
@@ -713,9 +732,10 @@
                     for (const key in docsDoContrato) {
                         if (Object.hasOwnProperty.call(docsDoContrato, key)) {
                             const doc = docsDoContrato[key];
-                            addParcela(doc.parcelaAtual, doc.numDeParcelas, doc.vencimento, doc.numeroDoc, doc.valorDoc, doc.descontos, doc.acrescimos, doc.totalCobrado, doc.dataProcessamento, doc.informacoes)
+                            await addParcela(doc.parcelaAtual, doc.numDeParcelas, doc.vencimento, doc.numeroDoc, doc.valorDoc, doc.descontos, doc.acrescimos, doc.totalCobrado, doc.dataProcessamento, doc.informacoes)
                         }
                     }
+                    
 
                     loaderRun()
 
@@ -772,8 +792,16 @@
                         `
                     }
                     let boletos = document.getElementById('boletos' + pag)
+                    let gera = firebase.functions().httpsCallable('geraPix')
+                    return gera({valor: totalCobrado, descricao: `DOC${numeroDoc}`}).then(function(lineCode) {
                     
-                    boletos.innerHTML += `
+                        
+                        //divQr.src = lineCode.data;
+                        console.log(lineCode)
+                        //const code = new QRCode(divQr, { text: lineCode.data, width: 100, height: 100 });
+                        // qrCodesArray.push({qrcode: lineCode.data, numeroDoc: numeroDoc})
+                        
+                        boletos.innerHTML += `
                     <table style="height: 4.8cm; width: 100%; border-collapse: collapse; border-style: solid; margin-top: 18px;" border="1" >
                         <tbody>
                             <tr style="height: 10px; border-style: none;">
@@ -903,7 +931,7 @@
                                     R$${valorDoc}
                                 </section>          
                             </td>
-                            <td style="width: 51.4498%; height: 88px; border-left: dotted;" colspan="4" rowspan="4">
+                            <td style="width: 51.4498%; height: 88px; border-left: dotted;" colspan="3" rowspan="4">
                                 <section style="font-size: 8pt;">
                                     &nbsp;Informações
                                 </section>
@@ -911,13 +939,19 @@
                                 <section style="font-size: x-small;">
                                     &nbsp;${data.nomeCursoAdd}
                                 </section>
-                                <section style="font-size: x-small;">
-                                    &nbsp;Pagamento realizado por:
-                                    <p>&nbsp;</p>
-                                    
-                                </section>
-                            <hr />
+                                
+                                
                             <p style="font-size: x-small; width: 100%; text-align: start;">&nbsp;${data.descricaoPlano}</p>
+                            </td>
+                            <td style="width: 17.9337%; height: 88px;" rowspan="4" colspan="1">
+                                <section style="font-size: 8pt; text-align: center;">
+                                    Pague via PIX
+                                </section>
+                                <section style="font-size: 8pt; text-align: center;">
+                                    <img id="qrcode${numeroDoc}" style="width: 80px;" src="${lineCode.data}">
+                                </section>
+                                
+                                   
                             </td>
                             <td style="width: 64.5223%; height: 24px;">
                                 <section style="font-size: 8pt; text-align: center;">
@@ -1022,15 +1056,42 @@
                         </tbody>
                     </table>
                     `
+                        return ;
+                    })
+                    
+                    
+
+                   
                 }
 
                 
 
             }
 
+            let qrCodesArray = []
+            async function geraPix(valor, descricao, numeroDoc) {
+                let gera = firebase.functions().httpsCallable('geraPix')
+                gera({valor: valor, descricao: descricao}).then(function(lineCode) {
+                   
+                    
+                    //divQr.src = lineCode.data;
+                    console.log(lineCode)
+                    //const code = new QRCode(divQr, { text: lineCode.data, width: 100, height: 100 });
+                    qrCodesArray.push({qrcode: lineCode.data, numeroDoc: numeroDoc})
+                    
+                })
+                
+            }    
+            function setQrCode() {
+                console.log(qrCodesArray);
+                qrCodesArray.map((code, i) => {
+                    document.getElementById(`qrcode${code.numeroDoc}`).src = code.qrcode;
+                })
+            }
         </script>
 
         <script src="../../js/app.js"></script>
+        <script src="qrcode.js"></script>
         
 </body>
 </html>
