@@ -361,6 +361,7 @@ async function carregaListaDeAlunosDaTurma(turma, filtro='') {
 
     turmasRef.child(turma + '/status').once('value').then(snapshot => {
         let status = snapshot.val()
+        let btnGeraDiario = document.getElementById('btnGeraDiario')
         if (snapshot.exists()) {
             if (status.turma == 'aberta') {
                 document.getElementById('infoTurma').style.color = 'green'
@@ -371,6 +372,9 @@ async function carregaListaDeAlunosDaTurma(turma, filtro='') {
                 document.getElementById('btnFechaPeriodo').disabled = false
                 document.getElementById('btnLancaFrequencia').style.visibility = 'visible'
                 document.getElementById('btnLancaNotas').style.visibility = 'visible'
+                btnGeraDiario.style.visibility = 'visible'
+                btnGeraDiario.disabled = false
+                btnGeraDiario.addEventListener('click', () => geraDiarioClasse(alunosSelecionadosTurma.codTurma))
             } else {
                 document.getElementById('btnLancaFrequencia').style.visibility = 'hidden'
                 document.getElementById('btnLancaNotas').style.visibility = 'hidden'
@@ -381,6 +385,9 @@ async function carregaListaDeAlunosDaTurma(turma, filtro='') {
                 document.getElementById('btnFechaPeriodo').style.visibility = 'hidden'
                 document.getElementById('btnIniciaPeriodo').disabled = false
                 document.getElementById('btnFechaPeriodo').disabled = true
+                btnGeraDiario.style.visibility = 'visible'
+                btnGeraDiario.disabled = true
+                
             }
         } else {
             document.getElementById('btnLancaFrequencia').style.visibility = 'hidden'
@@ -389,6 +396,8 @@ async function carregaListaDeAlunosDaTurma(turma, filtro='') {
             document.getElementById('btnIniciaPeriodo').disabled = false
             document.getElementById('infoTurma').innerText = 'Turma'
             document.getElementById('infoTurma').style.color = 'black'
+            btnGeraDiario.style.visibility = 'hidden'
+            btnGeraDiario.disabled = true
         }
         
     }).catch(error => {
@@ -397,6 +406,16 @@ async function carregaListaDeAlunosDaTurma(turma, filtro='') {
     })
     
 }
+
+function geraDiarioClasse(turmaAberta) {
+    let baseUrl = window.location.origin
+    console.log(baseUrl)
+    window.open(
+        baseUrl + `/resources/pdfsProntos/diario.html#diario?${turmaAberta}`,
+        'Diário ' + turmaAberta
+    )
+}
+
 document.getElementById('listaAlunosTurmaForm').addEventListener('submit', (e) => {
     e.preventDefault()
     console.log(e)

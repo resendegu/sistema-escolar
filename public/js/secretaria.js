@@ -632,6 +632,8 @@ async function turmas() {
         }
         return somatorio;
     }
+
+
     function carregaListaDeAlunosDaTurma(alunos, filtro='') {
         loaderRun(true, 'Carregando alunos...')
         let listaAlunosTurma = document.getElementById('listaAlunosTurma')
@@ -674,6 +676,7 @@ async function turmas() {
             let infoTurma = document.getElementById('infoTurma')
             let btnIniciaPeriodo = document.getElementById('btnIniciaPeriodo')
             let btnFechaPeriodo = document.getElementById('btnFechaPeriodo')
+            let btnGeraDiario = document.getElementById('btnGeraDiario')
             if (snapshot.exists()) {
                 if (status.turma == 'aberta') {
                     infoTurma.style.color = 'green'
@@ -683,7 +686,13 @@ async function turmas() {
                     btnIniciaPeriodo.disabled = true
                     btnFechaPeriodo.disabled = false
                     btnFechaPeriodo.addEventListener('click', () => fechaPeriodo())
+                    btnGeraDiario.style.visibility = 'visible'
+                    btnGeraDiario.disabled = false
+
+                    btnGeraDiario.addEventListener('click', () => geraDiarioClasse())
                 } else {
+                    btnGeraDiario.style.visibility = 'visible'
+                    btnGeraDiario.disabled = true
                     btnIniciaPeriodo.style.visibility = 'hidden'
                     infoTurma.style.color = 'gold'
                     infoTurma.innerText = 'Turma Fechada'
@@ -694,6 +703,8 @@ async function turmas() {
                     btnIniciaPeriodo.addEventListener('click', () => iniciaPeriodo())
                 }
             } else {
+                btnGeraDiario.style.visibility = 'hidden'
+                btnGeraDiario.disabled = true
                 btnFechaPeriodo.style.visibility = 'hidden'
                 btnIniciaPeriodo.disabled = false
                 btnIniciaPeriodo.style.visibility = 'visible'
@@ -703,6 +714,15 @@ async function turmas() {
             }
         })
         
+    }
+
+    function geraDiarioClasse() {
+        let baseUrl = window.location.origin
+        console.log(baseUrl)
+        window.open(
+            baseUrl + `/resources/pdfsProntos/diario.html#diario?${turmaAberta}`,
+            'Diário ' + turmaAberta
+        )
     }
 
     let turma

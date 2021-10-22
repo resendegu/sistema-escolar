@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diário</title>
+    <link rel="stylesheet" href="../../css/loader.css">
+    <style type="text/css">
+      
+      
+      .tg  {border-collapse:collapse; border-style: solid; border-color:#000000;border-spacing:0;margin:0px auto; width: 28cm;}
+      .tg td{background-color:#ffffff;border-color:#000000;border-style:hidden;border-width:1px;color:#444;
+        font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:2px 15px;word-break:normal;}
+      .tg th{background-color:#ffffff;border-color:#000000;border-style:hidden;border-width:1px;color:#fff;
+        font-family:Arial, sans-serif;font-size:14px;font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
+      .tg .tg-yj5y{background-color:#efefef;border-color:inherit;text-align:center;vertical-align:center}
+      .tg .tg-sg5v{border-bottom: solid; font-size: 9pt;}
+      .tg .tg-wp8o{text-align:center;vertical-align:center; }
+      .tg .tg-m1nc{background-color:#ffffff;border-color:inherit;color:#000000;font-size:10px;text-align:right;vertical-align:center}
+      .tg .tg-0pky{border-color:inherit;border-style: solid; text-align:left;vertical-align:center; text-align: center;}
+      .tg .tg-73oq{border-color:#000000;text-align:left;vertical-align:center}
+      .tg .tg-hvas{font-size:xx-small;text-align:left;vertical-align:center}
+      .tg .tg-0lax{text-align:left;vertical-align:center; font-size: 9pt; border-style: solid; }
+      .blank_row
+        {
+            height: 10px !important; /* overwrites any other rules */
+            
+            border-top: #000000;
+            border-bottom: #000000;
+        }
+  </style>
+</head>
+<body>
+    
+         <!-- Loader -->
+      
+    <div id="loader" class="window-loader">
+      <label id="loaderMsg">Aguarde...</label>
+        <div class="loader"></div>
+    </div>
+            <!-- Inicialização do Firebase -->
+      <!-- update the version number as needed -->
+      <script defer src="/__/firebase/8.2.3/firebase-app.js"></script>
+      <!-- include only the Firebase features as you need -->
+      <script defer src="/__/firebase/8.2.3/firebase-auth.js"></script>
+      <script defer src="/__/firebase/8.2.3/firebase-database.js"></script>
+      <!-- <script defer src="/__/firebase/8.2.3/firebase-firestore.js"></script> -->
+      <script defer src="/__/firebase/8.2.3/firebase-functions.js"></script>
+      <!-- <script defer src="/__/firebase/8.2.3/firebase-messaging.js"></script> -->
+      <script defer src="/__/firebase/8.2.3/firebase-storage.js"></script>
+      <script defer src="/__/firebase/8.2.3/firebase-analytics.js"></script>
+      <!-- <script defer src="/__/firebase/8.1.1/firebase-remote-config.js"></script> -->
+      <script defer src="/__/firebase/8.2.3/firebase-performance.js"></script>
+      <!-- 
+        initialize the SDK after all desired features are loaded, set useEmulator to false
+        to avoid connecting the SDK to running emulators.
+      -->
+      <script defer src="/__/firebase/init.js?useEmulator=true"></script>
+        <table class="tg">
+        <thead id="head">
+          <tr>
+            <th class="tg-m1nc" colspan="16" id="timestamp">Data de emissão: --/--/-- --:--:--</th>
+          </tr>
+          <tr id="title">
+            <td class="tg-wp8o" colspan="16"><span style="font-weight:bold">TÍTULO TABELA</span></td>
+          </tr>
+          <tr id="infoSchool">
+            <td class="tg-wp8o" colspan="16">INFORMAÇÕES DA ESCOLA</td>
+          </tr>
+          <tr id="infoDoc">
+            <td class="tg-sg5v" colspan="4">TOPICO DE INFORMAÇÕES</td>
+            <td class="tg-sg5v" colspan="4">INFORMAÇÕES</td>
+            <td class="tg-sg5v" colspan="4">TOPICO DE INFORMAÇÕES</td>
+            <td class="tg-sg5v" colspan="4">INFORMAÇÕES</td>
+          </tr>
+          <!-- 16 colunas -->
+          <tr id="infoTopics">
+            <td class="tg-0pky"></td>
+            <td class="tg-0pky"></td>
+            <td class="tg-0pky"></td>
+            <td class="tg-0pky"></td>
+            <td class="tg-0pky"></td>
+            <td class="tg-0pky"></td>
+            <td class="tg-0pky"></td>
+            <td class="tg-0pky"></td>
+            <td class="tg-0pky"></td>
+            <td class="tg-0pky"></td>
+            <td class="tg-0pky"></td>
+            <td class="tg-0pky"></td>
+            <td class="tg-0pky"></td>
+            <td class="tg-0pky"></td>
+            <td class="tg-0pky"></td>
+            <td class="tg-0pky"></td>
+          </tr>
+        </thead>
+        <tbody id="rows">
+          
+          <tr>
+            <td class="tg-0lax"></td>
+            <td class="tg-0lax"></td>
+            <td class="tg-0lax"></td>
+            <td class="tg-0lax"></td>
+            <td class="tg-0lax"></td>
+            <td class="tg-0lax"></td>
+            <td class="tg-0lax"></td>
+            <td class="tg-0lax"></td>
+            <td class="tg-0lax"></td>
+            <td class="tg-0lax"></td>
+            <td class="tg-0lax"></td>
+            <td class="tg-0lax"></td>
+            <td class="tg-0lax"></td>
+            <td class="tg-0lax"></td>
+            <td class="tg-0lax"></td>
+            <td class="tg-0lax"></td>
+          </tr>
+          
+        </tbody>
+        
+            <tfoot id="lastRow">
+                <tr>
+                    <td class="tg-0lax"></td>
+                    <td class="tg-0lax"></td>
+                    <td class="tg-0lax"></td>
+                    <td class="tg-0lax"></td>
+                    <td class="tg-0lax"></td>
+                    <td class="tg-0lax"></td>
+                    <td class="tg-0lax"></td>
+                    <td class="tg-0lax"></td>
+                    <td class="tg-0lax"></td>
+                    <td class="tg-0lax"></td>
+                    <td class="tg-0lax"></td>
+                    <td class="tg-0lax"></td>
+                    <td class="tg-0lax"></td>
+                    <td class="tg-0lax"></td>
+                    <td class="tg-0lax"></td>
+                    <td class="tg-0lax"></td>
+                </tr>
+            </tfoot>
+        </table>
+        <script defer src="../../js/app.js"></script>
+        <script defer src="diario.js"></script>
+</body>
+</html>
