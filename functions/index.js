@@ -900,7 +900,7 @@ exports.aberturaChamados = functions.database.ref('sistemaEscolar/chamados/{key}
     }
 
     const priorities = ['Baixa', 'Média', 'Alta', 'Crítica'];
-    const emailSuporte = 'suporte@agenciaprojetox.com'
+    const emailSuporte = 'suporte@grupoprox.com'
     const key = context.params.key
     let chamado = snapshot.val()
     chamado.timestamp = admin.firestore.Timestamp.now()
@@ -1095,6 +1095,15 @@ exports.geraPix = functions.https.onCall((data, context) => {
       return criaCod();
       
 })
+
+exports.alteracaoDados = functions.database.ref('sistemaEscolar/alunos/{matricula}/{key}').onUpdate((snapshot, context) => {
+    
+    functions.logger.log(context.params.key)
+    functions.logger.log(context.params.matricula)
+    functions.logger.log(snapshot.before.val())
+    functions.logger.log(snapshot.after.val())
+})
+
 // exports.adicionaFotoAluno = functions.storage.object().onFinalize(async (object) => {
 //     const fileBucket = object.bucket; // The Storage bucket that contains the file.
 //     const filePath = object.name; // File path in the bucket.

@@ -1967,8 +1967,8 @@ function setaRespPedag(num) {
 }
 
 document.getElementById('matriculaAluno').addEventListener('change', arrumaNumMatricula)
-function arrumaNumMatricula() {
-    var input = document.getElementById('matriculaAluno');
+function arrumaNumMatricula(e) {
+    var input = e.target
     
     input.value="00000"+input.value.replace(/\D/g,'');
     input.value=input.value.slice(-5,-1)+input.value.slice(-1);

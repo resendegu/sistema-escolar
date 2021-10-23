@@ -297,6 +297,7 @@
                             } else {
                                 parcela == 0 ? saldo = data.valorFinal : null
                                 valorCobrado = parseFloat(data.valorFinal / data.numeroParcelas).toFixed(2)
+                                valorParcela = valorCobrado
                                 // saldo = saldo - parseFloat(data.valorFinal / data.numeroMaximoParcelasPlano).toFixed(2)
                                 somaParcelas += Number(parseFloat(data.valorFinal / data.numeroParcelas))
                             }
