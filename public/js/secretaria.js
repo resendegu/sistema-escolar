@@ -1597,7 +1597,7 @@ function carregaProfsETurmas(preMatricula=false) {
         }).catch(error => {
             loaderRun()
             console.error(error)
-            AstNotif.dialog('Erro', error.message)
+            AstNotif.dialog('Sistema não configurado', 'Parece que o sistema ainda não foi completamente configurado. Se estiver tendo dificuldades, entre em contato com o suporte.')
         })
         document.getElementById('vencimento').innerHTML = '<option selected hidden>Escolha...</option>'
         for (let i = 0; i < 28; i++) {
@@ -1614,7 +1614,7 @@ function carregaProfsETurmas(preMatricula=false) {
     
     ultimaMatriculaRef.once('value').then(snapshot => {
         matriculaAluno.value = Number(snapshot.val()) + 1
-        arrumaNumMatricula()
+        arrumaNumMatricula(matriculaAluno)
     }).catch(error => {
         loaderRun()
         console.log(error)
@@ -1968,10 +1968,10 @@ function setaRespPedag(num) {
 
 document.getElementById('matriculaAluno').addEventListener('change', arrumaNumMatricula)
 function arrumaNumMatricula(e) {
-    var input = e.target
+    var input = e.target;
     
-    input.value="00000"+input.value.replace(/\D/g,'');
-    input.value=input.value.slice(-5,-1)+input.value.slice(-1);
+    input.value = "00000" + input.value.replace(/\D/g,'');
+    input.value = input.value.slice(-5,-1) + input.value.slice(-1);
 }
 
 

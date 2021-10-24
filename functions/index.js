@@ -393,7 +393,7 @@ exports.cadastraAluno = functions.https.onCall(async (data, context) => {
                 message: {
                     subject: `${dadosEscola.nomeEscola}`,
                     text: `Olá ${dadosAluno.nomeAluno.split(' ')[0]}, você foi pré-matriculado em nosso sistema. Sistemas ProjetoX.`,
-                    html: `<h3>Olá ${dadosAluno.nomeAluno.split(' ')[0]}!</h3><p>Você foi pré-matriculado(a) em nosso sistema. Viemos te dar as boas vindas, e esperamos que em breve você esteja com a gente.</p><p><b>Entre em contato com a escola para maiores informações</b>.</p><p><b>Dados de contato da escola:</b><br>Telefone: ${dadosEscola.telefoneEscola}<br>E-mail: ${dadosEscola.emailEscola}<br>Endereço: ${dadosEscola.enderecoEscola}</p><p>Sistemas ProXDigital.</p>`
+                    html: `<h3>Olá ${dadosAluno.nomeAluno.split(' ')[0]}!</h3><p>Você foi pré-matriculado(a) em nosso sistema. Viemos te dar as boas vindas, e esperamos que em breve você esteja com a gente.</p><p><b>Entre em contato com a escola para maiores informações</b>.</p><p><b>Dados de contato da escola:</b><br>Telefone: ${dadosEscola.telefoneEscola}<br>E-mail: ${dadosEscola.emailEscola}<br>Endereço: ${dadosEscola.enderecoEscola}</p><p>Sistemas GrupoProX.</p>`
                 }
             }
 
@@ -431,7 +431,7 @@ exports.cadastraAluno = functions.https.onCall(async (data, context) => {
                 message: {
                     subject: `${dadosEscola.nomeEscola}`,
                     text: `Olá ${dadosAluno.nomeAluno.split(' ')[0]}, você foi corretamente cadastrado(a) em nosso sistema e está pronto(a) para iniciar essa jornada conosco. Sistemas ProjetoX.`,
-                    html: `<h3>Olá ${dadosAluno.nomeAluno.split(' ')[0]}!</h3><p>Você está matriculado(a) no nº de matrícula <b>${dadosAluno.matriculaAluno}</b>, e está pronto(a) para iniciar os estudos conosco. Use seu e-mail e senha cadastrados para acessar o sistema. Só lembrando, sua senha é: <b>${dadosAluno.senhaAluno}</b>. Fique atento aos e-mails, pois sua escola pode utilizar este canal para comunicação com você.</p><p>Em caso de dificuldades <b>entre em contato com a escola para maiores informações</b>.</p><p><b>Dados de contato da escola:</b><br>Telefone: ${dadosEscola.telefoneEscola}<br>E-mail: ${dadosEscola.emailEscola}<br>Endereço: ${dadosEscola.enderecoEscola}</p><p>Sistemas ProXDigital.</p>`
+                    html: `<h3>Olá ${dadosAluno.nomeAluno.split(' ')[0]}!</h3><p>Você está matriculado(a) no nº de matrícula <b>${dadosAluno.matriculaAluno}</b>, e está pronto(a) para iniciar os estudos conosco. Use seu e-mail e senha cadastrados para acessar o sistema. Só lembrando, sua senha é: <b>${dadosAluno.senhaAluno}</b>. Fique atento aos e-mails, pois sua escola pode utilizar este canal para comunicação com você.</p><p>Em caso de dificuldades <b>entre em contato com a escola para maiores informações</b>.</p><p><b>Dados de contato da escola:</b><br>Telefone: ${dadosEscola.telefoneEscola}<br>E-mail: ${dadosEscola.emailEscola}<br>Endereço: ${dadosEscola.enderecoEscola}</p><p>Sistemas GrupoProX.</p>`
                 }
             }
             dadosAluno.userCreator = context.auth.uid
