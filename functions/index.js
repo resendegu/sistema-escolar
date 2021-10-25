@@ -174,6 +174,33 @@ exports.cadastroUser = functions.auth.user().onCreate((user) => {
     var dadosNoBanco = admin.database().ref(`sistemaEscolar/usuarios/${user.uid}/`)
     var listaDeUsers = admin.database().ref(`sistemaEscolar/listaDeUsuarios`)
     var usuariosMaster = admin.database().ref('sistemaEscolar/usuariosMaster')
+    let firestoreRef = admin.firestore().collection('mail');
+
+    admin.auth().generateEmailVerificationLink(user.email).then(value => {
+        functions.logger.log(value)
+        let emailContent = {
+            to: user.email,
+            message: {
+                subject: `Verificação de segurança do Sistema Escolar`,
+                text: `Clique no link para verificar seu e-mail no sistema escolar`,
+                html: `
+                    <p>Olá, ${user.displayName || 'usuário'}</p>
+                    <p>Clique neste link para verificar seu endereço de e-mail.</p>
+                    <p><a href="${value}">${value}</a></p>
+                    <p>Se você não solicitou a verificação deste endereço, ignore este e-mail.</p>
+                    <p>Obrigado,</p>
+                    <p>Equipe do GrupoProX</p>
+                `
+            }
+        }
+        firestoreRef.add(emailContent).then(() => {
+            console.log('Queued email for delivery to ' + user.email)
+        }).catch(error => {
+            console.error(error)
+        })
+    }).catch(error => {
+        functions.logger.log(error)
+    })
 
     dadosNoBanco.set({
         nome: user.displayName,

@@ -16,14 +16,19 @@ firebase.auth().onAuthStateChanged((usuario) => {
 })
 
 function update() {
-	let versao = 0.99935
-	updatesRef.on('value', (snapshot) => {
-		let dados = snapshot.val().lastUpdate
-
-		if (versao < dados.versao) {
-			abrirModal('modal', 'Atualização do site', `<b>Uma atualização foi lançada:</b><br>Nova versão: ${dados.versao}<br>Sua versão: ${versao}<br>Descrição do novo Update: ${dados.descricao}<br>Importância: ${dados.prioridade}<br>Data do lançamento: ${dados.data}<br><br><a class="btn btn-primary" onclick="window.location.reload(true)">Clique aqui para atualizar</a><br>Caso você tenha clicado para atualizar mas continua vendo esta mensagem, segure a tecla shift e aperte o botão recarregar do navegador para atualizar.`, `<button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>`)
-		}
-	})
+	let versao = 0.99937
+	try {
+		updatesRef.on('value', (snapshot) => {
+			let dados = snapshot.val().lastUpdate
+	
+			if (versao < dados.versao) {
+				abrirModal('modal', 'Atualização do site', `<b>Uma atualização foi lançada:</b><br>Nova versão: ${dados.versao}<br>Sua versão: ${versao}<br>Descrição do novo Update: ${dados.descricao}<br>Importância: ${dados.prioridade}<br>Data do lançamento: ${dados.data}<br><br><a class="btn btn-primary" onclick="window.location.reload(true)">Clique aqui para atualizar</a><br>Caso você tenha clicado para atualizar mas continua vendo esta mensagem, segure a tecla shift e aperte o botão recarregar do navegador para atualizar.`, `<button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>`)
+			}
+		})
+	} catch (error) {
+		console.log(error)
+	}
+	
 }
 
 function loaderRun(show=false, msg='') {
@@ -439,7 +444,7 @@ function chamados() {
 		let camposAddChamados = document.getElementById('camposAddChamados');
 		let btnAddChamado = document.getElementById('btnAddChamado');
 
-		btnAddChamado.addEventListener('click', chamados);
+		btnAddChamado.addEventListener('click', () => AstNotif.toast('Lista atualizada'));
 
 		areaEditaChamados.style.display = 'none';
 		camposAddChamados.style.display = 'block';
@@ -452,6 +457,7 @@ function chamados() {
 			document.getElementById('email').value = user.email;
 	
 			carregaChamados()
+			
 		}, 1000);
 		
 		formAddChamados.addEventListener('submit', async (e) => {
