@@ -1508,25 +1508,35 @@ function addCampoNotaTurma(valorInicial=0, readonly=false, desempenho=false) {
     document.getElementById('somaNotasDistribuidas').innerText = 0
     
     if (desempenho) {
-        camposNotas.innerHTML += 
-        `
+        let newField = new DOMParser().parseFromString(`
         <div class="row" id="linha${contadorNotas}">
-            <div class="col-2" >
-                <input type="text" class="form-control" id="nomeNota${contadorNotas}" placeholder="EX ${contadorNotas + 1}" value="Desempenho" readonly>
-            </div>
-            <div class="col-2">
-                <input type="number" id="valorNota${contadorNotas}" class="form-control" onkeyup="somaNotasDistribuidas('${contadorNotas}')" value="${valorInicial}" placeholder="15.5" readonly>
-            </div>
+        <div class="col-2" >
+            <input type="text" class="form-control" id="nomeNota${contadorNotas}" placeholder="EX ${contadorNotas + 1}" value="Desempenho" readonly>
         </div>
-        `
+        <div class="col-2">
+            <input type="number" id="valorNota${contadorNotas}" class="form-control" onkeyup="somaNotasDistribuidas('${contadorNotas}')" value="${valorInicial}" placeholder="15.5" readonly>
+        </div>
+    </div>
+       `, 'text/html')
+        camposNotas.appendChild(newField.body)
+        // camposNotas.innerHTML += 
+        // `
+        // <div class="row" id="linha${contadorNotas}">
+        //     <div class="col-2" >
+        //         <input type="text" class="form-control" id="nomeNota${contadorNotas}" placeholder="EX ${contadorNotas + 1}" value="Desempenho" readonly>
+        //     </div>
+        //     <div class="col-2">
+        //         <input type="number" id="valorNota${contadorNotas}" class="form-control" onkeyup="somaNotasDistribuidas('${contadorNotas}')" value="${valorInicial}" placeholder="15.5" readonly>
+        //     </div>
+        // </div>
+        // `
         somaNotasDistribuidas(contadorNotas)
         feather.replace()
         contadorNotas++
         
     } else {
-        camposNotas.innerHTML += 
-        `
-        <div class="row" id="linha${contadorNotas}">
+       let newField = new DOMParser().parseFromString(`
+       <div class="row" id="linha${contadorNotas}">
             <div class="col-2" >
                 <input type="text" class="form-control" id="nomeNota${contadorNotas}" placeholder="EX ${contadorNotas + 1}" value="EX ${contadorNotas + 1}" ${readonly}>
             </div>
@@ -1535,7 +1545,9 @@ function addCampoNotaTurma(valorInicial=0, readonly=false, desempenho=false) {
             </div>
             <button type="button" class="btn btn-light btn-sm" onclick="somaNotasDistribuidas('${contadorNotas}', true), document.getElementById('linha${contadorNotas}').remove(), contadorNotas--"><span data-feather="x-square"></span></button><br>
         </div>
-        `
+       `, 'text/html')
+       camposNotas.appendChild(newField.body)
+        
         feather.replace()
         contadorNotas++
     }
@@ -1553,20 +1565,25 @@ function somaNotasDistribuidas(id, subtrai=false) {
     } else {
         notasDistribuidas[document.getElementById('nomeNota' + id).value] = Number(document.getElementById('valorNota' + id).value)
     }
-    somaNotasDist.innerText = 0
-    somatorioDistribuidas = 0
-    for (const idValor in notasDistribuidas) {
-        if (Object.hasOwnProperty.call(notasDistribuidas, idValor)) {
-            const valor = notasDistribuidas[idValor];
-            somatorioDistribuidas += Number(valor)
-            if (somatorioDistribuidas > 100) {
-                somaNotasDist.style.color = 'red'
-            } else {
-                somaNotasDist.style.color = 'black'
+    try {
+        somaNotasDist.innerText = 0
+        somatorioDistribuidas = 0
+        for (const idValor in notasDistribuidas) {
+            if (Object.hasOwnProperty.call(notasDistribuidas, idValor)) {
+                const valor = notasDistribuidas[idValor];
+                somatorioDistribuidas += Number(valor)
+                if (somatorioDistribuidas > 100) {
+                    somaNotasDist.style.color = 'red'
+                } else {
+                    somaNotasDist.style.color = 'black'
+                }
             }
         }
+        somaNotasDist.innerText = somatorioDistribuidas
+    } catch (error) {
+        console.log(error)
     }
-    somaNotasDist.innerText = somatorioDistribuidas
+    
 }
 
 // Funções do cadastro de alunos
@@ -3879,8 +3896,7 @@ function addCampoNota(extra=false) {
     if (extra) {
         
     } else {
-        camposNotas.innerHTML += 
-        `
+        let newField = new DOMParser().parseFromString(`
         <div class="row" id="linha${contadorNotas}">
             <div class="col-2" >
                 <input type="text" class="form-control" id="nomeNota${contadorNotas}" placeholder="EX ${contadorNotas + 1}" value="EX ${contadorNotas + 1}">
@@ -3890,7 +3906,9 @@ function addCampoNota(extra=false) {
             </div>
             <button type="button" class="btn btn-light btn-sm" onclick="somaNotasDistribuidas('${contadorNotas}', true), document.getElementById('linha${contadorNotas}').remove(), contadorNotas--"><span data-feather="x-square"></span></button><br>
         </div>
-        `
+        `, 'text/html')
+        camposNotas.appendChild(newField.body)
+        
         feather.replace()
         contadorNotas++
     }

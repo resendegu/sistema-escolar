@@ -851,8 +851,7 @@ function addCampoNota(valorInicial=0, readonly=false, desempenho=false) {
     document.getElementById('somaNotasDistribuidas').innerText = 0
     
     if (desempenho) {
-        camposNotas.innerHTML += 
-        `
+        let newField = new DOMParser().parseFromString(`
         <div class="row" id="linha${contadorNotas}">
             <div class="col-2" >
                 <input type="text" class="form-control" id="nomeNota${contadorNotas}" placeholder="EX ${contadorNotas + 1}" value="Desempenho" readonly>
@@ -861,14 +860,14 @@ function addCampoNota(valorInicial=0, readonly=false, desempenho=false) {
                 <input type="number" id="valorNota${contadorNotas}" class="form-control" onkeyup="somaNotasDistribuidas('${contadorNotas}')" value="${valorInicial}" placeholder="15.5" readonly>
             </div>
         </div>
-        `
+        `, 'text/html')
+        camposNotas.appendChild(newField.body)
         somaNotasDistribuidas(contadorNotas)
         feather.replace()
         contadorNotas++
         
     } else {
-        camposNotas.innerHTML += 
-        `
+        let newField = new DOMParser().parseFromString(`
         <div class="row" id="linha${contadorNotas}">
             <div class="col-2" >
                 <input type="text" class="form-control" id="nomeNota${contadorNotas}" placeholder="EX ${contadorNotas + 1}" value="EX ${contadorNotas + 1}" ${readonly}>
@@ -878,7 +877,8 @@ function addCampoNota(valorInicial=0, readonly=false, desempenho=false) {
             </div>
             <button type="button" class="btn btn-light btn-sm" onclick="somaNotasDistribuidas('${contadorNotas}', true), document.getElementById('linha${contadorNotas}').remove(), contadorNotas--"><span data-feather="x-square"></span></button><br>
         </div>
-        `
+        `, 'text/html')
+        camposNotas.appendChild(newField.body)
         feather.replace()
         contadorNotas++
     }
