@@ -413,7 +413,13 @@ exports.cadastraAluno = functions.https.onCall(async (data, context) => {
             let firestoreRef = admin.firestore().collection('mail');
             let infoEscola = await admin.database().ref('sistemaEscolar/infoEscola/dadosBasicos').once('value')
             let dadosEscola = infoEscola.val()
-            const responsavelPedagogico = dadosAluno.responsaveis.find(responsavel => responsavel.pedagogico == true) || dadosAluno.responsaveis[0]
+            const responsavelPedagogico = {email: null}
+            try {
+                responsavelPedagogico = dadosAluno.responsaveis.find(responsavel => responsavel.pedagogico == true) || dadosAluno.responsaveis[0]
+            } catch (error) {
+                console.log(error)
+            }
+            
             let emailContent = {
                 to: dadosAluno.emailAluno,
                 cc: responsavelPedagogico.email || null,
