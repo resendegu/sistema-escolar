@@ -1,8 +1,9 @@
 {
   "projects": {
+    "default": "projetoxagencia",
     "learnup": "learnupschool",
-    "escola": "projetoxagencia",
-    "default": "projetoxagencia"
+    "escola": "projetoxagencia"
+   
   },
   "targets": {}
 }

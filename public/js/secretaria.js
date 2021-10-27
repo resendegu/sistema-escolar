@@ -1614,7 +1614,7 @@ function carregaProfsETurmas(preMatricula=false) {
     
     ultimaMatriculaRef.once('value').then(snapshot => {
         matriculaAluno.value = Number(snapshot.val()) + 1
-        arrumaNumMatricula(matriculaAluno)
+        arrumaNumMatricula({target: matriculaAluno})
     }).catch(error => {
         loaderRun()
         console.log(error)
