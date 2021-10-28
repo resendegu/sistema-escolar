@@ -5251,7 +5251,7 @@ function dadosInfoEscola() {
                 `
             })
             document.getElementById('addHorarioComercial').addEventListener('click', (e) => {
-                divHorarioComercial.innerHTML += `
+                let newField = new DOMParser().parseFromString(`
                 <div class="row" id="horarioComercialRow${c}">
                     <div class="col-auto">
                         <div class="form-group">
@@ -5300,7 +5300,8 @@ function dadosInfoEscola() {
                     </div>
                     </div>
                 </div>
-                `
+                `, 'text/html')
+                divHorarioComercial.appendChild(newField.body)
                 c++
             })
         }  
