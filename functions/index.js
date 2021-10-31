@@ -622,7 +622,7 @@ exports.excluiTurma = functions.https.onCall((data, context) => {
     if (context.auth.token.master == true || context.auth.token.secretaria == true) {
         let turma = data.codTurma
         return admin.database().ref(`sistemaEscolar/turmas/${turma}/professor/0`).once('value').then(snapshot => {
-            if (snapshot.val() != null) {
+            if (snapshot.val()) {
                 throw new HttpsError('cancelled', 'Operação cancelada! Desconecte todos os professores desta turma antes de excluir a turma', )
             }
             return admin.database().ref(`sistemaEscolar/turmas/${turma}`).remove().then(() => {

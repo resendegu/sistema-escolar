@@ -589,7 +589,8 @@ async function turmas() {
                 loaderRun()
             })
         } else {
-            if (alunosSelecionados.length != 0) {
+            console.log(alunosSelecionados)
+            if (alunosSelecionados.length == 0) {
                 abrirModal('modal', 'Confirmação', 'Você está prestes à excluir uma turma. Ao excluir uma turma, todo o histórico gravado da turma será excluído! Depois de excluída, você poderá criar uma nova turma com o mesmo ID. Esta ação não pode ser revertida. <br><br> <b>Você têm certeza que deseja excluir esta turma?</b>', '<button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button><button type="button" class="btn btn-danger" data-dismiss="modal" onclick="excluirTurma(true)">Excluir</button>')
             } else {
                 abrirModal('modal', 'Calma aí', 'Você não pode excluir uma turma com alunos cadastrados nela. Antes de excluir a turma, transfira os alunos para outra turma, ou desative os alunos.', '<button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>')
