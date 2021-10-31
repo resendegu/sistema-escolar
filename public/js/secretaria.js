@@ -494,6 +494,7 @@ async function turmas() {
             }
             document.getElementById('selectTurmas').style.visibility = 'visible'
             loaderRun()
+
         }).catch(error => {
             loaderRun()
             console.error(error)
@@ -579,18 +580,19 @@ async function turmas() {
             loader.style.display = 'block'
             loaderMsg.innerText = 'Excluindo turma...'
             let excluiTurma = firebase.functions().httpsCallable('excluiTurma')
-            excluiTurma({codTurma: alunosSelecionadosTurma.codTurma}).then(function(result) {
+            excluiTurma({codTurma: turmaAberta}).then(function(result) {
                 AstNotif.dialog('Sucesso', result.data.answer)
                 carregaTurmas()
+                areaInfoTurma.style.visibility = 'hidden'
                 loaderRun()
             }).catch(function(error) {
-                AstNotif.dialog('Erro', error.message)
+                AstNotif.dialog('Erro ' + error.code, error.message)
                 console.log(error)
                 loaderRun()
             })
         } else {
-            console.log(alunosSelecionados)
-            if (alunosSelecionados.length == 0) {
+            console.log(alunosTurma)
+            if (!alunosTurma) {
                 abrirModal('modal', 'Confirmação', 'Você está prestes à excluir uma turma. Ao excluir uma turma, todo o histórico gravado da turma será excluído! Depois de excluída, você poderá criar uma nova turma com o mesmo ID. Esta ação não pode ser revertida. <br><br> <b>Você têm certeza que deseja excluir esta turma?</b>', '<button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button><button type="button" id="btnExcluirConfirma" class="btn btn-danger" data-dismiss="modal">Excluir</button>')
                 let btnExcluirConfirma = document.getElementById('btnExcluirConfirma')
                 btnExcluirConfirma.addEventListener('click', () => excluirTurma(true))
