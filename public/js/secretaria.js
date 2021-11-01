@@ -1354,7 +1354,7 @@ function retiraProf(email, nome, codSala, confirma=false) {
     if (confirma) {
         loader.style.display = 'block'
         loaderMsg.innerText = 'Removendo professor da turma...'
-        document.getElementById('ast-dialog-bg').remove()
+        document.getElementById('ast-dialog-bg').style.display = 'none'
         turmasRef.child(codSala).child('professor').once('value', (snapshot) => {
             let listaProf = snapshot.val()
             console.log(listaProf)
