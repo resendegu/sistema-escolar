@@ -1637,7 +1637,7 @@
               <label class="h3">Cadastrar turmas</label>
               <form id="formCadastroTurma">
                 <div class="form-group row">
-                  <label for="codTurmaAdd" class="col-sm-3 col-form-label col-form-label-lg">Código da Turma</label>
+                  <label for="codTurmaAdd" class="col-sm-3 col-form-label col-form-label-lg">Código da Turma*</label>
                   <div class="col-sm-auto">
                     <input type="text" required class="form-control form-control-lg" id="codTurmaAdd" name="codTurmaAdd" placeholder="Código da Turma">
                     <small id="codHelp" class="form-text text-muted">O código de turma será gerado automaticamente a medida que você inserir os dados. Mas você pode editar o código aqui caso seja necessário.</small>
@@ -1645,26 +1645,46 @@
                 </div>
                 <div class="form-group row">
                   <div class="col-auto my-1">
-                    <label class="mr-sm-2" for="listaCursosTurma">Curso</label>
+                    <label class="mr-sm-2" for="listaCursosTurma">Curso*</label>
                     <select required class="custom-select mr-sm-2" id="listaCursosTurma" name="listaCursosTurma">
                       <option hidden selected>Escolha um curso...</option>
                       
                     </select>
                   </div>
                   <div class="col-auto my-1">
-                    <label class="mr-sm-2" for="listaProfessoresTurma">Professor(a) Referência</label>
+                    <label class="mr-sm-2" for="listaProfessoresTurma">Professor(a) Referência*</label>
                     <select required class="custom-select mr-sm-2" id="listaProfessoresTurma" name="listaProfessoresTurma">
                       <option hidden selected>Escolha um professor...</option>
                       
                     </select>
                   </div>
-                  <div class="col-auto my-1">
-                    <label class="mr-sm-2" for="horarioTurma">Horário</label>
-                    <input class="form-control" required type="time" name="horarioTurma" id="horarioTurma">
-                  </div>
+                  
                 </div>
                 <div class="form-group row">
-                  <label class="mr-sm-2" for="listaProfessoresTurma">Dias de Aula:</label>
+                  <div class="col-auto my-1">
+                    <label class="mr-sm-2" for="horarioTurma">Hr. Início*</label>
+                    <input class="form-control" required type="time" name="horarioTurma" id="horarioTurma">
+                  </div>
+                  <div class="col-auto my-1">
+                    <label class="mr-sm-2" for="horarioTurma">Hr. Fim</label>
+                    <input class="form-control" type="time" name="horarioTerminoTurma" id="horarioTerminoTurma">
+                  </div>
+                  <div class="col-auto my-1">
+                    <label class="mr-sm-2">Modalidade de Ensino*</label>
+                    <div class="custom-control custom-radio">
+                      <input type="radio" id="presencial" value="presencial" checked name="modalidade" class="custom-control-input">
+                      <label class="custom-control-label" for="presencial">Ensino Presencial</label>
+                    </div>
+                    <div class="custom-control custom-radio">
+                      <input type="radio" id="ead" value="ead" name="modalidade" class="custom-control-input">
+                      <label class="custom-control-label" for="ead">Ensino à Distância (EaD)</label>
+                    </div>
+                  </div>
+                  
+                  
+                </div>
+                <div class="form-group row">
+                  <label class="mr-sm-2">Dias de Aula:</label>
                 </div>
                 <div class="form-group row">
                   <div class="col-auto my-1">
