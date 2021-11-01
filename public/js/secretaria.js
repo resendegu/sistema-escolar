@@ -420,34 +420,47 @@ function preparaCadastroTurma() {
         console.log(horario)
     })
 
-    document.getElementById('formCadastroTurma').addEventListener('submit', (e) => {
+    document.getElementById('formCadastroTurma').addEventListener('submit', async (e) => {
         e.preventDefault()
-        loaderRun(true, 'Enviando dados da turma para o servidor...')
-        const dados = new FormData(e.target)
-        let dadosTurma = {}
-        dadosTurma.codigoSala = dados.get('codTurmaAdd')
-        dadosTurma.professor = dados.get('listaProfessoresTurma').split('|')[1]
-        console.log(dadosTurma.professor)
-        dadosTurma.diasDaSemana = dados.getAll('dia')
-        dadosTurma.livros = dados.getAll('livros')
-        dadosTurma.curso = dados.get('listaCursosTurma')
-        if (dados.get('horarioTurma').split(':')[1] == '00') {
-            horario = dados.get('horarioTurma').split(':')[0]
-        } else {
-            horario = dados.get('horarioTurma').split(':').join('_')
-        }
-        dadosTurma.hora = horario
-        
-        var cadastraTurma = firebase.functions().httpsCallable('cadastraTurma')
-        cadastraTurma(dadosTurma).then(function(result) {
-            console.log(result)
-            AstNotif.dialog('Sucesso', result.data.answer)
-            loaderRun()
-        }).catch(function(error) {
+        try {
+            loaderRun(true, 'Enviando dados da turma para o servidor...')
+            const dados = new FormData(e.target)
+            
+            let dadosTurma = {}
+            dadosTurma.codigoSala = dados.get('codTurmaAdd')
+            dadosTurma.professor = dados.get('listaProfessoresTurma').split('|')[1]
+            console.log(dadosTurma.professor)
+            dadosTurma.diasDaSemana = dados.getAll('dia')
+            if (dadosTurma.diasDaSemana.length == 0) {
+                throw new Error('Por favor, selecione ao menos um dia para as aulas da turma.')
+            }
+            dadosTurma.livros = dados.getAll('livros')
+            dadosTurma.curso = dados.get('listaCursosTurma')
+            dadosTurma.modalidade = dados.get('modalidade')
+            dadosTurma.horarioTerminoTurma = dados.get('horarioTerminoTurma')
+            if (dados.get('horarioTurma').split(':')[1] == '00') {
+                horario = dados.get('horarioTurma').split(':')[0]
+            } else {
+                horario = dados.get('horarioTurma').split(':').join('_')
+            }
+            dadosTurma.hora = horario
+            
+            var cadastraTurma = firebase.functions().httpsCallable('cadastraTurma')
+            cadastraTurma(dadosTurma).then(function(result) {
+                console.log(result)
+                AstNotif.dialog('Sucesso', result.data.answer)
+                loaderRun()
+                document.getElementById('formCadastroTurma').reset()
+            }).catch(function(error) {
+                AstNotif.dialog('Erro', error.message)
+                console.log(error)
+                loaderRun()
+            })
+        } catch (error) {
             AstNotif.dialog('Erro', error.message)
-            console.log(error)
             loaderRun()
-        })
+        }
+        
     })
 }
 
