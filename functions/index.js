@@ -273,7 +273,7 @@ exports.cadastroUser = functions.auth.user().onCreate((user) => {
     })
 })
 
-exports.cadastraTurma = functions.https.onCall((data, context) => {
+exports.cadastraTurma = functions.https.onCall(async (data, context) => {
     /**{codigoSala: codPadrao, professor: professor, diasDaSemana: diasDaSemana, livros: books, hora: horarioCurso} */
     console.log(data)
     if (context.auth.token.master == true || context.auth.token.secretaria == true) {
@@ -284,9 +284,20 @@ exports.cadastraTurma = functions.https.onCall((data, context) => {
             if (snapshot.val()) {
                 throw new HttpsError('cancelled', 'Operação cancelada! Desconecte todos os professores desta turma antes de editar a turma', )
             }
-            return admin.database().ref(`sistemaEscolar/turmas/${turma}`).once('value').then((turmaFire) => {
+            return admin.database().ref(`sistemaEscolar/turmas/${turma}`).once('value').then(async (turmaFire) => {
                 let dadosTurmaAtual = turmaFire.val()
-                Object.assign(dadosTurmaAtual, dados)
+                
+
+                async function atualizaAlunos() {
+                    Object.keys(dadosTurmaAtual.alunos).map(async (matricula) => {
+                        await admin.database().ref('sistemaEscolar/alunos/' + matricula + '/turmaAluno').set(dados.codigoSala)
+                    })
+                    return ;
+                }
+
+                if (Object.keys(dadosTurmaAtual.alunos).length > 0) {
+                    await atualizaAlunos();
+                }
 
                 // Essa parte se repete com as funções de baixo
                 return admin.database().ref(`sistemaEscolar/turmas/${turma}`).remove().then(() => {
@@ -308,7 +319,8 @@ exports.cadastraTurma = functions.https.onCall((data, context) => {
                     return admin.database().ref(`sistemaEscolar/usuarios/${user.uid}/professor/turmas/${data.codigoSala}`).set(true).then(() => {
                         return admin.database().ref(`sistemaEscolar/turmas/${data.codigoSala}/`).once('value').then(snapshot =>{
                             if (snapshot.exists() == false) {
-                                return admin.database().ref(`sistemaEscolar/turmas/${data.codigoSala}/`).set(dados).then(() => {
+                                Object.assign(dadosTurmaAtual, dados)
+                                return admin.database().ref(`sistemaEscolar/turmas/${data.codigoSala}/`).set(dadosTurmaAtual).then(() => {
                                     admin.database().ref(`sistemaEscolar/numeros/turmasCadastradas`).transaction(function (current_value) {
                                         return (current_value || 0) + 1
                                     }).catch(function (error) {
