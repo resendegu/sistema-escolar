@@ -434,7 +434,11 @@ function preparaCadastroTurma() {
             if (dadosTurma.diasDaSemana.length == 0) {
                 throw new Error('Por favor, selecione ao menos um dia para as aulas da turma.')
             }
+            
             dadosTurma.livros = dados.getAll('livros')
+            if (dadosTurma.livros.length == 0) {
+                throw new Error('Por favor, selecione ao menos um livro.') 
+            }
             dadosTurma.curso = dados.get('listaCursosTurma')
             dadosTurma.modalidade = dados.get('modalidade')
             dadosTurma.horarioTerminoTurma = dados.get('horarioTerminoTurma')
@@ -468,6 +472,7 @@ function preparaCadastroTurma() {
 
 //Aba de turmas
 let turmaAberta
+let dadosTurmaAberta
 async function turmas() {
     let turmas
     let alunosSelecionados = []
@@ -482,17 +487,165 @@ async function turmas() {
         
     })
 
+    let btnEditarTurma = document.getElementById('btnEditarTurma')
+
+    btnEditarTurma.addEventListener('click', edicaoTurmas)
+
     function edicaoTurmas() {
+        abrirModal('modal', 'Editar informações da turma', `
+            <label class="h3">Editar informações da turma</label>
+            <form id="formEditarTurma">
+            <div class="form-group row">
+                <label for="codTurmaAdd" class="col-sm-3 col-form-label col-form-label-lg">Código da Turma*</label>
+                <div class="col-sm-auto">
+                <input type="text" required class="form-control form-control-lg" id="codTurmaAdd" name="codTurmaAdd" placeholder="Código da Turma" value="${dadosTurmaAberta.codigoSala}">
+                <small id="codHelp" class="form-text text-muted">O código de turma será gerado automaticamente a medida que você inserir os dados. Mas você pode editar o código aqui caso seja necessário.</small>
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-auto my-1">
+                <label class="mr-sm-2" for="listaCursosTurma">Curso*</label>
+                <select required class="custom-select mr-sm-2" id="listaCursosTurma" name="listaCursosTurma">
+                    <option hidden selected>Escolha um curso...</option>
+                    
+                </select>
+                </div>
+                <div class="col-auto my-1">
+                    <label class="mr-sm-2" for="listaProfessoresTurma">Professor(a) Referência*</label>
+                    <select required class="custom-select mr-sm-2" id="listaProfessoresTurma" name="listaProfessoresTurma">
+        
+                      
+                    </select>
+                </div>
+                
+                
+            </div>
+            <div class="form-group row">
+                <div class="col-auto my-1">
+                <label class="mr-sm-2" for="horarioTurma">Hr. Início*</label>
+                <input class="form-control" required type="time" name="horarioTurma" value="${dadosTurmaAberta.hora.indexOf('_') == -1 ? dadosTurmaAberta.hora + ':00' : dadosTurmaAberta.hora.split('_')[0] + ':' + dadosTurmaAberta.hora.split('_')[1]}" id="horarioTurma">
+                </div>
+                <div class="col-auto my-1">
+                <label class="mr-sm-2" for="horarioTurma">Hr. Fim</label>
+                <input class="form-control" value="${dadosTurmaAberta.horarioTerminoTurma}" type="time" name="horarioTerminoTurma" id="horarioTerminoTurma">
+                </div>
+                <div class="col-auto my-1">
+                <label class="mr-sm-2">Modalidade de Ensino*</label>
+                <div class="custom-control custom-radio">
+                    <input type="radio" id="presencial" ${dadosTurmaAberta.modalidade == "presencial" && 'checked'} value="presencial"  name="modalidade" class="custom-control-input">
+                    <label class="custom-control-label" for="presencial">Ensino Presencial</label>
+                </div>
+                <div class="custom-control custom-radio">
+                    <input type="radio" id="ead" ${dadosTurmaAberta.modalidade == "ead" && 'checked'} value="ead" name="modalidade" class="custom-control-input">
+                    <label class="custom-control-label" for="ead">Ensino à Distância (EaD)</label>
+                </div>
+                </div>
+                
+                
+            </div>
+            <div class="form-group row">
+                <label class="mr-sm-2">Dias de Aula:</label>
+            </div>
+            <div class="form-group row">
+                <div class="col-auto my-1">
+                <div class="custom-control custom-checkbox mr-sm-2">
+                    <input type="checkbox" value="0" ${dadosTurmaAberta.diasDaSemana.indexOf('0') != -1 && 'checked'} class="custom-control-input" id="diaDomingo" name="dia">
+                    <label class="custom-control-label" for="diaDomingo">Domingo</label>
+                </div>
+                </div>
+                <div class="col-auto my-1">
+                <div class="custom-control custom-checkbox mr-sm-2">
+                    <input type="checkbox" value="1" ${dadosTurmaAberta.diasDaSemana.indexOf('1') != -1 && 'checked'} class="custom-control-input" id="diaSegunda" name="dia">
+                    <label class="custom-control-label" for="diaSegunda">Segunda</label>
+                </div>
+                </div>
+                <div class="col-auto my-1">
+                <div class="custom-control custom-checkbox mr-sm-2">
+                    <input type="checkbox" value="2" ${dadosTurmaAberta.diasDaSemana.indexOf('2') != -1 && 'checked'} class="custom-control-input" id="diaTerca" name="dia">
+                    <label class="custom-control-label" for="diaTerca">Terça</label>
+                </div>
+                </div>
+                <div class="col-auto my-1">
+                <div class="custom-control custom-checkbox mr-sm-2">
+                    <input type="checkbox" value="3" ${dadosTurmaAberta.diasDaSemana.indexOf('3') != -1 && 'checked'} class="custom-control-input" id="diaQuarta" name="dia">
+                    <label class="custom-control-label" for="diaQuarta">Quarta</label>
+                </div>
+                </div>
+                <div class="col-auto my-1">
+                <div class="custom-control custom-checkbox mr-sm-2">
+                    <input type="checkbox" value="4" ${dadosTurmaAberta.diasDaSemana.indexOf('4') != -1 && 'checked'} class="custom-control-input" id="diaQuinta" name="dia">
+                    <label class="custom-control-label" for="diaQuinta">Quinta</label>
+                </div>
+                </div>
+                <div class="col-auto my-1">
+                <div class="custom-control custom-checkbox mr-sm-2">
+                    <input type="checkbox" value="5" ${dadosTurmaAberta.diasDaSemana.indexOf('5') != -1 && 'checked'} class="custom-control-input" id="diaSexta" name="dia">
+                    <label class="custom-control-label" for="diaSexta">Sexta</label>
+                </div>
+                </div>
+                <div class="col-auto my-1">
+                <div class="custom-control custom-checkbox mr-sm-2">
+                    <input type="checkbox" value="6" ${dadosTurmaAberta.diasDaSemana.indexOf('6') != -1 && 'checked'} class="custom-control-input" id="diaSabado" name="dia">
+                    <label class="custom-control-label" for="diaSabado">Sábado</label>
+                </div>
+                </div>
+            </div>
+            <div class="container-xl">
+                <div class="table-responsive">
+                <div class="table-wrapper">
+                    <div class="table-title">
+                    <div class="row">
+                        <div class="col-sm-6">
+                        <h2>Escolha os <b>livros</b></h2>
+                        </div>
+                        
+                    </div>
+                    </div>
+                    <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                        <th>
+                            
+                        </th>
+                        <th>Nome do Livro</th>
+                        <th>Código</th>
+                        <th>Identificação</th>
+                        
+                        </tr>
+                    </thead>
+                    <tbody id="listaLivrosTurma">
+                        <tr>
+                        <td>
+                            <span class="custom-checkbox">
+                            <input type="checkbox" id="checkbox1" name="livros" value="1">
+                            <label for="checkbox1"></label>
+                            </span>
+                        </td>
+                        <td>Book 1</td>
+                        <td>1</td>
+                        
+                        </tr>
+                    </tbody>
+                    </table>
+                    
+                </div>
+                </div>
+            </div>
+            <button class="btn btn-primary btn-block" type="submit">Editar informações</button>
+            </form>
+        `, `<button data-dismiss="modal" class="btn btn-secondary">Fechar</button>`)
+
         let codTurmaAdd = document.getElementById('codTurmaAdd')
+        let codigoTurmaAtual = turmaAberta
 
         let codDiasSemana
         let cursosCadastrados
         let livrosCadastrados
 
         let codCurso
-        let horario
+        let horario = dadosTurmaAberta.hora.indexOf('_') == -1 ? dadosTurmaAberta.hora + ':00' : dadosTurmaAberta.hora.split('_')[0] + ':' + dadosTurmaAberta.hora.split('_')[1]
         let dias = []
-        let livros = [] 
+        let livros = []
 
         function geraCod() {
             let codTurma = ''
@@ -522,6 +675,10 @@ async function turmas() {
 
         infoEscolaRef.child('codDiasSemana').on('value', (snapshot) => {
             codDiasSemana = snapshot.val()
+            dadosTurmaAberta.diasDaSemana.map((dia) => {
+                dias.push(codDiasSemana[Number(dia)])
+            })
+            
         })
 
         infoEscolaRef.child('livros').on('value', (snapshot) => {
@@ -535,7 +692,7 @@ async function turmas() {
                         <tr>
                             <td>
                                 <span class="custom-checkbox">
-                                    <input type="checkbox" id="checkbox${livro.codSistema}" name="livros" value="${livro.codSistema}">
+                                    <input type="checkbox" id="checkbox${livro.codSistema}" name="livros" value="${livro.codSistema}" ${dadosTurmaAberta.livros.indexOf(livro.codSistema) != -1 && 'checked'}>
                                     <label for="checkbox${livro.codSistema}"></label>
                                 </span>
                             </td>
@@ -544,6 +701,10 @@ async function turmas() {
                             <td>${livro.idLivro}</td>
                         </tr>
                     `
+                    if (dadosTurmaAberta.livros.indexOf(livro.codSistema) != -1) {
+                        livros.push(livrosCadastrados[Number(livro.codSistema)].codLivro)
+                    }
+                    
                 }
             }
             document.getElementsByName('livros').forEach(livro => {
@@ -567,15 +728,18 @@ async function turmas() {
                 if (Object.hasOwnProperty.call(cursosCadastrados, i)) {
                     const curso = cursosCadastrados[i];
                     listaCursos.innerHTML += `
-                    <option value="${curso.codSistema}">${curso.codCurso} - ${curso.nomeCurso}</option>
+                    <option value="${curso.codSistema}" ${dadosTurmaAberta.curso == curso.codSistema && 'selected'}>${curso.codCurso} - ${curso.nomeCurso}</option>
                     `
+                    if (dadosTurmaAberta.curso == curso.codSistema) {
+                        codCurso = curso.codCurso
+                    }
                 }
             }
+            
         })
 
         listaDeProfessores.on('value', (snapshot) => {
             let listaProfessoresTurma = document.getElementById('listaProfessoresTurma')
-            listaProfessoresTurma.innerHTML = '<option hidden selected>Escolha um professor...</option>'
             for (const key in snapshot.val()) {
                 if (Object.hasOwnProperty.call(snapshot.val(), key)) {
                     const professor = snapshot.val()[key];
@@ -585,6 +749,8 @@ async function turmas() {
                 }
             }
         })
+
+       
 
         document.getElementById('listaCursosTurma').addEventListener('input', (e) => {
             codCurso = cursosCadastrados[e.target.value].codCurso
@@ -616,46 +782,56 @@ async function turmas() {
             console.log(horario)
         })
 
-        document.getElementById('formCadastroTurma').addEventListener('submit', async (e) => {
+        document.getElementById('formEditarTurma').addEventListener('submit', async (e) => {
             e.preventDefault()
-            try {
-                loaderRun(true, 'Enviando dados da turma para o servidor...')
-                const dados = new FormData(e.target)
-                
-                let dadosTurma = {}
-                dadosTurma.codigoSala = dados.get('codTurmaAdd')
-                dadosTurma.professor = dados.get('listaProfessoresTurma').split('|')[1]
-                console.log(dadosTurma.professor)
-                dadosTurma.diasDaSemana = dados.getAll('dia')
-                if (dadosTurma.diasDaSemana.length == 0) {
-                    throw new Error('Por favor, selecione ao menos um dia para as aulas da turma.')
-                }
-                dadosTurma.livros = dados.getAll('livros')
-                dadosTurma.curso = dados.get('listaCursosTurma')
-                dadosTurma.modalidade = dados.get('modalidade')
-                dadosTurma.horarioTerminoTurma = dados.get('horarioTerminoTurma')
-                if (dados.get('horarioTurma').split(':')[1] == '00') {
-                    horario = dados.get('horarioTurma').split(':')[0]
-                } else {
-                    horario = dados.get('horarioTurma').split(':').join('_')
-                }
-                dadosTurma.hora = horario
-                
-                var cadastraTurma = firebase.functions().httpsCallable('cadastraTurma')
-                cadastraTurma(dadosTurma).then(function(result) {
-                    console.log(result)
-                    AstNotif.dialog('Sucesso', result.data.answer)
-                    loaderRun()
-                    document.getElementById('formCadastroTurma').reset()
-                }).catch(function(error) {
+            const confirm = await ui.confirm('Antes de continuar, certifique se você desconectou todos os professores antes de editar a turma. Você está realizando uma operação sensível. Você confirma a edição das informações da turma?');
+
+            if (confirm) {
+                try {
+                    loaderRun(true, 'Enviando dados da turma para o servidor...')
+                    const dados = new FormData(e.target)
+                    
+                    let dadosTurma = {}
+                    dadosTurma.codTurmaAtual = codigoTurmaAtual
+                    dadosTurma.codigoSala = dados.get('codTurmaAdd')
+                    dadosTurma.professor = dados.get('listaProfessoresTurma').split('|')[1]
+                    console.log(dadosTurma.professor)
+                    dadosTurma.diasDaSemana = dados.getAll('dia')
+                    if (dadosTurma.diasDaSemana.length == 0) {
+                        throw new Error('Por favor, selecione ao menos um dia para as aulas da turma.')
+                    }
+                    
+                    dadosTurma.livros = dados.getAll('livros')
+                    if (dadosTurma.livros.length == 0) {
+                        throw new Error('Por favor, selecione ao menos um livro.') 
+                    }
+                    dadosTurma.curso = dados.get('listaCursosTurma')
+                    dadosTurma.modalidade = dados.get('modalidade')
+                    dadosTurma.horarioTerminoTurma = dados.get('horarioTerminoTurma')
+                    if (dados.get('horarioTurma').split(':')[1] == '00') {
+                        horario = dados.get('horarioTurma').split(':')[0]
+                    } else {
+                        horario = dados.get('horarioTurma').split(':').join('_')
+                    }
+                    dadosTurma.hora = horario
+                    
+                    var cadastraTurma = firebase.functions().httpsCallable('cadastraTurma')
+                    cadastraTurma(dadosTurma).then(function(result) {
+                        console.log(result)
+                        AstNotif.dialog('Sucesso', result.data.answer)
+                        loaderRun()
+                        document.getElementById('formEditarTurma').reset()
+                    }).catch(function(error) {
+                        AstNotif.dialog('Erro', error.message)
+                        console.log(error)
+                        loaderRun()
+                    })
+                } catch (error) {
                     AstNotif.dialog('Erro', error.message)
-                    console.log(error)
                     loaderRun()
-                })
-            } catch (error) {
-                AstNotif.dialog('Erro', error.message)
-                loaderRun()
+                }
             }
+            
             
         })
     }
@@ -1326,6 +1502,7 @@ async function turmas() {
             // TODO: Mostrar na tela as informações da turma
             console.log(snapshot.val())
             let dadosDaTurma = snapshot.val()
+            dadosTurmaAberta = dadosDaTurma
             carregaListaDeAlunosDaTurma(dadosDaTurma.alunos)
 
             codigoDaTurmaLabel.innerText = dadosDaTurma.codigoSala
