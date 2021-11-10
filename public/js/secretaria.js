@@ -6259,8 +6259,9 @@ async function abaPreMatriculas() {
         dados = preMatriculas[key];
         document.getElementById('infoPreMatricula').style.display = 'block'
         document.getElementById('rolaTelaAbaixoPre').style.display = 'block'
-        document.getElementById('secGeraFichaPre').innerHTML = `<button class="btn btn-outline-primary btn-block" id="btnGeraFicha" onclick="gerarFichaPreMatricula('${key}')">Gerar ficha de pré-matrícula em PDF</button>
+        document.getElementById('secGeraFichaPre').innerHTML = `<button class="btn btn-outline-primary btn-block" id="editarDadosPre">Ver/Editar dados do aluno</button><button class="btn btn-outline-primary btn-block" id="btnGeraFicha" onclick="gerarFichaPreMatricula('${key}')">Gerar ficha de pré-matrícula em PDF</button>
         `
+        
         
         dadosResponsaveis = {
             nomeResponsavelAluno1: dados.nomeResponsavelAluno1,
@@ -6315,293 +6316,414 @@ async function abaPreMatriculas() {
         document.getElementById('mostraEnderecoAlunoPre').innerText = `${dados.enderecoAluno}, ${dados.numeroAluno}, ${dados.bairroAluno}, ${dados.cidadeAluno}, ${dados.estadoAluno}. CEP ${dados.cepAluno}.`
         document.getElementById('rolaTelaAbaixoPre').focus()
         document.getElementById('rolaTelaAbaixoPre').style.display = 'none'
+
+        document.getElementById('editarDadosPre').addEventListener('click', () => editarDadosPreMatricula(key))
         
     }
 
     function editarDadosPreMatricula(key) {
         let aluno = preMatriculas[key]
     
-        abrirModal('modal', 'Editar dados de ' + aluno.nomeAluno, `
-        <form id="formEditaAluno" onkeydown="return event.key != 'Enter';">
-            <label class="h6">Dados pessoais</label>
-            <div class="form-row">
-            <div class="form-group col-md-4">
-                <label for="inputPassword4">Nome</label>
-                <input type="name" class="form-control" id="nomeAluno" name="nomeAluno" placeholder="Nome" onblur="maiusculo(this)" required>
-            </div>
-            <div class="form-group col-auto">
-                <label for="inputPassword4">Data de nascimento</label>
-                <input type="date" class="form-control" id="dataNascimentoAluno" name="dataNascimentoAluno" placeholder="Data" onblur="calculaIdade(this.value)" required>
-                
-            </div>
-            <div class="form-group col-auto">
-                <br><br>
-                <label for="dataNascimentoAluno" class="text-muted" id="idadeCalculada">Idade:</label>
-            </div>
-            </div>
-            <div class="form-row">
-            <div class="form-group col-auto">
-                <label for="inputEmail4">Telefone (fixo)</label>
-                <input type="phone" onkeypress="$(this).mask('(00) 0000-00009')" class="form-control" id="telefoneAluno" name="telefoneAluno" placeholder="Número">
-            </div>
+        abrirModal('modal', 'Ver e Editar dados de ' + aluno.nomeAluno, `
+    <form id="formEditaAluno" onkeydown="return event.key != 'Enter';">
+        <label class="h6">Dados pessoais</label>
+        <div class="form-row">
+        
+        <div class="form-group col-md-4">
+            <label for="inputPassword4">Nome</label>
+            <input type="name" class="form-control" id="nomeAluno" name="nomeAluno" placeholder="Nome" onblur="maiusculo(this)" required>
+        </div>
+        <div class="form-group col-auto">
+            <label for="inputPassword4">Data de nascimento</label>
+            <input type="date" class="form-control" id="dataNascimentoAluno" name="dataNascimentoAluno" placeholder="Data" onblur="calculaIdade(this.value)" required>
             
-            <div class="form-group col-auto">
-                <label for="inputPassword4">Celular</label>
-                <input type="phone" class="form-control" id="celularAluno" name="celularAluno" placeholder="Número" onkeypress="$(this).mask('00000000009')" required>
-                <small id="senhaHelp" class="form-text text-muted">Digite o DDD seguido do número (Ex.: 31999999999)</small>
-            </div>
-            
-            <div class="form-group col-md-5">
-                <label for="inputPassword4">Email</label>
-                <input type="email" class="form-control" id="emailAluno" name="emailAluno" placeholder="Email" required>
-            </div>
-            </div>
-            <div class="form-row">
-            <div class="form-group col-md-3">
-                <label for="inputEmail4">Senha de acesso ao portal</label>
-                <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <div class="input-group-text">
-                    <input type="checkbox" aria-label="Mostra e esconde a senha" onclick="this.checked ? (document.getElementById('senhaAluno').type = 'text'):(document.getElementById('senhaAluno').type = 'password')">
-                    </div>
-                </div>
-                <input type="password" class="form-control" id="senhaAluno" name="senhaAluno" placeholder="Senha" required>
-                </div>
-                <small id="senhaHelp" class="form-text text-muted">A senha precisa ter no mínimo 6 caracteres.</small>
-            </div>
-            <div class="form-group col-auto">
-                <label for="inputEmail4">RG</label>
-                <input type="text" class="form-control" id="rgAluno" name="rgAluno" placeholder="RG" required>
-            </div>
-            <div class="form-group col-auto">
-                <label for="inputPassword4">CPF</label>
-                <input type="text" class="form-control" id="cpfAluno" name="cpfAluno" placeholder="CPF" onchange="verificaCPF(this)" required>
-                <small id="cpfHelp" class="form-text text-muted">Digite um CPF válido, existe um algoritmo de validação neste campo.</small>
-            </div>
-            </div>
-            <hr>
-            <label class="h6">Dados de endereço</label>
-            <div class="form-row col-md-4">
-            <label for="inputZip">CEP (somente números)</label>
-            <input type="text" class="form-control" id="cepAluno" name="cepAluno" placeholder="CEP" onchange="preencheEndereco(this.value)" onkeypress="$(this).mask('00.000-000')">
-            <small id="emailHelp" class="form-text text-muted">O CEP é opcional, mas quando inserido preenche o endereço automaticamente.</small>
-            </div>
-            <div class="form-row">
-            <div class="form-group col-md-5">
-                <label for="inputAddress2">Rua</label>
-                <input type="text" class="form-control" id="enderecoAluno" name="enderecoAluno" placeholder="Endereço">
-            </div>
-            <div class="form-group col-md-1">
-                <label for="inputAddress2">Número</label>
-                <input type="number" class="form-control" id="numeroAluno" name="numeroAluno" placeholder="Núm.">
-            </div>
-            <div class="form-group col-md-2">
-                <label for="inputCity">Bairro</label>
-                <input type="text" class="form-control" id="bairroAluno"name="bairroAluno" placeholder="Bairro">
-            </div>
-            <div class="form-group col-md-2">
-                <label for="inputState">Cidade</label>
-                <input type="text" class="form-control" id="cidadeAluno" name="cidadeAluno" placeholder="Cidade">
-            </div>
-            <div class="form-group col-md-1">
-                <label for="inputState">Estado</label>
-                <input type="text" class="form-control" id="estadoAluno" name="estadoAluno" placeholder="Estado">
-            </div>
-            </div>
-            <hr>
-            <label class="h6">Dados de filiação</label>
-            <div class="form-row border border-secondary rounded">
-            <div class="form-group col-md-4">
-                <label for="inputAddress">Filiação ou Responsável legal 1</label>
-                <input type="text" class="form-control" id="nomeResponsavelAluno1" name="nomeResponsavelAluno1" placeholder="Nome" onblur="maiusculo(this)">
-            </div>
-            <div class="form-group col-md-2">
-                <label for="inputAddress">Relação</label>
-                <br>
-                <select class="form-control form-control-md" name="relacaoAluno1" id="relacaoAluno1">
-                <option hidden selected>Escolha...</option>
-                <option value="Mãe">Mãe</option>
-                <option value="Pai">Pai</option>
-                <option value="Tio/Tia">Tio/Tia</option>
-                <option value="Avô/Avó">Avô/Avó</option>
-                <option value="Outros">Outros</option>
-                </select>
-            </div>
-            <div class="form-group col-md-2">
-                <label for="inputAddress">Número comercial</label>
-                <input type="text" class="form-control" id="numeroComercialResponsavel1" name="numeroComercialResponsavel1" placeholder="Comercial" onkeypress="$(this).mask('(00) 0000-00009')">
-            </div>
-            <div class="form-group col-md-2">
-                <label for="inputAddress">Número Celular</label>
-                <input type="text" class="form-control" id="numeroCelularResponsavel1" name="numeroCelularResponsavel1" placeholder="Celular" onkeypress="$(this).mask('(00) 0000-00009')">
-            </div>
-            <div class="form-group col-auto">
-                <label for="inputEmail4">RG</label>
-                <input type="text" class="form-control" id="rgResponsavel1" name="rgResponsavel1" placeholder="RG">
-            </div>
-            <div class="form-group col-auto">
-                <label for="inputPassword4">CPF</label>
-                <input type="text" class="form-control" id="cpfResponsavel1" name="cpfResponsavel1" placeholder="CPF" onchange="verificaCPF(this)">
-                <small id="cpfHelp" class="form-text text-muted">Digite um CPF válido, existe um algoritmo de validação neste campo.</small>
-            </div>
-            
-            <div class="form-group col-md-auto">
-                <br>
-                <div class="form-group col-md-auto">
-                <a class="btn btn-outline-primary btn-sm" name="responsavelFinanceiro" id="responsavelFinanceiro1" onclick="setaRespFinan('1')">Copiar dados p/ Resp. Financeiro</a>
-                <br>
-                <a class="btn btn-outline-success btn-sm" name="responsavelPedagogico" id="responsavelPedagogico1" onclick="setaRespPedag('1')">Copiar dados p/ Resp. Pedagógico</a>
-                
-                </div>
-            </div>
-            </div>
-            <br>
-            
-            <div class="form-row border border-secondary rounded">
-            <div class="form-group col-md-4">
-                <label for="inputAddress">Filiação ou Responsável legal 2</label>
-                <input type="text" class="form-control" id="nomeResponsavelAluno2" name="nomeResponsavelAluno2" placeholder="Nome" onblur="maiusculo(this)">
-            </div>
-            <div class="form-group col-md-2">
-                <label for="inputAddress">Relação</label>
-                <br>
-                <select class="form-control form-control-md" name="relacaoAluno2" id="relacaoAluno2">
-                <option hidden selected>Escolha...</option>
-                <option value="Mãe">Mãe</option>
-                <option value="Pai">Pai</option>
-                <option value="Tio/Tia">Tio/Tia</option>
-                <option value="Avô/Avó">Avô/Avó</option>
-                <option value="Outros">Outros</option>
-                </select>
-            </div>
-            <div class="form-group col-md-2">
-                <label for="inputAddress">Número comercial</label>
-                <input type="text" class="form-control" id="numeroComercialResponsavel2" name="numeroComercialResponsavel2" placeholder="Comercial">
-            </div>
-            <div class="form-group col-md-2">
-                <label for="inputAddress">Número Celular</label>
-                <input type="text" class="form-control" id="numeroCelularResponsavel2" name="numeroCelularResponsavel2" placeholder="Celular">
-            </div>
-            <div class="form-group col-auto">
-                <label for="inputEmail4">RG</label>
-                <input type="text" class="form-control" id="rgResponsavel2" name="rgResponsavel2" placeholder="RG">
-            </div>
-            <div class="form-group col-auto">
-                <label for="inputPassword4">CPF</label>
-                <input type="text" class="form-control" id="cpfResponsavel2" name="cpfResponsavel2" placeholder="CPF" onchange="verificaCPF(this)">
-                <small id="cpfHelp" class="form-text text-muted">Digite um CPF válido, existe um algoritmo de validação neste campo.</small>
-            </div>
-            &nbsp;&nbsp;&nbsp;
-            <div class="form-group col-md-auto">
-                <br>
-                <a class="btn btn-outline-primary btn-sm" name="responsavelFinanceiro" id="responsavelFinanceiro2" onclick="setaRespFinan('2')">Copiar dados p/ Resp. Financeiro</a>
-                <br>
-                <a class="btn btn-outline-success btn-sm" name="responsavelPedagogico" id="responsavelPedagogico2" onclick="setaRespPedag('2')">Copiar dados p/ Resp. Pedagogico</a>
-                
-            </div>
-            </div>
-            <br>
-            <hr>
-            <label class="h6">Dados do responsável Financeiro</label>
-            <div class="form-row border border-primary rounded">
-            <div class="form-group col-md-4">
-                <label for="inputAddress">Responsável financeiro</label>
-                <input type="text" class="form-control" id="nomeResponsavelFinanceiroAluno" name="nomeResponsavelFinanceiroAluno" placeholder="Nome" onblur="maiusculo(this)">
-            </div>
-            <div class="form-group col-md-2">
-                <label for="inputAddress">Relação</label>
-                <br>
-                <select class="form-control form-control-md" name="relacaoFinanceiroAluno" id="relacaoFinanceiroAluno">
-                <option hidden selected>Escolha...</option>
-                <option value="Mãe">Mãe</option>
-                <option value="Pai">Pai</option>
-                <option value="Tio/Tia">Tio/Tia</option>
-                <option value="Avô/Avó">Avô/Avó</option>
-                <option value="Outros">Outros</option>
-                </select>
-            </div>
-            <div class="form-group col-md-2">
-                <label for="inputAddress">Número comercial</label>
-                <input type="text" class="form-control" id="numeroComercialFinanceiroAluno" name="numeroComercialFinanceiroAluno" placeholder="Comercial" onkeypress="$(this).mask('(00) 0000-00009')">
-            </div>
-            <div class="form-group col-md-2">
-                <label for="inputAddress">Número Celular</label>
-                <input type="text" class="form-control" id="numeroCelularFinanceiroAluno" name="numeroCelularFinanceiroAluno" placeholder="Celular" onkeypress="$(this).mask('(00) 0000-00009')">
-            </div>
-            <div class="form-group col-md-5">
-                <label for="inputPassword4">Email</label>
-                <input type="email" class="form-control" id="emailResponsavelFinanceiro" name="emailResponsavelFinanceiro" placeholder="Email">
-            </div>
-            <div class="form-group col-auto">
-                <label for="inputEmail4">RG</label>
-                <input type="text" class="form-control" id="rgFinanceiroAluno" name="rgFinanceiroAluno" placeholder="RG">
-            </div>
-            <div class="form-group col-auto">
-                <label for="inputPassword4">CPF</label>
-                <input type="text" class="form-control" id="cpfFinanceiroAluno" name="cpfFinanceiroAluno"  placeholder="CPF" onchange="verificaCPF(this)">
-                <small id="cpfHelp4" class="form-text text-muted">Digite um CPF válido, existe um algoritmo de validação neste campo.</small>
-            </div>
-            </div>
-            <br>
-            <label class="h6">Dados do responsável Pedagógico</label>
-            <div class="form-row border border-success rounded">
-            
-            <div class="form-group col-md-4">
-                <label for="inputAddress">Responsável pedagógico/didático</label>
-                <input type="text" class="form-control" id="nomeResponsavelPedagogicoAluno" name="nomeResponsavelPedagogicoAluno" placeholder="Nome" onblur="maiusculo(this)">
-            </div>
-            <div class="form-group col-md-2">
-                <label for="inputAddress">Relação</label>
-                <br>
-                <select class="form-control form-control-md" name="relacaoPedagogicoAluno" id="relacaoPedagogicoAluno">
-                <option hidden selected>Escolha...</option>
-                <option value="Mãe">Mãe</option>
-                <option value="Pai">Pai</option>
-                <option value="Tio/Tia">Tio/Tia</option>
-                <option value="Avô/Avó">Avô/Avó</option>
-                <option value="Outros">Outros</option>
-                </select>
-            </div>
-            <div class="form-group col-md-2">
-                <label for="inputAddress">Número comercial</label>
-                <input type="text" class="form-control" id="numeroComercialPedagogicoAluno" name="numeroComercialPedagogicoAluno" placeholder="Comercial">
-            </div>
-            <div class="form-group col-md-2">
-                <label for="inputAddress">Número Celular</label>
-                <input type="text" class="form-control" id="numeroCelularPedagogicoAluno" name="numeroCelularPedagogicoAluno" placeholder="Celular">
-            </div>
-            <div class="form-group col-md-5">
-                <label for="inputPassword4">Email</label>
-                <input type="email" class="form-control" id="emailResponsavelPedagogico" name="emailResponsavelPedagogico" placeholder="Email">
-            </div>
-            <div class="form-group col-auto">
-                <label for="inputEmail4">RG</label>
-                <input type="text" class="form-control" id="rgPedagogicoAluno" name="rgPedagogicoAluno" placeholder="RG">
-            </div>
-            <div class="form-group col-auto">
-                <label for="inputPassword4">CPF</label>
-                <input type="text" class="form-control" id="cpfPedagogicoAluno" name="cpfPedagogicoAluno" placeholder="CPF" onchange="verificaCPF(this)">
-                <small id="cpfHelp3" class="form-text text-muted">Digite um CPF válido, existe um algoritmo de validação neste campo.</small>
-            </div>
-            </div>
-    
-            
-            <button type="submit" class="btn btn-primary" id="cadastrarAluno">Salvar dados</button>
+        </div>
+        <div class="form-group col-auto">
             <br><br>
-        </form>
+            <label for="dataNascimentoAluno" class="text-muted" id="idadeCalculada">Idade:</label>
+        </div>
+        </div>
+        <div class="form-row">
+        <div class="form-group col-auto">
+            <label for="inputEmail4">Telefone (fixo)</label>
+            <input type="phone" onkeypress="$(this).mask('(00) 0000-00009')" class="form-control" id="telefoneAluno" name="telefoneAluno" placeholder="Número">
+        </div>
+        
+        <div class="form-group col-auto">
+            <label for="inputPassword4">Celular</label>
+            <input type="phone" class="form-control" id="celularAluno" name="celularAluno" placeholder="Número" onkeypress="$(this).mask('00000000009')" required>
+            <small id="senhaHelp" class="form-text text-muted">Digite o DDD seguido do número (Ex.: 31999999999)</small>
+        </div>
+        
+        <div class="form-group col-md-5">
+            <label for="inputPassword4">Email</label>
+            <input type="email" class="form-control" id="emailAluno" name="emailAluno" placeholder="Email" required>
+        </div>
+        </div>
+        <div class="form-row">
+        <div class="form-group col-md-3">
+            <label for="inputEmail4">Senha de acesso ao portal</label>
+            <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <div class="input-group-text">
+                <input type="checkbox" aria-label="Mostra e esconde a senha" onclick="this.checked ? (document.getElementById('senhaAluno').type = 'text'):(document.getElementById('senhaAluno').type = 'password')">
+                </div>
+            </div>
+            <input type="password" class="form-control" id="senhaAluno" name="senhaAluno" placeholder="Senha" required>
+            </div>
+            <small id="senhaHelp" class="form-text text-muted">A senha precisa ter no mínimo 6 caracteres.</small>
+        </div>
+        <div class="form-group col-auto">
+            <label for="inputEmail4">RG</label>
+            <input type="text" class="form-control" id="rgAluno" name="rgAluno" placeholder="RG" required>
+        </div>
+        <div class="form-group col-auto">
+            <label for="inputPassword4">CPF</label>
+            <input type="text" class="form-control" id="cpfAluno" name="cpfAluno" placeholder="CPF" onchange="verificaCPF(this)" required>
+            <small id="cpfHelp" class="form-text text-muted">Digite um CPF válido, existe um algoritmo de validação neste campo.</small>
+        </div>
+        </div>
+        <hr>
+        <label class="h6">Dados de endereço</label>
+        <div class="form-row col-md-4">
+        <label for="inputZip">CEP (somente números)</label>
+        <input type="text" class="form-control" id="cepAluno" name="cepAluno" placeholder="CEP" onchange="preencheEndereco(this.value)" onkeypress="$(this).mask('00.000-000')">
+        <small id="emailHelp" class="form-text text-muted">O CEP é opcional, mas quando inserido preenche o endereço automaticamente.</small>
+        </div>
+        <div class="form-row">
+        <div class="form-group col-md-5">
+            <label for="inputAddress2">Rua</label>
+            <input type="text" class="form-control" id="enderecoAluno" name="enderecoAluno" placeholder="Endereço">
+        </div>
+        <div class="form-group col-md-1">
+            <label for="inputAddress2">Número</label>
+            <input type="number" class="form-control" id="numeroAluno" name="numeroAluno" placeholder="Núm.">
+        </div>
+        <div class="form-group col-md-2">
+            <label for="inputCity">Bairro</label>
+            <input type="text" class="form-control" id="bairroAluno"name="bairroAluno" placeholder="Bairro">
+        </div>
+        <div class="form-group col-md-2">
+            <label for="inputState">Cidade</label>
+            <input type="text" class="form-control" id="cidadeAluno" name="cidadeAluno" placeholder="Cidade">
+        </div>
+        <div class="form-group col-md-1">
+            <label for="inputState">Estado</label>
+            <input type="text" class="form-control" id="estadoAluno" name="estadoAluno" placeholder="Estado">
+        </div>
+        </div>
+        <hr>
+        <label class="h6">Dados opcionais</label>
+                <div class="form-row col-auto">
+                  <label for="inputZip">"Qual o seu objetivo ao adquirir o curso?"</label>
+                  <input type="text" class="form-control" id="objetivoAluno" name="objetivoAluno" placeholder="Descreva...">
+                </div>
+                <br>
+                <div class="form-row col-auto">
+                  <label for="inputZip">"Toma remédios controlados? Se sim, qual e com que frequência?"</label>
+                  <input type="text" class="form-control" id="remedioAluno" name="remedioAluno" placeholder="Descreva...">
+                </div>
+                <br>
+                <div class="form-row col-auto">
+                  <label for="inputZip">"Possui alguma alergia? Se sim qual?"</label>
+                  <input type="text" class="form-control" id="alergiaAluno" name="alergiaAluno" placeholder="Descreva...">
+                </div>
+                <br>
+                <div class="form-row col-auto">
+                  <label for="inputZip">"Possui intolerância a algum alimento? Se sim qual?"</label>
+                  <input type="text" class="form-control" id="intoleranciaAluno" name="intoleranciaAluno" placeholder="Descreva...">
+                </div>
+                <br>
+                <div class="form-row col-auto">
+                  <label for="inputZip">"Qual curso está fazendo atualmente?"</label>
+                  <input type="text" class="form-control" id="cursoAtualmenteAluno" name="cursoAtualmenteAluno" placeholder="Descreva...">
+                </div>
+                <br>
+                
+                <div class="form-row col-auto">
+                  <label for="marketing">"Como conheceu a escola?"</label>
+                  <select class="form-control" name="marketing" id="marketing">
+                    <option selected hidden>Escolha...</option>
+                    <option value="Jornal">Jornal</option>
+                    <option value="Internet">Internet</option>
+                    <option value="Redes Sociais">Redes Sociais</option>
+                    <option value="Eventos">Eventos</option>
+                    <option value="Indicação">Indicação</option>
+                    <option value="Outdoors/Panfletos">Outdoors/Panfletos</option>
+                    <option value="Outros">Outros</option>
+                  </select>
+                </div>
+                <br>
+                <div class="form-row col-auto">
+                  <label for="vencimento">Data preferencial para vencimento</label>
+                  <select class="form-control" name="vencimento" id="vencimento">
+                    <option selected hidden>Escolha...</option>
+                    
+                  </select>
+                </div>
+                
+                <br>
+                <div class="form-row col-auto">
+                  <label for="inputZip">Outras observações...</label>
+                  <input type="text" class="form-control" id="observacoesAluno" name="observacoesAluno" placeholder="Descreva...">
+                </div>
+                <br>
+                <label><b>Dias e horários disponíveis:</b></label>
+                <div class="form-row">
+                  <div class=" col-md-2">
+                    <div class="custom-control custom-checkbox">
+                      
+                      <label  for="segunda">Segunda-feira</label>
+                    </div>
+                  </div>
+                  <div class="col-md-2">
+                    
+                    <input type="time" class="form-control" id="segundaHora1" name="segundaHora1" placeholder="Horário">
+                  </div>
+                  <div class="col-md-2">
+                    
+                    <input type="time" class="form-control" id="segundaHora2" name="segundaHora2" placeholder="Horário">
+                  </div>
+                </div>
+                <hr>
+                <div class="form-row">
+                  <div class=" col-md-2">
+                    <div class="custom-control custom-checkbox">
+                      
+                      <label for="terca">Terça-feira</label>
+                    </div>
+                  </div>
+                  <div class="col-md-2">
+                    
+                    <input type="time" class="form-control" id="tercaHora1" name="tercaHora1" placeholder="Horário">
+                  </div>
+                  <div class="col-md-2">
+                    
+                    <input type="time" class="form-control" id="tercaHora2" name="tercaHora2" placeholder="Horário">
+                  </div>
+                </div>
+                <hr>
+                <div class="form-row">
+                  <div class=" col-md-2">
+                    <div class="custom-control custom-checkbox">
+                      
+                      <label  for="quarta">Quarta-feira</label>
+                    </div>
+                  </div>
+                  <div class="col-md-2">
+                    
+                    <input type="time" class="form-control" id="quartaHora1" name="quartaHora1" placeholder="Horário">
+                  </div>
+                  <div class="col-md-2">
+                    
+                    <input type="time" class="form-control" id="quartaHora2" name="quartaHora2" placeholder="Horário">
+                  </div>
+                </div>
+                <hr>
+                <div class="form-row">
+                  <div class=" col-md-2">
+                    <div class="custom-control custom-checkbox">
+                      
+                      <label  for="quinta">Quinta-feira</label>
+                    </div>
+                  </div>
+                  <div class="col-md-2">
+                    
+                    <input type="time" class="form-control" id="quintaHora1" name="quintaHora1" placeholder="Horário">
+                  </div>
+                  <div class="col-md-2">
+                    
+                    <input type="time" class="form-control" id="quintaHora2" name="quintaHora2" placeholder="Horário">
+                  </div>
+                </div>
+                <hr>
+                <div class="form-row">
+                  <div class=" col-md-2">
+                    <div class="custom-control custom-checkbox">
+                      
+                      <label  for="sexta">Sexta-feira</label>
+                    </div>
+                  </div>
+                  <div class="col-md-2">
+                    
+                    <input type="time" class="form-control" id="sextaHora1" name="sextaHora1" placeholder="Horário">
+                  </div>
+                  <div class="col-md-2">
+                    
+                    <input type="time" class="form-control" id="sextaHora2" name="sextaHora2" placeholder="Horário">
+                  </div>
+                </div>
+                <hr>
+                <div class="form-row">
+                  <div class=" col-md-2">
+                    <div class="custom-control custom-checkbox">
+                      
+                      <label  for="sabado">Sábado</label>
+                    </div>
+                  </div>
+                  <div class="col-md-2">
+                    
+                    <input type="time" class="form-control" id="sabadoHora1" name="sabadoHora1" placeholder="Horário">
+                  </div>
+                  <div class="col-md-2">
+                    
+                    <input type="time" class="form-control" id="sabadoHora2" name="sabadoHora2" placeholder="Horário">
+                  </div>
+                </div>
+                <hr>
+                <div class="form-row">
+                  <div class=" col-md-2">
+                    <div class="custom-control custom-checkbox">
+                      
+                      <label  for="domingo">Domingo</label>
+                    </div>
+                  </div>
+                  <div class="col-md-2">
+                    
+                    <input type="time" class="form-control" id="domingoHora1" name="domingoHora1" placeholder="Horário">
+                  </div>
+                  <div class="col-md-2">
+                    
+                    <input type="time" class="form-control" id="domingoHora2" name="domingoHora2" placeholder="Horário">
+                  </div>
+                </div>
+                
+                  <br>
+                  <hr>
+                  <div class="form-row col-auto">
+                      
+                      <label for="autorizaImagemAluno">O aluno autoriza o uso de sua imagem e dados para divulgação? (Marque esta caixa apenas mediante autorização do aluno ou responsável)</label>
+                  </div>
+                  <div class="form-row col-auto">
+                    <div class="custom-control custom-radio custom-control-inline">
+                      <input type="radio" id="autorizaImagem" name="imagemAluno" value="autorizaImagem" class="custom-control-input">
+                      <label class="custom-control-label" for="autorizaImagem">Autoriza</label>
+                    </div>
+                    <div class="custom-control custom-radio custom-control-inline">
+                      <input type="radio" id="naoAutorizaImagem" checked name="imagemAluno" value="naoAutorizaImagem" class="custom-control-input">
+                      <label class="custom-control-label" for="naoAutorizaImagem">Não autoriza</label>
+                    </div>
+                  </div>
+                  
+        <button type="submit" class="btn btn-primary btn-block">Salvar dados</button>
+        <hr>
+        <h6>Dados dos responsáveis</h6>
+        <label>Para editar os dados dos responsáveis você deve abrir a ficha do aluno</label>
+        <section id="responsaveis">
+
+        </section>
+    </form>
         `, '<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>');
     
-        let formEditaAluno = document.getElementById('formEditaAluno');
-        let campos = $('#formEditaAluno').serializeArray();
-        console.log(campos)
+    for (let i = 0; i < 28; i++) {
+        let opt = document.createElement('option')
+        opt.value = i + 1
+        opt.innerHTML = i + 1
+        document.getElementById('vencimento').appendChild(opt)                 
+    }
+
+    let formEditaAluno = document.getElementById('formEditaAluno');
+    let campos = $('#formEditaAluno').serializeArray();
+    console.log(campos)
     
-        for (const key in campos) {
-            if (Object.hasOwnProperty.call(campos, key)) {
-                const element = campos[key];
-                console.log(element)
-                document.getElementById(element.name).value = aluno[element.name] == undefined ? null : aluno[element.name] ;
+    let responsaveis = aluno.responsaveis
+        let sectionResponsaveis = document.getElementById('responsaveis')
+        console.log(responsaveis)
+        sectionResponsaveis.innerHTML = ''
+        for (const i in responsaveis) {
+            if (Object.hasOwnProperty.call(responsaveis, i)) {
+                const responsavel = responsaveis[i];
+                sectionResponsaveis.innerHTML += `
+                <div class="form-row border border-success rounded">
+                
+                <div class="form-group col-md-4">
+                    <label for="inputAddress">Responsável</label>
+                    <input type="text" class="form-control" id="nome${i}" name="nome" placeholder="Nome" onblur="maiusculo(this)" disabled value="${responsavel.nome}">
+                </div>
+                <div class="form-group col-md-2">
+                    <label for="inputAddress">Relação</label>
+                    
+                    <input type="text" class="form-control form-control-md" value="${responsavel.relacao}" name="relacao" id="relacao${i}" disabled>
+                    
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="inputAddress">Número Celular</label>
+                    <input type="text" class="form-control" id="celular${i}" value="${responsavel.celular}" name="celular" placeholder="Celular" disabled>
+                </div>
+                
+                <div class="form-group col-md-5">
+                    <label for="inputPassword4">Email</label>
+                    <input type="email" class="form-control" id="email${i}" value="${responsavel.email}" name="email" placeholder="Email" disabled>
+                </div>
+                
+                <div class="form-group col-auto">
+                    <label for="inputEmail4">RG</label>
+                    <input type="text" class="form-control" id="rg${i}" value="${responsavel.rg}" name="rg" placeholder="RG" disabled>
+                </div>
+                
+                <div class="form-group col-auto">
+                    <label for="inputPassword4">CPF</label>
+                    <input type="text" class="form-control" id="cpf${i}" value="${responsavel.cpf}" name="cpf" placeholder="CPF" onchange="verificaCPF(this)" disabled>
+                    <small id="cpfHelp3" class="form-text text-muted">Digite um CPF válido, existe um algoritmo de validação neste campo.</small>
+                </div>
+                <div class="custom-control custom-checkbox">
+                    &nbsp;&nbsp;
+                        <input type="checkbox" class="custom-control-input" ${responsavel.pedagogico ? 'checked' : null} disabled id="pedagogico${i}" name="pedagogico">
+                        <label class="custom-control-label" for="pedagogico${i}">Responsável pedagógico</label>
+                    </div>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" ${responsavel.financeiro ? 'checked' : null} disabled id="financeiro${i}" name="financeiro">
+                        <label class="custom-control-label" for="financeiro${i}">Responsável financeiro</label>
+                    </div>
+                </div>
+                <br>
+                `
+
+                // for (const id in responsavel) {
+                //     if (Object.hasOwnProperty.call(responsavel, id)) {
+                //         const value = responsavel[id];
+                //         console.log(value)
+                //         document.getElementById(id + i).value = value
+                //         if (id == 'pedagogico' || id == 'financeiro') {
+                //             document.getElementById(id + i).checked = value
+                //         }
+                //     }
+                // }
             }
         }
+
+    for (const key in campos) {
+        if (Object.hasOwnProperty.call(campos, key)) {
+            const element = campos[key];
+            console.log(element)
+            console.log(aluno[element.name])
+            try {
+                if (element.name == 'imagemAluno') {
+                    document.getElementById(aluno[element.name]).checked = true;
+                } else if (aluno[element.name] != 'on') {
+                    document.getElementById(element.name).checked = false
+                }
+                try {
+                    document.getElementById(element.name).value = aluno[element.name] == undefined ? null : aluno[element.name] ; 
+                } catch (error) {
+                    console.log(error)
+                }
+                    
+                
+                
+                
+            } catch (error) {
+                console.log(error)
+            }
+           
+            
+            
+                
+        }
+    }
+    
+    
         
         formEditaAluno.addEventListener('submit', (e) => {
             e.preventDefault();
