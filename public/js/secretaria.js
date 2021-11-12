@@ -2383,7 +2383,7 @@ function cadastrarResponsavel(onlyList=true) {
             
             <div class="form-group col-md-4">
                 <label for="inputAddress">Responsável</label>
-                <input type="text" class="form-control" id="nome" name="nome" placeholder="Nome" onblur="maiusculo(this)">
+                <input type="text" class="form-control" id="nome" name="nome" placeholder="Nome" onblur="maiusculo(this)" required>
             </div>
             <div class="form-group col-md-2">
                 <label for="inputAddress">Relação</label>
@@ -2405,15 +2405,15 @@ function cadastrarResponsavel(onlyList=true) {
             </div>
             <div class="form-group col-md-5">
                 <label for="inputPassword4">Email</label>
-                <input type="email" class="form-control" id="email" name="email" placeholder="Email">
+                <input type="email" class="form-control" id="email" name="email" placeholder="Email" required>
             </div>
             <div class="form-group col-auto">
                 <label for="inputEmail4">RG</label>
-                <input type="text" class="form-control" id="rg" name="rg" placeholder="RG">
+                <input type="text" class="form-control" id="rg" name="rg" placeholder="RG" required> 
             </div>
             <div class="form-group col-auto">
                 <label for="inputPassword4">CPF</label>
-                <input type="text" class="form-control" id="cpf" name="cpf" placeholder="CPF" onchange="verificaCPF(this)">
+                <input type="text" class="form-control" id="cpf" name="cpf" placeholder="CPF" onchange="verificaCPF(this)" required>
                 <small id="cpfHelp3" class="form-text text-muted">Digite um CPF válido, existe um algoritmo de validação neste campo.</small>
             </div>
             
@@ -2562,7 +2562,7 @@ function cadastrarResponsavel(onlyList=true) {
             
             <div class="form-group col-md-4">
                 <label for="inputAddress">Responsável</label>
-                <input type="text" class="form-control" id="nome" name="nome" placeholder="Nome" onblur="maiusculo(this)">
+                <input type="text" class="form-control" id="nome" name="nome" placeholder="Nome" onblur="maiusculo(this)" required>
             </div>
             <div class="form-group col-md-2">
                 <label for="inputAddress">Relação</label>
@@ -2584,15 +2584,15 @@ function cadastrarResponsavel(onlyList=true) {
             </div>
             <div class="form-group col-md-5">
                 <label for="inputPassword4">Email</label>
-                <input type="email" class="form-control" id="email" name="email" placeholder="Email">
+                <input type="email" class="form-control" id="email" name="email" placeholder="Email" required>
             </div>
             <div class="form-group col-auto">
                 <label for="inputEmail4">RG</label>
-                <input type="text" class="form-control" id="rg" name="rg" placeholder="RG">
+                <input type="text" class="form-control" id="rg" name="rg" placeholder="RG" required>
             </div>
             <div class="form-group col-auto">
                 <label for="inputPassword4">CPF</label>
-                <input type="text" class="form-control" id="cpf" name="cpf" placeholder="CPF" onchange="verificaCPF(this)">
+                <input type="text" class="form-control" id="cpf" name="cpf" placeholder="CPF" onchange="verificaCPF(this)" required>
                 <small id="cpfHelp3" class="form-text text-muted">Digite um CPF válido, existe um algoritmo de validação neste campo.</small>
             </div>
             
@@ -2689,7 +2689,7 @@ formCadastroAluno.addEventListener('submit', async (e) => {
     } else if (dadosAluno.emailAluno == '' || emailRegularExpression(dadosAluno.emailAluno) == false) {
         AstNotif.dialog('Confira o email do aluno', 'O email do aluno é obrigatório. Confira se foi escrito corretamente.')
         loaderRun()
-    } else if (dadosAluno.cpfAluno == '' || dadosAluno.rgAluno == '') {
+    } else if ((dadosAluno.cpfAluno == '' || dadosAluno.rgAluno == '') && idadeAluno.years >= 18) {
         AstNotif.dialog('Confira os campos', 'Os dados de RG e CPF do aluno não podem estar em branco.')
         loaderRun()
     } else if (dadosAluno.turmaAluno == 'Escolha uma turma...' && dadosAluno.tipoMatricula == 'matricula') {
