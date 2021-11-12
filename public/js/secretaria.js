@@ -2373,6 +2373,15 @@ function criaPDFAluno() {
     doc.save("a4.pdf");
 }
 
+let btnCadastraResponsavel = document.getElementById('cadastraResponsavel')
+btnCadastraResponsavel.addEventListener('click', (e) => {
+    e.preventDefault()
+    e.stopImmediatePropagation()
+    e.stopPropagation()
+    
+    cadastrarResponsavel(false)
+})
+
 function cadastrarResponsavel(onlyList=true) {
     
     if (!onlyList) {
