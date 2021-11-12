@@ -2672,6 +2672,7 @@ formCadastroAluno.addEventListener('submit', async (e) => {
         let values = formData.getAll(field.name)
         values.length == 1 ? dadosAluno[field.name] = values[0] : dadosAluno[field.name] = values
     })
+    
     dadosAluno.codCurso = dadosAluno.turmaAluno.split(',')[1]
     dadosAluno.turmaAluno = dadosAluno.turmaAluno.split(',')[0]
     
@@ -2706,11 +2707,13 @@ formCadastroAluno.addEventListener('submit', async (e) => {
             loaderRun()
         } else {
             loaderMsg.innerText = 'Enviando dados para o servidor...'
+            let codPreMatricula = sessionStorage.getItem('preMatricula')
             let cadastraAluno = firebase.functions().httpsCallable('cadastraAluno')
-            cadastraAluno({dados: dadosAluno, contratoConfigurado: contratoConfigurado, planoOriginal: planoOriginal}).then(function(result) {
+            cadastraAluno({dados: dadosAluno, contratoConfigurado: contratoConfigurado, planoOriginal: planoOriginal, preMatricula: codPreMatricula}).then(function(result) {
                 sessionStorage.removeItem('contratoConfigurado')
                 sessionStorage.removeItem('planoOriginal')
                 sessionStorage.removeItem('responsaveis')
+                sessionStorage.removeItem('preMatricula')
                 loaderRun()
                 console.log(result.data)
                 AstNotif.notify('Sucesso', result.data.answer, 'agora', {length: 15000})
@@ -6240,6 +6243,7 @@ async function abaPreMatriculas() {
     let listaPreMatriculas = document.getElementById('listaPreMatriculas')
     let preMatriculas
     let dados
+    let keyAtual
     carregaMatriculas()
 
     async function carregaMatriculas() {
@@ -6298,6 +6302,7 @@ async function abaPreMatriculas() {
 
     async function abreDadosPreMatricula(key) {
         dados = preMatriculas[key];
+        keyAtual = key
         document.getElementById('infoPreMatricula').style.display = 'block'
         document.getElementById('rolaTelaAbaixoPre').style.display = 'block'
         document.getElementById('secGeraFichaPre').innerHTML = `<button class="btn btn-outline-primary btn-block" id="editarDadosPre">Ver/Editar dados do aluno</button><button class="btn btn-outline-primary btn-block" id="btnGeraFicha" onclick="gerarFichaPreMatricula('${key}')">Gerar ficha de pré-matrícula em PDF</button>
@@ -6827,6 +6832,7 @@ async function abaPreMatriculas() {
 
     let btnMatricularAluno = document.getElementById('btnMatricularAluno')
     btnMatricularAluno.addEventListener('click', async (e) => {
+        sessionStorage.setItem('preMatricula', keyAtual)
         
         let btnCadastrarAlunos = document.getElementById('btnCadastrarAlunos');
         btnCadastrarAlunos.click();
