@@ -2011,7 +2011,7 @@ function carregaProfsETurmas(preMatricula=false) {
         AstNotif.dialog('Erro', error.message)
     })
 
-    if(preMatricula) {
+    if (preMatricula) {
         for (const name in preMatricula) {
             if (Object.hasOwnProperty.call(preMatricula, name)) {
                 const value = preMatricula[name];

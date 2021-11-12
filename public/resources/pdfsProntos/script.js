@@ -324,7 +324,10 @@ window.addEventListener('DOMContentLoaded', (e) => {
                             }
                         }
                     }
-                    responsavel = responsavel === undefined ? responsaveis[keyResp] : responsavel
+                    if (idade.years < 18) {
+                        responsavel = responsavel === undefined ? responsaveis[keyResp] : responsavel
+                    }
+                    
                     console.log(aluno);
                     let titulos = [
                         [true, 'Dados do Aluno'],
