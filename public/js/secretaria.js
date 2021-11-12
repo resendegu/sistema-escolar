@@ -2688,22 +2688,49 @@ formCadastroAluno.addEventListener('submit', async (e) => {
     
 
     console.log(dadosAluno)
-    
-    if (dadosAluno.dataNascimentoAluno == '' || dadosAluno.nomeAluno == '') {
-        AstNotif.dialog('Confira os campos', 'A data de nascimento do aluno e o nome do aluno são obrigatórios.')
-        loaderRun()
-    } else if((!responsaveis || responsaveis.length == 0)&& idadeAluno != undefined && idadeAluno.years < 18) {
-        AstNotif.dialog('Confira os campos', 'O aluno é menor de idade. É obrigatório adicionar pelo menos um responsável para o aluno.')
-        loaderRun()
-    } else if (dadosAluno.emailAluno == '' || emailRegularExpression(dadosAluno.emailAluno) == false) {
-        AstNotif.dialog('Confira o email do aluno', 'O email do aluno é obrigatório. Confira se foi escrito corretamente.')
-        loaderRun()
-    } else if ((dadosAluno.cpfAluno == '' || dadosAluno.rgAluno == '') && idadeAluno.years >= 18) {
-        AstNotif.dialog('Confira os campos', 'Os dados de RG e CPF do aluno não podem estar em branco.')
-        loaderRun()
-    } else if (dadosAluno.turmaAluno == 'Escolha uma turma...' && dadosAluno.tipoMatricula == 'matricula') {
-        AstNotif.dialog('Confira os campos', 'É obrigatório matricular o aluno em uma turma. Se você deseja fazer pré-matricula, vá até o início deste formulário e marque a opção de Pré-matricula.')
-        loaderRun()
+    if (dadosAluno.tipoMatricula == 'matricula') {
+        if (dadosAluno.dataNascimentoAluno == '' || dadosAluno.nomeAluno == '') {
+            AstNotif.dialog('Confira os campos', 'A data de nascimento do aluno e o nome do aluno são obrigatórios.')
+            loaderRun()
+        } else if((!responsaveis || responsaveis.length == 0)&& idadeAluno != undefined && idadeAluno.years < 18) {
+            AstNotif.dialog('Confira os campos', 'O aluno é menor de idade. É obrigatório adicionar pelo menos um responsável para o aluno.')
+            loaderRun()
+        } else if ((dadosAluno.emailAluno == '' || emailRegularExpression(dadosAluno.emailAluno) == false) && dadosAluno.tipoMatricula == 'matricula') {
+            AstNotif.dialog('Confira o email do aluno', 'O email do aluno é obrigatório. Confira se foi escrito corretamente.')
+            loaderRun()
+        } else if ((dadosAluno.cpfAluno == '' || dadosAluno.rgAluno == '') && idadeAluno.years >= 18) {
+            AstNotif.dialog('Confira os campos', 'Os dados de RG e CPF do aluno não podem estar em branco.')
+            loaderRun()
+        } else if (dadosAluno.turmaAluno == 'Escolha uma turma...' && dadosAluno.tipoMatricula == 'matricula') {
+            AstNotif.dialog('Confira os campos', 'É obrigatório matricular o aluno em uma turma. Se você deseja fazer pré-matricula, vá até o início deste formulário e marque a opção de Pré-matricula.')
+            loaderRun()
+        } else {
+            loaderMsg.innerText = 'Enviando dados para o servidor...'
+            let cadastraAluno = firebase.functions().httpsCallable('cadastraAluno')
+            cadastraAluno({dados: dadosAluno, contratoConfigurado: contratoConfigurado, planoOriginal: planoOriginal}).then(function(result) {
+                sessionStorage.removeItem('contratoConfigurado')
+                sessionStorage.removeItem('planoOriginal')
+                sessionStorage.removeItem('responsaveis')
+                loaderRun()
+                console.log(result.data)
+                AstNotif.notify('Sucesso', result.data.answer, 'agora', {length: 15000})
+                
+                if (dadosAluno.geraBoleto == 'on') {
+                    boleto('geraBoletos', dadosAluno.matriculaAluno, result.data.codContrato)
+                }
+                if (dadosAluno.geraPDFAluno == 'on') {
+                    gerarFichaAluno(dadosAluno.matriculaAluno)
+                }
+                
+                document.getElementById('resetForm').style.visibility = 'visible'
+                document.getElementById('resetForm').click()
+                carregaProfsETurmas()
+            }).catch(function(error) {
+                AstNotif.dialog('Erro', error.message)
+                console.log(error)
+                loaderRun()
+            })
+        }
     } else {
         loaderMsg.innerText = 'Enviando dados para o servidor...'
         let cadastraAluno = firebase.functions().httpsCallable('cadastraAluno')
@@ -2731,6 +2758,8 @@ formCadastroAluno.addEventListener('submit', async (e) => {
             loaderRun()
         })
     }
+    
+    
     
 })
 

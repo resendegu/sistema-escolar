@@ -517,29 +517,14 @@ exports.cadastraAluno = functions.https.onCall(async (data, context) => {
                 console.log(error)
             }
             
-            let emailContent = {
-                to: dadosAluno.emailAluno,
-                cc: responsavelPedagogico.email || null,
-                message: {
-                    subject: `${dadosEscola.nomeEscola}`,
-                    text: `Olá ${dadosAluno.nomeAluno.split(' ')[0]}, você foi pré-matriculado em nosso sistema. Sistemas ProjetoX.`,
-                    html: `<h3>Olá ${dadosAluno.nomeAluno.split(' ')[0]}!</h3><p>Você foi pré-matriculado(a) em nosso sistema. Viemos te dar as boas vindas, e esperamos que em breve você esteja com a gente.</p><p><b>Entre em contato com a escola para maiores informações</b>.</p><p><b>Dados de contato da escola:</b><br>Telefone: ${dadosEscola.telefoneEscola}<br>E-mail: ${dadosEscola.emailEscola}<br>Endereço: ${dadosEscola.enderecoEscola}</p><p>Sistemas GrupoProX.</p>`
-                }
-            }
+            
 
             dadosAluno.timestamp = admin.firestore.Timestamp.now()
             dadosAluno.userCreator = context.auth.uid
 
             return admin.database().ref('/sistemaEscolar/preMatriculas').push(dadosAluno).then(() => {
                 
-                return firestoreRef.add(emailContent).then(() => {
-                    console.log('Queued email for delivery to ' + dadosAluno.emailAluno)
-                    return {answer: 'Aluno cadastrado em pré-matrícula com sucesso! Um e-mail será enviado para o aluno e seu responsável pedagógico, informando-os sobre este cadastro.'}
-                    
-                }).catch(error => {
-                    console.error(error)
-                    throw new Error(error.message)
-                })
+                return {answer: 'Aluno cadastrado em pré-matrícula com sucesso! Um e-mail será enviado para o aluno e seu responsável pedagógico, informando-os sobre este cadastro.'}
             }).catch(error => {
                 throw new functions.https.HttpsError('unknown', error.message, error)
             })
