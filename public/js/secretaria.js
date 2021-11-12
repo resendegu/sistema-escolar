@@ -2743,6 +2743,9 @@ function calculaIdade(dataNasc) {
         calcularIdadePrecisa(dataNasc).then(function(idade){
             idadeAluno = idade
             console.log(idadeAluno)
+            if (idadeAluno.years < 18) {
+                cadastrarResponsavel(false)
+            }
             document.getElementById('idadeCalculada').innerText = `Idade: ${idadeAluno.years} ano(s), ${idadeAluno.months} mes(es), ${idadeAluno.days} dia(s)`
             loaderRun()
         }).catch(function(error){
