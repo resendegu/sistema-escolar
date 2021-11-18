@@ -288,8 +288,8 @@ async function carregaListaDeAlunosDaTurma(turma, filtro='') {
                         <td>${matricula}</td>
                         <td><b>${somatorioNota}</b>/100</td>
                         <td>${statusTurma == 'aberta' ? `
-                            <a href="#" class="action" id="lancaFrequencia${c}" onclick="lancaDesempenho('${matricula}', '${turma}')"><i data-feather="edit-2" data-toggle="tooltip" title="Lançar Desempenho"></i></a>
-                            <a href="#" id="lançaNotas${c}" onclick="editaNotasAluno('${matricula}', '${turma}')" class="edit"><i data-feather="edit" data-toggle="tooltip" title="Lançar notas"></i></a>
+                            <a href="#" class="action" id="lancaFrequencia${c}" onclick="lancaDesempenho('${matricula}', '${turma}')" data-toggle="tooltip" title="Lançar Desempenho"><i data-feather="edit-2"></i></a>
+                            <a href="#" id="lançaNotas${c}" onclick="editaNotasAluno('${matricula}', '${turma}')" class="edit" data-toggle="tooltip" title="Lançar notas"><i data-feather="edit"></i></a>
                         ` : ''}
                             
                         </td>
@@ -338,8 +338,8 @@ async function carregaListaDeAlunosDaTurma(turma, filtro='') {
                         <td>${matricula}</td>
                         <td><b>${somatorioNota}</b>/100</td>
                         <td>
-                            <a href="#" class="action" id="lancaFrequencia${c}" onclick="lancaDesempenho('${matricula}', '${turma}')"><i data-feather="edit-2" data-toggle="tooltip" title="Lançar Desempenho"></i></a>
-                            <a href="#" id="lançaNotas${c}" onclick="editaNotasAluno('${matricula}', '${turma}')" class="edit"><i data-feather="edit" data-toggle="tooltip" title="Lançar notas"></i></a>
+                            <a href="#" class="action" id="lancaFrequencia${c}" data-toggle="tooltip" title="Lançar Desempenho" onclick="lancaDesempenho('${matricula}', '${turma}')"><i data-feather="edit-2"></i></a>
+                            <a href="#" id="lançaNotas${c}" onclick="editaNotasAluno('${matricula}', '${turma}')" class="edit" data-toggle="tooltip" title="Lançar notas"><i data-feather="edit"></i></a>
                         </td>
                     </tr>
                     `
@@ -2030,8 +2030,8 @@ function historicoAluno(matricula, turma) {
             <td>${dataFechamento.getDate()}/${dataFechamento.getMonth() + 1}/${dataFechamento.getFullYear()}</td>
             <td><b>${somatorioNota}</b>/100</td>
             <td>
-                <a id="emiteBoletim${c}" onclick="emiteBoletim('${matricula}', '${registro.key}')" class="action" data-toggle="modal"><i data-feather="file-text" data-toggle="tooltip" title="Emitir boletim"></i></a>
-                <a href="#" id="verHistorico${c}" class="edit" data-toggle="modal"><i data-feather="eye" data-toggle="tooltip" title="Visualizar dados"></i></a>
+                <a id="emiteBoletim${c}" onclick="emiteBoletim('${matricula}', '${registro.key}')" class="action" data-toggle="tooltip" title="Emitir boletim"><i data-feather="file-text"></i></a>
+                <a href="#" id="verHistorico${c}" class="edit" data-toggle="tooltip" title="Visualizar dados"><i data-feather="eye"></i></a>
             </td>
         </tr>
         `

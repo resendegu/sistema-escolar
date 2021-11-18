@@ -280,79 +280,85 @@ exports.cadastraTurma = functions.https.onCall(async (data, context) => {
         var dados = data
         if (dados.hasOwnProperty('codTurmaAtual')) {
             let turma = dados.codTurmaAtual
-        return admin.database().ref(`sistemaEscolar/turmas/${turma}/professor/0`).once('value').then(snapshot => {
-            if (snapshot.val()) {
-                throw new HttpsError('cancelled', 'Operação cancelada! Desconecte todos os professores desta turma antes de editar a turma', )
-            }
-            return admin.database().ref(`sistemaEscolar/turmas/${turma}`).once('value').then(async (turmaFire) => {
-                let dadosTurmaAtual = turmaFire.val()
-                
-
-                async function atualizaAlunos() {
-                    Object.keys(dadosTurmaAtual.alunos).map(async (matricula) => {
-                        await admin.database().ref('sistemaEscolar/alunos/' + matricula + '/turmaAluno').set(dados.codigoSala)
-                    })
-                    return ;
+            return admin.database().ref(`sistemaEscolar/turmas/${turma}/professor/0`).once('value').then(snapshot => {
+                if (snapshot.val()) {
+                    throw new HttpsError('cancelled', 'Operação cancelada! Desconecte todos os professores desta turma antes de editar a turma', )
                 }
+                return admin.database().ref(`sistemaEscolar/turmas/${turma}`).once('value').then(async (turmaFire) => {
+                    let dadosTurmaAtual = turmaFire.val()
+                    
 
-                if (Object.keys(dadosTurmaAtual.alunos).length > 0) {
-                    await atualizaAlunos();
-                }
-
-                // Essa parte se repete com as funções de baixo
-                return admin.database().ref(`sistemaEscolar/turmas/${turma}`).remove().then(() => {
-                    return admin.database().ref(`sistemaEscolar/registroGeral`).push({operacao: 'Edição das informações de turma do sistema', timestamp: admin.firestore.Timestamp.now(), userCreator: context.auth.uid, dados: {codTurma: turma}}).then(() => {
-                        var horario
-                let hora = dados.hora.indexOf('_') == -1 ? dados.hora : dados.hora.split('_')[0]
-                if (hora >= 12 && hora <= 17) {
-                    horario = 'Tarde'
-                } else if (hora >= 18 && hora <= 23) {
-                    horario = 'Noite'
-                } else if (hora >= 5 && hora <= 11) {
-                    horario = 'Manha'
-                } else {
-                    throw new functions.https.HttpsError('invalid-argument', 'Você deve passar um horário válido')
-                }
-                return admin.auth().getUserByEmail(data.professor).then(function(user) {
-                    dados.professor = [{nome: user.displayName, email: user.email}]
-                    dados.timestamp = admin.firestore.Timestamp.now()
-                    return admin.database().ref(`sistemaEscolar/usuarios/${user.uid}/professor/turmas/${data.codigoSala}`).set(true).then(() => {
-                        return admin.database().ref(`sistemaEscolar/turmas/${data.codigoSala}/`).once('value').then(snapshot =>{
-                            if (snapshot.exists() == false) {
-                                Object.assign(dadosTurmaAtual, dados)
-                                return admin.database().ref(`sistemaEscolar/turmas/${data.codigoSala}/`).set(dadosTurmaAtual).then(() => {
-                                    admin.database().ref(`sistemaEscolar/numeros/turmasCadastradas`).transaction(function (current_value) {
-                                        return (current_value || 0) + 1
-                                    }).catch(function (error) {
-                                        throw new functions.https.HttpsError('unknown', error.message, error)
-                                    })
-                                    return admin.database().ref(`sistemaEscolar/registroGeral`).push({operacao: 'Cadastro de Turma', timestamp: admin.firestore.Timestamp.now(), userCreator: context.auth.uid, dados: dados}).then(() => {
-                                        return {answer: 'A turma e todos os seus registros foram alterados com sucesso.'}
-                                    }).catch(error => {
-                                        throw new functions.https.HttpsError('unknown', error.message, error)
-                                    })
-                                    
-                                    }).catch(error => {
-                                        throw new functions.https.HttpsError(error.code, error.message, error)
-                                    })
-                            } else {
-                                throw new functions.https.HttpsError('already-exists', 'Uma turma com o mesmo código já foi criada.')
-                            }
-                            
+                    async function atualizaAlunos() {
+                        Object.keys(dadosTurmaAtual.alunos).map(async (matricula) => {
+                            await admin.database().ref('sistemaEscolar/alunos/' + matricula + '/turmaAluno').set(dados.codigoSala)
                         })
+                        return ;
+                    }
+
+                    if (Object.keys(dadosTurmaAtual.alunos).length > 0) {
+                        await atualizaAlunos();
+                    }
+
+                    // Essa parte se repete com as funções de baixo
+                    return admin.database().ref(`sistemaEscolar/turmas/${turma}`).remove().then(() => {
+                        return admin.database().ref(`sistemaEscolar/registroGeral`).push({operacao: 'Edição das informações de turma do sistema', timestamp: admin.firestore.Timestamp.now(), userCreator: context.auth.uid, dados: {codTurma: turma}}).then(() => {
+                            var horario
+                    let hora = dados.hora.indexOf('_') == -1 ? dados.hora : dados.hora.split('_')[0]
+                    if (hora >= 12 && hora <= 17) {
+                        horario = 'Tarde'
+                    } else if (hora >= 18 && hora <= 23) {
+                        horario = 'Noite'
+                    } else if (hora >= 5 && hora <= 11) {
+                        horario = 'Manha'
+                    } else {
+                        throw new functions.https.HttpsError('invalid-argument', 'Você deve passar um horário válido')
+                    }
+                    return admin.auth().getUserByEmail(data.professor).then(function(user) {
+                        dados.professor = [{nome: user.displayName, email: user.email}]
+                        dados.timestamp = admin.firestore.Timestamp.now()
+                        dados.id = dados.codigoSala
+                        return admin.database().ref(`sistemaEscolar/usuarios/${user.uid}/professor/turmas/${data.codigoSala}`).set(true).then(() => {
+                            return admin.database().ref(`sistemaEscolar/turmas/${data.codigoSala}/`).once('value').then(snapshot =>{
+                                if (snapshot.exists() == false) {
+                                    Object.assign(dadosTurmaAtual, dados)
+                                    return admin.database().ref(`sistemaEscolar/turmas/${data.codigoSala}/`).set(dadosTurmaAtual).then(() => {
+                                        admin.database().ref(`sistemaEscolar/numeros/turmasCadastradas`).transaction(function (current_value) {
+                                            return (current_value || 0) + 1
+                                        }).catch(function (error) {
+                                            throw new functions.https.HttpsError('unknown', error.message, error)
+                                        })
+                                        return admin.database().ref(`sistemaEscolar/registroGeral`).push({operacao: 'Cadastro de Turma', timestamp: admin.firestore.Timestamp.now(), userCreator: context.auth.uid, dados: dados}).then(() => {
+                                            return {answer: 'A turma e todos os seus registros foram alterados com sucesso.'}
+                                        }).catch(error => {
+                                            throw new functions.https.HttpsError('unknown', error.message, error)
+                                        })
+                                        
+                                        }).catch(error => {
+                                            throw new functions.https.HttpsError(error.code, error.message, error)
+                                        })
+                                } else {
+                                    throw new functions.https.HttpsError('already-exists', 'Uma turma com o mesmo código já foi criada.')
+                                }
+                                
+                            })
+                        }).catch(error => {
+                            throw new functions.https.HttpsError('unknown', error.message, error)
+                        })
+                        
+                            
+                    }).catch(function(error) {
+                        throw new functions.https.HttpsError('unknown', error.message, error)
+                    })
+                            
+                        }).catch(error => {
+                            throw new functions.https.HttpsError('unknown', error.message, error)
+                        })
+        
+                        
                     }).catch(error => {
                         throw new functions.https.HttpsError('unknown', error.message, error)
                     })
                     
-                        
-                }).catch(function(error) {
-                    throw new functions.https.HttpsError('unknown', error.message, error)
-                })
-                        
-                    }).catch(error => {
-                        throw new functions.https.HttpsError('unknown', error.message, error)
-                    })
-    
                     
                 }).catch(error => {
                     throw new functions.https.HttpsError('unknown', error.message, error)
@@ -362,16 +368,12 @@ exports.cadastraTurma = functions.https.onCall(async (data, context) => {
             }).catch(error => {
                 throw new functions.https.HttpsError('unknown', error.message, error)
             })
-            
-            
-        }).catch(error => {
-            throw new functions.https.HttpsError('unknown', error.message, error)
-        })
 
 
 
 
         } else {
+            data.id = data.codigoSala
             var horario
             let hora = dados.hora.indexOf('_') == -1 ? dados.hora : dados.hora.split('_')[0]
             if (hora >= 12 && hora <= 17) {
@@ -507,6 +509,7 @@ exports.cadastraAluno = functions.https.onCall(async (data, context) => {
         let dadosAluno = data.dados
         if (dadosAluno.tipoMatricula == 'preMatricula') {
             delete dadosAluno.tipoMatricula
+            
             let firestoreRef = admin.firestore().collection('mail');
             let infoEscola = await admin.database().ref('sistemaEscolar/infoEscola/dadosBasicos').once('value')
             let dadosEscola = infoEscola.val()

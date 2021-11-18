@@ -1114,7 +1114,7 @@ async function turmas() {
                     await turmasRef.child(turmaAberta + '/aulaEvento').set(eventSource)
                     $('#modal').modal('hide')
                     AstNotif.notify('Sucesso', 'Turma aberta')
-                    carregaListaDeAlunosDaTurma(turmaAberta)
+                    abreTurma(turmaAberta)
                     loaderRun()
                 }).catch(error => {
                     loaderRun()
@@ -3135,6 +3135,9 @@ function desativarAlunos(confirma=false, codTurma, matricula, nome) {
                 <br><br>
                 Esta ação ficará salva no histórico de operações do aluno e da turma para futuras consultas.
         `, `<button type="button" data-toggle="tooltip" data-placement="top" title="Desativar agora" class="btn btn-warning" onclick="desativarAlunos(true, '${codTurma}', '${matricula}', '${nome}')">Desativar</button><button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>`)
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
     }
     
 }
@@ -3586,14 +3589,16 @@ function carregaListaDeAlunos(filtro='') {
                         <td>${matricula}</td>
                         <td>${aluno.turmaAluno}</td>
                         <td>
-                            <a href="#" class="edit" onclick="editarDadosAluno('${matricula}')"><i data-feather="edit" data-toggle="tooltip" title="Editar dados"></i></a>
-                            <a href="#checkbox${c}" class="delete" onclick="desativarAlunos(false, '${aluno.turmaAluno}', '${matricula}', '${aluno.nomeAluno}')"><i data-feather="user-x" data-toggle="tooltip" title="Desativar aluno"></i></a>
+                            <a href="#" class="edit" data-toggle="tooltip" title="Editar dados" onclick="editarDadosAluno('${matricula}')"><i data-feather="edit" ></i></a>
+                            <a href="#checkbox${c}" data-toggle="tooltip" title="Desativar aluno" class="delete" onclick="desativarAlunos(false, '${aluno.turmaAluno}', '${matricula}', '${aluno.nomeAluno}')"><i data-feather="user-x"></i></a>
                         </td>
                     </tr>`
                 }
             }
             feather.replace()
-            $('[data-toggle="tooltip"]').tooltip();
+            $(function () {
+                $('[data-toggle="tooltip"]').tooltip()
+            })
             ativaCheckboxes()
             loaderRun()
         })
@@ -3618,14 +3623,16 @@ function carregaListaDeAlunos(filtro='') {
                         <td>${matricula}</td>
                         <td>${aluno.turmaAluno}</td>
                         <td>
-                            <a href="#" class="action" onclick="ativarAluno('${matricula}')"><i data-feather="user-check" data-toggle="tooltip" title="Reativar Aluno"></i></a>
-                            <a href="#deleteEmployeeModal" class="delete" data-toggle="modal"><i data-feather="trash" data-toggle="tooltip" title="Deletar aluno"></i></a>
+                            <a href="#" class="action" onclick="ativarAluno('${matricula}')"><i data-feather="user-check"></i></a>
+                            <a href="#deleteEmployeeModal" class="delete" data-toggle="modal" data-toggle="tooltip" title="Deletar aluno" data-toggle="tooltip" title="Reativar Aluno"><i data-feather="trash"></i></a>
                         </td>
                     </tr>`
                 }
             }
             feather.replace()
-            $('[data-toggle="tooltip"]').tooltip();
+            $(function () {
+                $('[data-toggle="tooltip"]').tooltip()
+            })
             ativaCheckboxes()
             loaderRun()
         }).catch(error => {
@@ -3820,8 +3827,8 @@ async function carregaContratosAluno(matricula) {
                 <td>${contrato.contratoConfigurado.nomeCursoAdd}</td>
                 <td>${contrato.situacao || ''}</td>
                 <td>
-                  <a href="#" class="action" onclick="segundaViaBoleto('${matricula}', '${codContrato}')" ><i data-feather="file-text" data-toggle="tooltip" title="Segunda via de boletos">&#xE254;</i></a>
-                  <a href="#" class="action" data-toggle="modal" onclick="geraBoletoContrato('${matricula}', '${codContrato}')"><i data-feather="dollar-sign" data-toggle="tooltip" title="Gerar boletos de pagamento">&#xE872;</i></a>
+                  <a href="#" class="action" onclick="segundaViaBoleto('${matricula}', '${codContrato}')" data-toggle="tooltip" title="Segunda via de boletos"><i data-feather="file-text">&#xE254;</i></a>
+                  <a href="#" class="action" data-toggle="tooltip" title="Gerar boletos de pagamento"onclick="geraBoletoContrato('${matricula}', '${codContrato}')"><i data-feather="dollar-sign">&#xE872;</i></a>
                 </td>
               </tr>
                 `
@@ -4407,7 +4414,7 @@ async function historicoAluno(matricula, turma) {
                 <td>${dataFechamento.getDate()}/${dataFechamento.getMonth() + 1}/${dataFechamento.getFullYear()}</td>
                 <td><b>${somatorioNota}</b>/100</td>
                 <td>
-                    <a id="emiteBoletim${c}" style="cursor: pointer;" onclick="emiteBoletim('${matricula}', '${key}')" class="action" data-toggle="modal"><i data-feather="file-text" data-toggle="tooltip" title="Emitir boletim"></i></a>
+                    <a id="emiteBoletim${c}" style="cursor: pointer;" onclick="emiteBoletim('${matricula}', '${key}')" class="action" data-toggle="tooltip" title="Emitir boletim"><i data-feather="file-text"></i></a>
                     
                 </td>
             </tr>
@@ -5240,7 +5247,7 @@ async function abaEmail() {
                     </div>
                 </div>
                 `
-                emaiLengthPage.innerText = '0'
+                emailLengthPage.innerText = '0'
             }
             
             emailLengthPage.innerText = emails.length
@@ -5474,8 +5481,8 @@ function carregaAlunosDesativados(matricula=false,filtro='', numPrimeiros=20, nu
                     <td>${matricula}</td>
                     <td>${dados.dadosAluno.turmaAluno}</td>
                     <td>
-                        <a href="#" class="action" onclick="ativarAluno('${matricula}')"><i data-feather="user-check" data-toggle="tooltip" title="Reativar Aluno"></i></a>
-                        <a href="#deleteEmployeeModal" class="delete" data-toggle="modal"><i data-feather="trash" data-toggle="tooltip" title="Deletar aluno"></i></a>
+                        <a href="#" class="action" onclick="ativarAluno('${matricula}')" data-toggle="tooltip" title="Reativar Aluno"><i data-feather="user-check"></i></a>
+                        <a href="#deleteEmployeeModal" class="delete" data-toggle="modal" data-toggle="tooltip" title="Deletar aluno"><i data-feather="trash" ></i></a>
                     </td>
                 </tr>
                 
@@ -5745,14 +5752,16 @@ function dadosInfoEscola() {
                         <td>${livro.nomeLivro}</td>
                         <td>${livro.codLivro}</td>
                         <td>
-                            <a href="#modalAdicionaLivro" onclick="carregaDadosLivro('${livro.codSistema}')" class="edit" data-toggle="modal"><i data-feather="edit" data-toggle="tooltip" title="Editar livro">&#xE254;</i></a>
-                            <a href="#deleteEmployeeModal" class="action" data-toggle="modal"><i data-feather="eye" data-toggle="tooltip" title="Ver Estatísticas"></i></a>
+                            <a data-toggle="modal" href="#modalAdicionaLivro" onclick="carregaDadosLivro('${livro.codSistema}')" class="edit" data-toggle="tooltip" title="Editar livro"><i data-feather="edit">&#xE254;</i></a>
+                            <a href="#deleteEmployeeModal" class="action" data-toggle="modal" data-toggle="tooltip" title="Ver Estatísticas"><i data-feather="eye" ></i></a>
                         </td>
                     </tr>
                 `
             }
         }
-        
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
         feather.replace()
         ativaCheckboxes()
     })
@@ -5775,14 +5784,16 @@ function dadosInfoEscola() {
                         <td></td>
                         <td>${curso.codCurso}</td>
                         <td>
-                            <a href="#modalAdicionaCurso" onclick="carregaDadosCurso('${curso.codSistema}')" class="edit" data-toggle="modal"><i data-feather="edit" data-toggle="tooltip" title="Editar curso">&#xE254;</i></a>
-                            <a href="#deleteEmployeeModal" class="action" data-toggle="modal"><i data-feather="eye" data-toggle="tooltip" title="Ver Estatísticas"></i></a>
+                            <a data-toggle="modal" href="#modalAdicionaCurso" onclick="carregaDadosCurso('${curso.codSistema}')" class="edit" data-toggle="tooltip" title="Editar curso"><i data-feather="edit">&#xE254;</i></a>
+                            <a href="#deleteEmployeeModal" class="action" data-toggle="tooltip" title="Ver Estatísticas"><i data-feather="eye"></i></a>
                         </td>
                     </tr>
                 `
             }
         }
-        
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
         feather.replace()
         ativaCheckboxes()
     })
@@ -5806,13 +5817,15 @@ function dadosInfoEscola() {
                         <td>${checklist.qtdeChecklist}</td>
                         <td>
                             
-                            <a href="#deleteEmployeeModal" class="action" data-toggle="modal"><i data-feather="eye" data-toggle="tooltip" title="Ver Estatísticas"></i></a>
+                            <a href="#deleteEmployeeModal" class="action" data-toggle="tooltip" title="Ver Estatísticas"><i data-feather="eye" ></i></a>
                         </td>
                     </tr>
                 `
             }
         }
-        
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
         feather.replace()
         ativaCheckboxes()
     })
@@ -5842,7 +5855,9 @@ function dadosInfoEscola() {
                 `
             }
         }
-        
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
         feather.replace()
         ativaCheckboxes()
     })
@@ -6268,8 +6283,8 @@ async function abaPreMatriculas() {
                         <td>${preMatricula.celularAluno}</td>
                         <td>
                             
-                            <a style="cursor: pointer;" class="edit" id="${key}" name="editaPreMatricula"><i data-feather="edit" data-toggle="tooltip" title="Editar dados"></i></a>
-                            <a style="cursor: pointer;" id="${key}" name="deletaPreMatricula" class="delete"><i data-feather="user-x" data-toggle="tooltip" title="Apagar matrícula"></i></a>
+                            <a style="cursor: pointer;" class="edit" id="${key}" name="editaPreMatricula" data-toggle="tooltip" title="Editar dados"><i data-feather="edit"></i></a>
+                            <a style="cursor: pointer;" id="${key}" name="deletaPreMatricula" class="delete" data-toggle="tooltip" title="Apagar matrícula"><i data-feather="user-x"></i></a>
                             
                         </td>
                     </tr>`

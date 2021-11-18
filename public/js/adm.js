@@ -1897,8 +1897,16 @@ async function carregaFinanceiro() {
     let cursos = cursosFirebase.val()
     let listaPlanosCurso = document.getElementById('listaPlanosCurso')
     let listaCursos = document.getElementById('listaCursos')
+    let cursoAtual
     console.log(cursos)
     mostraCursos(cursos)
+
+    async function refresh() {
+        loaderRun(true, 'Atualizando planos...')
+        cursos = (await cursosRef.once('value')).val()
+        loaderRun()
+        return ;
+    }
     
     function mostraCursos(cursos) {
         
@@ -1935,16 +1943,57 @@ async function carregaFinanceiro() {
                     <td>${plano.valorFinal}</td>
                     <td>${plano.adesoes == undefined ? 0 : plano.adesoes}</td>
                     <td>
-                        <a href="#editEmployeeModal" class="action" data-toggle="modal"><i data-feather="edit" data-toggle="tooltip" title="Reativar aluno">&#xE254;</i></a>
-                        <a href="#deleteEmployeeModal" class="delete" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Deletar">&#xE872;</i></a>
+                        <a href="#editEmployeeModal" id="${key}" name="deletePlan" class="delete" data-toggle="tooltip" title="Deletar plano"><i id="${key}" data-feather="trash"></i></a>
+                        <!--<a href="#deleteEmployeeModal" class="delete" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Deletar">&#xE872;</i></a>-->
                     </td>
                 </tr>
                 `
                 c++
             }
         }
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
+        feather.replace()
         
+        document.getElementsByName('deletePlan').forEach(elem => {
+            elem.addEventListener('click', (e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                e.stopImmediatePropagation()
+                let key = e.target.id
+                if (key != '') {
+                    console.log(key)
+                    deletaPlano(key)
+                }
+                
+            })
+        })
     }
+
+    async function deletaPlano(key) {
+        console.log(key)
+        const confirm = await ui.confirm('Você confirma a exclusão desse plano? Esta ação não é reversível');
+        if (confirm) {
+            try {
+                loaderRun(true, 'Excluindo plano...')
+                await cursosRef.child(cursoAtual).child('planos').child(key).remove()
+                AstNotif.notify('Sucesso', 'Plano deletado com sucesso', 'agora')
+                await refresh()
+                mostraPlanos(cursoAtual)
+                loaderRun()
+            } catch (error) {
+                AstNotif.dialog('Erro', error.message)
+                console.log(error)
+                loaderRun()
+            }
+        }
+        
+        
+
+    }
+
+    
     
     document.getElementById('btnAddPlano').addEventListener('click', (e) => {
         if (listaCursos.value == '') {
@@ -2241,10 +2290,12 @@ async function carregaFinanceiro() {
                 })
                 data.codCurso = codSistema
                 console.log(data)
-                cursosRef.child(listaCursos.value + '/planos').push(data).then(() => {
+                cursosRef.child(listaCursos.value + '/planos').push(data).then(async () => {
                     loaderRun()
                     AstNotif.notify('Sucesso', 'Dados enviados com sucesso!')
                     $('#modal').modal('hide')
+                    await refresh()
+                    mostraPlanos(cursoAtual)
                 }).catch(error => {
                     AstNotif.dialog('Erro', error.message)
                 })
@@ -2257,6 +2308,7 @@ async function carregaFinanceiro() {
 
     listaCursos.addEventListener('change', (e) => {
         let codSistema = e.target.value
+        cursoAtual = codSistema
         mostraPlanos(codSistema)
     })
 

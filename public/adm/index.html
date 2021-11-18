@@ -31,7 +31,17 @@
   </head>
 
   <body>
-
+    <div class="confirm">
+      <div></div>
+      <div>
+        <div id="confirmMessage"></div>
+        <div>
+          <input id="confirmYes" type="button" value="Sim" />
+          <input id="confirmNo" type="button" value="Não" />
+        </div>
+      </div>
+    </div>
+    
     <div class="modal fade bd-example-modal-xl" tabindex="-1" role="dialog" id="modal">
       <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
@@ -821,7 +831,7 @@
                                     
                           </div>
                           <div class="col-auto">
-                            <button class="btn btn-danger" id="btnDeletaPlano">&nbsp; <span class="feather-24" data-feather="trash-2"></span><span>Deletar plano</span></button>
+                            <!-- <button class="btn btn-danger" id="btnDeletaPlano">&nbsp; <span class="feather-24" data-feather="trash-2"></span><span>Deletar plano</span></button> -->
                             <button type="submit" class="btn btn-primary" id="btnAddPlano">&nbsp; <span class="feather-24" data-feather="plus"></span>Adicionar plano<span></span></button>
                           </div>
                           
@@ -846,9 +856,9 @@
                           
                         </tbody>
                       </table>
-                      <div class="clearfix">
+                      <!-- <div class="clearfix">
                         <div class="hint-text"><label id="mostraQtdeAlunosTurma">0</label> alunos <input id="qtdeAlunosTurma" name="qtdeAlunosTurma" type="number" style="visibility: hidden;" ><input id="codTurmaAlunos" name="codTurmaAlunos" type="text" style="visibility: hidden;" ></div>
-                        <!--
+                        
                         <ul class="pagination">
                           <li class="page-item disabled"><a href="#">Previous</a></li>
                           <li class="page-item"><a href="#" class="page-link">1</a></li>
@@ -858,8 +868,8 @@
                           <li class="page-item"><a href="#" class="page-link">5</a></li>
                           <li class="page-item"><a href="#" class="page-link">Next</a></li>
                         </ul>
-                        -->
-                      </div>
+                        
+                      </div> -->
                     </div>
                   </div>
                 </div>
