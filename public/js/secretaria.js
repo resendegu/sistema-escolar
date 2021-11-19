@@ -4148,93 +4148,98 @@ function abreDadosDoAluno(matricula, desativado=false, notasDesativado=false) {
     document.getElementById('mostraEnderecoAluno').innerText = `${dados.enderecoAluno}, ${dados.numeroAluno}, ${dados.bairroAluno}, ${dados.cidadeAluno}, ${dados.estadoAluno}. CEP ${dados.cepAluno}.`
     document.getElementById('rolaTelaAbaixoAlunos').focus()
     document.getElementById('rolaTelaAbaixoAlunos').style.display = 'none'
-    turmasRef.child(`${dados.turmaAluno}/alunos/${matricula}/notas`).once('value').then(snapshot => {
-        turmasRef.child(`${dados.turmaAluno}/notas`).once('value').then(notasReferencia => {
-            let notas = snapshot.val()
-            let referenciaDeNotas = notasReferencia.val()
-            if (desativado != false) {
-                notas = notasDesativado
-            }
-            console.log(notas)
-            let notasDoAlunoDiv = document.getElementById('notasDoAluno')
-            notasDoAlunoDiv.innerHTML = ''
-            //let somatorioNotasDiv = document.getElementById('somatorioNotas')
-            if (notas == null) {
-                notasDoAlunoDiv.innerHTML = 'Nenhuma nota foi lançada para este aluno'
-            }
-            let somatorioNotas = 0
-            for (const nomeNota in notas) {
-                if (Object.hasOwnProperty.call(notas, nomeNota)) {
-                    const valorNota = notas[nomeNota];
-                    const barra = (100*valorNota)/referenciaDeNotas[nomeNota]
-                    somatorioNotas += valorNota
-                    notasDoAlunoDiv.innerHTML += `
-                    
-                    <small id="nomeNota${nomeNota}"><b>${nomeNota}</b>: ${valorNota}</small><small id="notaReferencia">/${referenciaDeNotas[nomeNota]}</small>
-                    <div class="progress mb-3" style="height: 10px">
-                    <div class="progress-bar bg-primary" role="progressbar" style="width: ${barra}%" aria-valuenow="${valorNota}" aria-valuemin="0" aria-valuemax="${referenciaDeNotas[nomeNota]}">${valorNota}</div>
-                    </div>
-                    `
-                    
+    if (!desativado) {
+        turmasRef.child(`${dados.turmaAluno}/alunos/${matricula}/notas`).once('value').then(snapshot => {
+            turmasRef.child(`${dados.turmaAluno}/notas`).once('value').then(notasReferencia => {
+                let notas = snapshot.val()
+                let referenciaDeNotas = notasReferencia.val()
+                if (desativado != false) {
+                    notas = notasDesativado
                 }
-            }
-            notasDoAlunoDiv.innerHTML += `<div id="somatorioNotas">Somatório: <b>${somatorioNotas}</b>/100</div>`
-
-            /*document.getElementById('pontosAudicao').innerText = notas.audicao
-            document.getElementById('pontosFala').innerText = notas.fala
-            document.getElementById('pontosEscrita').innerText = notas.escrita
-            document.getElementById('pontosLeitura').innerText = notas.leitura
-            document.getElementById('barraPontosAudicao').style.width = notas.audicao * 20 + '%'
-            document.getElementById('barraPontosFala').style.width = notas.fala * 20 + '%'
-            document.getElementById('barraPontosEscrita').style.width = notas.escrita * 20 + '%'
-            document.getElementById('barraPontosLeitura').style.width = notas.leitura * 20 + '%'*/
-        }).catch(error => {
-            AstNotif.dialog('Erro', error.message)
-            console.log(error)
-        })
-        
-    }).catch(error => {
-        AstNotif.dialog('Erro', error.message)
-        console.log(error)
-    })
-
-    turmasRef.child(`${dados.turmaAluno}/alunos/${matricula}/desempenho`).on('value', (desempenho) => {
-        desempenhoRef.once('value').then(referenciaDesempenho => {
-            let notas = desempenho.val()
-            let referenciaDeNotas = referenciaDesempenho.val()
-            console.log(notas)
-            let notasDoAlunoDiv = document.getElementById('desempenhoAluno')
-            notasDoAlunoDiv.innerHTML = ''
-            //let somatorioNotasDiv = document.getElementById('somatorioNotas')
-            if (notas == null) {
-                notasDoAlunoDiv.innerHTML = 'Nenhuma nota de desempenho foi lançada para este aluno'
-            }
-            let somatorioNotas = 0
-            for (const nomeNota in notas) {
-                if (Object.hasOwnProperty.call(notas, nomeNota)) {
-                    const valorNota = notas[nomeNota];
-                    const barra = (100*valorNota)/referenciaDeNotas[nomeNota]
-                    somatorioNotas += valorNota
-                    notasDoAlunoDiv.innerHTML += `
-                    
-                    <small id="nomeDesempenho${nomeNota}"><b>${nomeNota}</b>: ${valorNota}</small><small id="notaReferencia">/${referenciaDeNotas[nomeNota]}</small>
-                    <div class="progress mb-3" style="height: 10px">
-                    <div class="progress-bar bg-primary" role="progressbar" style="width: ${barra}%" aria-valuenow="${valorNota}" aria-valuemin="0" aria-valuemax="${referenciaDeNotas[nomeNota]}">${valorNota}</div>
-                    </div>
-                    `
-                    
+                console.log(notas)
+                let notasDoAlunoDiv = document.getElementById('notasDoAluno')
+                notasDoAlunoDiv.innerHTML = ''
+                //let somatorioNotasDiv = document.getElementById('somatorioNotas')
+                if (notas == null) {
+                    notasDoAlunoDiv.innerHTML = 'Nenhuma nota foi lançada para este aluno'
                 }
-            }
-            
-            notasDoAlunoDiv.innerHTML += `<div id="somatorioNotas">Somatório: <b>${somatorioNotas}</b></div>`
+                let somatorioNotas = 0
+                for (const nomeNota in notas) {
+                    if (Object.hasOwnProperty.call(notas, nomeNota)) {
+                        const valorNota = notas[nomeNota];
+                        const barra = (100*valorNota)/referenciaDeNotas[nomeNota]
+                        somatorioNotas += valorNota
+                        notasDoAlunoDiv.innerHTML += `
+                        
+                        <small id="nomeNota${nomeNota}"><b>${nomeNota}</b>: ${valorNota}</small><small id="notaReferencia">/${referenciaDeNotas[nomeNota]}</small>
+                        <div class="progress mb-3" style="height: 10px">
+                        <div class="progress-bar bg-primary" role="progressbar" style="width: ${barra}%" aria-valuenow="${valorNota}" aria-valuemin="0" aria-valuemax="${referenciaDeNotas[nomeNota]}">${valorNota}</div>
+                        </div>
+                        `
+                        
+                    }
+                }
+                notasDoAlunoDiv.innerHTML += `<div id="somatorioNotas">Somatório: <b>${somatorioNotas}</b>/100</div>`
 
+                /*document.getElementById('pontosAudicao').innerText = notas.audicao
+                document.getElementById('pontosFala').innerText = notas.fala
+                document.getElementById('pontosEscrita').innerText = notas.escrita
+                document.getElementById('pontosLeitura').innerText = notas.leitura
+                document.getElementById('barraPontosAudicao').style.width = notas.audicao * 20 + '%'
+                document.getElementById('barraPontosFala').style.width = notas.fala * 20 + '%'
+                document.getElementById('barraPontosEscrita').style.width = notas.escrita * 20 + '%'
+                document.getElementById('barraPontosLeitura').style.width = notas.leitura * 20 + '%'*/
+            }).catch(error => {
+                AstNotif.dialog('Erro', error.message)
+                console.log(error)
+            })
             
         }).catch(error => {
             AstNotif.dialog('Erro', error.message)
             console.log(error)
         })
-        
-    })
+    }
+
+    if (!desativado) {
+        turmasRef.child(`${dados.turmaAluno}/alunos/${matricula}/desempenho`).on('value', (desempenho) => {
+            desempenhoRef.once('value').then(referenciaDesempenho => {
+                let notas = desempenho.val()
+                let referenciaDeNotas = referenciaDesempenho.val()
+                console.log(notas)
+                let notasDoAlunoDiv = document.getElementById('desempenhoAluno')
+                notasDoAlunoDiv.innerHTML = ''
+                //let somatorioNotasDiv = document.getElementById('somatorioNotas')
+                if (notas == null) {
+                    notasDoAlunoDiv.innerHTML = 'Nenhuma nota de desempenho foi lançada para este aluno'
+                }
+                let somatorioNotas = 0
+                for (const nomeNota in notas) {
+                    if (Object.hasOwnProperty.call(notas, nomeNota)) {
+                        const valorNota = notas[nomeNota];
+                        const barra = (100*valorNota)/referenciaDeNotas[nomeNota]
+                        somatorioNotas += valorNota
+                        notasDoAlunoDiv.innerHTML += `
+                        
+                        <small id="nomeDesempenho${nomeNota}"><b>${nomeNota}</b>: ${valorNota}</small><small id="notaReferencia">/${referenciaDeNotas[nomeNota]}</small>
+                        <div class="progress mb-3" style="height: 10px">
+                        <div class="progress-bar bg-primary" role="progressbar" style="width: ${barra}%" aria-valuenow="${valorNota}" aria-valuemin="0" aria-valuemax="${referenciaDeNotas[nomeNota]}">${valorNota}</div>
+                        </div>
+                        `
+                        
+                    }
+                }
+                
+                notasDoAlunoDiv.innerHTML += `<div id="somatorioNotas">Somatório: <b>${somatorioNotas}</b></div>`
+    
+                
+            }).catch(error => {
+                AstNotif.dialog('Erro', error.message)
+                console.log(error)
+            })
+            
+        })
+    }
+    
 }
 
 function alteraNotasDesempenho(confirma=false) {
