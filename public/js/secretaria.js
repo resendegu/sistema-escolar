@@ -5605,12 +5605,15 @@ function alteraTipoDeBuscaDesativados(tipo) {
 // Aba de Informações da Escola
 
 function dadosInfoEscola() {
+    
+
     let listaLivros = document.getElementById('listaLivros')
     let listaCursos = document.getElementById('listaCursos')
     let listaChecklist = document.getElementById('listaChecklist')
     let listaChecklistAcompanhamento = document.getElementById('listaChecklistAcompanhamento')
     let horarioComercial
     infoEscolaRef.once('value').then(snapshot => {
+        document.getElementById('addHorarioComercial').removeEventListener('click', addHorario)
         let dados = snapshot.val()
         if (dados != null) {
             for (const key in dados.dadosBasicos) {
@@ -5623,15 +5626,22 @@ function dadosInfoEscola() {
                     }
                 }
             }
-            horarioComercial = dados.dadosBasicos.horarioComercial
+            if (dados.dadosBasicos.hasOwnProperty('horarioComercial')) {
+                horarioComercial = dados.dadosBasicos.horarioComercial
+            } else {
+                horarioComercial = []
+            }
+            
             let divHorarioComercial = document.getElementById('horarioComercial');
             divHorarioComercial.innerHTML = ''
+
             let c = horarioComercial.length
             horarioComercial.map((horario, i) => {
                 divHorarioComercial.innerHTML += `
                 <div class="row" id="horarioComercialRow${i}">
                     <div class="col-auto">
                         <div class="form-group">
+                            <label class="h5">Horário ${i + 1}</label>
                             <label for="exampleInputPassword1">Dias da semana:</label>
                             <br>
                             <input type="checkbox" id="dom|${i}" value="0" ${horario.daysOfWeek.indexOf('0') != -1 && 'checked'} name="dias|${i}">
@@ -5671,19 +5681,26 @@ function dadosInfoEscola() {
                             </div>
                             <input type="time" id="endTime|${i}" required name="endTime|${i}" class="form-control" value="${horario.endTime}">
                             &nbsp;&nbsp;
-                            <a class="btn btn-warning" id="removeHorario|${i}" onclick="$('#horarioComercialRow${i}').remove()">Excluir horário</a>
+                            <a class="btn btn-warning" id="removeHorario|${i}" onclick="c--, $('#horarioComercialRow${i}').remove()">Excluir horário</a>
                         </div>
                         
                     </div>
                     </div>
+                    
                 </div>
+                
                 `
             })
-            document.getElementById('addHorarioComercial').addEventListener('click', (e) => {
+            
+            document.getElementById('addHorarioComercial').addEventListener('click', addHorario)
+            
+ 
+            function addHorario(e) {
                 let newField = new DOMParser().parseFromString(`
                 <div class="row" id="horarioComercialRow${c}">
                     <div class="col-auto">
                         <div class="form-group">
+                        <label class="h5">Horário ${c + 1}</label>
                             <label for="exampleInputPassword1">Dias da semana:</label>
                             <br>
                             <input type="checkbox" id="dom|${c}" value="0" name="dias|${c}">
@@ -5723,15 +5740,32 @@ function dadosInfoEscola() {
                             </div>
                             <input type="time" id="endTime|${c}" required name="endTime|${c}" class="form-control">
                             &nbsp;&nbsp;
-                            <a class="btn btn-warning" id="removeHorario|${c}" onclick="$('#horarioComercialRow${c}').remove()">Excluir horário</a>
+                            <a class="btn btn-warning" id="removeHorario|${c}" name="removeHorario" >Excluir horário</a>
                         </div>
                         
                     </div>
                     </div>
                 </div>
+                
                 `, 'text/html')
                 divHorarioComercial.appendChild(newField.body)
                 c++
+                let removeButtons = document.getElementsByName('removeHorario')
+                removeButtons.forEach(elem => {
+                    elem.addEventListener('click', (e) => {
+                        c--
+                        c = c < 0 ? 0 : c
+                        $('#horarioComercialRow' + e.target.id.split('|')[1]).remove();
+                    })
+                })
+            }
+
+            let removeButtons = document.getElementsByName('removeHorario')
+            removeButtons.forEach(elem => {
+                elem.addEventListener('click', (e) => {
+                    c--
+                    $('#horarioComercialRow' + e.target.id.split('|')[1]).remove();
+                })
             })
         }  
     }).catch(error => {
