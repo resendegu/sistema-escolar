@@ -309,9 +309,14 @@
                     <input type="number" required class="form-control" id="qtdeChecklistAdd" name="qtdeChecklistAdd" placeholder="Quantidade de checklists">
                     <small id="qtdeChecklistHElp" class="form-text text-muted">Quantidade de vezes que esse checklist se repete.</small>
                 </div>
+                <div class="form-group col-md-6">
+                  <label for="inputPassword4">Cod. do Sistema</label>
+                    <input type="text" readonly class="form-control" id="codChecklist" name="codChecklist" placeholder="Quantidade de checklists">
+                    <small id="qtdeChecklistHElp" class="form-text text-muted">Código interno de controle do sistema.</small>
+                </div>
               </div>
               
-              <button type="submit" class="btn btn-primary btn-block">Adicionar</button>
+              <button type="submit" class="btn btn-primary btn-block">Salvar</button>
             </form>
           </div>
           <div class="modal-footer" id="botoesAddChecklist">
@@ -351,6 +356,11 @@
                     <input type="number" required class="form-control" id="qtdeChecklistAcompanhamentoAdd" name="qtdeChecklistAcompanhamentoAdd" placeholder="Quantidade de checklists">
                     <small id="qtdeChecklistHElp" class="form-text text-muted">Quantidade de vezes que esse checklist se repete.</small>
                 </div>
+                <div class="form-group col-md-6">
+                  <label for="inputPassword4">Cod. do Sistema</label>
+                    <input type="text" readonly class="form-control" id="codChecklistAcompanhamento" name="codChecklistAcompanhamento" placeholder="Quantidade de checklists">
+                    <small id="qtdeChecklistHElp" class="form-text text-muted">Código interno de controle do sistema.</small>
+                </div>
               </div>
               <div class="form-row">
                 <div class="form-group col-md-3">
@@ -370,7 +380,7 @@
                 </div>
               </div>
               
-              <button type="submit" class="btn btn-primary btn-block">Adicionar</button>
+              <button type="submit" class="btn btn-primary btn-block">Salvar</button>
             </form>
           </div>
           <div class="modal-footer" id="botoesAddChecklist">
@@ -2799,7 +2809,7 @@
                             <h2><b>Checklist Sequencial</b></h2>
                           </div>
                           <div class="col-sm-6">
-                            <a href="#modalAdicionaChecklist" class="btn btn-primary" data-toggle="modal">&nbsp; <span class="feather-24" data-feather="plus"></span><span>Adicionar</span></a>
+                            <a href="#modalAdicionaChecklist" class="btn btn-primary" data-toggle="modal">&nbsp; <span class="feather-24" data-feather="plus" id="modalChecklist"></span><span>Adicionar</span></a>
                             <button type="submit" class="btn btn-danger" data-toggle="modal">&nbsp;<span class="feather-24" data-feather="trash"></span> <span>Deletar</span></button>						
                           </div>
                         </div>
@@ -2850,7 +2860,8 @@
                             <h2><b>Checklist de Acompanhamento</b></h2>
                           </div>
                           <div class="col-sm-6">
-                            <a href="#modalAdicionaChecklistAcompanhamento" class="btn btn-primary" data-toggle="modal">&nbsp; <span class="feather-24" data-feather="plus"></span><span>Adicionar</span></a>
+                            <a href="#modalAdicionaChecklistAcompanhamento" class="btn btn-primary" data-toggle="modal">&nbsp; <span class="feather-24" data-feather="plus"
+                            id="modalChecklistAcompanhamento"></span><span>Adicionar</span></a>
                             <button type="submit" class="btn btn-danger" data-toggle="modal">&nbsp;<span class="feather-24" data-feather="trash"></span> <span>Deletar</span></button>						
                           </div>
                         </div>

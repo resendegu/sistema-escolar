@@ -5855,8 +5855,8 @@ function dadosInfoEscola() {
                         <td>${checklist.nomeChecklist}</td>
                         <td>${checklist.qtdeChecklist}</td>
                         <td>
-                            
-                            <a href="#deleteEmployeeModal" class="action" data-toggle="tooltip" title="Ver Estatísticas"><i data-feather="eye" ></i></a>
+                            <a href="#modalAdicionaChecklist" data-toggle="modal" onclick="carregaDadosChecklist('${key}')" class="edit"><i data-feather="edit" data-toggle="tooltip" title="Editar checklist"></i></a>
+                            <a href="#deleteEmployeeModal" class="action" data-toggle="tooltip" title="Ver Estatísticas"><i data-feather="eye"></i></a>
                         </td>
                     </tr>
                 `
@@ -5887,8 +5887,8 @@ function dadosInfoEscola() {
                         <td>${checklist.nomeChecklist}</td>
                         <td>${checklist.qtdeChecklist}</td>
                         <td>
-                            
-                            <a href="#deleteEmployeeModal" class="action" data-toggle="modal"><i data-feather="eye" data-toggle="tooltip" title="Ver Estatísticas"></i></a>
+                            <a href="#modalAdicionaChecklistAcompanhamento" data-toggle="modal" onclick="carregaDadosChecklistAcompanhamento('${key}')" class="edit"><i data-feather="edit" data-toggle="tooltip" title="Editar checklist"></i></a>
+                            <a href="#deleteEmployeeModal" class="action"><i data-feather="eye" data-toggle="tooltip" title="Ver Estatísticas"></i></a>
                         </td>
                     </tr>
                 `
@@ -5910,7 +5910,13 @@ function dadosInfoEscola() {
         });
     })
 
+    document.getElementById('modalChecklist').addEventListener('click', (e) => {
+        document.getElementById('addChecklistTabela').reset()
+    })
 
+    document.getElementById('modalChecklistAcompanhamento').addEventListener('click', (e) => {
+        document.getElementById('addChecklistAcompanhamentoTabela').reset()
+    })
     
 }
 
@@ -5928,6 +5934,29 @@ function carregaDadosCurso(codSistema) {
         document.getElementById('nomeCursoAdd').value = snapshot.val().nomeCurso
         document.getElementById('codigoCursoAdd').value = snapshot.val().codCurso
         document.getElementById('codigoCursoSistemaAdd').value = snapshot.val().codSistema
+    })
+}
+
+function carregaDadosChecklist(codSistema) {
+    infoEscolaRef.child('checklist/' + codSistema).once('value').then(snapshot => {
+        document.getElementById('topicoChecklistAdd').value = snapshot.val().topicoChecklist
+        document.getElementById('nomeChecklistAdd').value = snapshot.val().nomeChecklist
+        document.getElementById('qtdeChecklistAdd').value = snapshot.val().qtdeChecklist
+        document.getElementById('codChecklist').value = snapshot.key
+
+    })
+}
+
+function carregaDadosChecklistAcompanhamento(codSistema) {
+    infoEscolaRef.child('checklistAcompanhamento/' + codSistema).once('value').then(snapshot => {
+        document.getElementById('topicoChecklistAcompanhamentoAdd').value = snapshot.val().topicoChecklist
+        document.getElementById('nomeChecklistAcompanhamentoAdd').value = snapshot.val().nomeChecklist
+        document.getElementById('qtdeChecklistAcompanhamentoAdd').value = snapshot.val().qtdeChecklist
+        document.getElementById('situacao1Add').value = snapshot.val().situacao1
+        document.getElementById('situacao2Add').value = snapshot.val().situacao2
+        document.getElementById('situacao3Add').value = snapshot.val().situacao3
+        document.getElementById('codChecklistAcompanhamento').value = snapshot.key
+
     })
 }
 
@@ -6159,16 +6188,34 @@ document.getElementById('addChecklistTabela').addEventListener('submit', (e) => 
     checklist.topicoChecklist = dados.get('topicoChecklistAdd')
     checklist.nomeChecklist = dados.get('nomeChecklistAdd')
     checklist.qtdeChecklist = dados.get('qtdeChecklistAdd')
+    let codChecklist = dados.get('codChecklist')
     loaderRun(true, 'Enviando dados do Checklist...')
-    infoEscolaRef.child('checklist').push(checklist).then(() => {
-        AstNotif.notify('Checklist Adicionado', 'Checklist adicionado com sucesso', 'agora', {length: 5000})
-        $('#modalAdicionaChecklist').modal('hide')
-        loaderRun()
-    }).catch(error => {
-        AstNotif.dialog('Erro', error.message)
-        console.log(error)
-        loaderRun()
-    })
+
+    if (codChecklist == '') {
+        infoEscolaRef.child('checklist').push(checklist).then(() => {
+            AstNotif.notify('Checklist Adicionado', 'Checklist adicionado com sucesso', 'agora', {length: 5000})
+            $('#modalAdicionaChecklist').modal('hide')
+            loaderRun()
+        }).catch(error => {
+            
+            AstNotif.dialog('Erro', error.message)
+            console.log(error)
+            loaderRun()
+        })
+    } else {
+        infoEscolaRef.child('checklist/' + codChecklist).set(checklist).then(() => {
+            AstNotif.notify('Checklist Editado', 'Checklist editado com sucesso', 'agora', {length: 5000})
+            document.getElementById('addChecklistTabela').reset()
+            $('#modalAdicionaChecklist').modal('hide')
+            loaderRun()
+        }).catch(error => {
+            AstNotif.dialog('Erro', error.message)
+            console.log(error)
+            loaderRun()
+        })
+    }
+    
+    
 })
 
 document.getElementById('formListaChecklist').addEventListener('submit', (e) => {
@@ -6213,16 +6260,32 @@ document.getElementById('addChecklistAcompanhamentoTabela').addEventListener('su
     checklist.situacao1 = dados.get('situacao1Add')
     checklist.situacao2 = dados.get('situacao2Add')
     checklist.situacao3 = dados.get('situacao3Add')
+    let codChecklist = dados.get('codChecklistAcompanhamento')
+
+    if (codChecklist == '') {
+        infoEscolaRef.child('checklistAcompanhamento').push(checklist).then(() => {
+            AstNotif.notify('Checklist Adicionado', 'Checklist adicionado com sucesso', 'agora', {length: 5000})
+            $('#modalAdicionaChecklistAcompanhamento').modal('hide')
+            loaderRun()
+        }).catch(error => {
+            AstNotif.dialog('Erro', error.message)
+            console.log(error)
+            loaderRun()
+        })
+    } else {
+        infoEscolaRef.child('checklistAcompanhamento/' + codChecklist).set(checklist).then(() => {
+            AstNotif.notify('Checklist Editado', 'Checklist editado com sucesso', 'agora', {length: 5000})
+            document.getElementById('addChecklistTabela').reset()
+            $('#modalAdicionaChecklistAcompanhamento').modal('hide')
+            loaderRun()
+        }).catch(error => {
+            AstNotif.dialog('Erro', error.message)
+            console.log(error)
+            loaderRun()
+        })
+    }
     loaderRun(true, 'Enviando dados do Checklist...')
-    infoEscolaRef.child('checklistAcompanhamento').push(checklist).then(() => {
-        AstNotif.notify('Checklist Adicionado', 'Checklist adicionado com sucesso', 'agora', {length: 5000})
-        $('#modalAdicionaChecklistAcompanhamento').modal('hide')
-        loaderRun()
-    }).catch(error => {
-        AstNotif.dialog('Erro', error.message)
-        console.log(error)
-        loaderRun()
-    })
+    
 })
 
 document.getElementById('formListaChecklistAcompanhamento').addEventListener('submit', (e) => {
