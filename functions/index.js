@@ -205,6 +205,7 @@ exports.cadastroUser = functions.auth.user().onCreate((user) => {
     dadosNoBanco.set({
         nome: user.displayName,
         email: user.email,
+        
         timestamp: admin.firestore.Timestamp.now()
     }).then(() => {
 
@@ -815,7 +816,7 @@ exports.ativaDesativaAlunos = functions.https.onCall((data, context) => {
                         await admin.database().ref(`sistemaEscolar/alunos/${matricula}`).once('value').then(snapshot => {
                             dadosAluno = snapshot.val()
                             console.log(dadosAluno)
-
+                            turma = dadosAluno.turmaAluno
                             admin.database().ref(`sistemaEscolar/turmas/${turma}/alunos/${matricula}/`).once('value').then(snapshotTurma => {
                                 dadosTurma = snapshotTurma.val()
 
@@ -1231,6 +1232,14 @@ exports.alteracaoDados = functions.database.ref('sistemaEscolar/alunos/{matricul
     functions.logger.log(snapshot.after.val())
 })
 
+exports.systemUpdate = functions.pubsub.schedule('every sunday 03:00')
+  .timeZone('America/Sao_Paulo') // Users can choose timezone - default is America/Los_Angeles
+  .onRun((context) => {
+    let aniversariantesRef = admin.database().ref('sistemaEscolar/aniversariantes')
+    let alunosRef = admin.database().ref('sistemaEscolar/alunos')
+    let alunosRef = admin.database().ref('sistemaEscolar/alunos')
+  return null;
+});
 // exports.adicionaFotoAluno = functions.storage.object().onFinalize(async (object) => {
 //     const fileBucket = object.bucket; // The Storage bucket that contains the file.
 //     const filePath = object.name; // File path in the bucket.
