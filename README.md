@@ -1,3 +1,6 @@
+# Atenção: versão descontinuada
+Uma nova versão deste sistema utilizando ReactJS + MaterialUI está sendo desenvolvida [aqui](https://github.com/GrupoProX/sistema-escolar-react). Você pode utilizar este código da maneira que achar melhor, mas saiba que nossos esforços estarão voltados para o novo projeto.
+
 # Sistema de gestão escolar
 
 Um sistema de gestão escolar, indicado para **escolas de idiomas e cursos livres**, feito com HTML5 e CSS3, JavaScript, Bootstrap 4. O [Firebase](https://firebase.google.com) é utilizado como hospedagem, backend e demais funcionalidades. *O firebase possui cotas gratuitas generosas, confira-as no site do Firebase*.
